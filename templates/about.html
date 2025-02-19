@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - AI Emotion Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 🔵 Animated Background Gradient */
+        @keyframes animatedBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 🌟 Neon Title */
+        .neon-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            animation: glow 2s infinite alternate;
+            text-shadow: 0 0 15px #00b7ff, 0 0 25px #00b7ff;
+        }
+
+        /* Section Styling */
+        .section-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Table Styling */
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .styled-table th, .styled-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .styled-table th {
+            background: rgba(0, 183, 255, 0.2);
+        }
+
+        /* Cards */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+        }
+
+        /* 🌟 Neon Title */
+        .neon-text {
+            font-size: 2.8rem;
+            font-weight: bold;
+            animation: glow 2s infinite alternate;
+            text-shadow: 0 0 20px #00b7ff, 0 0 30px #00b7ff;
+        }
+
+        /* 🌀 Section Styling */
+        .section-container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .section-container:hover {
+            transform: scale(1.02);
+        }
+
+        /* 🌟 Feature Card Hover Effect */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 183, 255, 0.4);
+        }
+
+        /* 🎯 Table Hover */
+        .styled-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* 🚀 Glowing Button */
+        .glow-button {
+            background: linear-gradient(45deg, #00b7ff, #0072ff);
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease-in-out;
+            text-transform: uppercase;
+        }
+
+        .glow-button:hover {
+            box-shadow: 0 0 20px #00b7ff, 0 0 40px #0072ff;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="text-white bg-gray-900">
+
+    {% include 'header.html' %}
+
+    <!-- 🔥 Floating Particles -->
+    <div class="floating" style="top: 20%; left: 10%; animation-duration: 6s;"></div>
+
+    <!-- 📌 About Section -->
+    <section class="section-container text-center">
+        <h1 class="neon-text">About AI Emotion Detection</h1>
+        <p class="text-lg mt-4">
+            AI Emotion Detection is a deep learning project that uses **facial recognition and multimodal learning** to detect emotions. It provides personalized interactions through **music recommendations and chatbot responses** based on user mood.
+        </p>
+        <table class="styled-table mt-6">
+            <tr>
+                <th>Feature</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Real-Time Emotion Analysis</td>
+                <td>Detects emotions from facial expressions instantly</td>
+            </tr>
+            <tr>
+                <td>Music Recommendation</td>
+                <td>Suggests songs based on detected mood</td>
+            </tr>
+            <tr>
+                <td>Chatbot Integration</td>
+                <td>Interacts with users based on their emotions</td>
+            </tr>
+        </table>
+    </section>
+
+    <!-- 📌 Key Features Section -->
+    <section class="section-container">
+        <h2 class="text-2xl font-bold text-center mb-6">🔹 Key Features</h2>
+        <div class="grid grid-cols-2 gap-6">
+            <div class="feature-card">
+                <h3 class="text-xl font-semibold">🎭 Facial Expression Tracking</h3>
+                <p class="mt-2">Captures subtle changes in emotions using facial landmarks.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="text-xl font-semibold">🎵 AI-Powered Music</h3>
+                <p class="mt-2">Automatically plays songs based on your mood.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="text-xl font-semibold">💬 AI Chatbot</h3>
+                <p class="mt-2">Engages in meaningful conversations based on emotional state.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="text-xl font-semibold">📈 Mental Health Insights</h3>
+                <p class="mt-2">Analyzes emotional trends for stress & well-being tracking.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 📌 How It Works -->
+    <section class="section-container text-center">
+        <h2 class="text-2xl font-bold">🎥 How It Works</h2>
+        <p class="text-lg mt-4">
+            The system **analyzes facial landmarks** using AI and classifies emotions based on muscle movement and gaze patterns. Then, it:
+        </p>
+        <table class="styled-table mt-6">
+            <tr>
+                <th>Process</th>
+                <th>What Happens?</th>
+            </tr>
+            <tr>
+                <td>📸 Face Analysis</td>
+                <td>Scans 68 key points on the face</td>
+            </tr>
+            <tr>
+                <td>📊 AI Emotion Classification</td>
+                <td>Detects happiness, sadness, anger, and more</td>
+            </tr>
+            <tr>
+                <td>🎶 Music/Chatbot Response</td>
+                <td>Plays songs or starts a conversation based on mood</td>
+            </tr>
+        </table>
+    </section>
+
+    <!-- 📌 Applications Section -->
+    <section class="section-container">
+        <h2 class="text-2xl font-bold text-center">🌎 Real-World Applications</h2>
+        <div class="grid grid-cols-2 gap-6 mt-6">
+            <div class="feature-card">
+                <h3 class="text-xl font-semibold">🎮 Gaming & VR</h3>
+                <p class="mt-2">Adapts gameplay based on real-time emotions.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="text-xl font-semibold">📞 Customer Support</h3>
+                <p class="mt-2">AI adjusts responses based on user frustration levels.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="text-xl font-semibold">📈 Mental Health</h3>
+                <p class="mt-2">Monitors stress levels through emotion detection.</p>
+            </div>
+            <div class="feature-card">
+                <h3 class="text-xl font-semibold">🎶 Music & Streaming</h3>
+                <p class="mt-2">Personalized music recommendations based on emotions.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 📌 Future Scope -->
+    <section class="section-container text-center">
+        <h2 class="text-2xl font-bold">🚀 Future Scope</h2>
+        <p class="text-lg mt-4">
+            Our next goal is to **expand AI Emotion Detection** into:
+        </p>
+        <ul class="text-lg mt-4 space-y-2">
+            <li>🤖 **Virtual Assistants** (Siri, Alexa, Google Assistant)</li>
+            <li>🧠 **Deep Learning Enhancements** for improved accuracy</li>
+            <li>📊 **Live Video Analysis** for security and streaming</li>
+        </ul>
+    </section>
+
+    <!-- 📌 Call-to-Action -->
+    <section class="section-container text-center">
+        <button class="glow-button">Get Started</button>
+    </section>
+
+    {% include 'footer.html' %}
+
+</body>
+</html>

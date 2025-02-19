@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Emotion Detection & Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function fetchEmotions() {
+                fetch('/get_emotions')
+                    .then(response => response.json())
+                    .then(data => console.log("Emotions:", data))
+                    .catch(error => console.error("Error fetching emotions:", error));
+            }
+
+            fetchEmotions();
+            setInterval(fetchEmotions, 1000);
+
+            document.addEventListener("visibilitychange", function () {
+                if (document.hidden) {
+                    console.log("⏸️ Tab hidden - Pausing camera...");
+                    fetch('/toggle_camera', { 
+                        method: 'POST',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "pause" }) 
+                    })
+                    .then(response => response.json())
+                    .then(data => console.log(data.status))
+                    .catch(error => console.error("Error pausing camera:", error));
+
+                    processResults(); // Keep updating recommendations even when tab is hidden
+                } else {
+                    console.log("▶️ Tab visible again - Resuming camera...");
+                    document.getElementById("camera-feed").src = "/video_feed?" + new Date().getTime();
+                    fetch('/toggle_camera', { 
+                        method: 'POST',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "resume" }) 
+                    })
+                    .then(response => response.json())
+                    .then(data => console.log(data.status))
+                    .catch(error => console.error("Error resuming camera:", error));
+                }
+            });
+
+            document.getElementById("user-input").addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    sendMessage();
+                }
+            });
+
+            setInterval(processResults, 5000); // Update song recommendations every 5 seconds
+        });
+
+        function sendMessage() {
+            let userMessage = document.getElementById("user-input").value.trim();
+            if (!userMessage) return;
+
+            let chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
+
+            fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userMessage })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatBox.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+
+                if (data.end_chat) {
+                    chatBox.innerHTML += `<p class="emotion-final">🧠 Final Emotion Detected: <strong>${data.dominant_emotion.toUpperCase()}</strong></p>`;
+                    document.getElementById("user-input").disabled = true;
+                    document.getElementById("send-btn").disabled = true;
+                }
+
+                chatBox.scrollTop = chatBox.scrollHeight;
+                document.getElementById("user-input").value = "";
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function processResults() {
+            fetch('/process_results')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data || !data.recommended_songs || !Array.isArray(data.recommended_songs)) {
+                        console.error("Invalid response:", data);
+                        return;
+                    }
+        
+                    let songContainer = document.getElementById("results");
+                    songContainer.innerHTML = `<h3>🎵 Recommended Songs</h3><div id="songContainer" class="song-grid"></div>`;
+        
+                    let songGrid = document.getElementById("songContainer");
+        
+                    // Display only top 10 songs
+                    data.recommended_songs.slice(0, 10).forEach(song => {
+                        let songBox = document.createElement("div");
+                        songBox.classList.add("song-card");
+                        songBox.innerHTML = `
+                            <p><strong>${song.track}</strong></p>
+                            <p>🎤 ${song.artist}</p>
+                            <a href="${song.link}" target="_blank">▶ Listen</a>
+                        `;
+                        songGrid.appendChild(songBox);
+                    });
+        
+                    songContainer.style.opacity = 0;
+                    setTimeout(() => songContainer.style.opacity = 1, 500);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        
+        
+        
+    </script>
+
+ 
+
+
+
+
+
+    
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <h1>🎭 AI Emotion Detection & Chatbot</h1>
+
+    <div class="main-container">
+        <div class="emotion-section">
+            <h2>Facial Emotion Recognition</h2>
+            <div class="video-container">
+                <img src="{{ url_for('video_feed') }}" class="video-feed" alt="Live Emotion Detection">
+            </div>
+            <div class="emotion-display">
+                <div id="emotion-data" class="loading">⏳ Analyzing emotions...</div>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <h2>AI Chatbot 🤖</h2>
+            <div id="chat-box"></div>
+            <div>
+                <input type="text" id="user-input" placeholder="Type your message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <div class="recommendation-section">
+            <h2>🎶 Emotion-Based Music Recommendation</h2>
+            <div id="results"></div>
+        </div>
+    </div>
+
+</body>
+    {% include 'footer.html' %}
+
+</html>

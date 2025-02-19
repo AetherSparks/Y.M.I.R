@@ -1,0 +1,6 @@
+/.venv
+/shape_predictor_68_face_landmarks.dat
+/models
+/*.json
+venv
+/shape_predictor_68_face_landmarks.dat

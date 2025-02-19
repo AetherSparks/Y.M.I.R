@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - AI Emotion Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --color-primary: #0a192f;
+            --color-secondary: #1e3a8a;
+            --color-accent: #3b82f6;
+            --color-text: #ffffff;
+            --color-bg: #0a192f;
+            --color-card: rgba(255, 255, 255, 0.1);
+            --color-card-hover: rgba(255, 255, 255, 0.2);
+            --color-border: rgba(255, 255, 255, 0.2);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-primary: #0a192f;
+                --color-secondary: #1e3a8a;
+                --color-accent: #3b82f6;
+                --color-text: #ffffff;
+                --color-bg: #0a192f;
+                --color-card: rgba(255, 255, 255, 0.1);
+                --color-card-hover: rgba(255, 255, 255, 0.2);
+                --color-border: rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .typing-text {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid var(--color-text);
+            display: inline-block;
+            animation: typing 3s steps(40, end) infinite alternate;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+            background-size: 200% 200%;
+            animation: gradientShift 10s ease infinite;
+        }
+        .hover-scale {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        .card {
+            background: var(--color-card);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid var(--color-border);
+        }
+        .card:hover {
+            background: var(--color-card-hover);
+        }
+        .animate-fade-in {
+            animation: fadeIn 1.5s ease-out;
+        }
+        .glow-text {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6);
+        }
+        .decorative-shape {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .decorative-shape::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: var(--color-accent);
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+            z-index: -1;
+        }
+        .text-in-shape {
+            position: relative;
+            padding: 20px;
+            background: var(--color-card);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .text-in-shape::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--color-accent), transparent);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="gradient-bg text-white">
+
+    <!-- Include Navbar -->
+    {% include 'header.html' %}
+
+    <!-- Decorative Quarter Circles -->
+    <div class="relative w-full h-20">
+        <div class="absolute top-0 left-0 w-20 h-20 bg-blue-800 rounded-br-full"></div>
+        <div class="absolute top-0 right-0 w-20 h-20 bg-blue-500 rounded-bl-full"></div>
+    </div>
+
+    <!-- Hero Section with Animation -->
+    <section class="flex items-center justify-center text-center min-h-screen p-10 relative decorative-shape">
+        <div class="max-w-3xl animate-fade-in">
+            <h1 class="text-6xl font-extrabold mb-4 typing-text bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200 glow-text">Welcome to AI Emotion Detection</h1>
+            <p class="text-lg mb-6">Experience real-time facial emotion recognition and an AI-powered chatbot.</p>
+            <button onclick="window.location.href='/ai_app'" 
+                class="bg-white text-blue-700 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg shadow-lg transition transform hover:scale-105 animate-bounce">
+                Get Started 🚀
+            </button>
+        </div>
+    </section>
+
+    <!-- Our Features Section with Icons -->
+    <section class="py-16 bg-gray-900 text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-8 text-blue-400 glow-text">Our Features</h2>
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="p-6 bg-gray-800 rounded-lg shadow-md hover-scale card">
+                    <h3 class="text-xl font-semibold text-blue-400">🔍 High Accuracy</h3>
+                    <p class="mt-2 text-gray-300">AI-powered deep learning ensures accurate emotion detection.</p>
+                </div>
+                <div class="p-6 bg-gray-800 rounded-lg shadow-md hover-scale card">
+                    <h3 class="text-xl font-semibold text-blue-400">📷 Real-Time Analysis</h3>
+                    <p class="mt-2 text-gray-300">Detect emotions instantly using a live camera feed.</p>
+                </div>
+                <div class="p-6 bg-gray-800 rounded-lg shadow-md hover-scale card">
+                    <h3 class="text-xl font-semibold text-blue-400">💡 AI-Powered Chatbot</h3>
+                    <p class="mt-2 text-gray-300">Interact with an intelligent chatbot based on detected emotions.</p>
+                </div>
+                <div class="p-6 bg-gray-800 rounded-lg shadow-md hover-scale card">
+                    <h3 class="text-xl font-semibold text-blue-400">🎵 Music Recommendations</h3>
+                    <p class="mt-2 text-gray-300">AI suggests songs based on your mood.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI in Action Section with Carousel -->
+    <section class="py-16 bg-gray-800 text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-8 text-blue-400 glow-text">AI in Action</h2>
+            <div class="flex space-x-4 overflow-x-auto p-4">
+                <img src="ai_demo1.jpg" class="rounded-lg shadow-lg w-1/3 hover-scale" alt="AI Emotion Detection">
+                <img src="ai_demo2.jpg" class="rounded-lg shadow-lg w-1/3 hover-scale" alt="AI Music Suggestions">
+                <img src="ai_demo3.jpg" class="rounded-lg shadow-lg w-1/3 hover-scale" alt="AI Chatbot Response">
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 bg-gray-900 text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-8 text-blue-400 glow-text">What Our Users Say</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="p-6 bg-gray-800 rounded-lg shadow-md hover-scale card">
+                    <p class="text-lg italic text-gray-300">"This AI emotion detection is a game-changer! It's incredibly accurate and easy to use."</p>
+                    <p class="mt-4 font-semibold text-blue-400">- John Doe</p>
+                </div>
+                <div class="p-6 bg-gray-800 rounded-lg shadow-md hover-scale card">
+                    <p class="text-lg italic text-gray-300">"The music recommendations are spot on. It feels like the AI knows me better than I do!"</p>
+                    <p class="mt-4 font-semibold text-blue-400">- Jane Smith</p>
+                </div>
+                <div class="p-6 bg-gray-800 rounded-lg shadow-md hover-scale card">
+                    <p class="text-lg italic text-gray-300">"The chatbot is so intuitive and helpful. It's like having a personal assistant."</p>
+                    <p class="mt-4 font-semibold text-blue-400">- Mike Johnson</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-16 bg-gray-800 text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-8 text-blue-400 glow-text">Frequently Asked Questions</h2>
+            <div class="grid md:grid-cols-2 gap-8 text-left">
+                <div class="p-6 bg-gray-700 rounded-lg shadow-md hover-scale card">
+                    <h3 class="text-lg font-semibold text-blue-400">🤖 How does AI detect emotions?</h3>
+                    <p class="mt-2 text-gray-300">Our AI uses deep learning models trained on facial expression data to analyze emotions.</p>
+                </div>
+                <div class="p-6 bg-gray-700 rounded-lg shadow-md hover-scale card">
+                    <h3 class="text-lg font-semibold text-blue-400">🎵 How accurate are the music recommendations?</h3>
+                    <p class="mt-2 text-gray-300">We use ensemble learning techniques to provide highly accurate song suggestions.</p>
+                </div>
+                <div class="p-6 bg-gray-700 rounded-lg shadow-md hover-scale card">
+                    <h3 class="text-lg font-semibold text-blue-400">📱 Can I use this on mobile devices?</h3>
+                    <p class="mt-2 text-gray-300">Yes! The platform is mobile-friendly and works on all devices.</p>
+                </div>
+                <div class="p-6 bg-gray-700 rounded-lg shadow-md hover-scale card">
+                    <h3 class="text-lg font-semibold text-blue-400">🔒 Is my data secure?</h3>
+                    <p class="mt-2 text-gray-300">We prioritize user privacy and do not store facial recognition data.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="py-16 bg-gray-900 text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-8 text-blue-400 glow-text">Ready to Experience the Future?</h2>
+            <p class="text-lg mb-6">Join thousands of users who are already benefiting from our AI Emotion Detection platform.</p>
+            <button onclick="window.location.href='/ai_app'" 
+                class="bg-white text-blue-700 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg shadow-lg transition transform hover:scale-105 animate-bounce">
+                Get Started 🚀
+            </button>
+        </div>
+    </section>
+
+    <!-- Decorative Quarter Circles Before Footer -->
+    <div class="relative w-full h-20">
+        <div class="absolute bottom-0 left-0 w-20 h-20 bg-blue-500 rounded-tr-full"></div>
+        <div class="absolute bottom-0 right-0 w-20 h-20 bg-blue-800 rounded-tl-full"></div>
+    </div>
+
+    <!-- Include Footer -->
+    {% include 'footer.html' %}
+
+</body>
+</html>
