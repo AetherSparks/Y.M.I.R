@@ -6,6 +6,7 @@
     <title>Home - AI Emotion Detection</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Root Variables */
         :root {
             --color-primary: #0a192f;
             --color-secondary: #1e3a8a;
@@ -15,6 +16,9 @@
             --color-card: rgba(255, 255, 255, 0.1);
             --color-card-hover: rgba(255, 255, 255, 0.2);
             --color-border: rgba(255, 255, 255, 0.2);
+            --color-glow: rgba(255, 255, 255, 0.8);
+            --color-neon-blue: rgba(59, 130, 246, 0.9);
+            --color-neon-white: rgba(255, 255, 255, 1);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -30,9 +34,10 @@
             }
         }
 
+        
         @keyframes typing {
             from { width: 0; }
-            to { width: 100%; }
+            to { width: 103%; }
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -43,43 +48,83 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 10px var(--color-neon-blue); }
+            50% { box-shadow: 0 0 20px var(--color-neon-white); }
+            100% { box-shadow: 0 0 10px var(--color-neon-blue); }
+        }
+        
         .typing-text {
             overflow: hidden;
             white-space: nowrap;
-            border-right: 2px solid var(--color-text);
+            border-right: 1px solivar(--color-text);
             display: inline-block;
-            animation: typing 3s steps(40, end) infinite alternate;
+            font: semibold;
+            animation: typing 6s steps(40, end)  infinite; 
         }
         .gradient-bg {
             background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
             background-size: 200% 200%;
             animation: gradientShift 10s ease infinite;
         }
+        /* Hover Scale */
         .hover-scale {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .hover-scale:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 20px var(--color-neon-blue);
         }
+        /* Glowing Cards */
         .card {
             background: var(--color-card);
             backdrop-filter: blur(10px);
             border-radius: 15px;
-            border: 1px solid var(--color-border);
+            border: 2px solid var(--color-border);
+            box-shadow: 0 0 10px var(--color-neon-blue);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card:hover {
             background: var(--color-card-hover);
+            box-shadow: 0 0 20px var(--color-neon-white), 0 0 40px var(--color-neon-blue);
+            transform: scale(1.05);
         }
+        
         .animate-fade-in {
             animation: fadeIn 1.5s ease-out;
         }
         .glow-text {
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6);
+            color: var(--color-text);
+            text-shadow: 0 0 10px var(--color-neon-white), 0 0 20px var(--color-neon-blue);
         }
         .decorative-shape {
             position: relative;
             overflow: hidden;
+        }
+        /* Buttons */
+        .button {
+            padding: 12px 18px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--color-accent), var(--color-secondary));
+            color: var(--color-text);
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--color-neon-blue);
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+        .button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--color-neon-white), 0 0 30px var(--color-neon-blue);
+        }
+        .button:active {
+            transform: scale(0.95);
+        }
+        /* Glowing Borders */
+        .glow-border {
+            border: 2px solid var(--color-neon-blue);
+            box-shadow: 0 0 10px var(--color-neon-blue);
         }
 
         .decorative-shape::after {
@@ -112,6 +157,10 @@
         }
     </style>
 </head>
+
+
+
+
 <body class="gradient-bg text-white">
 
     <!-- Include Navbar -->
@@ -125,13 +174,10 @@
 
     <!-- Hero Section with Animation -->
     <section class="flex items-center justify-center text-center min-h-screen p-10 relative decorative-shape">
-        <div class="max-w-3xl animate-fade-in">
+        <div class="max-w-full animate-fade-in">
             <h1 class="text-6xl font-extrabold mb-4 typing-text bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200 glow-text">Welcome to AI Emotion Detection</h1>
             <p class="text-lg mb-6">Experience real-time facial emotion recognition and an AI-powered chatbot.</p>
-            <button onclick="window.location.href='/ai_app'" 
-                class="bg-white text-blue-700 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg shadow-lg transition transform hover:scale-105 animate-bounce">
-                Get Started 🚀
-            </button>
+            <button onclick="window.location.href='/ai_app'" class="button animate-bounce">Get Started 🚀</button>
         </div>
     </section>
 
@@ -230,7 +276,7 @@
         </div>
     </section>
 
-    <!-- Decorative Quarter Circles Before Footer -->
+    <!-- Footer Decorative Shapes -->
     <div class="relative w-full h-20">
         <div class="absolute bottom-0 left-0 w-20 h-20 bg-blue-500 rounded-tr-full"></div>
         <div class="absolute bottom-0 right-0 w-20 h-20 bg-blue-800 rounded-tl-full"></div>
