@@ -6,118 +6,181 @@
     <title>About - AI Emotion Detection</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 🔵 Animated Background Gradient */
+        /* 🔵 Dynamic Animated Background */
         @keyframes animatedBackground {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
-        /* 🌟 Neon Title */
-        .neon-text {
-            font-size: 2.5rem;
-            font-weight: bold;
-            animation: glow 2s infinite alternate;
-            text-shadow: 0 0 15px #00b7ff, 0 0 25px #00b7ff;
-        }
-
-        /* Section Styling */
-        .section-container {
-            width: 100%;
-            max-width: 1100px;
-            margin: auto;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-        }
-
-        /* Table Styling */
-        .styled-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .styled-table th, .styled-table td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .styled-table th {
-            background: rgba(0, 183, 255, 0.2);
-        }
-
-        /* Cards */
-        .feature-card {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 20px;
-            border-radius: 8px;
+        
+        body {
+            background: linear-gradient(-45deg, #000000, #001933, #002b5e, #000000);
+            background-size: 400% 400%;
+            animation: animatedBackground 12s infinite ease-in-out;
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
             text-align: center;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
         }
-
-        /* 🌟 Neon Title */
+        
+        /* 🌟 Neon Text Glow */
         .neon-text {
-            font-size: 2.8rem;
+            font-size: 3.5rem;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             animation: glow 2s infinite alternate;
-            text-shadow: 0 0 20px #00b7ff, 0 0 30px #00b7ff;
+            text-shadow: 0 0 25px #00c3ff, 0 0 35px #009bff, 0 0 45px #0072ff;
         }
-
-        /* 🌀 Section Styling */
+        
+        /* ✨ Enhanced Glow Animation */
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 15px #00b7ff, 0 0 25px #008cff, 0 0 35px #005fcc;
+            }
+            100% {
+                text-shadow: 0 0 30px #00e5ff, 0 0 40px #00b7ff, 0 0 50px #008cff;
+            }
+        }
+        
+        /* 🌀 Modern Glassmorphism Card */
         .section-container {
             max-width: 1100px;
             margin: auto;
             padding: 50px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
-            transition: transform 0.3s ease-in-out;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 183, 255, 0.3);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
-
+        
         .section-container:hover {
-            transform: scale(1.02);
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(0, 183, 255, 0.5);
         }
-
-        /* 🌟 Feature Card Hover Effect */
-        .feature-card {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 20px;
+        
+        /* 🎬 Stylish Tables */
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .styled-table th, .styled-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+        }
+        
+        .styled-table th {
+            background: rgba(0, 183, 255, 0.2);
+            color: #00d4ff;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        
+        .styled-table tbody tr:hover {
+            background: rgba(0, 183, 255, 0.3);
+            transition: 0.3s ease-in-out;
+        }
+        
+        /* 🌀 Floating Feature Cards */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 183, 255, 0.3);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
+        
         .feature-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 183, 255, 0.4);
+            transform: scale(1.07);
+            box-shadow: 0 0 30px rgba(0, 183, 255, 0.6);
         }
-
-        /* 🎯 Table Hover */
-        .styled-table tbody tr:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        /* 🚀 Glowing Button */
+        
+        /* 🚀 Ultimate Glowing Button */
         .glow-button {
-            background: linear-gradient(45deg, #00b7ff, #0072ff);
-            padding: 14px 28px;
+            background: linear-gradient(45deg, #00d4ff, #0072ff);
+            padding: 15px 32px;
             border-radius: 50px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
+            color: #ffffff;
             cursor: pointer;
-            transition: box-shadow 0.3s ease-in-out;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: box-shadow 0.4s ease-in-out, transform 0.3s ease-in-out;
+            border: none;
+            outline: none;
         }
-
+        
         .glow-button:hover {
-            box-shadow: 0 0 20px #00b7ff, 0 0 40px #0072ff;
+            box-shadow: 0 0 25px #00d4ff, 0 0 50px #0072ff;
             transform: scale(1.1);
         }
+        
+        .glow-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* 🌀 Neon Divider Line */
+        .glow-divider {
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(0, 183, 255, 0) 0%, rgba(0, 183, 255, 1) 50%, rgba(0, 183, 255, 0) 100%);
+            margin: 30px auto;
+            box-shadow: 0 0 10px rgba(0, 183, 255, 0.5);
+        }
+        
+        /* ✨ Animated Slide-In */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 1.5s ease-out;
+        }
+        
+        /* 🌌 Floating Particles Effect */
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .floating-effect {
+            animation: floating 4s infinite ease-in-out;
+        }
+        
+        /* 🎇 Polygonal Borders */
+        .glow-border {
+            border: 3px solid rgba(0, 183, 255, 0.7);
+            box-shadow: 0 0 15px rgba(0, 183, 255, 0.6);
+            border-radius: 15px;
+        }
+        
+        /* 🔥 Futuristic Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #001f3f;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #00b7ff;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0072ff;
+        }
+        
     </style>
 </head>
 <body class="text-white bg-gray-900">
@@ -130,8 +193,8 @@
     <!-- 📌 About Section -->
     <section class="section-container text-center">
         <h1 class="neon-text">About AI Emotion Detection</h1>
-        <p class="text-lg mt-4">
-            AI Emotion Detection is a deep learning project that uses **facial recognition and multimodal learning** to detect emotions. It provides personalized interactions through **music recommendations and chatbot responses** based on user mood.
+        <p class="text-lg mt-4",style = "font-weight: 900; font-size: 1.2em; text-shadow: 0 0 8px black, 0 0 12px black;">
+            AI Emotion Detection is a deep learning project that uses <strong>facial recognition and multimodal learning</strong> to detect emotions. It provides personalized interactions through <strong>music recommendations and chatbot responses</strong> based on user mood.
         </p>
         <table class="styled-table mt-6">
             <tr>
@@ -159,7 +222,7 @@
         <div class="grid grid-cols-2 gap-6">
             <div class="feature-card">
                 <h3 class="text-xl font-semibold">🎭 Facial Expression Tracking</h3>
-                <p class="mt-2">Captures subtle changes in emotions using facial landmarks.</p>
+                <p class="mt-2",style="font-weight: 900; font-size: 1.2em; text-shadow: 0 0 8px black, 0 0 12px black;">Captures subtle changes in emotions using facial landmarks.</p>
             </div>
             <div class="feature-card">
                 <h3 class="text-xl font-semibold">🎵 AI-Powered Music</h3>
@@ -179,9 +242,10 @@
     <!-- 📌 How It Works -->
     <section class="section-container text-center">
         <h2 class="text-2xl font-bold">🎥 How It Works</h2>
-        <p class="text-lg mt-4">
-            The system **analyzes facial landmarks** using AI and classifies emotions based on muscle movement and gaze patterns. Then, it:
+        <p style="font-weight: 900; font-size: 1.2em; text-shadow: 0 0 8px black, 0 0 12px black;">
+            The system <strong>analyzes facial landmarks</strong> using AI and classifies emotions based on muscle movement and gaze patterns. Then, it:
         </p>
+        
         <table class="styled-table mt-6">
             <tr>
                 <th>Process</th>
@@ -232,9 +296,9 @@
             Our next goal is to **expand AI Emotion Detection** into:
         </p>
         <ul class="text-lg mt-4 space-y-2">
-            <li>🤖 **Virtual Assistants** (Siri, Alexa, Google Assistant)</li>
-            <li>🧠 **Deep Learning Enhancements** for improved accuracy</li>
-            <li>📊 **Live Video Analysis** for security and streaming</li>
+            <li>🤖 <strong>Virtual Assistants</strong> (Siri, Alexa, Google Assistant)</li>
+            <li>🧠 <strong>Deep Learning Enhancements</strong> for improved accuracy</li>
+            <li>📊 <strong>Live Video Analysis</strong> for security and streaming</li>
         </ul>
     </section>
 
