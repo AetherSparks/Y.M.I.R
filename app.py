@@ -1003,14 +1003,36 @@ def save_chat_results():
 
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-@app.route('/process_results', methods=['POST'])
+@app.route('/process_results', methods=['GET', 'POST'])
 def process_results():
-    final_emotions = calculate_final_emotions()
-    if "error" in final_emotions:
-        return jsonify({"error": final_emotions["error"]})
+    try:
+        # Calculate final averaged emotions
+        final_emotions = calculate_final_emotions()
+        
+        # Check for errors in emotion calculation
+        if not isinstance(final_emotions, dict):
+            return jsonify({"error": "Emotion processing failed, invalid data received."}), 500
+        
+        if "error" in final_emotions:
+            return jsonify({"error": final_emotions["error"]}), 400
 
-    songs = recommend_songs("final_averaged_emotions.json")  # Ensure correct file is passed
-    return jsonify({"final_emotions": final_emotions, "recommended_songs": songs})
+        # Fetch recommended songs
+        songs = recommend_songs("final_average_emotions.json")
+
+        # Ensure songs is a list
+        if not isinstance(songs, list):
+            songs = []  # Fallback to empty list if invalid
+
+        # Log response for debugging
+        print("✅ Processed Emotions:", final_emotions)
+        print("✅ Recommended Songs:", songs)
+
+        return jsonify({"final_emotions": final_emotions, "recommended_songs": songs})
+
+    except Exception as e:
+        print(f"❌ Error in /process_results: {str(e)}")
+        return jsonify({"error": "An unexpected error occurred while processing results."}), 500
+
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
