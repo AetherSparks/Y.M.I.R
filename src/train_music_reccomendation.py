@@ -176,24 +176,28 @@ import os
 import pandas as pd
 import numpy as np
 import json
-import re
-import pickle  # For saving and loading models
+import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Machine Learning Imports
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, VotingClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score, f1_score,
+    confusion_matrix, classification_report, roc_auc_score
+)
+from imblearn.over_sampling import SMOTE
 
 # === 📌 Load Dataset ===
-file_path = r"datasets/therapeutic_music_enriched.csv"  # Update the path if needed
+file_path = r"datasets/therapeutic_music_enriched.csv"
 df = pd.read_csv(file_path)
 
 # === 📌 Define Opposite Moods for Uplifting Recommendation ===
@@ -209,7 +213,6 @@ opposite_moods = {
 }
 
 # === 📌 Data Preprocessing ===
-# Select features for training
 features = ["Danceability", "Energy", "Key", "Loudness", "Speechiness", 
             "Acousticness", "Instrumentalness", "Liveness", "Valence", "Tempo"]
 X = df[features]
@@ -219,86 +222,118 @@ le = LabelEncoder()
 df["Mood_Label_Encoded"] = le.fit_transform(df["Mood_Label"])
 y = df["Mood_Label_Encoded"]
 
-# Normalize the dataset
+# Normalize dataset
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
+# Apply PCA for dimensionality reduction (retain 95% variance)
+pca = PCA(n_components=0.95)
+X_pca = pca.fit_transform(X_scaled)
+
+# Handle class imbalance
+smote = SMOTE(sampling_strategy="auto", random_state=42, k_neighbors=1)  # Reduce k_neighbors
+X_balanced, y_balanced = smote.fit_resample(X_pca, y)
+
 # Train-Test Split
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_balanced, y_balanced, test_size=0.2, random_state=42)
 
 # Create a directory to store models
 os.makedirs("models", exist_ok=True)
 
-# === 📌 Train and Save Multiple Models ===
+# === 📌 Hyperparameter Tuning ===
+def tune_model(model, param_grid, name):
+    search = RandomizedSearchCV(model, param_grid, n_iter=10, scoring='f1_weighted', cv=3, random_state=42, n_jobs=-1)
+    search.fit(X_train, y_train)
+    print(f"✅ Best parameters for {name}: {search.best_params_}")
+    return search.best_estimator_
+
+# Define Models & Tune Hyperparameters
 models = {
-    "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42),
-    "XGBoost": XGBClassifier(n_estimators=100, learning_rate=0.1, random_state=42, eval_metric="logloss"),
-    "LightGBM": LGBMClassifier(n_estimators=100, learning_rate=0.1, min_data_in_leaf=5, min_split_gain=0.01, random_state=42),
-    "SVM": SVC(kernel="rbf", probability=True),
-    "LogisticRegression": LogisticRegression(max_iter=500),
-    "MLP": MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=300, random_state=42),
-    "GradientBoosting": GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=42)
+    "RandomForest": tune_model(
+        RandomForestClassifier(random_state=42),
+        {"n_estimators": [50, 100, 200], "max_depth": [10, 20, None], "min_samples_split": [2, 5, 10]},
+        "RandomForest"
+    ),
+    "XGBoost": tune_model(
+        XGBClassifier(eval_metric="mlogloss", random_state=42),
+        {"n_estimators": [50, 100, 200], "learning_rate": [0.01, 0.1, 0.2], "max_depth": [3, 6, 9]},
+        "XGBoost"
+    ),
+    "LightGBM": tune_model(
+        LGBMClassifier(random_state=42),
+        {"n_estimators": [50, 100, 200], "learning_rate": [0.01, 0.1, 0.2], "num_leaves": [10, 20, 31]},
+        "LightGBM"
+    ),
+    "SVM": tune_model(
+        SVC(kernel="rbf", probability=True),
+        {"C": [0.1, 1, 10], "gamma": ["scale", "auto"]},
+        "SVM"
+    ),
+    "MLP": MLPClassifier(hidden_layer_sizes=(128, 64), max_iter=500, random_state=42)
 }
 
 trained_models = {}
+performance_results = {}
 
-# Train each model, store it, and save to file
+# Train and Evaluate Models
 for name, model in models.items():
     print(f"🔄 Training {name}...")
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
+    y_proba = model.predict_proba(X_test) if hasattr(model, "predict_proba") else None
+
+    # Compute Performance Metrics
     accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average="weighted", zero_division=0)
+    recall = recall_score(y_test, y_pred, average="weighted", zero_division=0)
+    f1 = f1_score(y_test, y_pred, average="weighted", zero_division=0)
+    roc_auc = roc_auc_score(y_test, y_proba, multi_class="ovr") if y_proba is not None else None
+
     print(f"✅ {name} Accuracy: {accuracy:.4f}")
-    
+
     # Save the trained model
-    model_path = f"models/{name}.pkl"
-    with open(model_path, "wb") as f:
+    with open(f"models/{name}.pkl", "wb") as f:
         pickle.dump(model, f)
-    
+
     trained_models[name] = model
+    performance_results[name] = {"accuracy": accuracy, "precision": precision, "recall": recall, "f1_score": f1, "roc_auc": roc_auc}
 
-# Save the label encoder and scaler
-with open("models/label_encoder.pkl", "wb") as f:
-    pickle.dump(le, f)
-with open("models/scaler.pkl", "wb") as f:
-    pickle.dump(scaler, f)
+# Save performance results
+with open("models/model_performance.json", "w") as f:
+    json.dump(performance_results, f, indent=4)
 
-# === 📌 Evaluate Individual Models ===
-def evaluate_model(model, name, y_pred):
-    acc = accuracy_score(y_test, y_pred)
-    print(f"\n📊 Performance of {name}:")
+# Save the label encoder, scaler, and PCA
+for obj, name in [(le, "label_encoder"), (scaler, "scaler"), (pca, "pca")]:
+    with open(f"models/{name}.pkl", "wb") as f:
+        pickle.dump(obj, f)
 
-    # Get only the labels that are actually present in y_test
-    unique_labels = np.unique(y_test)
-    label_names = le.inverse_transform(unique_labels)
+# === 📌 Voting Classifier (Using Top 3 Models) ===
+top_models = sorted(performance_results.keys(), key=lambda x: performance_results[x]["f1_score"], reverse=True)[:3]
 
-    # Use only present labels in classification_report
-    print(classification_report(y_test, y_pred, labels=unique_labels, target_names=label_names))
-
-    # Confusion matrix
-    cm = confusion_matrix(y_test, y_pred, labels=unique_labels)
-    plt.figure(figsize=(8,6))
-    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=label_names, yticklabels=label_names)
-    plt.title(f"Confusion Matrix - {name}")
-    plt.xlabel("Predicted")
-    plt.ylabel("Actual")
-    plt.show()
-
-# === 📌 Evaluate All Individual Models ===
-for model_name, model in trained_models.items():
-    y_pred = model.predict(X_test)
-    evaluate_model(model, model_name, y_pred)
-
-# === 📌 Voting Classifier (Combining Top Models) ===
 ensemble_model = VotingClassifier(
-    estimators=[("rf", trained_models["RandomForest"]), 
-                ("xgb", trained_models["XGBoost"]), 
-                ("lgbm", trained_models["LightGBM"]),
-                ("mlp", trained_models["MLP"])], 
+    estimators=[(name, trained_models[name]) for name in top_models],
     voting="soft"
 )
 
-# Train and save ensemble model
+# Train & Save Ensemble Model
 ensemble_model.fit(X_train, y_train)
 with open("models/ensemble_model.pkl", "wb") as f:
     pickle.dump(ensemble_model, f)
+
+# Evaluate Ensemble Model
+y_pred_ensemble = ensemble_model.predict(X_test)
+y_proba_ensemble = ensemble_model.predict_proba(X_test)
+ensemble_performance = {
+    "accuracy": accuracy_score(y_test, y_pred_ensemble),
+    "precision": precision_score(y_test, y_pred_ensemble, average="weighted", zero_division=0),
+    "recall": recall_score(y_test, y_pred_ensemble, average="weighted", zero_division=0),
+    "f1_score": f1_score(y_test, y_pred_ensemble, average="weighted", zero_division=0),
+    "roc_auc": roc_auc_score(y_test, y_proba_ensemble, multi_class="ovr")
+}
+
+# Save final performance
+performance_results["EnsembleModel"] = ensemble_performance
+with open("models/model_performance.json", "w") as f:
+    json.dump(performance_results, f, indent=4)
+
+print("\n✅ All models trained, optimized, and evaluated successfully!")
