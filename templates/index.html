@@ -86,65 +86,103 @@
             fetch('/process_results')
                 .then(response => response.json())
                 .then(data => {
-                    console.log("✅ Received Data:", data);  // Debugging
-        
-                    if (!data || !data.recommended_songs || !Array.isArray(data.recommended_songs)) {
-                        console.error("❌ Invalid response:", data);
-                        document.getElementById("results").innerHTML = "<p style='color: red;'>❌ No songs found!</p>";
-                        return;
-                    }
+                    console.log("✅ Received Data:", data);
         
                     let songContainer = document.getElementById("results");
-                    songContainer.innerHTML = `
-                        <h3>🎵 Recommended Songs</h3>
-                        <div id="sliderContainer">
-                            <div id="songSlider" class="song-slider"></div>
-                        </div>
-                    `;
+                    
+                    // Check if the response contains valid recommended songs
+                    if (!data || !data.recommended_songs || !Array.isArray(data.recommended_songs) || data.recommended_songs.length === 0) {
+                        console.warn("⚠️ No detected emotion. Falling back to neutral songs.");
         
-                    let songSlider = document.getElementById("songSlider");
-                    songSlider.innerHTML = "";  // Clear previous songs
+                        // Fetch neutral songs instead of showing "No songs found"
+                        fetch('/get_neutral_songs')
+                            .then(response => response.json())
+                            .then(neutralData => {
+                                if (!neutralData || !neutralData.songs || neutralData.songs.length === 0) {
+                                    songContainer.innerHTML = "<p style='color: red;'>❌ No songs found!</p>";
+                                } else {
+                                    displaySongs(neutralData.songs);
+                                }
+                            })
+                            .catch(error => {
+                                console.error("❌ Error fetching neutral songs:", error);
+                                songContainer.innerHTML = "<p style='color: red;'>❌ No songs found!</p>";
+                            });
         
-                    // Add new songs dynamically
-                    data.recommended_songs.slice(0, 10).forEach(song => {
-                        let songBox = document.createElement("div");
-                        songBox.classList.add("song-card");
+                        return;  // Exit early since we're fetching fallback songs
+                    }
         
-                        // Use '#' if no valid link exists
-                        let songLink = song.link ? song.link : "#";
-        
-                        songBox.innerHTML = `
-                            <p><strong>${song.track}</strong></p>
-                            <p>🎤 ${song.artist}</p>
-                            <a href="${songLink}" target="_blank">▶ Listen</a>
-                        `;
-        
-                        songSlider.appendChild(songBox);
-                    });
-        
-                    restartSliderAnimation();
+                    // Display detected songs
+                    displaySongs(data.recommended_songs);
                 })
-                .catch(error => console.error('❌ Fetch Error:', error));
+                .catch(error => {
+                    console.error('❌ Fetch Error:', error);
+                    document.getElementById("results").innerHTML = "<p style='color: red;'>❌ No songs found!</p>";
+                });
         }
         
-        // ✅ **Fix Slider Animation Restart**
-        function restartSliderAnimation() {
+        // Function to display songs in the UI
+        function displaySongs(songs) {
+            let songContainer = document.getElementById("results");
+            songContainer.innerHTML = `
+                <h3>🎵 Recommended Songs</h3>
+                <div id="sliderContainer">
+                    <div id="songSlider" class="song-slider"></div>
+                </div>
+            `;
+        
+            let songSlider = document.getElementById("songSlider");
+            songSlider.innerHTML = ""; // Clear previous songs
+        
+            songs.slice(0, 10).forEach(song => {
+                let songBox = document.createElement("div");
+                songBox.classList.add("song-card");
+        
+                // Use '#' if no valid link exists
+                let songLink = song.link ? song.link : "#";
+        
+                songBox.innerHTML = `
+                    <p><strong>${song.track}</strong></p>
+                    <p>🎤 ${song.artist}</p>
+                    <a href="${songLink}" target="_blank">▶ Listen</a>
+                `;
+        
+                songSlider.appendChild(songBox);
+            });
+        
+            startInfiniteScroll();  // Start Animation
+        }
+        
+        // ✅ **Continuous Scroll Effect**
+        function startInfiniteScroll() {
             let slider = document.getElementById("songSlider");
+            let clone = slider.cloneNode(true);
+            slider.parentNode.appendChild(clone);  // Clone for Infinite Scroll
         
-            // Ensure animation is fully reset before restarting
-            slider.style.animation = "none";
-            void slider.offsetWidth;  // Force reflow
-            slider.style.animation = "slideAnimation 15s linear infinite";
+            let totalWidth = slider.scrollWidth;
+            let currentPosition = 0;
+        
+            function scrollLoop() {
+                currentPosition -= 1;  // Move left
+                if (Math.abs(currentPosition) >= totalWidth) {
+                    currentPosition = 0;  // Reset
+                }
+                slider.style.transform = `translateX(${currentPosition}px)`;
+                requestAnimationFrame(scrollLoop);  // Smooth Frame Updates
+            }
+        
+            scrollLoop();  // Start scrolling
         }
-            
         
         // ✅ **Update songs every 15 seconds**
         setInterval(processResults, 15000);
         
         
+        
         </script>
 
         <style>
+            /* 🎵 Song Slider Container */
             #sliderContainer {
                 width: 100%;
                 overflow: hidden;
@@ -152,30 +190,36 @@
                 position: relative;
             }
             
+            /* 🎶 Flexbox for Smooth Horizontal Scroll */
             .song-slider {
                 display: flex;
                 gap: 15px;
-                animation: slideAnimation 15s linear infinite;
+                transition: transform 0.5s ease-in-out;
+                will-change: transform;
             }
             
+            /* 🎼 Each Song Card */
             .song-card {
-                min-width: 200px;  /* Ensure cards are large enough */
+                min-width: 200px;
                 padding: 10px;
                 background: #222;
                 color: white;
                 border-radius: 5px;
                 text-align: center;
                 flex: 0 0 auto;
+                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+                transition: transform 0.3s ease-in-out;
             }
             
-            /* Smooth infinite scrolling effect */
-            @keyframes slideAnimation {
-                0% {
-                    transform: translateX(100%);
-                }
-                100% {
-                    transform: translateX(-100%);
-                }
+            /* 🔄 Smooth Hover Effect */
+            .song-card:hover {
+                transform: scale(1.1);
+            }
+            
+            /* 🎚️ Keyframe for Continuous Scrolling */
+            @keyframes scrollSongs {
+                from { transform: translateX(0); }
+                to { transform: translateX(-100%); }
             }
             
     </style>

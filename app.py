@@ -33,6 +33,7 @@ from transformers import pipeline, AutoModelForSequenceClassification, AutoToken
 
 #Flask App════════════════════════════════════════════════════════Initialised══════════════════════════════════════════════════════════════════════════════
 app = Flask(__name__)
+#══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
 
@@ -61,9 +62,6 @@ app = Flask(__name__)
 
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-
-# === 📌 Load Required Models & Dataset ===
 # === 📌 Load Required Models & Dataset ===
 MODEL_PATH = "models/ensemble_model.pkl"
 ENCODER_PATH = "models/label_encoder.pkl"
@@ -851,6 +849,24 @@ def about():
 def contact():
     return render_template('contact.html')
 
+
+@app.route('/get_neutral_songs', methods=['GET'])
+def get_neutral_songs():
+    neutral_songs = [
+        {"track": "On Top Of The World", "artist": "Imagine Dragons", "mood": "Neutral"},
+        {"track": "Counting Stars", "artist": "OneRepublic", "mood": "Neutral"},
+        {"track": "Let Her Go", "artist": "Passenger", "mood": "Neutral"},
+        {"track": "Photograph", "artist": "Ed Sheeran", "mood": "Neutral"},
+        {"track": "Paradise", "artist": "Coldplay", "mood": "Neutral"},
+        {"track": "Stay", "artist": "Zedd & Alessia Cara", "mood": "Neutral"},
+        {"track": "Happier", "artist": "Marshmello & Bastille", "mood": "Neutral"},
+        {"track": "Closer", "artist": "The Chainsmokers & Halsey", "mood": "Neutral"},
+        {"track": "Waves", "artist": "Dean Lewis", "mood": "Neutral"},
+        {"track": "Memories", "artist": "Maroon 5", "mood": "Neutral"}
+    ]
+    
+    return jsonify({"songs": neutral_songs})
+
 # Flask Route: Get Emotions
 @app.route('/get_emotions', methods=['GET'])
 def get_emotions():
@@ -1009,7 +1025,6 @@ def save_chat_results():
     with open("chat_results.json", "w") as f:
         json.dump(chat_data, f, indent=4)
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
 
 
 
