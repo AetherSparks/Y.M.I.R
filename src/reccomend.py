@@ -103,7 +103,20 @@ def recommend_songs(emotion_file):
 
     # ✅ Get Emotion-Based Features
     emotion_vector, emotion_scores = process_emotions(emotion_file)
+    # Load pre-trained transformations
+    with open("models/scaler.pkl", "rb") as f:
+        scaler = pickle.load(f)
+
+    with open("models/pca.pkl", "rb") as f:
+        pca = pickle.load(f)
+
+    # Apply transformations
+    emotion_vector = scaler.transform(emotion_vector.reshape(1, -1))  # Standardize
+    emotion_vector = pca.transform(emotion_vector)  # Reduce dimensions
+
+    # Predict using ensemble model
     mood_probs = ensemble_model.predict_proba(emotion_vector)
+
     print(f"\n🔍 Model Confidence Scores for Moods: {dict(zip(le.classes_, mood_probs[0]))}\n")
 
     # ✅ Predict Mood
