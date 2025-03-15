@@ -89,7 +89,7 @@ Then, open **`http://127.0.0.1:5000/`** in your browser. 🎉
 ---
 
 ### **Contributors & Credits**  
-🚀 Developed by **[Your Name]**  
+🚀 Developed by **Pallav Sharma**  
 💡 Special thanks to OpenAI, DeepFace, and Flask community!  
 
 ---
@@ -98,5 +98,3 @@ Then, open **`http://127.0.0.1:5000/`** in your browser. 🎉
 📜 This project is **open-source** under the MIT License.  
 
 ---
-
-This should be a great starting point for your `README.md`. Let me know if you want any changes! 🚀🔥
