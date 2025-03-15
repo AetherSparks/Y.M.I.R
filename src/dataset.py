@@ -44,7 +44,7 @@ print(df.describe())
 
 # 1️⃣ Mood Label Distribution (Bar Chart)
 plt.figure(figsize=(12, 6))
-sns.countplot(y=df["Mood_Label"], order=df["Mood_Label"].value_counts().index, palette="coolwarm")
+sns.countplot(y=df["Mood_Label"], order=df["Mood_Label"].value_counts().index, palette="coolwarm", hue=df["Mood_Label"], legend=False)
 plt.title("Mood Label Distribution")
 plt.xlabel("Count")
 plt.ylabel("Mood Label")
@@ -59,10 +59,12 @@ plt.ylabel("Mental Health Benefit")
 plt.show()
 
 # 3️⃣ Correlation Heatmap (Numerical Features)
+numeric_df = df.select_dtypes(include=["number"])  # Only numeric columns
 plt.figure(figsize=(12, 8))
-sns.heatmap(df.corr(), annot=True, cmap="coolwarm", linewidths=0.5)
+sns.heatmap(numeric_df.corr(), annot=True, cmap="coolwarm", linewidths=0.5)
 plt.title("Feature Correlation Heatmap")
 plt.show()
+
 
 # 4️⃣ Boxplots for Outlier Detection
 num_features = ["Danceability", "Energy", "Valence", "Tempo", "Duration (ms)"]
