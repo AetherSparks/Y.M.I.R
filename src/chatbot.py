@@ -10,7 +10,7 @@ from rich.panel import Panel
 console = Console()
 
 # Groq API Configuration
-GROQ_API_KEY = "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"  # Replace with actual key
+GROQ_API_KEY = ""  # Replace with actual key
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 # Load emotion classifiers
