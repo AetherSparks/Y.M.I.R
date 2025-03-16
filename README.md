@@ -1,4 +1,3 @@
-Sure! Here's a structured `README.md` file for your project:  
 
 ---
 
@@ -6,7 +5,7 @@ Sure! Here's a structured `README.md` file for your project:
 
 ### **Overview**  
 This is an AI-powered **Emotion Detection and Music Recommendation System** that:  
-✅ Detects facial emotions using a webcam (DeepFace + multimodal analysis) 📷  
+✅ Detects facial emotions using a webcam (DeepFace + multimodal analysis + Text based models) 📷  
 ✅ Analyzes text-based emotions via chatbot interaction 💬  
 ✅ Averages both detected emotions for better accuracy 📊  
 ✅ Suggests music based on the user's final emotional state 🎶  
@@ -89,7 +88,7 @@ Then, open **`http://127.0.0.1:5000/`** in your browser. 🎉
 ---
 
 ### **Contributors & Credits**  
-🚀 Developed by **Pallav Sharma**  
+🚀 Developed by **Pallav Sharma** and **Abhiraj Ghose**  
 💡 Special thanks to OpenAI, DeepFace, and Flask community!  
 
 ---
