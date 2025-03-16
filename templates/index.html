@@ -3,10 +3,968 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Emotion Detection & Chatbot</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>AI Emotion Detection and Chatbot</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #f0f0f0;
+        }
+        
+        .content-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Modern Card Design */
+        .card {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 255, 0.2);
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 255, 0.15);
+        }
+        
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        /* Typography */
+        h2 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4070ff;
+            display: inline-block;
+        }
+        
+        /* Emotion Detection Section */
+        .emotion-section {
+            grid-column: span 2;
+        }
+        
+        .video-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .video-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            border: 3px solid #4070ff;
+            box-shadow: 0 0 20px rgba(64, 112, 255, 0.3);
+        }
+        
+        #emotion-data {
+            text-align: center;
+            font-size: 1.2rem;
+            padding: 15px;
+            background: rgba(64, 112, 255, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #4070ff;
+        }
+        
+        /* Chatbot Section */
+        .chat-section {
+            display: flex;
+            flex-direction: column;
+            height: 450px;
+        }
+        
+        #chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(50, 50, 50, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+        }
+        
+        #chat-box p {
+            margin: 8px 0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        #chat-box p strong {
+            color: #4070ff;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #user-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        #user-input:focus {
+            border-color: #4070ff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(64, 112, 255, 0.3);
+        }
+        
+        button {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #4070ff, #5040ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #5080ff, #6050ff);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(64, 112, 255, 0.3);
+        }
+        
+        /* Music Recommendation Section */
+        .recommendation-section {
+            grid-column: 1 / -1;
+        }
+        
+        #results {
+            padding: 15px;
+            background: rgba(50, 50, 50, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            min-height: 150px;
+        }
+        
+        #sliderContainer {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            margin-top: 20px;
+        }
+        
+        .song-slider {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .song-card {
+            min-width: 200px;
+            padding: 15px;
+            background: rgba(40, 40, 60, 0.7);
+            border-radius: 12px;
+            text-align: center;
+            flex: 0 0 auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out;
+            border: 1px solid rgba(100, 100, 255, 0.2);
+        }
+        
+        .song-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(64, 112, 255, 0.2);
+        }
+        
+        .song-card p {
+            margin: 8px 0;
+        }
+        
+        .song-card a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #4070ff, #5040ff);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .song-card a:hover {
+            background: linear-gradient(135deg, #5080ff, #6050ff);
+            transform: translateY(-2px);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .emotion-section {
+                grid-column: 1;
+            }
+        }
+        
+        /* Header Styles */
+        /* Text glow effect */
+        .text-glow {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+        
+        /* Navigation link hover animation */
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after {
+            width: 80%;
+        }
+        
+        /* Logo animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            75% { transform: rotate(-10deg); }
+            100% { transform: rotate(0deg); }
+        }
+        
+        .logo-container:hover .emoji-rotate {
+            animation: rotate 0.5s ease;
+        }
+        
+        .pulse-btn {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Mobile menu button animation */
+        .burger-menu {
+            width: 30px;
+            height: 25px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .burger-line {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background-color: white;
+            margin: 6px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .burger-menu.active .burger-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        
+        .burger-menu.active .burger-line:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .burger-menu.active .burger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+        
+        /* Mobile menu animations */
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .mobile-link {
+            animation: slideIn 0.3s ease forwards;
+            opacity: 0;
+        }
+        
+        .mobile-link:nth-child(1) { animation-delay: 0.1s; }
+        .mobile-link:nth-child(2) { animation-delay: 0.2s; }
+        .mobile-link:nth-child(3) { animation-delay: 0.3s; }
+        .mobile-link:nth-child(4) { animation-delay: 0.4s; }
+        .mobile-link:nth-child(5) { animation-delay: 0.5s; }
+        
+        /* Fade in animation for page load */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        nav {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .nav-links {
+            animation: fadeIn 0.7s ease forwards;
+        }
+        
+        /* Additional Tailwind utility classes needed for header */
+        .bg-gradient-to-r {
+            background-image: linear-gradient(to right, var(--tw-gradient-stops));
+        }
+        
+        .from-black {
+            --tw-gradient-from: #000;
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(0, 0, 0, 0));
+        }
+        
+        .to-gray-800 {
+            --tw-gradient-to: #1f2937;
+        }
+        
+        .text-white {
+            color: #fff;
+        }
+        
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .sticky {
+            position: sticky;
+        }
+        
+        .top-0 {
+            top: 0;
+        }
+        
+        .z-50 {
+            z-index: 50;
+        }
+        
+        .container {
+            width: 100%;
+        }
+        
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .px-6 {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .space-x-2 > * + * {
+            margin-left: 0.5rem;
+        }
+        
+        .group {
+            position: relative;
+        }
+        
+        .text-3xl {
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+        }
+        
+        .text-2xl {
+            font-size: 1.5rem;
+            line-height: 2rem;
+        }
+        
+        .font-bold {
+            font-weight: 700;
+        }
+        
+        .bg-clip-text {
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        
+        .text-transparent {
+            color: transparent;
+        }
+        
+        .from-blue-400 {
+            --tw-gradient-from: #60a5fa;
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(96, 165, 250, 0));
+        }
+        
+        .to-purple-500 {
+            --tw-gradient-to: #8b5cf6;
+        }
+        
+        .transition-colors {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+        
+        .duration-300 {
+            transition-duration: 300ms;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .md\:flex {
+            display: flex;
+        }
+        
+        .space-x-1 > * + * {
+            margin-left: 0.25rem;
+        }
+        
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+        
+        .hover\:bg-blue-600:hover {
+            background-color: #2563eb;
+        }
+        
+        .hover\:bg-opacity-20:hover {
+            --tw-bg-opacity: 0.2;
+        }
+        
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+        
+        .font-medium {
+            font-weight: 500;
+        }.relative {
+            position: relative;
+        }
+        
+        .overflow-hidden {
+            overflow: hidden;
+        }
+        
+        .ml-2 {
+            margin-left: 0.5rem;
+        }
+        
+        .bg-blue-600 {
+            background-color: #2563eb;
+        }
+        
+        .font-semibold {
+            font-weight: 600;
+        }
+        
+        .hover\:bg-blue-500:hover {
+            background-color: #3b82f6;
+        }
+        
+        .shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .md\:hidden {
+            display: none;
+        }
+        
+        .outline-none {
+            outline: none;
+        }
+        
+        .pt-4 {
+            padding-top: 1rem;
+        }
+        
+        .pb-2 {
+            padding-bottom: 0.5rem;
+        }
+        
+        .space-y-2 > * + * {
+            margin-top: 0.5rem;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .md\:flex {
+                display: flex;
+            }
+            .md\:hidden {
+                display: none;
+            }
+        }
+
+        /* Footer Styles */
+        footer {
+            padding: 2rem 0;
+            background-image: linear-gradient(to right, #1d4ed8, #3b82f6);
+            color: white;
+        }
+
+        footer .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        footer h3 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            border-bottom: none;
+        }
+
+        footer p {
+            margin-bottom: 1rem;
+        }
+
+        footer .text-blue-100 {
+            color: #dbeafe;
+        }
+
+        footer .text-blue-200 {
+            color: #bfdbfe;
+        }
+
+        footer .text-blue-400 {
+            color: #60a5fa;
+        }
+
+        footer .text-blue-600 {
+            color: #2563eb;
+        }
+
+        footer .hover\:text-blue-100:hover {
+            color: #dbeafe;
+        }
+
+        footer .hover\:text-blue-200:hover {
+            color: #bfdbfe;
+        }
+
+        footer .hover\:bg-blue-100:hover {
+            background-color: #dbeafe;
+        }
+
+        footer .hover\:text-white:hover {
+            color: white;
+        }
+
+        footer .grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        footer .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+
+        footer .border-t {
+            border-top-width: 1px;
+        }
+
+        footer .border-blue-400 {
+            border-color: #60a5fa;
+        }
+
+        footer .my-4 {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        footer .space-x-4 > * + * {
+            margin-left: 1rem;
+        }
+
+        footer .justify-start {
+            justify-content: flex-start;
+        }
+
+        footer .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        footer .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+
+        footer .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        footer .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        footer .mr-2 {
+            margin-right: 0.5rem;
+        }
+
+        footer .mr-4 {
+            margin-right: 1rem;
+        }
+
+        footer .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        footer .mt-6 {
+            margin-top: 1.5rem;
+        }
+
+        footer .ml-1 {
+            margin-left: 0.25rem;
+        }
+
+        footer .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        footer .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        footer .py-8 {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        footer .rounded {
+            border-radius: 0.25rem;
+        }
+
+        footer .text-center {
+            text-align: center;
+        }
+
+        footer .text-left {
+            text-align: left;
+        }
+
+        footer .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        footer .text-xl {
+            font-size: 1.25rem;
+            line-height: 1.75rem;
+        }
+
+        footer .font-medium {
+            font-weight: 500;
+        }
+
+        footer .font-bold {
+            font-weight: 700;
+        }
+
+        footer .transition-colors {
+            transition-property: color, background-color, border-color;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+
+        footer .flex {
+            display: flex;
+        }
+
+        footer .items-center {
+            align-items: center;
+        }
+
+        footer .bg-white {
+            background-color: white;
+        }
+
+        footer .inline-block {
+            display: inline-block;
+        }
+
+        footer .inline-flex {
+            display: inline-flex;
+        }
+
+        footer a {
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        /* Responsive footer */
+        @media (min-width: 768px) {
+            footer .md\:grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            
+            footer .md\:flex-row {
+                flex-direction: row;
+            }
+            
+            footer .md\:mt-0 {
+                margin-top: 0;
+            }
+        }
+
+        footer .flex-col {
+            flex-direction: column;
+        }
+
+        footer .justify-between {
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER START -->
+    <nav class="bg-gradient-to-r from-black to-gray-800 text-white py-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-100">
+            <!-- Desktop Navigation -->
+            <div class="flex justify-between items-center">
+                <!-- Logo with animation -->
+                <a href="/" class="flex items-center space-x-2 group logo-container">
+                    <span class="text-3xl emoji-rotate">🎭</span>
+                    <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 group-hover:from-purple-500 group-hover:to-blue-400 transition-colors duration-300 text-glow">AI Emotion Detection</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-1 nav-links">
+                    <a href="/" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">Home</a>
+                    <a href="/ai_app" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">AI App</a>
+                    <a href="/about" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">About</a>
+                    <a href="/contact" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">Contact</a>
+                    <a href="/demo" class="ml-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition-all shadow-md pulse-btn">Try Demo</a>
+                </div>
+
+                <!-- Mobile menu button with animation -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="outline-none burger-menu">
+                        <span class="burger-line"></span>
+                        <span class="burger-line"></span>
+                        <span class="burger-line"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden pt-4 pb-2 mobile-menu-container">
+                <div class="flex flex-col space-y-2">
+                    <a href="/" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">Home</a>
+                    <a href="/ai_app" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">AI App</a>
+                    <a href="/about" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">About</a>
+                    <a href="/contact" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">Contact</a>
+                    <a href="/demo" class="mobile-link px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition-all shadow-md text-center mt-2">Try Demo</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- HEADER END -->
+    
+    <div class="content-wrapper">
+        <div class="dashboard-grid">
+            <div class="emotion-section card">
+                <h2>Facial Emotion Recognition</h2>
+                <div class="video-container">
+                    <img src="{{ url_for('video_feed') }}" class="video-feed" alt="Live Emotion Detection">
+                </div>
+                <div class="emotion-display">
+                    <div id="emotion-data" class="loading">⏳ Analyzing emotions...</div>
+                </div>
+            </div>
+
+            <div class="chat-section card">
+                <h2>AI Chatbot</h2>
+                <div id="chat-box"></div>
+                <div class="input-group">
+                    <input type="text" id="user-input" placeholder="Type your message...">
+                    <button onclick="sendMessage()" id="send-btn">Send</button>
+                </div>
+            </div>
+
+            <div class="recommendation-section card">
+                <h2>Emotion-Based Music Recommendation</h2>
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Simple Footer -->
+    <footer class="bg-gradient-to-r from-blue-700 to-blue-500 text-white py-8">
+        <div class="container mx-auto px-4">
+            <!-- Main Footer Content -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Company Info -->
+                <div class="text-left">
+                    <h3 class="text-xl font-bold mb-3">AI Emotion Detection</h3>
+                    <p class="text-blue-100 mb-4">Transforming human-computer interaction through advanced emotional intelligence.</p>
+                    <div class="flex space-x-4 justify-start">
+                        <!-- Social Media Icons -->
+                        <a href="#" class="text-white hover:text-blue-200 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-white hover:text-blue-200 transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="text-white hover:text-blue-200 transition-colors">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="text-left">
+                    <h3 class="text-xl font-bold mb-3">Quick Links</h3>
+                    <ul>
+                        <li class="mb-2"><a href="#" class="text-blue-100 hover:text-white transition-colors">Home</a></li>
+                        <li class="mb-2"><a href="#" class="text-blue-100 hover:text-white transition-colors">About Us</a></li>
+                        <li class="mb-2"><a href="#" class="text-blue-100 hover:text-white transition-colors">Features</a></li>
+                        <li class="mb-2"><a href="#" class="text-blue-100 hover:text-white transition-colors">Pricing</a></li>
+                        <li class="mb-2"><a href="#" class="text-blue-100 hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="text-left">
+                    <h3 class="text-xl font-bold mb-3">Contact Us</h3>
+                    <p class="mb-2 flex items-center">
+                        <i class="fas fa-envelope mr-2"></i>
+                        <a href="mailto:info@aiemotion.tech" class="text-blue-100 hover:text-white transition-colors">info@aiemotion.tech</a>
+                    </p>
+                    <p class="mb-2 flex items-center">
+                        <i class="fas fa-phone mr-2"></i>
+                        <a href="tel:+15551234567" class="text-blue-100 hover:text-white transition-colors">+1 (555) 123-4567</a>
+                    </p>
+                    <p class="mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        <span class="text-blue-100">San Francisco, CA</span>
+                    </p>
+                    <a href="#" class="bg-white text-blue-600 font-medium px-4 py-2 rounded hover:bg-blue-100 transition-colors inline-block">Get in Touch</a>
+                </div>
+            </div>
+            
+            <!-- Divider -->
+            <div class="border-t border-blue-400 my-4"></div>
+            
+            <!-- Bottom Footer -->
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p>&copy; 2025 AI Emotion Detection. All rights reserved.</p>
+                <div class="mt-2 md:mt-0">
+                    <a href="#" class="text-sm text-blue-100 hover:text-white mr-4 transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-sm text-blue-100 hover:text-white mr-4 transition-colors">Terms of Service</a>
+                    <a href="#" class="text-sm text-blue-100 hover:text-white transition-colors">Cookie Policy</a>
+                </div>
+            </div>
+            
+            <!-- Back to top button -->
+            <div class="text-center mt-6">
+                <a href="#top" class="inline-flex items-center text-blue-100 hover:text-white transition-colors">
+                    <span>Back to top</span>
+                    <i class="fas fa-chevron-up ml-1"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Note: You'll need Font Awesome for the icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 
     <script>
+            // Check if the header script has already run
+        if (!window.headerScriptExecuted) {
+            window.headerScriptExecuted = true;
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                const mobileMenuButton = document.getElementById('mobile-menu-button');
+                const mobileMenu = document.getElementById('mobile-menu');
+                
+                if (mobileMenuButton && mobileMenu) {
+                    mobileMenuButton.addEventListener('click', function() {
+                        mobileMenu.classList.toggle('hidden');
+                        this.classList.toggle('active');
+                        
+                        // Reset animations when toggling menu
+                        const mobileLinks = document.querySelectorAll('.mobile-link');
+                        mobileLinks.forEach(link => {
+                            link.style.animation = 'none';
+                            link.offsetHeight; // Trigger reflow
+                            link.style.animation = null;
+                        });
+                    });
+                }
+                
+                // Add subtle hover animations to nav links
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-2px)';
+                    });
+                    
+                    link.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                    });
+                });
+            });
+        }
+
+        // Main application script
         document.addEventListener("DOMContentLoaded", function () {
             function fetchEmotions() {
                 fetch('/get_emotions')
@@ -175,88 +1133,7 @@
         }
         
         // ✅ **Update songs every 15 seconds**
-        setInterval(processResults, 15000);
-        
-        
-        
-        </script>
-
-        <style>
-            /* 🎵 Song Slider Container */
-            #sliderContainer {
-                width: 100%;
-                overflow: hidden;
-                white-space: nowrap;
-                position: relative;
-            }
-            
-            /* 🎶 Flexbox for Smooth Horizontal Scroll */
-            .song-slider {
-                display: flex;
-                gap: 15px;
-                transition: transform 0.5s ease-in-out;
-                will-change: transform;
-            }
-            
-            /* 🎼 Each Song Card */
-            .song-card {
-                min-width: 200px;
-                padding: 10px;
-                background: #222;
-                color: white;
-                border-radius: 5px;
-                text-align: center;
-                flex: 0 0 auto;
-                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-                transition: transform 0.3s ease-in-out;
-            }
-            
-            /* 🔄 Smooth Hover Effect */
-            .song-card:hover {
-                transform: scale(1.1);
-            }
-            
-            /* 🎚️ Keyframe for Continuous Scrolling */
-            @keyframes scrollSongs {
-                from { transform: translateX(0); }
-                to { transform: translateX(-100%); }
-            }
-            
-    </style>
-
-</head>
-<body>
-    {% include 'header.html' %}
-
-    <h1>🎭 AI Emotion Detection & Chatbot</h1>
-
-    <div class="main-container">
-        <div class="emotion-section">
-            <h2>Facial Emotion Recognition</h2>
-            <div class="video-container">
-                <img src="{{ url_for('video_feed') }}" class="video-feed" alt="Live Emotion Detection">
-            </div>
-            <div class="emotion-display">
-                <div id="emotion-data" class="loading">⏳ Analyzing emotions...</div>
-            </div>
-        </div>
-
-        <div class="chat-section">
-            <h2>AI Chatbot 🤖</h2>
-            <div id="chat-box"></div>
-            <div>
-                <input type="text" id="user-input" placeholder="Type your message...">
-                <button onclick="sendMessage()">Send</button>
-            </div>
-        </div>
-
-        <div class="recommendation-section">
-            <h2>🎶 Emotion-Based Music Recommendation</h2>
-            <div id="results"></div>
-        </div>
-    </div>
-
+        setInterval(processResults, 10000);
+    </script>
 </body>
-    {% include 'footer.html' %}
-
 </html>

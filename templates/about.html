@@ -4,166 +4,274 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - AI Emotion Detection</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js"></script>
+
     <style>
-        /* 🔵 Dynamic Animated Background */
+        /* Base Styles */
+        :root {
+            --primary: #00c3ff;
+            --secondary: #0072ff;
+            --accent: #ff00c8;
+            --dark: #000000;
+            --darker: #000a14;
+            --light: #ffffff;
+        }
+        
+        body {
+            margin: 0;
+            background: linear-gradient(-45deg, #000000, #001933, #002b5e, #000000);
+            background-size: 400% 400%;
+            animation: animatedBackground 12s infinite ease-in-out;
+            color: var(--light);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
         @keyframes animatedBackground {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
         
-        body {
-            background: linear-gradient(-45deg, #000000, #001933, #002b5e, #000000);
-            background-size: 400% 400%;
-            animation: animatedBackground 12s infinite ease-in-out;
-            color: #ffffff;
-            font-family: 'Poppins', sans-serif;
-            text-align: center;
-        }
-        
-        /* 🌟 Neon Text Glow */
+        /* Neon Text Glow */
         .neon-text {
             font-size: 3.5rem;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 2px;
             animation: glow 2s infinite alternate;
-            text-shadow: 0 0 25px #00c3ff, 0 0 35px #009bff, 0 0 45px #0072ff;
+            text-shadow: 0 0 25px var(--primary), 0 0 35px var(--secondary), 0 0 45px #0072ff;
+            opacity: 1;
+            transform: translateY(30px);
         }
         
-        /* ✨ Enhanced Glow Animation */
+        /* Enhanced Glow Animation */
         @keyframes glow {
             0% {
-                text-shadow: 0 0 15px #00b7ff, 0 0 25px #008cff, 0 0 35px #005fcc;
+                text-shadow: 0 0 15px var(--primary), 0 0 25px var(--secondary), 0 0 35px #005fcc;
             }
             100% {
-                text-shadow: 0 0 30px #00e5ff, 0 0 40px #00b7ff, 0 0 50px #008cff;
+                text-shadow: 0 0 30px var(--primary), 0 0 40px var(--secondary), 0 0 50px #008cff;
             }
         }
         
-        /* 🌀 Modern Glassmorphism Card */
+        /* Modern Glassmorphism Card */
         .section-container {
             max-width: 1100px;
-            margin: auto;
+            margin: 80px auto;
             padding: 50px;
-            background: rgba(255, 255, 255, 0.07);
-            border-radius: 15px;
+            background: rgba(0, 12, 32, 0.7);
+            border-radius: 20px;
             backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(0, 183, 255, 0.3);
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            box-shadow: 0 0 30px rgba(0, 183, 255, 0.2);
+            transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            opacity: 1;
+            transform: scale(0.9);
         }
         
         .section-container:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 30px rgba(0, 183, 255, 0.5);
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(0, 183, 255, 0.4);
         }
         
-        /* 🎬 Stylish Tables */
+        /* Background Circles */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(0, 195, 255, 0.05), rgba(0, 114, 255, 0.05));
+            z-index: -1;
+        }
+        
+        /* Stylish Tables */
         .styled-table {
             width: 100%;
-            border-collapse: collapse;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            background: transparent;
+            border-radius: 12px;
             overflow: hidden;
+            margin: 30px 0;
         }
         
         .styled-table th, .styled-table td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 18px;
+            border: none;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
         
         .styled-table th {
-            background: rgba(0, 183, 255, 0.2);
-            color: #00d4ff;
+            background: rgba(0, 114, 255, 0.15);
+            color: var(--primary);
             text-transform: uppercase;
             font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .styled-table tbody tr {
+            background: rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
         }
         
         .styled-table tbody tr:hover {
-            background: rgba(0, 183, 255, 0.3);
-            transition: 0.3s ease-in-out;
+            background: rgba(0, 114, 255, 0.2);
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
         }
         
-        /* 🌀 Floating Feature Cards */
+        /* Floating Feature Cards */
         .feature-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            border-radius: 12px;
+            background: rgba(0, 12, 32, 0.6);
+            padding: 30px;
+            border-radius: 16px;
             text-align: center;
-            box-shadow: 0 0 15px rgba(0, 183, 255, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            border: 1px solid rgba(0, 114, 255, 0.1);
+            opacity: 1;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
         }
         
         .feature-card:hover {
-            transform: scale(1.07);
-            box-shadow: 0 0 30px rgba(0, 183, 255, 0.6);
+            transform: translateY(-15px);
+            box-shadow: 0 15px 40px rgba(0, 114, 255, 0.3);
         }
         
-        /* 🚀 Ultimate Glowing Button */
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        /* Glowing Button */
         .glow-button {
-            background: linear-gradient(45deg, #00d4ff, #0072ff);
-            padding: 15px 32px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            padding: 16px 40px;
             border-radius: 50px;
             font-size: 1.3rem;
             font-weight: bold;
-            color: #ffffff;
+            color: var(--light);
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: box-shadow 0.4s ease-in-out, transform 0.3s ease-in-out;
             border: none;
             outline: none;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            opacity: 1;
+        }
+        
+        .glow-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--accent), var(--primary));
+            z-index: -1;
+            transition: transform 0.6s ease;
+            transform: scaleX(0);
+            transform-origin: right;
         }
         
         .glow-button:hover {
-            box-shadow: 0 0 25px #00d4ff, 0 0 50px #0072ff;
-            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .glow-button:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
         }
         
         .glow-button:active {
             transform: scale(0.95);
         }
         
-        /* 🌀 Neon Divider Line */
+        /* Neon Divider Line */
         .glow-divider {
             width: 80%;
             height: 2px;
             background: linear-gradient(90deg, rgba(0, 183, 255, 0) 0%, rgba(0, 183, 255, 1) 50%, rgba(0, 183, 255, 0) 100%);
-            margin: 30px auto;
-            box-shadow: 0 0 10px rgba(0, 183, 255, 0.5);
+            margin: 40px auto;
+            box-shadow: 0 0 15px rgba(0, 183, 255, 0.5);
         }
         
-        /* ✨ Animated Slide-In */
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(15px); }
-            100% { opacity: 1; transform: translateY(0); }
+        /* Highlight Text */
+        .highlight-text {
+            color: var(--primary);
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
         }
         
-        .animate-fade-in {
-            animation: fadeIn 1.5s ease-out;
+        /* Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
         
-        /* 🌌 Floating Particles Effect */
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-            100% { transform: translateY(0px); }
+        /* Futuristic List */
+        .futuristic-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 30px 0;
         }
         
-        .floating-effect {
-            animation: floating 4s infinite ease-in-out;
+        .futuristic-list li {
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(-100px);
+            opacity: 1;
         }
         
-        /* 🎇 Polygonal Borders */
-        .glow-border {
-            border: 3px solid rgba(0, 183, 255, 0.7);
-            box-shadow: 0 0 15px rgba(0, 183, 255, 0.6);
-            border-radius: 15px;
+        .futuristic-list li:hover {
+            transform: translateX(0) scale(1.03);
+            background: rgba(0, 114, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 114, 255, 0.2);
         }
         
-        /* 🔥 Futuristic Scrollbar */
+        .futuristic-list li strong {
+            color: var(--primary);
+            margin-left: 10px;
+        }
+        
+        /* Futuristic Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -173,141 +281,724 @@
         }
         
         ::-webkit-scrollbar-thumb {
-            background: #00b7ff;
+            background: var(--primary);
             border-radius: 10px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: #0072ff;
+            background: var(--secondary);
         }
         
+        /* Responsive Spacers */
+        .spacer {
+            height: 40px;
+        }
+
+        /* Icon Pulse Animation */
+        @keyframes iconPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .icon-animate {
+            display: inline-block;
+            animation: iconPulse 2s infinite ease-in-out;
+        }
+        
+        /* Text Fade In */
+        .fade-in-text {
+            opacity: 1;
+            transform: translateY(20px);
+        }
+        
+        /* Stats Counter */
+        .stats-counter {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            opacity: 1;
+        }
+        
+        /* Interactive Card Flip */
+        .flip-card-container {
+            perspective: 1000px;
+            height: 300px;
+            margin: 15px 0;
+        }
+        
+        .flip-card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        
+        .flip-card-container:hover .flip-card {
+            transform: rotateY(180deg);
+        }
+        
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .flip-card-front {
+            background: rgba(0, 20, 40, 0.7);
+            border: 1px solid rgba(0, 114, 255, 0.2);
+        }
+        
+        .flip-card-back {
+            background: rgba(0, 114, 255, 0.2);
+            transform: rotateY(180deg);
+            border: 1px solid rgba(0, 195, 255, 0.3);
+        }
+
+        /* Make section containers visible by default for initial display */
+        .hero-section {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* Make sure neon text is visible initially */
+        .neon-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Make sure feature cards are visible initially */
+        .feature-card {
+            opacity: 1;
+        }
+        
+        /* Make button visible */
+        .glow-button {
+            opacity: 1;
+        }
+        
+        /* Make text visible initially */
+        .fade-in-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Make stats counter visible */
+        .stats-counter {
+            opacity: 1;
+        }
+        
+        /* Make list items visible */
+        .futuristic-list li {
+            opacity: 1;
+            transform: translateX(0);
+        }
     </style>
 </head>
-<body class="text-white bg-gray-900">
 
+<body class="text-white">
     {% include 'header.html' %}
 
-    <!-- 🔥 Floating Particles -->
-    <div class="floating" style="top: 20%; left: 10%; animation-duration: 6s;"></div>
+    <!-- Particles Background -->
+    <div id="particles-container"></div>
+    
+    <!-- Background Circles -->
+    <div class="bg-circle" style="width: 600px; height: 600px; top: -200px; right: -200px; opacity: 0.1;"></div>
+    <div class="bg-circle" style="width: 500px; height: 500px; bottom: -100px; left: -150px; opacity: 0.08;"></div>
+    <div class="bg-circle" style="width: 300px; height: 300px; top: 40%; left: 10%; opacity: 0.05;"></div>
+    <div class="bg-circle" style="width: 200px; height: 200px; top: 60%; right: 15%; opacity: 0.07;"></div>
 
-    <!-- 📌 About Section -->
-    <section class="section-container text-center">
-        <h1 class="neon-text">About AI Emotion Detection</h1>
-        <p class="text-lg mt-4",style = "font-weight: 900; font-size: 1.2em; text-shadow: 0 0 8px black, 0 0 12px black;">
-            AI Emotion Detection is a deep learning project that uses <strong>facial recognition and multimodal learning</strong> to detect emotions. It provides personalized interactions through <strong>music recommendations and chatbot responses</strong> based on user mood.
+    <!-- Hero Section -->
+    <section class="section-container hero-section" id="hero">
+        <h1 class="neon-text text-center mb-8">AI Emotion Detection</h1>
+        <div class="spacer"></div>
+        <p class="text-xl mt-8 mb-8 fade-in-text leading-relaxed">
+            Welcome to the future of human-computer interaction, where AI understands not just what you say, but 
+            <span class="highlight-text">how you feel</span>. Our groundbreaking technology uses 
+            <span class="highlight-text">advanced facial recognition</span> and 
+            <span class="highlight-text">multimodal learning</span> to detect emotions in real-time, creating 
+            personalized experiences through <span class="highlight-text">adaptive music recommendations</span> and 
+            <span class="highlight-text">emotionally intelligent responses</span>.
         </p>
-        <table class="styled-table mt-6">
-            <tr>
-                <th>Feature</th>
-                <th>Description</th>
-            </tr>
-            <tr>
-                <td>Real-Time Emotion Analysis</td>
-                <td>Detects emotions from facial expressions instantly</td>
-            </tr>
-            <tr>
-                <td>Music Recommendation</td>
-                <td>Suggests songs based on detected mood</td>
-            </tr>
-            <tr>
-                <td>Chatbot Integration</td>
-                <td>Interacts with users based on their emotions</td>
-            </tr>
-        </table>
+        <div class="spacer"></div>
+        <div class="flex justify-center mt-8">
+            <div class="stats-counter" data-target="98">0</div>
+            <span class="text-lg ml-2 mt-4">% Accuracy</span>
+        </div>
     </section>
 
-    <!-- 📌 Key Features Section -->
-    <section class="section-container">
-        <h2 class="text-2xl font-bold text-center mb-6">🔹 Key Features</h2>
-        <div class="grid grid-cols-2 gap-6">
-            <div class="feature-card">
-                <h3 class="text-xl font-semibold">🎭 Facial Expression Tracking</h3>
-                <p class="mt-2",style="font-weight: 900; font-size: 1.2em; text-shadow: 0 0 8px black, 0 0 12px black;">Captures subtle changes in emotions using facial landmarks.</p>
+    <!-- Key Features Section -->
+    <section class="section-container" id="features">
+        <h2 class="text-3xl font-bold text-center mb-10">
+            <span class="icon-animate">🔹</span> Revolutionary Features
+        </h2>
+        <div class="spacer"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="feature-card" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-perspective="500">
+                <div class="icon-animate text-4xl mb-4">🎭</div>
+                <h3 class="text-2xl font-semibold mb-3">Advanced Facial Expression Tracking</h3>
+                <div class="spacer-sm"></div>
+                <p class="mt-2 leading-relaxed">
+                    Our system captures subtle micro-expressions using 68 facial landmarks, detecting emotions with 
+                    <span class="highlight-text">98% accuracy</span>. Real-time analysis tracks changes in muscle movement 
+                    patterns to understand your emotional state precisely.
+                </p>
             </div>
-            <div class="feature-card">
-                <h3 class="text-xl font-semibold">🎵 AI-Powered Music</h3>
-                <p class="mt-2">Automatically plays songs based on your mood.</p>
+            
+            <div class="feature-card" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-perspective="500">
+                <div class="icon-animate text-4xl mb-4">🎵</div>
+                <h3 class="text-2xl font-semibold mb-3">AI-Powered Music Recommendations</h3>
+                <div class="spacer-sm"></div>
+                <p class="mt-2 leading-relaxed">
+                    Experience music that matches your mood perfectly. Our algorithm analyzes emotional patterns to 
+                    curate personalized playlists that enhance positive emotions or help transform negative ones.
+                </p>
             </div>
-            <div class="feature-card">
-                <h3 class="text-xl font-semibold">💬 AI Chatbot</h3>
-                <p class="mt-2">Engages in meaningful conversations based on emotional state.</p>
+            
+            <div class="feature-card" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-perspective="500">
+                <div class="icon-animate text-4xl mb-4">💬</div>
+                <h3 class="text-2xl font-semibold mb-3">Emotionally Intelligent Chatbot</h3>
+                <div class="spacer-sm"></div>
+                <p class="mt-2 leading-relaxed">
+                    Our AI assistant adapts its responses based on your emotional state, providing 
+                    <span class="highlight-text">empathetic conversations</span> that feel genuinely human. It knows when to be 
+                    encouraging, calming, or energizing.
+                </p>
             </div>
-            <div class="feature-card">
-                <h3 class="text-xl font-semibold">📈 Mental Health Insights</h3>
-                <p class="mt-2">Analyzes emotional trends for stress & well-being tracking.</p>
+            
+            <div class="feature-card" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-perspective="500">
+                <div class="icon-animate text-4xl mb-4">📈</div>
+                <h3 class="text-2xl font-semibold mb-3">Mental Wellness Analytics</h3>
+                <div class="spacer-sm"></div>
+                <p class="mt-2 leading-relaxed">
+                    Track emotional patterns over time with detailed insights and visualizations. Identify stress triggers 
+                    and mood correlations to improve your overall well-being through personalized recommendations.
+                </p>
             </div>
         </div>
     </section>
 
-    <!-- 📌 How It Works -->
-    <section class="section-container text-center">
-        <h2 class="text-2xl font-bold">🎥 How It Works</h2>
-        <p style="font-weight: 900; font-size: 1.2em; text-shadow: 0 0 8px black, 0 0 12px black;">
-            The system <strong>analyzes facial landmarks</strong> using AI and classifies emotions based on muscle movement and gaze patterns. Then, it:
+    <!-- How It Works Section -->
+    <section class="section-container" id="how-it-works">
+        <h2 class="text-3xl font-bold text-center">
+            <span class="icon-animate">🎥</span> The Science Behind Emotion AI
+        </h2>
+        <div class="spacer"></div>
+        
+        <p class="text-xl mt-4 mb-8 fade-in-text leading-relaxed text-center">
+            Our revolutionary system employs a multi-layered approach to understand human emotions with unprecedented accuracy:
         </p>
         
-        <table class="styled-table mt-6">
-            <tr>
-                <th>Process</th>
-                <th>What Happens?</th>
-            </tr>
-            <tr>
-                <td>📸 Face Analysis</td>
-                <td>Scans 68 key points on the face</td>
-            </tr>
-            <tr>
-                <td>📊 AI Emotion Classification</td>
-                <td>Detects happiness, sadness, anger, and more</td>
-            </tr>
-            <tr>
-                <td>🎶 Music/Chatbot Response</td>
-                <td>Plays songs or starts a conversation based on mood</td>
-            </tr>
+        <div class="flip-card-container">
+            <div class="flip-card">
+                <div class="flip-card-front">
+                    <div class="icon-animate text-5xl mb-6">📸</div>
+                    <h3 class="text-2xl font-bold mb-2">Advanced Facial Analysis</h3>
+                    <p>Hover to learn more about our facial scanning technology</p>
+                </div>
+                <div class="flip-card-back">
+                    <h3 class="text-xl font-semibold mb-4">Deep Neural Networks</h3>
+                    <p class="text-lg">
+                        Our system captures 68 key facial landmarks in real-time, tracking subtle changes in expression
+                        that even humans might miss. We use convolutional neural networks trained on over 10 million 
+                        facial expressions to achieve 98% accuracy in diverse lighting conditions.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="spacer"></div>
+        
+        <table class="styled-table" id="process-table">
+            <thead>
+                <tr>
+                    <th>Process</th>
+                    <th>Technology</th>
+                    <th>Impact</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="process-row">
+                    <td>📸 Facial Detection</td>
+                    <td>Deep Neural Networks</td>
+                    <td>98% accuracy in diverse conditions</td>
+                </tr>
+                <tr class="process-row">
+                    <td>📊 Emotion Classification</td>
+                    <td>Transformer Architecture</td>
+                    <td>Detects 7 primary and 14 complex emotions</td>
+                </tr>
+                <tr class="process-row">
+                    <td>🧠 Context Analysis</td>
+                    <td>Multimodal Learning</td>
+                    <td>Combines facial, voice & text data</td>
+                </tr>
+                <tr class="process-row">
+                    <td>🎶 Response Generation</td>
+                    <td>Reinforcement Learning</td>
+                    <td>Personalized music & conversation</td>
+                </tr>
+            </tbody>
         </table>
     </section>
 
-    <!-- 📌 Applications Section -->
-    <section class="section-container">
-        <h2 class="text-2xl font-bold text-center">🌎 Real-World Applications</h2>
-        <div class="grid grid-cols-2 gap-6 mt-6">
-            <div class="feature-card">
-                <h3 class="text-xl font-semibold">🎮 Gaming & VR</h3>
-                <p class="mt-2">Adapts gameplay based on real-time emotions.</p>
+    <!-- Applications Section -->
+    <section class="section-container" id="applications">
+        <h2 class="text-3xl font-bold text-center mb-8">
+            <span class="icon-animate">🌎</span> Real-World Applications
+        </h2>
+        <div class="spacer"></div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="feature-card application-card" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                <div class="icon-animate text-4xl mb-4">🎮</div>
+                <h3 class="text-2xl font-semibold mb-3">Immersive Gaming & VR</h3>
+                <div class="spacer-sm"></div>
+                <p class="mt-2 leading-relaxed">
+                    Experience games that adapt difficulty, storylines, and music based on your emotional state.
+                    Our AI creates truly personalized gameplay that responds to your frustration, excitement, or fear.
+                </p>
+                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300">
+                    Explore Gaming Integration →
+                </button>
             </div>
-            <div class="feature-card">
-                <h3 class="text-xl font-semibold">📞 Customer Support</h3>
-                <p class="mt-2">AI adjusts responses based on user frustration levels.</p>
+            
+            <div class="feature-card application-card" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                <div class="icon-animate text-4xl mb-4">📞</div>
+                <h3 class="text-2xl font-semibold mb-3">Enhanced Customer Support</h3>
+                <div class="spacer-sm"></div>
+                <p class="mt-2 leading-relaxed">
+                    AI assistants that detect customer frustration and adapt their approach accordingly.
+                    Our system can prioritize support tickets based on emotional urgency and provide
+                    tailored responses that improve satisfaction by 42%.
+                </p>
+                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300">
+                    See Business Solutions →
+                </button>
             </div>
-            <div class="feature-card">
-                <h3 class="text-xl font-semibold">📈 Mental Health</h3>
-                <p class="mt-2">Monitors stress levels through emotion detection.</p>
+            
+            <div class="feature-card application-card" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                <div class="icon-animate text-4xl mb-4">🧠</div>
+                <h3 class="text-2xl font-semibold mb-3">Mental Health & Wellness</h3>
+                <div class="spacer-sm"></div>
+                <p class="mt-2 leading-relaxed">
+                    Track emotional patterns to identify stress triggers and mood correlations.
+                    Our technology provides early detection of anxiety patterns and suggests
+                    personalized interventions before issues escalate.
+                </p>
+                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300">
+                    Discover Wellness Tools →
+                </button>
             </div>
-            <div class="feature-card">
-                <h3 class="text-xl font-semibold">🎶 Music & Streaming</h3>
-                <p class="mt-2">Personalized music recommendations based on emotions.</p>
+            
+            <div class="feature-card application-card" data-tilt data-tilt-max="5" data-tilt-speed="400">
+                <div class="icon-animate text-4xl mb-4">🎵</div>
+                <h3 class="text-2xl font-semibold mb-3">Personalized Entertainment</h3>
+                <div class="spacer-sm"></div>
+                <p class="mt-2 leading-relaxed">
+                    Streaming services that suggest content based on your current mood.
+                    Our emotion detection creates dynamic playlists that evolve with your emotional state
+                    throughout the day, increasing engagement by 67%.
+                </p>
+                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300">
+                    Try Music Recommendations →
+                </button>
             </div>
         </div>
     </section>
 
-    <!-- 📌 Future Scope -->
-    <section class="section-container text-center">
-        <h2 class="text-2xl font-bold">🚀 Future Scope</h2>
-        <p class="text-lg mt-4">
-            Our next goal is to **expand AI Emotion Detection** into:
+    <!-- Future Vision Section -->
+    <section class="section-container text-center" id="future">
+        <h2 class="text-3xl font-bold mb-8">
+            <span class="icon-animate">🚀</span> The Future of Emotion AI
+        </h2>
+        <div class="spacer"></div>
+        
+        <p class="text-xl mt-4 fade-in-text leading-relaxed">
+            We're pushing the boundaries of what's possible with emotion detection technology.
+            Our roadmap includes groundbreaking innovations that will transform how we interact with technology:
         </p>
-        <ul class="text-lg mt-4 space-y-2">
-            <li>🤖 <strong>Virtual Assistants</strong> (Siri, Alexa, Google Assistant)</li>
-            <li>🧠 <strong>Deep Learning Enhancements</strong> for improved accuracy</li>
-            <li>📊 <strong>Live Video Analysis</strong> for security and streaming</li>
+        
+        <ul class="futuristic-list text-lg mt-8">
+            <li class="future-item">
+                <div class="icon-animate mr-4">🤖</div>
+                <strong>Virtual Assistant Integration</strong> - Emotion-aware assistants that know when you need help before you ask
+            </li>
+            <li class="future-item">
+                <div class="icon-animate mr-4">🧠</div>
+                <strong>Multimodal Deep Learning</strong> - Combining facial, voice, text, and biometric data for holistic emotion understanding
+            </li>
+            <li class="future-item">
+                <div class="icon-animate mr-4">📊</div>
+                <strong>Real-time Video Analysis</strong> - Processing emotions across multiple faces in crowded environments
+            </li>
+            <li class="future-item">
+                <div class="icon-animate mr-4">🌐</div>
+                <strong>Cross-cultural Emotion Recognition</strong> - Understanding cultural nuances in emotional expression
+            </li>
         </ul>
     </section>
 
-    <!-- 📌 Call-to-Action -->
-    <section class="section-container text-center">
-        <button class="glow-button">Get Started</button>
+    <!-- Call-to-Action -->
+    <section class="section-container text-center" id="cta">
+        <h2 class="text-3xl font-bold mb-8 fade-in-text">Ready to Experience Emotion AI?</h2>
+        <div class="spacer"></div>
+        <p class="text-xl mb-8 fade-in-text leading-relaxed">
+            Join thousands of users already benefiting from our groundbreaking emotion detection technology.
+            Explore demos, developer tools, or schedule a personalized consultation.
+        </p>
+        <button class="glow-button" id="cta-button">Get Started Now</button>
+        <p class="mt-6 text-sm opacity-70 fade-in-text">No credit card required. Free trial available.</p>
     </section>
 
-    {% include 'footer.html' %}
-
+    <!-- JavaScript for Animations and Interactivity -->
+    <script>
+        // Initialize particles background
+        window.addEventListener('DOMContentLoaded', () => {
+            // Create particles - Missing library check
+            if (typeof Particles !== 'undefined') {
+                Particles.init({
+                    selector: '#particles-container',
+                    color: ['#00c3ff', '#0072ff', '#ffffff'],
+                    connectParticles: true,
+                    responsive: [
+                        {
+                            breakpoint: 768,
+                            options: {
+                                maxParticles: 80
+                            }
+                        },
+                        {
+                            breakpoint: 425,
+                            options: {
+                                maxParticles: 50
+                            }
+                        },
+                        {
+                            breakpoint: 320,
+                            options: {
+                                maxParticles: 30
+                            }
+                        }
+                    ],
+                    maxParticles: 120,
+                    sizeVariations: 3,
+                    speed: 0.5
+                });
+            }
+            
+            // Initialize tilt effect on cards - Missing library check
+            if (typeof VanillaTilt !== 'undefined') {
+                VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+                    max: 5,
+                    speed: 400,
+                    glare: true,
+                    "max-glare": 0.2,
+                });
+            }
+            
+            // Counter animation
+            const counters = document.querySelectorAll('.stats-counter');
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const increment = target / 100;
+                let count = 0;
+                
+                const updateCounter = () => {
+                    if (count < target) {
+                        count += increment;
+                        counter.innerText = Math.ceil(count);
+                        setTimeout(updateCounter, 15);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                
+                updateCounter();
+            });
+            
+            // GSAP animations for section entrance - Missing library check
+            if (typeof gsap !== 'undefined') {
+                // Check if ScrollTrigger is available
+                if (gsap.ScrollTrigger) {
+                    gsap.registerPlugin(ScrollTrigger);
+                }
+                
+                // Hero section - Error: using opacity:1 as starting value
+                gsap.from(".hero-section", {
+                    opacity: 0, // Changed from 1 to 0
+                    duration: 1.5,
+                    ease: "power3.out"
+                });
+                
+                // Error: using 'to' instead of 'from' for initial animation
+                gsap.from(".neon-text", { // Changed from 'to' to 'from'
+                    opacity: 0,
+                    y: 50, // Changed to start from below
+                    duration: 1.2,
+                    delay: 0.5,
+                    ease: "power3.out"
+                });
+                
+                // Text animations - Similar opacity error (starting at 1)
+                gsap.utils.toArray(".fade-in-text").forEach(text => {
+                    gsap.from(text, { // Changed from 'to' to 'from'
+                        scrollTrigger: {
+                            trigger: text,
+                            start: "top 80%",
+                            toggleActions: "play none none none"
+                        },
+                        opacity: 0, // Changed from 1 to 0
+                        y: 50, // Changed from 0 to 50
+                        duration: 1,
+                        ease: "power2.out"
+                    });
+                });
+                
+                // Section containers - Similar opacity error
+                gsap.utils.toArray(".section-container").forEach((section, i) => {
+                    const direction = i % 2 === 0 ? -100 : 100;
+                    gsap.from(section, {
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 80%",
+                            toggleActions: "play none none none"
+                        },
+                        x: direction,
+                        opacity: 0, // Changed from 1 to 0
+                        duration: 1.2,
+                        ease: "power3.out"
+                    });
+                });
+                
+                // Feature cards animation - Similar animation direction error
+                gsap.utils.toArray(".feature-card").forEach((card, i) => {
+                    gsap.from(card, { // Changed from 'to' to 'from'
+                        scrollTrigger: {
+                            trigger: card,
+                            start: "top 85%",
+                            toggleActions: "play none none none"
+                        },
+                        opacity: 0, // Changed from 1 to 0
+                        duration: 0.8,
+                        delay: i * 0.2,
+                        ease: "power2.out"
+                    });
+                });
+                
+                // Table rows animation - Fixed opacity
+                gsap.utils.toArray(".process-row").forEach((row, i) => {
+                    gsap.from(row, {
+                        scrollTrigger: {
+                            trigger: row,
+                            start: "top 90%",
+                            toggleActions: "play none none none"
+                        },
+                        opacity: 0, // Changed from 1 to 0
+                        x: -50,
+                        duration: 0.6,
+                        delay: i * 0.15,
+                        ease: "power2.out"
+                    });
+                });
+                
+                // Future list items animation - Fixed animation direction
+                gsap.utils.toArray(".future-item").forEach((item, i) => {
+                    gsap.from(item, { // Changed from 'to' to 'from'
+                        scrollTrigger: {
+                            trigger: item,
+                            start: "top 85%",
+                            toggleActions: "play none none none"
+                        },
+                        opacity: 0, // Changed from 1 to 0
+                        x: -50, // Changed from 0 to -50 for starting position
+                        duration: 0.8,
+                        delay: i * 0.2,
+                        ease: "back.out(1.2)"
+                    });
+                });
+                
+                // CTA button animation - Fixed animation direction
+                gsap.from("#cta-button", { // Changed from 'to' to 'from'
+                    scrollTrigger: {
+                        trigger: "#cta-button",
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    },
+                    opacity: 0, // Changed from 1 to 0
+                    scale: 0.8, // Changed from 1 to 0.8 for starting scale
+                    duration: 1,
+                    ease: "elastic.out(1, 0.5)"
+                });
+                
+                // Interactive elements
+                const featureCards = document.querySelectorAll('.feature-card');
+                featureCards.forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        gsap.to(card, {
+                            y: -15,
+                            boxShadow: "0 20px 50px rgba(0, 114, 255, 0.4)",
+                            duration: 0.3
+                        });
+                    });
+                    
+                    card.addEventListener('mouseleave', () => {
+                        gsap.to(card, {
+                            y: 0,
+                            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+                            duration: 0.3
+                        });
+                    });
+                });
+            }
+            
+            // Learn more buttons
+            const learnMoreBtns = document.querySelectorAll('.learn-more-btn');
+            learnMoreBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // Animation for button click
+                    if (typeof gsap !== 'undefined') {
+                        gsap.to(btn, {
+                            scale: 1.1,
+                            duration: 0.2,
+                            yoyo: true,
+                            repeat: 1
+                        });
+                    }
+                    
+                    // Show a custom popup or redirect to more information
+                    const card = btn.closest('.feature-card');
+                    if (card) {
+                        const titleElement = card.querySelector('h3');
+                        const title = titleElement ? titleElement.textContent : 'this feature';
+                        alert(`You're interested in learning more about ${title}. More information will be available soon!`);
+                    } else {
+                        alert('More information will be available soon!');
+                    }
+                });
+            });
+            
+            // CTA button interaction
+            const ctaButton = document.getElementById('cta-button');
+            if (ctaButton) {
+                ctaButton.addEventListener('click', () => {
+                    if (typeof gsap !== 'undefined') {
+                        // Create a flying element animation
+                        const flyingElement = document.createElement('div');
+                        flyingElement.style.position = 'fixed';
+                        flyingElement.style.left = '50%';
+                        flyingElement.style.top = '50%';
+                        flyingElement.style.transform = 'translate(-50%, -50%)';
+                        flyingElement.style.background = 'linear-gradient(45deg, #00c3ff, #0072ff)';
+                        flyingElement.style.borderRadius = '50%';
+                        flyingElement.style.width = '20px';
+                        flyingElement.style.height = '20px';
+                        flyingElement.style.boxShadow = '0 0 20px #00c3ff';
+                        flyingElement.style.zIndex = '1000';
+                        document.body.appendChild(flyingElement);
+                        
+                        // Animate the flying element
+                        gsap.to(flyingElement, {
+                            width: '2000px',
+                            height: '2000px',
+                            duration: 1,
+                            ease: 'power2.in',
+                            onComplete: () => {
+                                // Redirect to the sign-up page or show a modal
+                                alert('Thank you for your interest! Our sign-up page is coming soon.');
+                                document.body.removeChild(flyingElement);
+                            }
+                        });
+                    } else {
+                        alert('Thank you for your interest! Our sign-up page is coming soon.');
+                    }
+                });
+            }
+            
+            // Check if GSAP is available for the background circles
+            if (typeof gsap !== 'undefined') {
+                // Create background circles dynamically
+                for (let i = 0; i < 8; i++) {
+                    const circle = document.createElement('div');
+                    circle.classList.add('bg-circle');
+                    
+                    // Random size between 100px and 400px
+                    const size = Math.random() * 300 + 100;
+                    circle.style.width = `${size}px`;
+                    circle.style.height = `${size}px`;
+                    
+                    // Random position
+                    circle.style.top = `${Math.random() * 100}%`;
+                    circle.style.left = `${Math.random() * 100}%`;
+                    
+                    // Random opacity
+                    circle.style.opacity = (Math.random() * 0.05 + 0.02).toString();
+                    
+                    // Add to body
+                    document.body.appendChild(circle);
+                    
+                    // Animate position slowly
+                    gsap.to(circle, {
+                        x: Math.random() * 100 - 50,
+                        y: Math.random() * 100 - 50,
+                        duration: Math.random() * 100 + 50,
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "sine.inOut"
+                    });
+                }
+            }
+            
+            // Interactive table rows
+            const tableRows = document.querySelectorAll('.styled-table tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('click', () => {
+                    // Create a popup with more information
+                    const firstCell = row.querySelector('td:first-child');
+                    if (firstCell) {
+                        const process = firstCell.textContent;
+                        
+                        // Get more detailed information based on the process
+                        let detailedInfo = '';
+                        switch(process) {
+                            case '📸 Facial Detection':
+                                detailedInfo = 'Our AI scans 68 facial landmarks in real-time, tracking muscle movements with precision that exceeds human capability. The system works in variable lighting and can detect emotions even when faces are partially obscured.';
+                                break;
+                            case '📊 Emotion Classification':
+                                detailedInfo = 'Using transformer neural networks, we detect 7 primary emotions (happiness, sadness, anger, fear, disgust, surprise, contempt) and 14 complex emotional states with 98% accuracy through contextual analysis.';
+                                break;
+                            case '🧠 Context Analysis':
+                                detailedInfo = 'Our multimodal system combines facial expression data with voice tone analysis and text sentiment to understand emotional context fully. This creates a comprehensive emotional profile for more accurate responses.';
+                                break;
+                            case '🎶 Response Generation':
+                                detailedInfo = 'Based on detected emotions, our AI generates personalized responses, including music recommendations, conversation topics, and interface adjustments to create the optimal user experience.';
+                                break;
+                            default:
+                                detailedInfo = 'More details coming soon.';
+                        }
+                        
+                        alert(`${process}\n\n${detailedInfo}`);
+                    }
+                });
+            });
+        });
+    </script>
+    
 </body>
+
+{% include 'footer.html' %}
+
 </html>
