@@ -6,6 +6,7 @@
   <title>EmotionAI Pricing</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
+    /* Root Colors & Base Styles */
     :root {
       --primary-color: #4f46e5;
       --secondary-color: #6366f1;
@@ -134,15 +135,367 @@
         align-items: center;
       }
     }
+
+    /* Footer Styling */
+    .footer {
+      background: linear-gradient(to right, #3b82f6, #6366f1);
+      color: white;
+      padding: 60px 20px;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-title {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .footer-description {
+      color: #cbd5e1;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .footer-socials a {
+      margin-right: 15px;
+      color: white;
+      font-size: 1.2rem;
+      transition: color 0.3s;
+    }
+
+    .footer-socials a:hover {
+      color: #cbd5e1;
+    }
+
+    .footer-links {
+      list-style: none;
+      padding: 0;
+    }
+
+    .footer-links li {
+      margin-bottom: 10px;
+    }
+
+    .footer-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    .footer-section p {
+      margin-bottom: 12px;
+      color: #cbd5e1;
+    }
+
+    .footer-section p i {
+      margin-right: 8px;
+    }
+
+    .footer-btn {
+      display: inline-block;
+      background-color: white;
+      color: #3b82f6;
+      padding: 10px 20px;
+      margin-top: 10px;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+
+    .footer-btn:hover {
+      background-color: #e0e7ff;
+    }
+
+    .footer-divider {
+      border-top: 1px solid #93c5fd;
+      margin: 20px 0;
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between; /* Distribute space: left & right */
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .footer-policies {
+      display: flex;
+      gap: 15px; /* Space between links */
+    }
+    
+    .footer-policies a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s;
+    }
+    
+    .footer-policies a:hover {
+      color: white;
+    }
+    
+    @media (max-width: 768px) {
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-policies {
+        justify-content: center;
+        margin-top: 10px;
+      }
+    }
+    
+
+    .footer-top {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .footer-top a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-top a:hover {
+      color: white;
+    }
+
+
+
+    /* Header Styling */
+.header {
+  background: linear-gradient(to right, black, #374151);
+  color: white;
+  padding: 15px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.header-emoji {
+  font-size: 2rem;
+  transition: transform 0.3s;
+}
+
+.header-logo:hover .header-emoji {
+  animation: rotate 0.5s ease;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: linear-gradient(to right, #60a5fa, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.header-menu {
+  display: flex;
+  gap: 10px;
+}
+
+.header-link {
+  padding: 8px 12px;
+  text-decoration: none;
+  color: white;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.header-link:hover {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.header-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  transition: width 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.header-link:hover::after {
+  width: 80%;
+}
+
+.header-btn {
+  padding: 8px 16px;
+  background-color: #3b82f6;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.3s;
+  animation: pulse 2s infinite;
+}
+
+.header-btn:hover {
+  background-color: #2563eb;
+}
+
+/* Mobile Menu */
+.mobile-menu-btn {
+  display: none;
+}
+
+.burger-menu {
+  width: 30px;
+  height: 25px;
+  position: relative;
+  cursor: pointer;
+}
+
+.burger-line {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  margin: 6px 0;
+  transition: all 0.3s;
+}
+
+.burger-menu.active .burger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.burger-menu.active .burger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.burger-menu.active .burger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.mobile-link, .mobile-btn {
+  padding: 10px;
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  background-color: rgba(59, 130, 246, 0.2);
+  margin: 5px 0;
+  border-radius: 4px;
+}
+
+.mobile-btn {
+  background-color: #3b82f6;
+}
+
+/* Animation */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  75% { transform: rotate(-10deg); }
+  100% { transform: rotate(0); }
+}
+
+@media (max-width: 768px) {
+  .header-menu {
+    display: none;
+  }
+  .mobile-menu-btn {
+    display: flex;
+  }
+}
+
   </style>
 </head>
-<body>
-{% include 'header.html' %}
 
+<body>
+
+  <header class="header">
+    <div class="header-container">
+      <div class="header-flex">
+        <!-- Logo -->
+        <a href="/" class="header-logo">
+          <span class="header-emoji">🎭</span>
+          <span class="header-title">AI Emotion Detection</span>
+        </a>
+  
+        <!-- Desktop Menu -->
+        <nav class="header-menu">
+          <a href="/" class="header-link">Home</a>
+          <a href="/ai_app" class="header-link">AI App</a>
+          <a href="/about" class="header-link">About</a>
+          <a href="/contact" class="header-link">Contact</a>
+          <a href="/features" class="header-link">Features</a>
+          <a href="/ai_app" class="header-btn">Try Demo</a>
+        </nav>
+  
+        <!-- Mobile Menu Button -->
+        <div class="mobile-menu-btn">
+          <button id="mobile-menu-button" class="burger-menu">
+            <span class="burger-line"></span>
+            <span class="burger-line"></span>
+            <span class="burger-line"></span>
+          </button>
+        </div>
+      </div>
+  
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="mobile-menu">
+        <a href="/" class="mobile-link">Home</a>
+        <a href="/ai_app" class="mobile-link">AI App</a>
+        <a href="/about" class="mobile-link">About</a>
+        <a href="/contact" class="mobile-link">Contact</a>
+        <a href="/demo" class="mobile-btn">Try Demo</a>
+      </div>
+    </div>
+  </header>
+  
   <section class="pricing-section">
     <h2 class="section-title">Our Pricing Plans</h2>
     <div class="pricing-container">
-
       <!-- Basic Plan -->
       <div class="pricing-card">
         <h3 class="plan-name">Basic</h3>
@@ -153,7 +506,7 @@
           <li><i class="fas fa-check-circle"></i> Limited Music Library</li>
           <li><i class="fas fa-check-circle"></i> Email Support</li>
         </ul>
-        <button class="plan-btn">Get Started</button>
+        <button class="plan-btn" onclick="subscribePlan('Basic')">Get Started</button>
       </div>
 
       <!-- Premium Plan -->
@@ -167,7 +520,7 @@
           <li><i class="fas fa-check-circle"></i> Full Music Library Access</li>
           <li><i class="fas fa-check-circle"></i> Priority Support</li>
         </ul>
-        <button class="plan-btn">Subscribe Now</button>
+        <button class="plan-btn" onclick="subscribePlan('Premium')">Subscribe Now</button>
       </div>
 
       <!-- Enterprise Plan -->
@@ -180,25 +533,147 @@
           <li><i class="fas fa-check-circle"></i> Dedicated Manager</li>
           <li><i class="fas fa-check-circle"></i> 24/7 Premium Support</li>
         </ul>
-        <button class="plan-btn">Contact Us</button>
+        <button class="plan-btn" onclick="subscribePlan('Enterprise')">Contact Us</button>
       </div>
-
     </div>
   </section>
-  {% include 'footer.html' %}
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <!-- Main Footer Content -->
+      <div class="footer-grid">
+        <!-- Company Info -->
+        <div class="footer-section">
+          <h3 class="footer-title">AI Emotion Detection</h3>
+          <p class="footer-description">Transforming human-computer interaction through advanced emotional intelligence.</p>
+          <div class="footer-socials">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.linkedin.com/in/pallav-sharma"><i class="fab fa-linkedin"></i></a>
+            <a href="https://github.com/pallav110"><i class="fab fa-github"></i></a>
+          </div>
+        </div>
+  
+        <!-- Quick Links -->
+        <div class="footer-section">
+          <h3 class="footer-title">Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/features">Features</a></li>
+            <li><a href="{{ url_for('pricing') }}">Pricing</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+  
+        <!-- Contact Info -->
+        <div class="footer-section">
+          <h3 class="footer-title">Contact Us</h3>
+          <p><i class="fas fa-envelope"></i> <a href="mailto:info@aiemotion.tech">pallavs2020@gmail.com</a></p>
+          <p><i class="fas fa-phone"></i> <a href="tel:+15551234567">+91 8588999382</a></p>
+          <p><i class="fas fa-map-marker-alt"></i> India, Noida-Delhi</p>
+          <a href="/contact" class="footer-btn">Get in Touch</a>
+        </div>
+      </div>
+  
+      <!-- Divider -->
+      <div class="footer-divider"></div>
+  
+      <!-- Bottom Footer -->
+      <div class="footer-bottom">
+        <p>&copy; 2025 AI Emotion Detection. All rights reserved.</p>
+        <div class="footer-policies">
+          <a href="#">Privacy Policy</a>
+          <a href="/services">Terms of Service</a>
+          <a href="/cookies">Cookie Policy</a>
+        </div>
+      </div>
+  
+
+      <!-- Back to top -->
+      <div class="footer-top">
+        <a href="#top">Back to top <i class="fas fa-chevron-up"></i></a>
+      </div>
+    </div>
+  </footer>
+  
+
+
+
+  
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
 
   <script>
-    // Optional subtle animation
-    const cards = document.querySelectorAll('.pricing-card');
-    cards.forEach(card => {
-      card.addEventListener('mouseenter', () => {
-        card.style.transform = 'scale(1.05)';
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    if (!window.headerScriptExecuted) {
+      window.headerScriptExecuted = true;
+      document.addEventListener('DOMContentLoaded', function () {
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuButton && mobileMenu) {
+          mobileMenuButton.addEventListener('click', function () {
+            mobileMenu.classList.toggle('hidden');
+            this.classList.toggle('active');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+            mobileLinks.forEach(link => {
+              link.style.animation = 'none';
+              link.offsetHeight;
+              link.style.animation = null;
+            });
+          });
+        }
       });
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'scale(1)';
+    }
+
+    // Auth Functions
+    function signUp() {
+      const email = prompt('Enter your email:');
+      const password = prompt('Enter your password:');
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => alert('Signed Up Successfully!'))
+        .catch(error => alert(error.message));
+    }
+
+    function login() {
+      const email = prompt('Enter your email:');
+      const password = prompt('Enter your password:');
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => alert('Logged In Successfully!'))
+        .catch(error => alert(error.message));
+    }
+
+    function logout() {
+      auth.signOut().then(() => alert('Logged Out!'));
+    }
+
+    // Payment Placeholder (Stripe or Custom)
+    function subscribePlan(plan) {
+      alert(`You selected the ${plan} plan! Payment processing will begin...`);
+      // Here you can add Stripe Checkout logic or redirect to payment page
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+  
+      menuButton.addEventListener('click', () => {
+        mobileMenu.style.display = mobileMenu.style.display === 'flex' ? 'none' : 'flex';
+        menuButton.classList.toggle('active');
       });
     });
+    
   </script>
-
 </body>
 </html>

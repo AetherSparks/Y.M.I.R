@@ -865,6 +865,10 @@ def services():
 def pricing():
     return render_template('pricing.html')
 
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
 @app.route('/get_neutral_songs', methods=['GET'])
 def get_neutral_songs():
     neutral_songs = [
