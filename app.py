@@ -25,6 +25,11 @@ import time
 import re
 from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
 from flask import send_from_directory, url_for
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # 👈 THIS must come before os.getenv()
+
 #══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
@@ -34,7 +39,6 @@ from flask import send_from_directory, url_for
 #Flask App════════════════════════════════════════════════════════Initialised══════════════════════════════════════════════════════════════════════════════
 app = Flask(__name__)
 #══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
 
 
 
@@ -279,7 +283,7 @@ def recommend_songs(emotion_file):
 console = Console()
 
 # Groq API Configuration
-GROQ_API_KEY = "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"  # Replace with actual key
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 # Load emotion classifiers
@@ -811,7 +815,7 @@ def download_youtube_async(song, artist, filename):
 
     try:
         ydl_opts = {
-            'format': 'bestaudio[ext=m4a]/bestaudio/best',
+            'format': 'bestaudio/best',
             'outtmpl': os.path.join(MUSIC_DIR, filename.replace('.mp3', '')),
             'quiet': True,
             'noplaylist': True,
@@ -943,7 +947,7 @@ def get_neutral_songs():
     return jsonify({"songs": neutral_songs})
 
 
-JAMENDO_CLIENT_ID = 'f471f3d9'
+JAMENDO_CLIENT_ID = os.getenv('JAMENDO_CLIENT_ID')
 MUSIC_DIR = os.path.join('static', 'music')
 
 # Ensure music folder exists

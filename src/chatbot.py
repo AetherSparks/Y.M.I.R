@@ -6,11 +6,14 @@ import re
 from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
 from rich.console import Console
 from rich.panel import Panel
+import os
+
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 
 console = Console()
+print(f"GROQ API Key: {GROQ_API_KEY}")  # Should print key (only in local test)
 
 # Groq API Configuration
-GROQ_API_KEY = ""  # Replace with actual key
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 # Load emotion classifiers
