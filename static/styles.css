@@ -7,10 +7,6 @@
     scroll-behavior: smooth;
 }
 
-
-
-
-
 /* Responsive Tweaks */
 @media (max-width: 768px) {
     .container {
