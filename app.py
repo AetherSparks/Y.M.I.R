@@ -811,7 +811,7 @@ def download_youtube_async(song, artist, filename):
 
     try:
         ydl_opts = {
-            'format': 'bestaudio/best',
+            'format': 'bestaudio[ext=m4a]/bestaudio/best',
             'outtmpl': os.path.join(MUSIC_DIR, filename.replace('.mp3', '')),
             'quiet': True,
             'noplaylist': True,
