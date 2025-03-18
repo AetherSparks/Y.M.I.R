@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmoMusic Features</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4B0082;
+            --accent: #9370DB;
+            --light: #E6E6FA;
+            --dark: #191970;
+        }
+
+        body {
+            background-color: #121212;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        header {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .circle-1 {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -50px;
+            right: 100px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .circle-3 {
+            width: 200px;
+            height: 200px;
+            top: 100px;
+            right: -50px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            text-align: center;
+            padding: 2rem;
+            z-index: 1;
+        }
+
+        .typing-animation {
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typing 3.5s steps(40, end);
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.lead {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        nav {
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background-color: rgba(0, 0, 0, 0.95);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+        }
+
+        .bar {
+            display: block;
+            width: 25px;
+            height: 3px;
+            margin: 5px auto;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+
+        section {
+            padding: 5rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .section-title .underline {
+            height: 4px;
+            width: 100px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            margin: 0 auto;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.2;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .feature-desc {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .demo {
+            background-color: #0a0a0a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .demo-video {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .demo-video img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .recommendations {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .song-list {
+            list-style: none;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .song-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .song-item:last-child {
+            border-bottom: none;
+        }
+
+        .song-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            margin-right: 1rem;
+            object-fit: cover;
+        }
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .song-artist {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .mini-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            z-index: 100;
+            width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .now-playing-cover {
+            width: 60px;
+            height: 60px;
+            border-radius: 5px;
+            margin-right: 1rem;
+            object-fit: cover;
+        }
+
+        .now-playing-info {
+            flex: 1;
+            padding-right: 1rem;
+        }
+
+        .now-playing-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .now-playing-artist {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .control-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .control-button:hover {
+            color: var(--accent);
+        }
+
+        .play-button {
+            font-size: 1.5rem;
+        }
+
+        .how-it-works {
+            background: linear-gradient(135deg, #121212, #1a1a1a);
+        }
+
+        .process {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .process-step {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--accent);
+            opacity: 0.5;
+            line-height: 1;
+        }
+
+        .step-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .step-content p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        
+
+        /* Animation classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered animation delays */
+        .fade-in:nth-child(1) { transition-delay: 0.1s; }
+        .fade-in:nth-child(2) { transition-delay: 0.2s; }
+        .fade-in:nth-child(3) { transition-delay: 0.3s; }
+        .fade-in:nth-child(4) { transition-delay: 0.4s; }
+        .fade-in:nth-child(5) { transition-delay: 0.5s; }
+        .fade-in:nth-child(6) { transition-delay: 0.6s; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">EmoMusic</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/features">Features</a></li>
+                <li><a href="#demo">Demo</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/ai_app" class="ml-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition-all shadow-md pulse-btn">Try Demo</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero section -->
+    <header>
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+        <div class="hero-content">
+            <h1 class="typing-animation">Emotion Meets Music</h1>
+            <p class="lead">Experience an AI-powered system that detects your emotions and recommends the perfect soundtrack for your mood.</p>
+            <a href="#features" class="btn">Explore Features</a>
+        </div>
+    </header>
+
+    <!-- Features section -->
+    <section id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Key Features</h2>
+                <div class="underline"></div>
+            </div>
+            <div class="features">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3 class="feature-title">Facial Emotion Recognition</h3>
+                    <p class="feature-desc">Our system continuously detects and analyzes your facial expressions via webcam to understand your current emotional state in real-time.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3 class="feature-title">AI Chatbot</h3>
+                    <p class="feature-desc">Interact with our intelligent chatbot that detects emotions from your text and analyzes conversation history to better understand your mood.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Emotion Logging</h3>
+                    <p class="feature-desc">We track and log your emotions from both facial recognition and text analysis, averaging them to determine your dominant emotional state.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3 class="feature-title">Smart Music Recommendations</h3>
+                    <p class="feature-desc">Using a Content-Based Filtering model, we recommend the perfect songs based on your emotional state and music preferences.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3 class="feature-title">Integrated Music Player</h3>
+                    <p class="feature-desc">Listen to your recommended songs instantly with our Spotify-like floating mini-player without leaving the page.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3 class="feature-title">Seamless Integration</h3>
+                    <p class="feature-desc">The entire system runs seamlessly on your browser, combining frontend and backend technologies for a smooth user experience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo section -->
+    <section id="demo" class="demo">
+        <div class="container">
+            <div class="section-title">
+                <h2>See It In Action</h2>
+                <div class="underline"></div>
+            </div>
+            <div class="demo-container">
+                <div class="demo-video fade-in">
+                    <img src="/api/placeholder/800/450" alt="Demo video placeholder">
+                </div>
+                <div class="recommendations fade-in">
+                    <h3>Current Recommendations</h3>
+                    <ul class="song-list">
+                        <li class="song-item">
+                            <img src="/api/placeholder/50/50" alt="Song cover" class="song-cover">
+                            <div class="song-info">
+                                <div class="song-title">Happy Day</div>
+                                <div class="song-artist">The Mood Lifters</div>
+                            </div>
+                        </li>
+                        <li class="song-item">
+                            <img src="/api/placeholder/50/50" alt="Song cover" class="song-cover">
+                            <div class="song-info">
+                                <div class="song-title">Calm Waters</div>
+                                <div class="song-artist">Serenity</div>
+                            </div>
+                        </li>
+                        <li class="song-item">
+                            <img src="/api/placeholder/50/50" alt="Song cover" class="song-cover">
+                            <div class="song-info">
+                                <div class="song-title">Energy Boost</div>
+                                <div class="song-artist">The Motivators</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-title">
+                <h2>How It Works</h2>
+                <div class="underline"></div>
+            </div>
+            <div class="process">
+                <div class="process-step fade-in">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Emotion Detection</h3>
+                        <p>Our system uses your webcam to analyze facial expressions and detects emotions from your chat interactions. These inputs are processed in real-time using advanced AI algorithms.</p>
+                    </div>
+                </div>
+                <div class="process-step fade-in">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Emotion Analysis</h3>
+                        <p>We combine and average the emotions detected from your face and text to determine your dominant emotional state. This data is securely stored to improve future recommendations.</p>
+                    </div>
+                </div>
+                <div class="process-step fade-in">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Music Selection</h3>
+                        <p>Our Content-Based Filtering model analyzes your emotional state and matches it with songs from our database based on mood labels, mental health benefits, and musical features.</p>
+                    </div>
+                </div>
+                <div class="process-step fade-in">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Playback</h3>
+                        <p>The system fetches the recommended songs and plays them in our custom mini-player. The audio plays seamlessly in the background without showing external player interfaces.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mini Player -->
+    <div class="mini-player">
+        <img src="/api/placeholder/60/60" alt="Now playing" class="now-playing-cover">
+        <div class="now-playing-info">
+            <div class="now-playing-title">Happy Day</div>
+            <div class="now-playing-artist">The Mood Lifters</div>
+        </div>
+        <div class="player-controls">
+            <button class="control-button">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <button class="control-button play-button">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="control-button">
+                <i class="fas fa-step-forward"></i>
+            </button>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+
+    
+
+    <script>
+        // Hamburger menu functionality
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Fade-in animation on scroll
+        const fadeElements = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        fadeElements.forEach(element => {
+            observer.observe(element);
+        });
+
+        // Mini-player functionality
+        const playButton = document.querySelector('.play-button i');
+        let isPlaying = false;
+
+        playButton.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                playButton.classList.remove('fa-play');
+                playButton.classList.add('fa-pause');
+                // Logic to play audio would go here
+            } else {
+                playButton.classList.remove('fa-pause');
+                playButton.classList.add('fa-play');
+                // Logic to pause audio would go here
+            }
+        });
+
+        // Song list click functionality
+        const songItems = document.querySelectorAll('.song-item');
+        const nowPlayingTitle = document.querySelector('.now-playing-title');
+        const nowPlayingArtist = document.querySelector('.now-playing-artist');
+        const nowPlayingCover = document.querySelector('.now-playing-cover');
+
+        songItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Get song info
+                const title = item.querySelector('.song-title').textContent;
+                const artist = item.querySelector('.song-artist').textContent;
+                const cover = item.querySelector('.song-cover').src;
+                
+                // Update mini player
+                nowPlayingTitle.textContent = title;
+                nowPlayingArtist.textContent = artist;
+                nowPlayingCover.src = cover;
+                
+                // Set play state
+                if (!isPlaying) {
+                    playButton.click();
+                }
+                
+                // Logic to play selected song would go here
+            });
+        });
+    </script>
+</body>
+</html>

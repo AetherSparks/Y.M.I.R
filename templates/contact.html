@@ -5,214 +5,939 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact - AI Emotion Detection</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
 
     <style>
-        /* Background Animation */
-        /* Fixing Layout */
+        /* Core Styles */
         body {
             background: linear-gradient(135deg, #1e3c72, #2a5298, #0f2027);
             background-size: 300% 300%;
             animation: gradientAnimation 8s ease infinite;
             font-family: 'Poppins', sans-serif;
             color: white;
-            text-align: center;
             overflow-x: hidden;
             display: flex;
-            flex-direction: column;  /* Fix layout */
+            flex-direction: column;
             min-height: 100vh;
             margin: 0;
         }
-        
-        /* Main Content Section */
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animated Background Elements */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .circle:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            left: 80%;
+            animation-delay: 2s;
+        }
+
+        .circle:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            top: 80%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        .circle:nth-child(4) {
+            width: 250px;
+            height: 250px;
+            top: 20%;
+            left: 70%;
+            animation-delay: 6s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(10px, 10px) rotate(5deg); }
+            50% { transform: translate(0, 15px) rotate(0deg); }
+            75% { transform: translate(-10px, 5px) rotate(-5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* Main Content */
         .main-content {
-            flex: 1;  /* Makes the contact section take available space */
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-        }
-        
-        /* 🌟 Contact Card with Glassmorphism */
-        .contact-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 15px;
-            padding: 50px;
-            width: 90%;
-            max-width: 550px;
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 20px;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            padding: 40px 20px;
+            position: relative;
         }
 
-        .contact-card:hover {
+        /* Interactive Contact Section */
+        .contact-container {
+            width: 90%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            position: relative;
+        }
+
+        /* Left Side - Contact Info */
+        .contact-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-info:hover {
             transform: translateY(-5px);
             box-shadow: 0px 15px 35px rgba(255, 255, 255, 0.2);
         }
 
-        /* 🌟 Profile Image */
-        .profile-img {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0px 8px 20px rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .profile-img:hover {
-            transform: scale(1.1);
-        }
-
-        /* 🌟 Contact Title */
-        .contact-title {
-            font-size: 40px;
-            font-weight: 700;
-            text-transform: uppercase;
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
-        }
-
-        /* 🌟 Social Links */
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            width: 100%;
-        }
-
-        .social-links a {
-            font-size: 18px;
-            font-weight: 600;
-            color: white;
-            text-decoration: none;
+        .profile-section {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            gap: 20px;
         }
 
-        .social-links a i {
-            font-size: 22px;
-        }
-
-        .social-links a:hover {
-            transform: translateY(-4px);
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* 🌟 Contact Form */
-        .contact-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-        }
-
-        .contact-form input,
-        .contact-form textarea {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            outline: none;
-            font-size: 16px;
-            color: black;
-            background: rgba(255, 255, 255, 0.9);
-            transition: 0.3s ease-in-out;
-        }
-
-        .contact-form input:focus,
-        .contact-form textarea:focus {
-            transform: scale(1.02);
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
-        }
-
-        .contact-form textarea {
+        .profile-img-container {
+            position: relative;
+            width: 120px;
             height: 120px;
         }
 
-        .contact-form button {
-            padding: 14px;
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .profile-img-container:hover .profile-img {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .profile-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+            animation: pulse 3s infinite;
+            top: 0;
+            left: 0;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.3; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+
+        .profile-text {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .name {
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #fff, #aaf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .contact-item:hover {
+            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            font-size: 18px;
+        }
+
+        .contact-text {
+            font-size: 16px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-link:before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ffcc00, #ff6600);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px) rotate(10deg);
+            color: #fff;
+        }
+
+        .social-link:hover:before {
+            opacity: 1;
+        }
+
+        .linkedin:hover:before {
+            background: linear-gradient(45deg, #0077b5, #00a0dc);
+        }
+
+        .github:hover:before {
+            background: linear-gradient(45deg, #333, #666);
+        }
+
+        .twitter:hover:before {
+            background: linear-gradient(45deg, #1da1f2, #0d8ecf);
+        }
+
+        .instagram:hover:before {
+            background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+        }
+
+        /* Right Side - Contact Form */
+        .contact-form-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 15px 35px rgba(255, 255, 255, 0.2);
+        }
+
+        .form-header {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .form-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, #aaf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            pointer-events: none;
+            transition: 0.3s ease all;
+            opacity: 0.7;
+        }
+
+        .input-group input:focus ~ label,
+        .input-group input:not(:placeholder-shown) ~ label,
+        .input-group textarea:focus ~ label,
+        .input-group textarea:not(:placeholder-shown) ~ label {
+            top: -12px;
+            left: 10px;
+            font-size: 12px;
+            background: rgba(42, 82, 152, 0.8);
+            padding: 0 5px;
+            border-radius: 4px;
+            opacity: 1;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+        }
+
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: transparent;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .input-group .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        button.submit-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
             background: linear-gradient(90deg, #ffcc00, #ff6600);
             color: black;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
             cursor: pointer;
-            transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
         }
 
-        .contact-form button:hover {
-            background: linear-gradient(90deg, #ffb300, #ff3300);
+        button.submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.7s ease;
+        }
+
+        button.submit-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
 
-        /* 🌟 Responsive Design */
-        @media (max-width: 600px) {
-            .contact-card {
-                width: 95%;
+        button.submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .success-message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 128, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border-radius: 20px;
+            transform: translateY(-100%);
+            transition: transform 0.5s ease;
+            z-index: 10;
+        }
+
+        .success-message.show {
+            transform: translateY(0);
+        }
+
+        .success-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        /* Map Section */
+        .map-section {
+            margin-top: 40px;
+            width: 90%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .map-container {
+            width: 100%;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .map-icon {
+            font-size: 40px;
+            opacity: 0.7;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-top: 40px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .faq-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #fff, #aaf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .faq-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .faq-question {
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-answer {
+            margin-top: 15px;
+            height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            height: auto;
+            opacity: 1;
+        }
+
+        .faq-toggle {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
+
+        /* Newsletter Section */
+        .newsletter-section {
+            margin-top: 40px;
+            width: 90%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .newsletter-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #fff, #aaf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .newsletter-form {
+            display: flex;
+            max-width: 600px;
+            margin: 20px auto 0;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px 0 0 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+        }
+
+        .newsletter-btn {
+            padding: 0 25px;
+            background: linear-gradient(90deg, #ffcc00, #ff6600);
+            border: none;
+            border-radius: 0 12px 12px 0;
+            color: black;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-btn:hover {
+            background: linear-gradient(90deg, #ffb300, #ff3300);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-container {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 30px 15px;
+            }
+            
+            .contact-info, 
+            .contact-form-container {
                 padding: 30px;
             }
 
-            .contact-title {
-                font-size: 32px;
+            .profile-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-img-container {
+                margin: 0 auto;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .newsletter-input {
+                border-radius: 12px;
+            }
+
+            .newsletter-btn {
+                border-radius: 12px;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .contact-info, 
+            .contact-form-container,
+            .map-section,
+            .newsletter-section {
+                padding: 20px;
+            }
+
+            .form-title,
+            .newsletter-title,
+            .faq-title {
+                font-size: 24px;
+            }
+
+            .social-links {
+                justify-content: center;
             }
         }
     </style>
 </head>
+
 <body>
     {% include 'header.html' %}
 
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+
     <div class="main-content">
-        <div class="contact-card">
-        
-            <!-- 🌟 Profile Image -->
-            <img src="./logo192.png" alt="Your Icon" class="profile-img">
-    
-            <!-- 🌟 Title -->
-            <h1 class="contact-title">Get in Touch</h1>
-            <p>
-                Let's connect on  
-                <a href="https://www.linkedin.com/in/pallav-sharma" target="_blank" class="text-blue-300 hover:text-blue-500">
-                    <i class="fab fa-linkedin"></i> LinkedIn
-                </a> 
-                or  
-                <a href="https://github.com/PallavSharma" target="_blank" class="text-gray-300 hover:text-gray-500">
-                    <i class="fab fa-github"></i> GitHub
-                </a>.
-            </p>
-    
-            <!-- 🌟 Social Links -->
-            <div class="social-links">
-                <a href="https://www.linkedin.com/in/pallav-sharma" target="_blank">
-                    <i class="fab fa-linkedin"></i> LinkedIn
-                </a>
-                <a href="https://github.com/PallavSharma" target="_blank">
-                    <i class="fab fa-github"></i> GitHub
-                </a>
+        <div class="flex flex-col items-center w-full gap-10">
+            <!-- Contact Section -->
+            <div class="contact-container">
+                <!-- Left Side - Contact Info -->
+                <div class="contact-info">
+                    <div class="profile-section">
+                        <div class="profile-img-container">
+                            <div class="profile-glow"></div>
+                            <img src="./logo192.png" alt="Your Icon" class="profile-img">
+                        </div>
+                        <div class="profile-text">
+                            <h2 class="name">Pallav Sharma</h2>
+                            <p class="title">AI Specialist & Software Developer</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-text">contact@emotionai.com</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-text">+1 (555) 123-4567</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-text">San Francisco, CA, USA</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Connect With Me</h3>
+                        <div class="social-links">
+                            <a href="https://www.linkedin.com/in/pallav-sharma" target="_blank" class="social-link linkedin">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="https://github.com/PallavSharma" target="_blank" class="social-link github">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="#" class="social-link twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <h3 class="text-xl font-semibold mb-3">Office Hours</h3>
+                        <p class="mb-2">Monday - Friday: 9AM - 5PM</p>
+                        <p>Saturday - Sunday: Closed</p>
+                    </div>
+                </div>
+
+                <!-- Right Side - Contact Form -->
+                <div class="contact-form-container">
+                    <div class="form-header">
+                        <h2 class="form-title">Send Me a Message</h2>
+                        <p class="form-subtitle">I'll get back to you as soon as possible</p>
+                    </div>
+
+                    <form class="contact-form" id="contactForm">
+                        <div class="input-group">
+                            <input type="text" id="name" placeholder="Your name">
+                            <label for="name">Your Name</label>
+                            <i class="fas fa-user input-icon"></i>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="email" id="email" placeholder="Your email">
+                            <label for="email">Your Email</label>
+                            <i class="fas fa-envelope input-icon"></i>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="text" id="subject" placeholder="Subject">
+                            <label for="subject">Subject</label>
+                            <i class="fas fa-heading input-icon"></i>
+                        </div>
+
+                        <div class="input-group">
+                            <textarea id="message" placeholder="Your message"></textarea>
+                            <label for="message">Your Message</label>
+                            <i class="fas fa-comment input-icon"></i>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            Send Message <i class="fas fa-paper-plane ml-2"></i>
+                        </button>
+                    </form>
+
+                    <div class="success-message" id="successMessage">
+                        <i class="fas fa-check-circle success-icon"></i>
+                        <h3 class="text-2xl font-bold mb-2">Message Sent!</h3>
+                        <p>We'll get back to you soon.</p>
+                    </div>
+                </div>
             </div>
-    
-            <!-- 🌟 Contact Form -->
-            <form action="#" method="post" class="contact-form">
-                <input type="text" placeholder="Your Name">
-                <input type="email" placeholder="Your Email">
-                <textarea placeholder="Your Message"></textarea>
-                <button type="submit">Send Message</button>
-            </form>
+
+            <!-- Map Section -->
+            <div class="map-section">
+                <h2 class="text-2xl font-bold mb-4 text-center">Find Us</h2>
+                <div class="map-container">
+                    <div class="map-placeholder">
+                        <i class="fas fa-map-marked-alt map-icon"></i>
+                        <p>Interactive Map</p>
+                        <p class="text-sm opacity-70">San Francisco, CA, USA</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="faq-section">
+                <h2 class="faq-title">Frequently Asked Questions</h2>
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How does the emotion detection work?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Our system uses advanced AI algorithms to analyze facial expressions from your webcam and text sentiment from your chat interactions. These signals are combined to determine your emotional state with high accuracy.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Is my data kept private?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Yes, absolutely! We take privacy very seriously. All processing happens locally in your browser, and no facial recognition data is stored on our servers. We only save anonymized emotion logs to improve our recommendation engine.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How are music recommendations generated?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            We use a Content-Based Filtering model that matches your detected emotional state with music features, mood labels, and potential mental health benefits from our curated music database.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Can I use the system offline?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Once loaded, parts of the system can function offline, but an internet connection is required for full functionality including music streaming and AI chatbot responses.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletter Section -->
+            <div class="newsletter-section">
+                <h2 class="newsletter-title">Stay Updated</h2>
+                <p>Subscribe to our newsletter for the latest news and feature updates</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Your email address" class="newsletter-input">
+                    <button type="submit" class="newsletter-btn">Subscribe</button>
+                </form>
+            </div>
         </div>
     </div>
 
     {% include 'footer.html' %}
-</body>
 
+    <script>
+        // Form animation and validation
+        const contactForm = document.getElementById('contactForm');
+        const successMessage = document.getElementById('successMessage');
+        
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simple validation
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const message = document.getElementById('message').value;
+                
+                if (name && email && message) {
+                    // Show success message
+                    successMessage.classList.add('show');
+                    
+                    // Reset form
+                    contactForm.reset();
+                    
+                    // Hide success message after 3 seconds
+                    setTimeout(() => {
+                        successMessage.classList.remove('show');
+                    }, 3000);
+                }
+            });
+        }
+
+        // FAQ accordion functionality
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        faqItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Toggle active class
+                item.classList.toggle('active');
+                
+                // Close other items
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        // Floating circles animation enhancement
+        const circles = document.querySelectorAll('.circle');
+        
+        circles.forEach(circle => {
+            // Add random rotation
+            const randomDeg = Math.floor(Math.random() * 360);
+            circle.style.transform = `rotate(${randomDeg}deg)`;
+        });
+
+        // Add scroll animation for elements
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const fadeElements = document.querySelectorAll('.contact-info, .contact-form-container, .map-section, .faq-section, .newsletter-section');
+
+        const fadeInOnScroll = new IntersectionObserver((entries, fadeInOnScroll) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    fadeInOnScroll.unobserve(entry.target); // Once it's visible, stop observing
+                }
+            });
+        }, observerOptions);
+
+        fadeElements.forEach(element => {
+            fadeInOnScroll.observe(element);
+        });
+    </script>
+</body>
 </html>

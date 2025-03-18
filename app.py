@@ -849,6 +849,17 @@ def about():
 def contact():
     return render_template('contact.html')
 
+@app.route('/features')
+def features():
+    return render_template('features.html')
+
+@app.route('/cookies')
+def cookies():
+    return render_template('cookiepolicy.html')
+
+@app.route('/terms')
+def termsofservices():
+    return render_template('termsofservices.html')
 
 @app.route('/get_neutral_songs', methods=['GET'])
 def get_neutral_songs():
