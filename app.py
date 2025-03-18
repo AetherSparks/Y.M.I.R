@@ -24,7 +24,7 @@ import requests
 import time
 import re
 from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
-
+from flask import send_from_directory, url_for
 #══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
@@ -786,6 +786,58 @@ def calculate_final_emotions():
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
+import yt_dlp
+import os
+
+def search_youtube(song, artist):
+    query = f"{song} {artist} audio"
+    search_url = f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}"
+    # You can use YouTube API or scrape first result link
+    # For now, use yt-dlp to search:
+    ydl_opts = {
+        'quiet': True,
+        'default_search': 'ytsearch1',  # get top result
+        'skip_download': True,
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        result = ydl.extract_info(query, download=False)
+        if 'entries' in result and result['entries']:
+            return result['entries'][0]['webpage_url']  # Top video URL
+    return None
+
+def download_youtube_async(song, artist, filename):
+    # Search & download audio from YouTube using yt-dlp
+    query = f"{artist} {song} audio"
+
+    try:
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'outtmpl': os.path.join(MUSIC_DIR, filename.replace('.mp3', '')),
+            'quiet': True,
+            'noplaylist': True,
+            'logger': None,
+            'no_warnings': True,
+            'progress_hooks': [],
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }],
+            'default_search': 'ytsearch1',
+        }
+
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([query])
+
+        return jsonify({
+            'audio_link': url_for('static', filename=f'music/{filename}'),
+            'source': 'youtube'
+        })
+
+    except Exception as e:
+        print(f"Error downloading from YouTube: {e}")
+        return jsonify({'error': 'Song not found'}), 404
 
 
 
@@ -825,6 +877,10 @@ def update_all_in_background(interval=5):
 
         time.sleep(interval)  # Update every `interval` seconds
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+import re
+
+def clean_filename(text):
+    return re.sub(r'[^\w\-_\. ]', '_', text)
 
 
 
@@ -885,6 +941,58 @@ def get_neutral_songs():
     ]
     
     return jsonify({"songs": neutral_songs})
+
+
+JAMENDO_CLIENT_ID = 'f471f3d9'
+MUSIC_DIR = os.path.join('static', 'music')
+
+# Ensure music folder exists
+os.makedirs(MUSIC_DIR, exist_ok=True)
+
+@app.route('/get_audio')
+def get_audio():
+    song = request.args.get('song')
+    artist = request.args.get('artist')
+    song_file_name = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
+  # Normalize filename
+
+    # 🔽 1. Check if already downloaded locally (from YouTube previously)
+    local_path = os.path.join(MUSIC_DIR, song_file_name)
+    if os.path.exists(local_path):
+        return jsonify({
+            'audio_link': url_for('static', filename=f'music/{song_file_name}'),
+            'source': 'local'
+        })
+
+    # 🔽 2. First try Jamendo API
+    jamendo_url = "https://api.jamendo.com/v3.0/tracks"
+    params = {
+        'client_id': JAMENDO_CLIENT_ID,
+        'format': 'json',
+        'namesearch': song,
+        'artist_name': artist,
+        'limit': 1,
+        'audioformat': 'mp32'
+    }
+
+    response = requests.get(jamendo_url, params=params)
+    data = response.json()
+
+    if data['results']:
+        track_info = data['results'][0]
+        mp3_link = track_info['audio']
+        return jsonify({
+            'track': track_info['name'],
+            'artist': track_info['artist_name'],
+            'audio_link': mp3_link,
+            'source': 'jamendo'
+        })
+
+    # 🔽 3. Fallback to YouTube using yt-dlp
+    # Return a placeholder response immediately to show "Searching..."
+    return download_youtube_async(song, artist, song_file_name)
+
+
 
 # Flask Route: Get Emotions
 @app.route('/get_emotions', methods=['GET'])

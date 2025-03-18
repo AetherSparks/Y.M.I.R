@@ -1034,7 +1034,12 @@
                   <div class="wind-particle"></div>
                   <div class="wind-particle"></div>
                 </div>
-              
+
+
+                <div id="loadingMessage" style="display:none; color: #4f46e5; font-weight: bold;">
+                    🎵 Searching & Loading the song... Please wait a moment.
+                  </div>
+                  
                 <!-- Player content -->
                 <div id="playerContent" class="player-hidden">
                   <button id="closePlayerBtn" class="close-player-btn">✖</button>
@@ -1166,6 +1171,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 
     <script>
+
+        let songsList = [];  // Will hold song data dynamically
+
             // Check if the header script has already run
         if (!window.headerScriptExecuted) {
             window.headerScriptExecuted = true;
@@ -1327,38 +1335,7 @@
                 });
         }
         
-        // Function to display songs in the UI
-        function displaySongs(songs) {
-            let songContainer = document.getElementById("results");
-            songContainer.innerHTML = `
-                <h3>🎵 Recommended Songs</h3>
-                <div id="sliderContainer">
-                    <div id="songSlider" class="song-slider"></div>
-                </div>
-            `;
-        
-            let songSlider = document.getElementById("songSlider");
-            songSlider.innerHTML = ""; // Clear previous songs
-        
-            songs.slice(0, 10).forEach(song => {
-                let songBox = document.createElement("div");
-                songBox.classList.add("song-card");
-        
-                // Use '#' if no valid link exists
-                let songLink = song.link ? song.link : "#";
-        
-                songBox.innerHTML = `
-                    <p><strong>${song.track}</strong></p>
-                    <p>🎤 ${song.artist}</p>
-                    <a href="#" onclick="playSong('${song.track}', '${song.artist}')">▶ Listen</a>
-                `;
-        
-                songSlider.appendChild(songBox);
-            });
-        
-            startInfiniteScroll();  // Start Animation
-        }
-        
+
         // ✅ **Continuous Scroll Effect**
         function startInfiniteScroll() {
             let slider = document.getElementById("songSlider");
@@ -1384,7 +1361,6 @@
         setInterval(processResults, 10000);
         // Global variables for the music player
         let currentSongIndex = 0;
-        let songsList = [];  // Will hold song data dynamically
         let audioPlayer;
         let isPlaying = false;
 
@@ -1409,7 +1385,8 @@
         }
 
         // Start the wind animation
-        function startWindAnimation() {
+        function startWindAnimation()
+        {
         const popup = document.getElementById('musicPlayerPopup');
         const windAnimation = popup.querySelector('.wind-animation');
         const playerContent = document.getElementById('playerContent');
@@ -1444,59 +1421,78 @@
         }, 1500);
         }
 
-        // Function to open the music player popup with a specific song
+
+
         function openPlayer(song, index) {
-        // Get the music player elements
-        const audioPlayer = document.getElementById('audioPlayer');
-        const visualizerBars = document.querySelector('.visualizer-bars');
-        
-        // Set the current song title and artist
-        document.getElementById('currentSongTitle').innerText = song.track;
-        document.getElementById('currentArtist').innerText = song.artist;
-        
-        // Update the next song information
-        updateNextSong(index);
-        
-        // Use a default audio source if the song doesn't have a valid link
-        // In a real implementation, you would use actual song URLs
-        const audioSrc = song.link || "https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.core.min.js";
-        
-        // Set the audio source and play
-        audioPlayer.src = audioSrc;
-        
-        // Attempt to play the audio
-        audioPlayer.play()
-            .then(() => {
-            isPlaying = true;
-            document.getElementById('playPauseBtn').textContent = '⏸';
-            visualizerBars.classList.add('playing');
-            })
-            .catch(error => {
-            console.error("Audio playback failed:", error);
-            // Show an error message to the user
-            document.getElementById('currentSongTitle').innerText = `${song.track} (Playback unavailable)`;
-            isPlaying = false;
-            document.getElementById('playPauseBtn').textContent = '▶';
-            visualizerBars.classList.remove('playing');
-            });
-        
-        // Update current song index for prev/next functionality
-        currentSongIndex = index;
+            const audioPlayer = document.getElementById('audioPlayer');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const nextSongTitle = document.getElementById('nextSongTitle');
+            const nextArtist = document.getElementById('nextArtist');
+            const loadingMessage = document.getElementById('loadingMessage');
+
+            // Show Loading Message Immediately
+            loadingMessage.style.display = 'block';
+            document.getElementById('currentSongTitle').innerText = `Searching for ${song.track}...`;
+            document.getElementById('currentArtist').innerText = song.artist;
+
+            // Set current song title and artist
+            document.getElementById('currentSongTitle').innerText = song.track;
+            document.getElementById('currentArtist').innerText = song.artist;
+
+            currentIndex = index; // Update global current index
+
+            fetch(`/get_audio?song=${encodeURIComponent(song.track)}&artist=${encodeURIComponent(song.artist)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.audio_link) {
+
+                        loadingMessage.style.display = 'none';
+
+                        audioPlayer.src = data.audio_link;
+
+                        // Wait for src to be set, then play
+                        audioPlayer.play().then(() => {
+                            playPauseBtn.innerText = '⏸'; // Sync button to pause
+                        }).catch(error => {
+                            console.error('Playback error:', error);
+                        });
+
+                        // Update next song info
+                        updateNextSong(currentIndex);
+                    } else {
+                        alert('Song not found or unavailable.');
+                    }
+                });
         }
 
         // Update the next song information
+        // Update Next Song
         function updateNextSong(currentIndex) {
-        const nextIndex = (currentIndex + 1) % songsList.length;
-        const nextSong = songsList[nextIndex];
-        
-        if (nextSong) {
+            const nextIndex = (currentIndex + 1) % songsList.length;
+            const nextSong = songsList[nextIndex];
+
             document.getElementById('nextSongTitle').innerText = nextSong.track;
             document.getElementById('nextArtist').innerText = nextSong.artist;
-        } else {
-            document.getElementById('nextSongTitle').innerText = "End of playlist";
-            document.getElementById('nextArtist').innerText = "";
-        }
-        }
+
+            if (nextSong) {
+                document.getElementById('nextSongTitle').innerText = nextSong.track;
+                document.getElementById('nextArtist').innerText = nextSong.artist;
+            } else {
+                document.getElementById('nextSongTitle').innerText = "End of playlist";
+                document.getElementById('nextArtist').innerText = "";
+            }
+    }
+
+        // Previous & Next Buttons:
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        currentIndex = (currentIndex - 1 + songsList.length) % songsList.length;
+        openPlayer(songsList[currentIndex], currentIndex);
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        currentIndex = (currentIndex + 1) % songsList.length;
+        openPlayer(songsList[currentIndex], currentIndex);
+    });
 
         // Function to display songs and create Listen buttons
         function displaySongs(songs) {
@@ -1552,21 +1548,13 @@
         
         // Play/Pause button functionality
         document.getElementById('playPauseBtn').addEventListener('click', function() {
+            const audioPlayer = document.getElementById('audioPlayer');
             if (audioPlayer.paused) {
-            audioPlayer.play()
-                .then(() => {
-                isPlaying = true;
-                this.textContent = '⏸';
-                visualizerBars.classList.add('playing');
-                })
-                .catch(error => {
-                console.error("Audio playback failed:", error);
-                });
+                audioPlayer.play();
+                this.innerText = '⏸';
             } else {
-            audioPlayer.pause();
-            isPlaying = false;
-            this.textContent = '▶';
-            visualizerBars.classList.remove('playing');
+                audioPlayer.pause();
+                this.innerText = '▶';
             }
         });
         
