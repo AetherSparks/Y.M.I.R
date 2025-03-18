@@ -1009,8 +1009,15 @@
                 <div class="emotion-display">
                     <div id="emotion-data" class="loading">⏳ Analyzing emotions...</div>
                 </div>
+                
+                <div id="cameraSection" style="text-align:center; margin-top:20px;">
+                    <button id="cameraToggleBtn" style="padding:10px 20px; font-size:16px;">Start Camera</button><br><br>
+                    <video id="videoFeed" autoplay playsinline width="400" height="300" style="display:none; border:1px solid #ccc;"></video>
+                </div>
             </div>
 
+
+            
             <div class="chat-section card">
                 <h2>AI Chatbot</h2>
                 <div id="chat-box"></div>
@@ -1171,6 +1178,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 
     <script>
+        let stream = null;  // Store camera stream
+        const video = document.getElementById('videoFeed');
+        const cameraBtn = document.getElementById('cameraToggleBtn');
+    
+        cameraBtn.addEventListener('click', async () => {
+            if (!stream) {
+                // Start Camera
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    cameraBtn.innerText = 'Stop Camera';
+                } catch (err) {
+                    alert('Camera permission denied!');
+                }
+            } else {
+                // Stop Camera
+                stopCamera();
+            }
+        });
+    
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.style.display = 'none';
+                cameraBtn.innerText = 'Start Camera';
+                stream = null;
+            }
+        }
+    
+        // Auto-stop camera when leaving/reloading tab
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stopCamera();
+            }
+        });
 
         let songsList = [];  // Will hold song data dynamically
 

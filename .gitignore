@@ -7,3 +7,4 @@ venv
 /templates/Images
 static/music
 .env
+/static/Images

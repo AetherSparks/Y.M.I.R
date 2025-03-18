@@ -121,14 +121,14 @@ def process_emotions(emotion_file):
     with open(emotion_file, "r") as file:
         emotions = json.load(file)
     
-    print(f"\n📂 Loaded JSON Content:\n{json.dumps(emotions, indent=4)}\n")
+    # print(f"\n📂 Loaded JSON Content:\n{json.dumps(emotions, indent=4)}\n")
 
     # ✅ Fix: Extract the correct dictionary
     emotions = emotions["final_average_emotions"]
 
     # ✅ Debugging Print (to verify)
-    print(f"DEBUG: extracted emotions -> {emotions}")
-    print(f"DEBUG: type of each value -> {[type(v) for v in emotions.values()]}")
+    # print(f"DEBUG: extracted emotions -> {emotions}")
+    # print(f"DEBUG: type of each value -> {[type(v) for v in emotions.values()]}")
 
     # ✅ Now, this should work fine
     emotion_scores = {emotion: float(score) for emotion, score in emotions.items()}
@@ -136,24 +136,24 @@ def process_emotions(emotion_file):
 
 
     
-    print(f"\n📊 Extracted Emotion Scores:\n{emotion_scores}\n")
+    # print(f"\n📊 Extracted Emotion Scores:\n{emotion_scores}\n")
 
     weighted_audio_features = np.zeros(len(list(EMOTION_TO_AUDIO.values())[0]))  
 
 
 
 
-    print("\n🛠 Debugging Weighted Audio Features Calculation:")
+    # print("\n🛠 Debugging Weighted Audio Features Calculation:")
     for emotion, weight in emotion_scores.items():
         if emotion in EMOTION_TO_AUDIO:
             contribution = np.array(EMOTION_TO_AUDIO[emotion]) * weight
             weighted_audio_features += contribution
-            print(f"🔹 {emotion} ({weight}): {contribution}")
+            # print(f"🔹 {emotion} ({weight}): {contribution}")
 
     # ✅ Normalize Features Before Model Input
     weighted_audio_features = scaler.transform([weighted_audio_features])[0]
 
-    print(f"\n🎵 Final Normalized Audio Features (Input to Model):\n{weighted_audio_features}\n")
+    # print(f"\n🎵 Final Normalized Audio Features (Input to Model):\n{weighted_audio_features}\n")
 
     return weighted_audio_features.reshape(1, -1), emotion_scores
 
@@ -178,13 +178,13 @@ def recommend_songs(emotion_file):
     # Predict using ensemble model
     mood_probs = ensemble_model.predict_proba(emotion_vector)
 
-    print(f"\n🔍 Model Confidence Scores for Moods: {dict(zip(le.classes_, mood_probs[0]))}\n")
+    # print(f"\n🔍 Model Confidence Scores for Moods: {dict(zip(le.classes_, mood_probs[0]))}\n")
 
     # ✅ Predict Mood
     predicted_mood_index = ensemble_model.predict(emotion_vector)[0]
     predicted_mood = le.inverse_transform([predicted_mood_index])[0]
 
-    print(f"\n🎯 Initial Predicted Mood (Model Output): {predicted_mood}\n")
+    # print(f"\n🎯 Initial Predicted Mood (Model Output): {predicted_mood}\n")
 
     # ✅ Find Top 2 Dominant Emotions
     dominant_emotions = sorted(emotion_scores.items(), key=lambda x: x[1], reverse=True)[:2]
@@ -192,13 +192,13 @@ def recommend_songs(emotion_file):
     for emotion, _ in dominant_emotions:
         mapped_moods.update(EMOTION_TO_MOOD.get(emotion, ["Neutral"]))
 
-    print(f"\n🎭 Dominant Emotions: {dominant_emotions} → Adjusted Moods: {mapped_moods}\n")
+    # print(f"\n🎭 Dominant Emotions: {dominant_emotions} → Adjusted Moods: {mapped_moods}\n")
 
     # ✅ Adjust Mood If Necessary
     if predicted_mood not in mapped_moods:
         predicted_mood = list(mapped_moods)[0]  # Take the first mapped mood
 
-    print(f"\n🎯 Final Adjusted Mood: {predicted_mood}\n")
+    # print(f"\n🎯 Final Adjusted Mood: {predicted_mood}\n")
 
     # ✅ Filter Songs Based on Mood
     filtered_songs = df[df["Mood_Label"] == predicted_mood]
@@ -860,7 +860,7 @@ def update_all_in_background(interval=5):
 
     while running:
         try:
-            print("\n🔄 Processing Emotions & Recommendations...")
+            # print("\n🔄 Processing Emotions & Recommendations...")
             
             # Step 1: Process Video  Emotions
             calculate_and_store_average_emotions()  
@@ -872,9 +872,9 @@ def update_all_in_background(interval=5):
             # Step 3: Recommend Songs Based on Final Emotion
             latest_songs = recommend_songs("final_average_emotions.json")
             
-            print("✅ Updated Final Emotion:", latest_final_emotion)  # Debugging print
-            print("✅ Updated Songs:", latest_songs[:3])  # Print first 3 songs as a check
-            print("✅ Music recommendations updated.")
+            # print("✅ Updated Final Emotion:", latest_final_emotion)  # Debugging print
+            # print("✅ Updated Songs:", latest_songs[:3])  # Print first 3 songs as a check
+            # print("✅ Music recommendations updated.")
 
         except Exception as e:
             print(f"❌ Error updating: {e}")
@@ -1185,8 +1185,8 @@ def process_results():
             songs = []  # Fallback to empty list if invalid
 
         # Log response for debugging
-        print("✅ Processed Emotions:", final_emotions)
-        print("✅ Recommended Songs:", songs)
+        # print("✅ Processed Emotions:", final_emotions)
+        # print("✅ Recommended Songs:", songs)
 
         return jsonify({"final_emotions": final_emotions, "recommended_songs": songs})
 
