@@ -857,9 +857,13 @@ def features():
 def cookies():
     return render_template('cookiepolicy.html')
 
-@app.route('/terms')
-def termsofservices():
-    return render_template('termsofservices.html')
+@app.route('/services')
+def services():
+    return render_template('services.html')
+
+@app.route('/pricing')
+def pricing():
+    return render_template('pricing.html')
 
 @app.route('/get_neutral_songs', methods=['GET'])
 def get_neutral_songs():

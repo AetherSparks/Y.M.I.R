@@ -283,172 +283,275 @@
             background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
         }
 
-        /* Right Side - Contact Form */
+        /* Contact Form Container */
         .contact-form-container {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            position: relative;
-            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
+        
         .contact-form-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0px 15px 35px rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0px 15px 30px rgba(255, 255, 255, 0.2);
         }
-
+        
+        /* Form Header */
         .form-header {
-            margin-bottom: 25px;
             text-align: center;
+            margin-bottom: 20px;
         }
-
+        
         .form-title {
             font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 10px;
+            font-weight: bold;
             background: linear-gradient(90deg, #fff, #aaf);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
+        
         .form-subtitle {
             font-size: 16px;
             opacity: 0.8;
         }
-
-        .contact-form {
+        
+        /* Progress Indicator */
+        .form-progress {
             display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .input-group {
+            justify-content: space-between;
+            margin-bottom: 20px;
             position: relative;
         }
-
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .progress-step .step-number {
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .progress-step.active .step-number {
+            background: linear-gradient(90deg, #ffcc00, #ff6600);
+            color: black;
+        }
+        
+        .progress-step .step-text {
+            margin-top: 5px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Input Groups */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
         .input-group label {
             position: absolute;
-            top: 15px;
+            top: 14px;
             left: 15px;
-            pointer-events: none;
-            transition: 0.3s ease all;
+            font-size: 14px;
+            transition: all 0.3s ease;
             opacity: 0.7;
         }
-
+        
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
         .input-group input:focus ~ label,
         .input-group input:not(:placeholder-shown) ~ label,
         .input-group textarea:focus ~ label,
         .input-group textarea:not(:placeholder-shown) ~ label {
-            top: -12px;
+            top: -10px;
             left: 10px;
             font-size: 12px;
             background: rgba(42, 82, 152, 0.8);
-            padding: 0 5px;
+            padding: 2px 5px;
             border-radius: 4px;
-            opacity: 1;
         }
-
-        .input-group input,
-        .input-group textarea {
-            width: 100%;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: white;
-            outline: none;
-            transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
+        
+        /* Form Navigation */
+        .form-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
         }
-
-        .input-group input::placeholder,
-        .input-group textarea::placeholder {
-            color: transparent;
-        }
-
-        .input-group input:focus,
-        .input-group textarea:focus {
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .input-group textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .input-group .input-icon {
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        button.submit-btn {
-            padding: 15px;
+        
+        .next-btn, .prev-btn {
+            padding: 12px 20px;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             background: linear-gradient(90deg, #ffcc00, #ff6600);
             color: black;
-            font-weight: 600;
+            font-weight: bold;
             font-size: 16px;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        button.submit-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.7s ease;
+        
+        .prev-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
         }
-
-        button.submit-btn:hover {
+        
+        .next-btn:hover, .prev-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
         }
-
-        button.submit-btn:hover::before {
-            left: 100%;
+        
+        /* File Upload */
+        .file-upload {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
+        
+        .file-label {
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .file-label:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Success Message */
         .success-message {
+            display: none;
+            background: rgba(0, 128, 0, 0.9);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 128, 0, 0.9);
-            display: flex;
+            z-index: 10;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            border-radius: 20px;
-            transform: translateY(-100%);
             transition: transform 0.5s ease;
-            z-index: 10;
         }
-
+        
         .success-message.show {
-            transform: translateY(0);
+            display: flex;
         }
-
+        
         .success-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
+            font-size: 50px;
+            margin-bottom: 10px;
         }
+        
+        /* Loading Spinner */
+        .form-loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .form-step {
+            display: none; /* Hide all steps initially */
+        }
+        
+        .form-step.active {
+            display: block; /* Show only the active step */
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .contact-form-container {
+                padding: 20px;
+            }
+        
+            .form-title {
+                font-size: 24px;
+            }
+        
+            .form-progress {
+                flex-direction: column;
+                align-items: center;
+            }
+        
+            .progress-step {
+                flex-direction: row;
+                gap: 10px;
+            }
+        
+            .form-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
 
         /* Map Section */
         .map-section {
@@ -460,30 +563,72 @@
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
+        
+        .map-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.4);
+        }
+    
         .map-container {
             width: 100%;
             height: 400px;
             border-radius: 15px;
             overflow: hidden;
             position: relative;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+            transition: height 0.5s ease;
         }
-
-        .map-placeholder {
+        
+        /* Map expansion on hover */
+        .map-container:hover {
+            height: 500px;
+        }
+        
+        /* Add a loading indicator in case the map is slow to load */
+        .map-container::before {
+            content: 'Loading map...';
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 60, 114, 0.8);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            gap: 20px;
+            font-size: 18px;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-
-        .map-icon {
-            font-size: 40px;
-            opacity: 0.7;
+        
+        .map-container iframe {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .map-container {
+                height: 300px;
+            }
+            
+            .map-container:hover {
+                height: 350px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .map-container {
+                height: 250px;
+            }
+            
+            .map-container:hover {
+                height: 300px;
+            }
         }
 
         /* FAQ Section */
@@ -669,6 +814,305 @@
                 justify-content: center;
             }
         }
+
+
+
+        /* Accessibility Controls - Left Floating Vertical Panel */
+        .accessibility-controls {
+            position: fixed;
+            top: 20%;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            width: 60px;
+            overflow: hidden;
+        }
+
+        /* Hover Effect - Expands the Panel */
+        .accessibility-controls:hover {
+            width: 180px;
+        }
+
+        /* Accessibility Buttons */
+        .a11y-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        /* Icon Styling */
+        .a11y-btn i {
+            min-width: 25px;
+        }
+
+        /* Hover Effect */
+        .a11y-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* Language Selector */
+        .language-selector {
+            width: 100%;
+        }
+
+        #language-select {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        /* Hover Effect */
+        #language-select:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* High Contrast Mode */
+        .high-contrast {
+            filter: invert(1);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .accessibility-controls {
+                left: 5px;
+                width: 50px;
+                padding: 10px;
+            }
+
+            .accessibility-controls:hover {
+                width: 160px;
+            }
+
+            .a11y-btn {
+                font-size: 18px;
+                padding: 10px;
+            }
+
+            #language-select {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+
+
+        /* General Styles */
+        /* General Styles */
+.appointment-section {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #333;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    font-family: 'Arial', sans-serif;
+    color: #fff;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffcc00;
+    margin-bottom: 20px;
+}
+
+.appointment-container {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+/* Calendar Styles */
+.calendar-container {
+    flex: 1;
+    background: #444;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    color: #fff;
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #ffcc00;
+}
+
+.calendar-nav-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #ffcc00;
+    transition: 0.3s;
+}
+
+.calendar-nav-btn:hover {
+    color: #ffaa00;
+}
+
+.weekdays, .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    color: #ffcc00;
+}
+
+.weekdays div {
+    font-weight: bold;
+    color: #ffcc00;
+    padding: 8px 0;
+}
+
+.calendar-days div {
+    padding: 10px;
+    background: #555;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+    color: #fff;
+}
+
+.calendar-days div:hover {
+    background: #ffcc00;
+    color: #333;
+}
+
+/* Appointment Details */
+.appointment-details {
+    flex: 1;
+    background: #444;
+    padding: 20px;
+    border-radius: 8px;
+    color: #fff;
+}
+
+.input-group {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.input-group label {
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background: #444;
+    padding: 0 5px;
+    font-size: 12px;
+    color: #ffcc00;
+}
+
+.input-group input, .input-group select, .input-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ffcc00;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #555;
+    color: #fff;
+}
+
+.input-group textarea {
+    resize: none;
+    height: 80px;
+}
+
+.appointment-btn {
+    width: 100%;
+    padding: 12px;
+    background: #ffcc00;
+    color: #333;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.appointment-btn:hover {
+    background: #ffaa00;
+}
+
+.selected-day {
+    background-color: red !important;
+    color: white;
+}
+
+.calendar-day:not(.booked-day):hover {
+    background-color: lightgray;
+}
+
+button {
+    padding: 5px 10px;
+    margin-left: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.notification {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+}
+
+.success {
+    background-color: #4CAF50;
+}
+
+.error {
+    background-color: #f44336;
+}
+
+.fly-out {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.5s, transform 0.5s;
+}
+
     </style>
 </head>
 
@@ -683,9 +1127,29 @@
         <div class="circle"></div>
     </div>
 
+    <div class="accessibility-controls">
+        <button id="contrast-toggle" class="a11y-btn" title="Toggle High Contrast">
+            <i class="fas fa-adjust"></i>
+        </button>
+        <button id="font-size-increase" class="a11y-btn" title="Increase Font Size">
+            <i class="fas fa-text-height"></i>+
+        </button>
+        <button id="font-size-decrease" class="a11y-btn" title="Decrease Font Size">
+            <i class="fas fa-text-height"></i>-
+        </button>
+        <div class="language-selector">
+            <select id="language-select">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="zh">中文</option>
+            </select>
+        </div>
+    </div>
+
     <div class="main-content">
         <div class="flex flex-col items-center w-full gap-10">
-            <!-- Contact Section -->
             <div class="contact-container">
                 <!-- Left Side - Contact Info -->
                 <div class="contact-info">
@@ -746,62 +1210,245 @@
                     </div>
                 </div>
 
-                <!-- Right Side - Contact Form -->
-                <div class="contact-form-container">
-                    <div class="form-header">
-                        <h2 class="form-title">Send Me a Message</h2>
-                        <p class="form-subtitle">I'll get back to you as soon as possible</p>
-                    </div>
-
-                    <form class="contact-form" id="contactForm">
-                        <div class="input-group">
-                            <input type="text" id="name" placeholder="Your name">
-                            <label for="name">Your Name</label>
-                            <i class="fas fa-user input-icon"></i>
+                    <!-- Right Side - Contact Form -->
+                    <div class="contact-form-container">
+                        <div class="form-header">
+                            <h2 class="form-title">Send Me a Message</h2>
+                            <p class="form-subtitle">I'll get back to you as soon as possible</p>
                         </div>
 
-                        <div class="input-group">
-                            <input type="email" id="email" placeholder="Your email">
-                            <label for="email">Your Email</label>
-                            <i class="fas fa-envelope input-icon"></i>
+                        <!-- Form progress indicator -->
+                        <div class="form-progress">
+                            <div class="progress-step active" data-step="1">
+                                <span class="step-number">1</span>
+                                <span class="step-text">Contact</span>
+                            </div>
+                            <div class="progress-step" data-step="2">
+                                <span class="step-number">2</span>
+                                <span class="step-text">Message</span>
+                            </div>
+                            <div class="progress-step" data-step="3">
+                                <span class="step-number">3</span>
+                                <span class="step-text">Review</span>
+                            </div>
                         </div>
 
-                        <div class="input-group">
-                            <input type="text" id="subject" placeholder="Subject">
-                            <label for="subject">Subject</label>
-                            <i class="fas fa-heading input-icon"></i>
+                        <form class="contact-form" id="contactForm">
+                            <div class="form-step active" data-step="1">
+                                <div class="input-group">
+                                    <input type="text" id="name" name="name" placeholder="Your name" required>
+                                    <label for="name">Your Name</label>
+                                    <i class="fas fa-user input-icon"></i>
+                                    <span class="error-message" id="name-error"></span>
+                                </div>
+        
+                                <div class="input-group">
+                                    <input type="email" id="email" name="email" placeholder="Your email" required>
+                                    <label for="email">Your Email</label>
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    <span class="error-message" id="email-error"></span>
+                                </div>
+        
+                                <div class="input-group">
+                                    <input type="tel" id="phone" name="phone" placeholder="Your phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+                                    <label for="phone">Your Phone (optional)</label>
+                                    <i class="fas fa-phone input-icon"></i>
+                                    <span class="helper-text">Format: 123-456-7890</span>
+                                </div>
+        
+                                <div class="form-nav">
+                                    <button type="button" class="next-btn" data-next="2">Next <i class="fas fa-arrow-right"></i></button>
+                                </div>
+                            </div>
+        
+                            <div class="form-step" data-step="2">
+                                <div class="input-group">
+                                    <input type="text" id="subject" name="subject" placeholder="Subject" required>
+                                    <label for="subject">Subject</label>
+                                    <i class="fas fa-heading input-icon"></i>
+                                    <span class="error-message" id="subject-error"></span>
+                                </div>
+        
+                                <div class="input-group">
+                                    <textarea id="message" name="message" placeholder="Your message" required></textarea>
+                                    <label for="message">Your Message</label>
+                                    <i class="fas fa-comment input-icon"></i>
+                                    <div class="textarea-footer">
+                                        <span class="character-counter">0/500</span>
+                                    </div>
+                                    <span class="error-message" id="message-error"></span>
+                                </div>
+        
+                                <div class="input-group">
+                                    <div class="file-upload">
+                                        <input type="file" id="attachment" name="attachment" multiple>
+                                        <label for="attachment" class="file-label">
+                                            <i class="fas fa-paperclip"></i> Attach Files
+                                        </label>
+                                        <div class="file-list" id="file-list"></div>
+                                    </div>
+                                </div>
+        
+                                <div class="form-nav">
+                                    <button type="button" class="prev-btn" data-prev="1"><i class="fas fa-arrow-left"></i> Back</button>
+                                    <button type="button" class="next-btn" data-next="3">Next <i class="fas fa-arrow-right"></i></button>
+                                </div>
+                            </div>
+        
+                            <div class="form-step" data-step="3">
+                                <div class="review-section">
+                                    <h3>Review Your Message</h3>
+                                    <div class="review-data">
+                                        <p><strong>Name:</strong> <span id="review-name"></span></p>
+                                        <p><strong>Email:</strong> <span id="review-email"></span></p>
+                                        <p><strong>Phone:</strong> <span id="review-phone"></span></p>
+                                        <p><strong>Subject:</strong> <span id="review-subject"></span></p>
+                                        <p><strong>Message:</strong> <span id="review-message"></span></p>
+                                        <p><strong>Attachments:</strong> <span id="review-attachments"></span></p>
+                                    </div>
+                                </div>
+        
+                                <div class="recaptcha-container">
+                                    <div id="recaptcha-placeholder"></div>
+                                </div>
+        
+                                <div class="form-nav">
+                                    <button type="button" class="prev-btn" data-prev="2"><i class="fas fa-arrow-left"></i> Back</button>
+                                    <button type="submit" class="submit-btn">
+                                        Send Message <i class="fas fa-paper-plane ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <div class="form-loading" id="formLoading">
+                            <div class="spinner"></div>
+                            <p>Sending your message...</p>
                         </div>
 
-                        <div class="input-group">
-                            <textarea id="message" placeholder="Your message"></textarea>
-                            <label for="message">Your Message</label>
-                            <i class="fas fa-comment input-icon"></i>
+                        <div class="success-message" id="successMessage">
+                            <i class="fas fa-check-circle success-icon"></i>
+                            <h3 class="text-2xl font-bold mb-2">Message Sent!</h3>
+                            <p>We'll get back to you soon.</p>
                         </div>
-
-                        <button type="submit" class="submit-btn">
-                            Send Message <i class="fas fa-paper-plane ml-2"></i>
-                        </button>
-                    </form>
-
-                    <div class="success-message" id="successMessage">
-                        <i class="fas fa-check-circle success-icon"></i>
-                        <h3 class="text-2xl font-bold mb-2">Message Sent!</h3>
-                        <p>We'll get back to you soon.</p>
                     </div>
                 </div>
-            </div>
 
             <!-- Map Section -->
             <div class="map-section">
                 <h2 class="text-2xl font-bold mb-4 text-center">Find Us</h2>
+                <div class="map-controls">
+                    <button id="zoom-in" class="map-control-btn">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button id="zoom-out" class="map-control-btn">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <button id="street-view" class="map-control-btn">
+                        <i class="fas fa-street-view"></i>
+                    </button>
+                    <button id="get-directions" class="map-control-btn">
+                        <i class="fas fa-directions"></i>
+                    </button>
+                </div>
                 <div class="map-container">
-                    <div class="map-placeholder">
-                        <i class="fas fa-map-marked-alt map-icon"></i>
-                        <p>Interactive Map</p>
-                        <p class="text-sm opacity-70">San Francisco, CA, USA</p>
+                    <!-- Replace the placeholder with an actual Google Maps iframe -->
+                    <iframe 
+                        id="google-map"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d100939.98755677695!2d-122.50764089228032!3d37.75781499644112!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA%2C%20USA!5e0!3m2!1sen!2sus!4v1710778506027!5m2!1sen!2sus" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0; border-radius: 15px;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+    
+
+
+        <!-- Appointment Booking Section -->
+        <div class="appointment-section">
+            <h2 class="section-title">Schedule an Appointment</h2>
+            <div class="appointment-container">
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button id="prev-month" class="calendar-nav-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h3 id="current-month-year">March 2025</h3>
+                        <button id="next-month" class="calendar-nav-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="weekdays">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    <div id="calendar-days" class="calendar-days"></div>
+                </div>
+                <div class="appointment-details">
+                    <h3>Appointment Details</h3>
+                    <div class="appointment-form">
+                        <div class="input-group">
+                            <input type="text" id="selected-date" readonly>
+                            <label for="selected-date">Selected Date</label>
+                        </div>
+                        <div class="input-group">
+                            <select id="time-slot">
+                                <option value="">Select Time</option>
+                                <option value="09:00">9:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="13:00">1:00 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                            </select>
+                            <label for="time-slot">Time Slot</label>
+                        </div>
+                        <div class="input-group">
+                            <select id="meeting-duration">
+                                <option value="30">30 minutes</option>
+                                <option value="60">1 hour</option>
+                                <option value="90">1.5 hours</option>
+                                <option value="120">2 hours</option>
+                            </select>
+                            <label for="meeting-duration">Duration</label>
+                        </div>
+                        <div class="input-group">
+                            <select id="timezone">
+                                <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                <option value="America/Denver">Mountain Time (MT)</option>
+                                <option value="America/Chicago">Central Time (CT)</option>
+                                <option value="America/New_York">Eastern Time (ET)</option>
+                                <option value="Europe/London">GMT</option>
+                                <option value="Europe/Paris">CET</option>
+                                <option value="Asia/Tokyo">JST</option>
+                            </select>
+                            <label for="timezone">Time Zone</label>
+                        </div>
+                        <div class="input-group">
+                            <textarea id="appointment-notes" placeholder="What would you like to discuss?"></textarea>
+                            <label for="appointment-notes">Meeting Notes</label>
+                        </div>
+                        <button id="book-appointment" class="appointment-btn">
+                            Book Appointment <i class="fas fa-calendar-check ml-2"></i>
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+
+
+
 
             <!-- FAQ Section -->
             <div class="faq-section">
@@ -846,6 +1493,26 @@
                             Once loaded, parts of the system can function offline, but an internet connection is required for full functionality including music streaming and AI chatbot responses.
                         </div>
                     </div>
+    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>What technology is used for the AI system?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Our system uses a combination of deep learning models for facial expression analysis (CNN), natural language processing for text sentiment analysis (BERT), and recommendation systems based on collaborative filtering techniques.
+                        </div>
+                    </div>
+    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How do I start using EmotionAI?</span>
+                            <i class="fas fa-chevron-down faq-toggle"></i>
+                        </div>
+                        <div class="faq-answer">
+                            Simply sign up for an account, grant camera permissions when prompted, and you're ready to go! The system will begin analyzing your emotions and providing personalized recommendations right away.
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -854,9 +1521,26 @@
                 <h2 class="newsletter-title">Stay Updated</h2>
                 <p>Subscribe to our newsletter for the latest news and feature updates</p>
                 <form class="newsletter-form">
-                    <input type="email" placeholder="Your email address" class="newsletter-input">
+                    <input type="email" placeholder="Your email address" class="newsletter-input" required>
                     <button type="submit" class="newsletter-btn">Subscribe</button>
                 </form>
+                <div class="newsletter-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" checked>
+                        <span class="checkmark"></span>
+                        <span>Product Updates</span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" checked>
+                        <span class="checkmark"></span>
+                        <span>Industry News</span>
+                    </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox">
+                        <span class="checkmark"></span>
+                        <span>Events & Webinars</span>
+                    </label>
+                </div>
             </div>
         </div>
     </div>
@@ -864,33 +1548,7 @@
     {% include 'footer.html' %}
 
     <script>
-        // Form animation and validation
-        const contactForm = document.getElementById('contactForm');
-        const successMessage = document.getElementById('successMessage');
         
-        if (contactForm) {
-            contactForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Simple validation
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const message = document.getElementById('message').value;
-                
-                if (name && email && message) {
-                    // Show success message
-                    successMessage.classList.add('show');
-                    
-                    // Reset form
-                    contactForm.reset();
-                    
-                    // Hide success message after 3 seconds
-                    setTimeout(() => {
-                        successMessage.classList.remove('show');
-                    }, 3000);
-                }
-            });
-        }
 
         // FAQ accordion functionality
         const faqItems = document.querySelectorAll('.faq-item');
@@ -938,6 +1596,354 @@
         fadeElements.forEach(element => {
             fadeInOnScroll.observe(element);
         });
+
+            // Map controls
+                const zoomIn = document.getElementById('zoom-in');
+                const zoomOut = document.getElementById('zoom-out');
+                const streetView = document.getElementById('street-view');
+                const getDirections = document.getElementById('get-directions');
+                
+                if (zoomIn && zoomOut && streetView && getDirections) {
+                    // These would normally modify the map iframe parameters
+                    // For demonstration, we'll just show alerts
+                    zoomIn.addEventListener('click', function() {
+                        alert('Zoom in functionality would be implemented here');
+                    });
+                    
+                    zoomOut.addEventListener('click', function() {
+                        alert('Zoom out functionality would be implemented here');
+                    });
+                    
+                    streetView.addEventListener('click', function() {
+                        alert('Street view functionality would be implemented here');
+                    });
+                    
+                    getDirections.addEventListener('click', function() {
+                        // Open directions in a new tab
+                        window.open('https://www.google.com/maps/dir//San+Francisco,+CA,+USA/', '_blank');
+                    });
+    }
+
+    
+        // Function to change font size across all elements
+        function changeFontSize(delta) {
+            const root = document.documentElement; // Target the whole document
+            let currentSize = parseFloat(getComputedStyle(root).getPropertyValue("font-size"));
+            let newSize = currentSize + delta;
+
+            // Restrict font size within a reasonable range
+            if (newSize >= 12 && newSize <= 24) {
+                root.style.fontSize = newSize + "px";
+                localStorage.setItem("fontSize", newSize); // Save user preference
+            }
+        }
+
+        // Restore user preference on page load
+        document.addEventListener("DOMContentLoaded", function () {
+            const savedSize = localStorage.getItem("fontSize");
+            if (savedSize) {
+                document.documentElement.style.fontSize = savedSize + "px";
+            }
+        });
+
+        // Attach event listeners to buttons
+        document.getElementById("font-size-increase").addEventListener("click", function () {
+            changeFontSize(2);
+        });
+
+        document.getElementById("font-size-decrease").addEventListener("click", function () {
+            changeFontSize(-2);
+        });
+
+
+        
+
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const calendarDays = document.getElementById("calendar-days");
+            const currentMonthYear = document.getElementById("current-month-year");
+            const prevMonthBtn = document.getElementById("prev-month");
+            const nextMonthBtn = document.getElementById("next-month");
+            const selectedDateInput = document.getElementById("selected-date");
+            const timeSlotSelect = document.getElementById("time-slot");
+            const meetingDurationSelect = document.getElementById("meeting-duration");
+            const bookAppointmentBtn = document.getElementById("book-appointment");
+            const notificationContainer = document.createElement("div");
+            document.body.appendChild(notificationContainer);
+            notificationContainer.classList.add("notification-container");
+            
+            let currentDate = new Date();
+            let selectedDate = null;
+            let bookedAppointments = [];
+        
+            function renderCalendar() {
+                calendarDays.innerHTML = "";
+                const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+                const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+                const prevMonthDays = firstDay.getDay();
+                const totalDays = lastDay.getDate();
+                
+                currentMonthYear.textContent = currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+                
+                for (let i = 0; i < prevMonthDays; i++) {
+                    const emptyCell = document.createElement("div");
+                    emptyCell.classList.add("empty-day");
+                    calendarDays.appendChild(emptyCell);
+                }
+        
+                for (let day = 1; day <= totalDays; day++) {
+                    const dayElement = document.createElement("div");
+                    dayElement.textContent = day;
+                    dayElement.classList.add("calendar-day");
+                    
+                    let dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                    if (dayDate < new Date()) {
+                        dayElement.classList.add("disabled-day");
+                    } else {
+                        dayElement.addEventListener("click", () => selectDate(dayDate, dayElement));
+                    }
+                    
+                    if (bookedAppointments.some(appt => appt.date.getTime() === dayDate.getTime())) {
+                        dayElement.classList.add("booked-day");
+                    }
+                    
+                    calendarDays.appendChild(dayElement);
+                }
+            }
+        
+            function selectDate(date, element) {
+                if (selectedDate && selectedDate.getTime() === date.getTime()) {
+                    // If the same date is clicked, deselect it
+                    selectedDate = null;
+                    selectedDateInput.value = "";
+                    element.classList.remove("selected-day");
+                } else {
+                    // Select a new date
+                    selectedDate = date;
+                    updateSelectedDateDisplay();
+                    document.querySelectorAll(".calendar-day").forEach(day => day.classList.remove("selected-day"));
+                    element.classList.add("selected-day");
+                }
+            }
+            
+        
+            function updateSelectedDateDisplay() {
+                if (selectedDate) {
+                    selectedDateInput.value = `${selectedDate.toLocaleDateString("en-US")} - ${meetingDurationSelect.value} min`;
+                }
+            }
+        
+            meetingDurationSelect.addEventListener("change", updateSelectedDateDisplay);
+            timeSlotSelect.addEventListener("change", updateSelectedDateDisplay);
+        
+            prevMonthBtn.addEventListener("click", function () {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+        
+            nextMonthBtn.addEventListener("click", function () {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+        
+            bookAppointmentBtn.addEventListener("click", function () {
+                if (!selectedDate) {
+                    showNotification("Please select a date for your appointment.", "error");
+                    return;
+                }
+                if (!timeSlotSelect.value) {
+                    showNotification("Please choose a time slot.", "error");
+                    return;
+                }
+        
+                bookedAppointments.push({ date: selectedDate, time: timeSlotSelect.value, duration: meetingDurationSelect.value });
+                renderCalendar();
+                showNotification("Your appointment has been booked successfully!", "success");
+                updateAppointmentList();
+            });
+        
+            function updateAppointmentList() {
+                const appointmentList = document.getElementById("appointment-list");
+                appointmentList.innerHTML = "";
+                bookedAppointments.forEach((appt, index) => {
+                    const apptElement = document.createElement("div");
+                    apptElement.textContent = `${appt.date.toLocaleDateString("en-US")} at ${appt.time} - ${appt.duration} min`;
+                    
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.textContent = "Delete";
+                    deleteBtn.addEventListener("click", () => {
+                        bookedAppointments.splice(index, 1);
+                        renderCalendar();
+                        updateAppointmentList();
+                        showNotification("Appointment deleted successfully!", "success");
+                    });
+                    
+                    apptElement.appendChild(deleteBtn);
+                    appointmentList.appendChild(apptElement);
+                });
+            }
+        
+            function showNotification(message, type) {
+                const notification = document.createElement("div");
+                notification.textContent = message;
+                notification.classList.add("notification", type);
+                notificationContainer.appendChild(notification);
+                setTimeout(() => {
+                    notification.classList.add("fly-out");
+                    setTimeout(() => notification.remove(), 500);
+                }, 2000);
+            }
+        
+            renderCalendar();
+        });
+        
+        
+                
+
+//===================================================================For Contact Form============================================================================================================
+        
+            // Form animation and validation
+            const contactForm = document.getElementById('contactForm');
+            const successMessage = document.getElementById('successMessage');
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Simple validation
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const message = document.getElementById('message').value;
+                    
+                    if (name && email && message) {
+                        // Show success message
+                        successMessage.classList.add('show');
+                        
+                        // Reset form
+                        contactForm.reset();
+                        
+                        // Hide success message after 3 seconds
+                        setTimeout(() => {
+                            successMessage.classList.remove('show');
+                        }, 3000);
+                    }
+                });
+            }
+
+            
+
+            document.addEventListener("DOMContentLoaded", function () {
+            const nextButtons = document.querySelectorAll(".next-btn");
+            const prevButtons = document.querySelectorAll(".prev-btn");
+            const formSteps = document.querySelectorAll(".form-step");
+            const progressSteps = document.querySelectorAll(".progress-step");
+        
+            let currentStep = 0;
+        
+            function showStep(step) {
+                formSteps.forEach((stepElement, index) => {
+                    stepElement.classList.toggle("active", index === step);
+                });
+        
+                progressSteps.forEach((stepElement, index) => {
+                    stepElement.classList.toggle("active", index <= step);
+                });
+            }
+        
+            
+
+            function validateStep(step) {
+                // Example validation logic
+                let isValid = true;
+                const inputs = formSteps[step].querySelectorAll("input[required], textarea[required]");
+                
+                inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add("error");
+                        input.nextElementSibling.textContent = "This field is required";
+                    } else {
+                        input.classList.remove("error");
+                        input.nextElementSibling.textContent = "";
+                    }
+                });
+        
+                return isValid;
+            }
+
+
+
+            // Event listener for "Next" buttons
+            nextButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    console.log("➡️ Next button clicked! Current step:", currentStep);
+
+                    if (!validateStep(currentStep)) {
+                        console.log("❌ Validation failed at step:", currentStep);
+                        return; // Stop here if validation fails
+                    }
+
+                    console.log("✅ Validation passed, moving to next step...");
+                    
+                    // Increment step safely
+                    currentStep++;
+                    if (currentStep >= formSteps.length) {
+                        currentStep = formSteps.length - 1;
+                    }
+
+                    console.log("🔄 Current Step after update:", currentStep);
+
+                    if (currentStep === 2) { // Zero-based index for Step 3 (Review)
+                        console.log("📌 Populating review section...");
+
+                        let name = document.getElementById("name").value;
+                        let email = document.getElementById("email").value;
+                        let phone = document.getElementById("phone").value || "N/A";
+                        let subject = document.getElementById("subject").value;
+                        let message = document.getElementById("message").value;
+
+                        console.log("📋 Review Data - Name:", name, "Email:", email, "Phone:", phone, "Subject:", subject, "Message:", message);
+
+                        // Update review fields
+                        document.getElementById("review-name").textContent = name;
+                        document.getElementById("review-email").textContent = email;
+                        document.getElementById("review-phone").textContent = phone;
+                        document.getElementById("review-subject").textContent = subject;
+                        document.getElementById("review-message").textContent = message;
+
+                        // Handle file attachments
+                        let files = document.getElementById("attachment").files;
+                        let fileReview = document.getElementById("review-attachments");
+
+                        if (files.length > 0) {
+                            fileReview.textContent = Array.from(files).map(file => file.name).join(", ");
+                        } else {
+                            fileReview.textContent = "No attachments";
+                        }
+                    }
+
+                    // Show the updated step
+                    showStep(currentStep);
+                });
+            });
+        
+            prevButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    currentStep--;
+                    if (currentStep < 0) {
+                        currentStep = 0;
+                    }
+                    showStep(currentStep);
+                });
+            });
+        
+
+            showStep(currentStep);
+        });
+//===============================================================================================================================================================================
+
+            
     </script>
 </body>
 </html>
