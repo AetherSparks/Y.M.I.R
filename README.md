@@ -56,6 +56,12 @@ This is an AI-powered **Emotion Detection and Music Recommendation System** that
 │   ├── MainFunctionality.jpg
 
 ---
+```
+
+
+
+
+
 
 
 ### **Installation & Setup**  
