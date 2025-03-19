@@ -1034,29 +1034,29 @@ def video_feed():
 running = True  # To control video streaming
 
 
-@app.route('/toggle_camera', methods=['POST'])
-def toggle_camera():
-    """Pauses or resumes the camera feed based on user activity."""
-    global cap
-    action = request.json.get("action")  # Expecting 'pause' or 'resume'
+# @app.route('/toggle_camera', methods=['POST'])
+# def toggle_camera():
+#     """Pauses or resumes the camera feed based on user activity."""
+#     global cap
+#     action = request.json.get("action")  # Expecting 'pause' or 'resume'
 
-    try:
-        if action == "pause":
-            if cap is not None and cap.isOpened():
-                print("⏸️ Camera paused.")
-            return jsonify({"status": "Camera paused"}), 200
+#     try:
+#         if action == "pause":
+#             if cap is not None and cap.isOpened():
+#                 print("⏸️ Camera paused.")
+#             return jsonify({"status": "Camera paused"}), 200
 
-        elif action == "resume":
-            if cap is None or not cap.isOpened():
-                cap = cv2.VideoCapture(0)  # Restart if needed
-            print("▶️ Camera resumed.")
-            return jsonify({"status": "Camera resumed"}), 200
+#         elif action == "resume":
+#             if cap is None or not cap.isOpened():
+#                 cap = cv2.VideoCapture(0)  # Restart if needed
+#             print("▶️ Camera resumed.")
+#             return jsonify({"status": "Camera resumed"}), 200
 
-        else:
-            return jsonify({"error": "Invalid action"}), 400
+#         else:
+#             return jsonify({"error": "Invalid action"}), 400
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 ###🛑 CLEANUP AND EXIT ###
 
