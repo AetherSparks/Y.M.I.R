@@ -20,12 +20,6 @@
             --dark: #191970;
         }
 
-        body {
-            background-color: #121212;
-            color: white;
-            overflow-x: hidden;
-        }
-
         header {
             position: relative;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -34,71 +28,350 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            z-index: 1;
         }
-
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+        
+        /* Header/Hero Section */
+        header {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 100%);
+        }
+        
+        /* Animated Floating Circles */
         .circle {
             position: absolute;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
+            filter: blur(8px);
+            animation: float 8s infinite ease-in-out alternate;
         }
-
+        
+        /* Overlapping effect */
         .circle-1 {
-            width: 400px;
-            height: 400px;
-            top: -100px;
-            left: -100px;
-            background: rgba(255, 255, 255, 0.05);
+            width: 420px;
+            height: 420px;
+            top: -50px;
+            left: -50px;
+            background: rgba(255, 0, 128, 0.05);
+            animation-delay: 0s;
         }
-
+        
         .circle-2 {
-            width: 300px;
-            height: 300px;
+            width: 350px;
+            height: 350px;
             bottom: -50px;
-            right: 100px;
-            background: rgba(255, 255, 255, 0.1);
+            right: 50px;
+            background: rgba(64, 0, 255, 0.08);
+            animation-delay: 2s;
         }
-
+        
         .circle-3 {
+            width: 250px;
+            height: 250px;
+            top: 150px;
+            right: -50px;
+            background: rgba(255, 138, 0, 0.12);
+            animation-delay: 4s;
+        }
+        
+        /* Additional circles for more visual interest */
+        .circle-4 {
             width: 200px;
             height: 200px;
-            top: 100px;
-            right: -50px;
-            background: rgba(255, 255, 255, 0.15);
+            bottom: 100px;
+            left: 15%;
+            background: rgba(0, 255, 208, 0.07);
+            animation-delay: 3s;
+            animation-duration: 12s;
         }
-
+        
+        .circle-5 {
+            width: 180px;
+            height: 180px;
+            top: 25%;
+            left: 50%;
+            background: rgba(255, 0, 0, 0.06);
+            animation-delay: 1s;
+            animation-duration: 10s;
+        }
+        
+        /* Floating effect */
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(15px) rotate(5deg);
+            }
+            100% {
+                transform: translateY(-10px) rotate(10deg);
+            }
+        }
+        
+        /* Particle Animations */
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: particles 6s infinite ease-in-out alternate;
+        }
+        
+        /* Expanded particles for more visual interest */
+        .particle:nth-child(1) { top: 20%; left: 10%; animation-duration: 4s; background: #ff8a00; }
+        .particle:nth-child(2) { top: 40%; left: 60%; animation-duration: 6s; background: #e52e71; }
+        .particle:nth-child(3) { top: 70%; left: 30%; animation-duration: 5s; background: #00e6ff; }
+        .particle:nth-child(4) { top: 90%; left: 80%; animation-duration: 7s; background: #fffc00; }
+        .particle:nth-child(5) { top: 15%; left: 70%; animation-duration: 5.5s; background: #ff00e6; }
+        .particle:nth-child(6) { top: 55%; left: 20%; animation-duration: 6.5s; background: #00ff88; }
+        .particle:nth-child(7) { top: 85%; left: 40%; animation-duration: 7.5s; background: #ff0055; }
+        .particle:nth-child(8) { top: 35%; left: 85%; animation-duration: 4.5s; background: #0088ff; }
+        
+        /* Particle Movement */
+        @keyframes particles {
+            0% {
+                transform: translateY(0) translateX(0) scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-15px) translateX(10px) scale(1.5);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-30px) translateX(20px) scale(1);
+                opacity: 0.3;
+            }
+        }
+        
+        /* Sound Wave Animation */
+        .sound-wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 20px;
+        }
+        
+        .wave-bar {
+            width: 4px;
+            margin: 0 3px;
+            background: linear-gradient(to top, #ff8a00, #e52e71);
+            border-radius: 2px;
+            animation: wave 1.5s infinite ease-in-out alternate;
+        }
+        
+        @keyframes wave {
+            0% {
+                height: 10px;
+            }
+            100% {
+                height: 60px;
+            }
+        }
+        
+        /* Different delays for each bar */
+        .wave-bar:nth-child(1) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(2) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.5s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.6s; }
+        .wave-bar:nth-child(6) { animation-delay: 0.5s; }
+        .wave-bar:nth-child(7) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(8) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(9) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(10) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(11) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(12) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(13) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(14) { animation-delay: 0.5s; }
+        .wave-bar:nth-child(15) { animation-delay: 0.6s; }
+        
+        /* Hero Content */
         .hero-content {
-            max-width: 800px;
+            max-width: 900px;
             text-align: center;
             padding: 2rem;
-            z-index: 1;
+            z-index: 2;
+            position: relative;
+            animation: fadeUp 1.5s ease-out;
         }
-
+        
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         .typing-animation {
             overflow: hidden;
             white-space: nowrap;
             margin: 0 auto;
-            animation: typing 3.5s steps(40, end);
+            animation: typing 3.5s steps(40, end), fadeIn 1s ease-in-out;
         }
-
+        
         @keyframes typing {
             from { width: 0 }
             to { width: 100% }
         }
-
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
         h1 {
-            font-size: 3rem;
+            font-size: 4.5rem;
             margin-bottom: 1.5rem;
-            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            background: linear-gradient(90deg, #ff8a00, #e52e71, #00e6ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 138, 0, 0.3);
         }
-
+        
         p.lead {
-            font-size: 1.2rem;
+            font-size: 1.6rem;
             line-height: 1.6;
-            margin-bottom: 2rem;
-            opacity: 0.9;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
+        
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(229, 46, 113, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #e52e71, #ff8a00);
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(229, 46, 113, 0.6);
+        }
+        
+        .btn:hover:before {
+            opacity: 1;
+        }
+        
+        /* Music Note Icons */
+        .music-note {
+            position: absolute;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.3);
+            animation: floatNote 8s infinite ease-in-out;
+            opacity: 0;
+        }
+        
+        @keyframes floatNote {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) rotate(20deg);
+                opacity: 0;
+            }
+        }
+        
+        .music-note:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .music-note:nth-child(2) { left: 20%; animation-delay: 2s; }
+        .music-note:nth-child(3) { left: 30%; animation-delay: 4s; }
+        .music-note:nth-child(4) { left: 70%; animation-delay: 1s; }
+        .music-note:nth-child(5) { left: 80%; animation-delay: 3s; }
+        .music-note:nth-child(6) { left: 90%; animation-delay: 5s; }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            
+            p.lead {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+            
+            .sound-wave {
+                height: 80px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .circle-1, .circle-2, .circle-3, .circle-4, .circle-5 {
+                opacity: 0.5;
+            }
+        }
+        
 
         nav {
             background-color: rgba(0, 0, 0, 0.8);
@@ -251,9 +524,10 @@
         }
 
         .demo {
-            background-color: #0a0a0a;
+            background-color: rgba(47, 45, 45, 0.7);
             position: relative;
             overflow: hidden;
+            text-align: center;
         }
 
         .demo-container {
@@ -673,6 +947,31 @@
             justify-content: space-between;
         }
 
+        .neon-button {
+            padding: 12px 18px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--color-accent), var(--color-secondary));
+            color: var(--color-text);
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--color-neon-blue);
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .neon-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--color-neon-white), 0 0 30px var(--color-neon-blue);
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            }
+
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -680,7 +979,10 @@
     <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
-            <a href="#" class="logo">EmoMusic</a>
+            <a href="/" class="header-logo">
+                <span class="header-emoji">🎭</span>
+                <span class="header-title">AI Emotion Detection</span>
+              </a>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="/features">Features</a></li>
@@ -699,16 +1001,57 @@
 
     <!-- Hero section -->
     <header>
+        <!-- Animated Circles -->
         <div class="circle circle-1"></div>
         <div class="circle circle-2"></div>
         <div class="circle circle-3"></div>
+        <div class="circle circle-4"></div>
+        <div class="circle circle-5"></div>
+
+        <!-- Floating Particles -->
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+
+        <!-- Music Notes -->
+        <div class="music-note">♪</div>
+        <div class="music-note">♫</div>
+        <div class="music-note">♬</div>
+        <div class="music-note">♩</div>
+        <div class="music-note">♪</div>
+        <div class="music-note">♫</div>
+
+        <!-- Hero Content -->
         <div class="hero-content">
             <h1 class="typing-animation">Emotion Meets Music</h1>
-            <p class="lead">Experience an AI-powered system that detects your emotions and recommends the perfect soundtrack for your mood.</p>
+            <p class="lead">Experience an AI-powered system that detects your emotions and recommends the perfect soundtrack for your mood. Let the rhythm of your feelings guide your musical journey.</p>
             <a href="#features" class="btn">Explore Features</a>
         </div>
-    </header>
 
+        <!-- Sound Wave Animation -->
+        <div class="sound-wave">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+        </div>
+    </header>
     <!-- Features section -->
     <section id="features">
         <div class="container">
@@ -759,47 +1102,41 @@
                     <h3 class="feature-title">Seamless Integration</h3>
                     <p class="feature-desc">The entire system runs seamlessly on your browser, combining frontend and backend technologies for a smooth user experience.</p>
                 </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <h3 class="feature-title">Personalized User Profiles</h3>
+                    <p class="feature-desc">Create and manage user profiles, allowing the system to learn and adapt to your unique emotional patterns over time.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="feature-title">Privacy & Security</h3>
+                    <p class="feature-desc">Your emotions and data remain confidential with our secure, privacy-focused design, ensuring no data is stored without your consent.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 class="feature-title">Future Expansions</h3>
+                    <p class="feature-desc">We plan to introduce AI-driven mood forecasting and integration with external apps like Spotify & Apple Music.</p>
+                </div>
             </div>
         </div>
     </section>
 
+
     <!-- Demo section -->
     <section id="demo" class="demo">
-        <div class="container">
+        <div class="container demo-container">
             <div class="section-title">
                 <h2>See It In Action</h2>
                 <div class="underline"></div>
             </div>
-            <div class="demo-container">
-                <div class="demo-video fade-in">
-                    <img src="/api/placeholder/800/450" alt="Demo video placeholder">
-                </div>
-                <div class="recommendations fade-in">
-                    <h3>Current Recommendations</h3>
-                    <ul class="song-list">
-                        <li class="song-item">
-                            <img src="/api/placeholder/50/50" alt="Song cover" class="song-cover">
-                            <div class="song-info">
-                                <div class="song-title">Happy Day</div>
-                                <div class="song-artist">The Mood Lifters</div>
-                            </div>
-                        </li>
-                        <li class="song-item">
-                            <img src="/api/placeholder/50/50" alt="Song cover" class="song-cover">
-                            <div class="song-info">
-                                <div class="song-title">Calm Waters</div>
-                                <div class="song-artist">Serenity</div>
-                            </div>
-                        </li>
-                        <li class="song-item">
-                            <img src="/api/placeholder/50/50" alt="Song cover" class="song-cover">
-                            <div class="song-info">
-                                <div class="song-title">Energy Boost</div>
-                                <div class="song-artist">The Motivators</div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+            <div>
+                <button onclick="window.location.href='/ai_app'" class="neon-button">Get Started 🚀</button>
             </div>
         </div>
     </section>
@@ -844,25 +1181,6 @@
         </div>
     </section>
 
-    <!-- Mini Player -->
-    <div class="mini-player">
-        <img src="/api/placeholder/60/60" alt="Now playing" class="now-playing-cover">
-        <div class="now-playing-info">
-            <div class="now-playing-title">Happy Day</div>
-            <div class="now-playing-artist">The Mood Lifters</div>
-        </div>
-        <div class="player-controls">
-            <button class="control-button">
-                <i class="fas fa-step-backward"></i>
-            </button>
-            <button class="control-button play-button">
-                <i class="fas fa-play"></i>
-            </button>
-            <button class="control-button">
-                <i class="fas fa-step-forward"></i>
-            </button>
-        </div>
-    </div>
 
     <!-- Simple Footer -->
     <footer class="bg-gradient-to-r from-blue-700 to-blue-500 text-white py-8">
@@ -878,10 +1196,10 @@
                         <a href="#" class="text-white hover:text-blue-200 transition-colors">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="#" class="text-white hover:text-blue-200 transition-colors">
+                        <a href="https://www.linkedin.com/in/pallav-sharma" class="text-white hover:text-blue-200 transition-colors">
                             <i class="fab fa-linkedin"></i>
                         </a>
-                        <a href="#" class="text-white hover:text-blue-200 transition-colors">
+                        <a href="https://github.com/pallav110" class="text-white hover:text-blue-200 transition-colors">
                             <i class="fab fa-github"></i>
                         </a>
                     </div>
@@ -891,11 +1209,11 @@
                 <div class="text-left">
                     <h3 class="text-xl font-bold mb-3">Quick Links</h3>
                     <ul>
-                        <li class="mb-2"><a href="#" class="text-blue-100 hover:text-white transition-colors">Home</a></li>
-                        <li class="mb-2"><a href="#" class="text-blue-100 hover:text-white transition-colors">About Us</a></li>
-                        <li class="mb-2"><a href="#" class="text-blue-100 hover:text-white transition-colors">Features</a></li>
-                        <li class="mb-2"><a href="#" class="text-blue-100 hover:text-white transition-colors">Pricing</a></li>
-                        <li class="mb-2"><a href="#" class="text-blue-100 hover:text-white transition-colors">Contact</a></li>
+                        <li class="mb-2"><a href="/" class="text-blue-100 hover:text-white transition-colors">Home</a></li>
+                        <li class="mb-2"><a href="/about" class="text-blue-100 hover:text-white transition-colors">About Us</a></li>
+                        <li class="mb-2"><a href="/features" class="text-blue-100 hover:text-white transition-colors">Features</a></li>
+                        <li class="mb-2"><a href="/pricing" class="text-blue-100 hover:text-white transition-colors">Pricing</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-blue-100 hover:text-white transition-colors">Contact</a></li>
                     </ul>
                 </div>
                 
@@ -904,17 +1222,17 @@
                     <h3 class="text-xl font-bold mb-3">Contact Us</h3>
                     <p class="mb-2 flex items-center">
                         <i class="fas fa-envelope mr-2"></i>
-                        <a href="mailto:info@aiemotion.tech" class="text-blue-100 hover:text-white transition-colors">info@aiemotion.tech</a>
+                        <a href="mailto:info@aiemotion.tech" class="text-blue-100 hover:text-white transition-colors">pallavs2020@gmail.com</a>
                     </p>
                     <p class="mb-2 flex items-center">
                         <i class="fas fa-phone mr-2"></i>
-                        <a href="tel:+15551234567" class="text-blue-100 hover:text-white transition-colors">+1 (555) 123-4567</a>
+                        <a href="tel:+15551234567" class="text-blue-100 hover:text-white transition-colors">+91 8588999382</a>
                     </p>
                     <p class="mb-4 flex items-center">
                         <i class="fas fa-map-marker-alt mr-2"></i>
-                        <span class="text-blue-100">San Francisco, CA</span>
+                        <span class="text-blue-100">India, Noida-Delhi</span>
                     </p>
-                    <a href="#" class="bg-white text-blue-600 font-medium px-4 py-2 rounded hover:bg-blue-100 transition-colors inline-block">Get in Touch</a>
+                    <a href="/contact" class="bg-white text-blue-600 font-medium px-4 py-2 rounded hover:bg-blue-100 transition-colors inline-block">Get in Touch</a>
                 </div>
             </div>
             
