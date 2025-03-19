@@ -102,9 +102,11 @@ https://github.com/user-attachments/assets/3f4b822c-71db-4360-a202-a64f098c1137
 
 
 ### **Changes**  
-💡Still need changes in design and resposiveness.
-💡Need to make more accurate decisions for recommending music.
+**💡**Still need changes in design and resposiveness.
+**💡**Need to make more accurate decisions for recommending music.
+**💡**Need to handle camera functionality well with start and stop.
+**💡**Need to develop other functions for buttons as well.
+**💡**Need to introduce a saving method for music.
 
-
-
+**Warning ⚠️ : The website is still in building process, and the functionality may change over time.** 
 
