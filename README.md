@@ -13,23 +13,50 @@ This is an AI-powered **Emotion Detection and Music Recommendation System** that
 ### **Project Structure**  
 
 ```
-your_project/
-│── static/                   # Stores static assets (CSS, JS, images)
-│   ├── css/                  # Stylesheets
-│   ├── images/               # Images used in the website
-│── templates/                # HTML templates for Flask app
-│   ├── index.html            # Main webpage
-│   ├── chatbot.html          # Chatbot page
-│── datasets/                 # CSV files for music recommendation
-│── src/                      # Python scripts
-│   ├── fer1.py               # Facial Emotion Recognition (FER) system
-│   ├── chatbot.py            # AI Chatbot with text emotion analysis
-│   ├── music_recommender.py  # AI-based song recommendation model
-│── app.py                    # Flask application (integrates all components)
-│── final_averaged_emotion.json  # Stores final detected emotions
-│── requirements.txt          # Dependencies for the project
-│── README.md                 # Project documentation
-```
+│── Your_Project
+│── datasets/
+│   ├── therapeutic_music_enriched.csv
+│   ├── Y.M.I.R. original dataset.csv
+│   │── imagesofdataset/
+│   │   ├── Figure_1.png
+│   │   ├── Figure_2.png
+│   │   ├── Figure_3.png
+│   │   ├── Figure_4.png
+│   │   ├── Figure_5.png
+│   │   ├── Figure_6.png
+│   │   ├── image copy.png
+│   │   ├── image.png
+│── src/
+│   ├── chatbot.py
+│   ├── dataset.py
+│   ├── fer1.py
+│   ├── modules.py
+│   ├── reccomend.py
+│   ├── train_music_reccomendation.py
+│── static/
+│   ├── styles.css
+│   
+│── templates/
+│   ├── about.html
+│   ├── contact.html
+│   ├── cookiepolicy.html
+│   ├── features.html
+│   ├── footer.html
+│   ├── header.html
+│   ├── home.html
+│   ├── index.html
+│   ├── pricing.html
+│   ├── privacy.html
+│   ├── services.html
+│   ├── wellness_tools.html
+│── Website-Images/
+│   ├── Aboutpage.jpg
+│   ├── Contactpage.jpg
+│   ├── Homepage.jpg
+│   ├── MainFunctionality.jpg
+
+---
+
 
 ### **Installation & Setup**  
 
