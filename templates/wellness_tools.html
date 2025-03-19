@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health & Wellness Tracker</title>
+    <style>
+        /* Base styles */
+        :root {
+            --primary-color: #4299e1;
+            --primary-dark: #3182ce;
+            --secondary-color: #9ae6b4;
+            --secondary-dark: #68d391;
+            --text-color: #2d3748;
+            --light-text: #718096;
+            --background: #f7fafc;
+            --card-bg: #ffffff;
+            --accent: #e9d8fd;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background);
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Background animations */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .grass {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 15vh;
+            background: linear-gradient(transparent 0%, var(--secondary-color) 90%);
+            opacity: 0.15;
+        }
+        
+        .grass-blade {
+            position: absolute;
+            bottom: 0;
+            width: 5px;
+            background: var(--secondary-color);
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.3;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            50% {
+                transform: translateY(0) translateX(20px);
+            }
+            75% {
+                transform: translateY(20px) translateX(10px);
+            }
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+        }
+        
+        /* Header */
+        header {
+            background-color: var(--card-bg);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .logo-icon {
+            margin-right: 0.5rem;
+            font-size: 1.8rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 2rem;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Main content */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.9) 100%);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--light-text);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+        }
+        
+        .cta-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(66, 153, 225, 0.4);
+        }
+        
+        .cta-button:after {
+            content: " →";
+        }
+        
+        /* Features section */
+        .features {
+            margin-bottom: 4rem;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            display: inline-block;
+            padding: 0 1rem;
+            background-color: var(--background);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: var(--light-text);
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            display: inline-block;
+            padding: 1rem;
+            border-radius: 50%;
+            background-color: rgba(66, 153, 225, 0.1);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+        
+        .feature-card p {
+            color: var(--light-text);
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .feature-link:hover {
+            color: var(--primary-dark);
+        }
+        
+        .feature-link:after {
+            content: " →";
+        }
+        
+        /* Tools section */
+        .tools {
+            margin-bottom: 4rem;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .tool-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool-image {
+            height: 200px;
+            background-color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        
+        .tool-content {
+            padding: 1.5rem;
+        }
+        
+        .tool-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+        
+        .tool-card p {
+            color: var(--light-text);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tool-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tool-tag {
+            background-color: rgba(66, 153, 225, 0.1);
+            color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+        }
+        
+        /* Testimonials section */
+        .testimonials {
+            margin-bottom: 4rem;
+            position: relative;
+            padding: 2rem 0;
+        }
+        
+        .testimonials-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .testimonial-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .testimonial-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .testimonial-quote {
+            font-style: italic;
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .testimonial-quote::before {
+            content: '"';
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 3rem;
+            line-height: 1;
+            color: var(--primary-color);
+            opacity: 0.3;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+        
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+        
+        .testimonial-info h4 {
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .testimonial-info p {
+            color: var(--light-text);
+            font-size: 0.875rem;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 3rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-logo-icon {
+            margin-right: 0.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .footer-col p {
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        
+        .footer-col h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .footer-bottom p {
+            opacity: 0.7;
+        }
+        
+        .footer-bottom-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-bottom-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        
+        .footer-bottom-links a:hover {
+            opacity: 1;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+            }
+            
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background animations -->
+    <div class="bg-animation">
+        <div class="grass"></div>
+        <!-- Grass blades and floating circles will be added via JavaScript -->
+    </div>
+    
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">🌿</span>
+                <span>MindfulSpace</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#tools">Tools</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Main content -->
+    <main>
+        <!-- Hero section -->
+        <section class="hero">
+            <h1>Your Journey to Mental Wellness</h1>
+            <p>Track emotional patterns, identify triggers, and discover personalized interventions that work for you. Our technology provides early detection of anxiety patterns and suggests effective strategies before issues escalate.</p>
+            <a href="#tools" class="cta-button">Explore Wellness Tools</a>
+        </section>
+        
+        <!-- Features section -->
+        <section class="features" id="features">
+            <div class="section-title">
+                <h2>Key Features</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Emotional Pattern Recognition</h3>
+                    <p>Our AI-powered algorithm identifies patterns in your emotional states, helping you understand the rhythms of your mental wellness journey.</p>
+                    <a href="#" class="feature-link">Learn how it works</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Trigger Identification</h3>
+                    <p>Discover the specific events, environments, or interactions that contribute to stress and anxiety in your life through detailed analysis.</p>
+                    <a href="#" class="feature-link">See example insights</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Personalized Analytics</h3>
+                    <p>View comprehensive dashboards that visualize your emotional trends over time, making it easier to track progress and identify areas for growth.</p>
+                    <a href="#" class="feature-link">Preview dashboards</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Early Warning System</h3>
+                    <p>Receive gentle notifications when our system detects potential anxiety patterns, allowing you to implement coping strategies proactively.</p>
+                    <a href="#" class="feature-link">How it protects you</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🛠️</div>
+                    <h3>Customizable Interventions</h3>
+                    <p>Access a library of evidence-based techniques tailored to your specific needs, preferences, and the particular challenges you face.</p>
+                    <a href="#" class="feature-link">Browse techniques</a>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Privacy-First Design</h3>
+                    <p>Your mental health data is sensitive. Our platform is built with state-of-the-art security measures to ensure your information remains private.</p>
+                    <a href="#" class="feature-link">Our privacy pledge</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Tools section -->
+        <section class="tools" id="tools">
+            <div class="section-title">
+                <h2>Wellness Tools</h2>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-image">🧘</div>
+                    <div class="tool-content">
+                        <h3>Guided Meditation Suite</h3>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Stress Relief</span>
+                            <span class="tool-tag">Sleep</span>
+                            <span class="tool-tag">Focus</span>
+                        </div>
+                        <p>Our comprehensive meditation library includes over 200 guided sessions for every need and experience level. From quick breathing exercises to deep relaxation journeys, find the perfect meditation for any moment.</p>
+                        <a href="#" class="feature-link">Start meditating</a>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-image">📓</div>
+                    <div class="tool-content">
+                        <h3>Emotion Journal</h3>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Self-Awareness</span>
+                            <span class="tool-tag">Processing</span>
+                            <span class="tool-tag">Reflection</span>
+                        </div>
+                        <p>More than just a diary, our Emotion Journal uses gentle prompts and AI analysis to help you process feelings, identify patterns, and develop greater emotional intelligence through regular reflection.</p>
+                        <a href="#" class="feature-link">Open journal</a>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-image">🌬️</div>
+                    <div class="tool-content">
+                        <h3>Breathing Exercises</h3>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Anxiety</span>
+                            <span class="tool-tag">Immediate Relief</span>
+                            <span class="tool-tag">Calming</span>
+                        </div>
+                        <p>Interactive breathing exercises with visual guides and gentle audio cues help you master techniques like box breathing, 4-7-8 breath, and diaphragmatic breathing for instant stress relief.</p>
+                        <a href="#" class="feature-link">Try a breathing exercise</a>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-image">🎯</div>
+                    <div class="tool-content">
+                        <h3>Goal Setting & Habit Tracker</h3>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Progress</span>
+                            <span class="tool-tag">Motivation</span>
+                            <span class="tool-tag">Consistency</span>
+                        </div>
+                        <p>Create meaningful wellness goals and track your daily habits with our intuitive system. Celebrate small wins, maintain streaks, and build sustainable mental health practices through consistent action.</p>
+                        <a href="#" class="feature-link">Set your first goal</a>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-image">🎵</div>
+                    <div class="tool-content">
+                        <h3>Sound Therapy</h3>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Relaxation</span>
+                            <span class="tool-tag">Focus</span>
+                            <span class="tool-tag">Sleep</span>
+                        </div>
+                        <p>Immerse yourself in carefully crafted soundscapes designed to promote relaxation, focus, or sleep. Our library includes nature sounds, binaural beats, ambient music, and white noise to suit different needs.</p>
+                        <a href="#" class="feature-link">Listen now</a>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-image">🤝</div>
+                    <div class="tool-content">
+                        <h3>Community Support</h3>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Connection</span>
+                            <span class="tool-tag">Sharing</span>
+                            <span class="tool-tag">Growth</span>
+                        </div>
+                        <p>Connect with others on similar wellness journeys in our moderated community forums. Share experiences, exchange tips, and find understanding in a safe, supportive environment focused on mental health.</p>
+                        <a href="#" class="feature-link">Join the community</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Testimonials section -->
+        <section class="testimonials" id="testimonials">
+            <div class="section-title">
+                <h2>Success Stories</h2>
+            </div>
+            <div class="testimonials-container">
+                <div class="testimonial-card">
+                    <div class="testimonial-quote">
+                        The emotional pattern recognition literally changed my life. After three months of tracking, I discovered that my anxiety spikes were directly correlated with specific work situations. Now I have strategies in place that have reduced my anxiety by at least 70%.
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">SM</div>
+                        <div class="testimonial-info">
+                            <h4>Sarah M.</h4>
+                            <p>Marketing Director, Using MindfulSpace for 6 months</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-quote">
+                        I was skeptical at first, but the early warning system actually alerts me to potential anxiety episodes before I even recognize the signs myself. This has given me the chance to implement coping strategies before things escalate. It's like having a supportive friend who's always looking out for you.
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">JT</div>
+                        <div class="testimonial-info">
+                            <h4>James T.</h4>
+                            <p>Software Engineer, Using MindfulSpace for 1 year</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-quote">
+                        The guided meditation suite has been a game-changer for my sleep issues. I've struggled with insomnia for years, but the sleep-focused meditations have helped me develop a consistent bedtime routine. I'm now averaging 7 hours of sleep per night, up from 4-5 hours before.
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">EL</div>
+                        <div class="testimonial-info">
+                            <h4>Emma L.</h4>
+                            <p>Teacher, Using MindfulSpace for 9 months</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-col">
+                <div class="footer-logo">
+                    <span class="footer-logo-icon">🌿</span>
+                    <span>MindfulSpace</span>
+                </div>
+                <p>Empowering individuals to take control of their mental wellness through technology that understands, adapts, and supports.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">f</a>
+                    <a href="#" class="social-link">t</a>
+                    <a href="#" class="social-link">in</a>
+                    <a href="#" class="social-link">ig</a>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#tools">Wellness Tools</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Mental Health Blog</a></li>
+                    <li><a href="#">Research & Studies</a></li>
+                    <li><a href="#">Wellness Guide</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col" id="contact">
+                <h3>Contact Us</h3>
+                <p>Have questions or feedback? We'd love to hear from you.</p>
+                <p>Email: hello@mindfulspace.com</p>
+                <p>Phone: (123) 456-7890</p>
+                <p>Address: 123 Wellness Street, Mindful City, MC 12345</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 MindfulSpace. All rights reserved.</p>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+        // Wait for the DOM to fully load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Background animations
+            createGrassBlades();
+            createFloatingCircles();
+            
+            // Add scroll animations
+            addScrollAnimations();
+            
+            // Add interactive elements
+            makeCardsInteractive();
+        });
+
+        // Create grass blades in the background
+        function createGrassBlades() {
+            const grassContainer = document.querySelector('.grass');
+            const numberOfBlades = 150;
+            
+            for (let i = 0; i < numberOfBlades; i++) {
+                const blade = document.createElement('div');
+                blade.classList.add('grass-blade');
+                
+                // Random properties for each blade
+                const height = 10 + Math.random() * 20; // Height between 10-30px
+                const left = Math.random() * 100; // Position across the width
+                const width = 1 + Math.random() * 3; // Width between 1-4px
+                const delay = Math.random() * 2; // Animation delay
+                
+                // Apply styles
+                blade.style.height = `${height}px`;
+                blade.style.left = `${left}%`;
+                blade.style.width = `${width}px`;
+                blade.style.animationDelay = `${delay}s`;
+                
+                // Add subtle animation
+                blade.style.animation = 'sway 3s ease-in-out infinite alternate';
+                
+                grassContainer.appendChild(blade);
+            }
+            
+            // Add keyframes for grass sway animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes sway {
+                    0% { transform: rotate(-2deg); }
+                    100% { transform: rotate(2deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Create floating circles in the background
+        function createFloatingCircles() {
+            const bgAnimation = document.querySelector('.bg-animation');
+            const numberOfCircles = 15;
+            
+            for (let i = 0; i < numberOfCircles; i++) {
+                const circle = document.createElement('div');
+                circle.classList.add('floating-circle');
+                
+                // Random properties
+                const size = 50 + Math.random() * 150; // Size between 50-200px
+                const top = Math.random() * 100; // Position vertically
+                const left = Math.random() * 100; // Position horizontally
+                const opacity = 0.1 + Math.random() * 0.2; // Opacity between 0.1-0.3
+                const delay = Math.random() * 10; // Animation delay up to 10s
+                const duration = 15 + Math.random() * 20; // Animation duration between 15-35s
+                
+                // Apply styles
+                circle.style.width = `${size}px`;
+                circle.style.height = `${size}px`;
+                circle.style.top = `${top}%`;
+                circle.style.left = `${left}%`;
+                circle.style.opacity = opacity;
+                circle.style.animationDelay = `${delay}s`;
+                circle.style.animationDuration = `${duration}s`;
+                
+                bgAnimation.appendChild(circle);
+            }
+        }
+
+        // Add scroll animations to elements
+        function addScrollAnimations() {
+            // Get all elements that should animate on scroll
+            const featureCards = document.querySelectorAll('.feature-card');
+            const toolCards = document.querySelectorAll('.tool-card');
+            const testimonialCards = document.querySelectorAll('.testimonial-card');
+            
+            // Create IntersectionObserver
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.2
+            });
+            
+            // Observe elements
+            [...featureCards, ...toolCards, ...testimonialCards].forEach(card => {
+                // Add initial state
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                
+                observer.observe(card);
+            });
+            
+            // Add fade-in class style
+            const style = document.createElement('style');
+            style.textContent = `
+                .fade-in {
+                    opacity: 1 !important;
+                    transform: translateY(0) !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Make cards interactive
+        function makeCardsInteractive() {
+            // Tool cards - add click functionality
+            const toolCards = document.querySelectorAll('.tool-card');
+            
+            toolCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Get the tool name from the card
+                    const toolName = this.querySelector('h3').textContent;
+                    
+                    // Show a simple modal with more information
+                    showToolModal(toolName);
+                });
+            });
+            
+            // Feature cards - add hover effects
+            const featureCards = document.querySelectorAll('.feature-card');
+            
+            featureCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.querySelector('.feature-icon').style.transform = 'scale(1.1) rotate(5deg)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.querySelector('.feature-icon').style.transform = 'scale(1) rotate(0)';
+                });
+            });
+            
+            // Add smooth scrolling to navigation links
+            const navLinks = document.querySelectorAll('nav a, .cta-button');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Check if the link has a hash
+                    const href = this.getAttribute('href');
+                    if (href.startsWith('#')) {
+                        e.preventDefault();
+                        
+                        const targetId = href === '#' ? 'body' : href;
+                        const targetElement = document.querySelector(targetId);
+                        
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        }
+
+        // Show a modal with tool information
+        function showToolModal(toolName) {
+            // Create modal elements
+            const modal = document.createElement('div');
+            modal.classList.add('tool-modal');
+            
+            // Modal content will depend on the tool
+            let modalContent = '';
+            
+            switch (toolName) {
+                case 'Guided Meditation Suite':
+                    modalContent = `
+                        <h2>Guided Meditation Suite</h2>
+                        <p>Choose from over 200 guided meditations:</p>
+                        <ul>
+                            <li>Beginner meditations (5-10 minutes)</li>
+                            <li>Sleep stories and relaxation</li>
+                            <li>Focus and productivity sessions</li>
+                            <li>Stress and anxiety relief</li>
+                            <li>Emotional wellbeing practices</li>
+                        </ul>
+                        <button class="modal-cta">Start 7-Day Free Trial</button>
+                    `;
+                    break;
+                    
+                case 'Emotion Journal':
+                    modalContent = `
+                        <h2>Emotion Journal</h2>
+                        <p>Track your emotions with our intelligent journal:</p>
+                        <ul>
+                            <li>Daily guided prompts</li>
+                            <li>Mood tracking with visual charts</li>
+                            <li>Pattern recognition insights</li>
+                            <li>Reflection exercises</li>
+                            <li>Weekly summary reports</li>
+                        </ul>
+                        <button class="modal-cta">Create Your Journal</button>
+                    `;
+                    break;
+                    
+                case 'Breathing Exercises':
+                    modalContent = `
+                        <h2>Breathing Exercises</h2>
+                        <p>Calm your mind and body with these techniques:</p>
+                        <ul>
+                            <li>Box breathing (4-4-4-4)</li>
+                            <li>4-7-8 technique for sleep</li>
+                            <li>Diaphragmatic breathing</li>
+                            <li>Alternate nostril breathing</li>
+                            <li>Guided breath awareness</li>
+                        </ul>
+                        <button class="modal-cta">Try Now</button>
+                    `;
+                    break;
+                    
+                case 'Goal Setting & Habit Tracker':
+                    modalContent = `
+                        <h2>Goal Setting & Habit Tracker</h2>
+                        <p>Build lasting wellness habits:</p>
+                        <ul>
+                            <li>Set SMART wellness goals</li>
+                            <li>Track daily habits with streaks</li>
+                            <li>Receive gentle reminders</li>
+                            <li>Celebrate milestones</li>
+                            <li>Adjust goals based on progress</li>
+                        </ul>
+                        <button class="modal-cta">Start Goal Setting</button>
+                    `;
+                    break;
+                    
+                case 'Sound Therapy':
+                    modalContent = `
+                        <h2>Sound Therapy</h2>
+                        <p>Experience the healing power of sound:</p>
+                        <ul>
+                            <li>Nature soundscapes</li>
+                            <li>Binaural beats for focus</li>
+                            <li>Ambient music for relaxation</li>
+                            <li>White noise for sleep</li>
+                            <li>Guided sound journeys</li>
+                        </ul>
+                        <button class="modal-cta">Listen Now</button>
+                    `;
+                    break;
+                    
+                case 'Community Support':
+                    modalContent = `
+                        <h2>Community Support</h2>
+                        <p>Connect with others on similar journeys:</p>
+                        <ul>
+                            <li>Moderated discussion forums</li>
+                            <li>Weekly virtual meetups</li>
+                            <li>Resource sharing</li>
+                            <li>Expert Q&A sessions</li>
+                            <li>Peer support groups</li>
+                        </ul>
+                        <button class="modal-cta">Join Community</button>
+                    `;
+                    break;
+                    
+                default:
+                    modalContent = `
+                        <h2>${toolName}</h2>
+                        <p>More information coming soon!</p>
+                        <button class="modal-cta">Notify Me</button>
+                    `;
+            }
+            
+            // Set modal content and add close button
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    ${modalContent}
+                </div>
+            `;
+            
+            // Add modal styles
+            const style = document.createElement('style');
+            style.textContent = `
+                .tool-modal {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
+                
+                .modal-content {
+                    background-color: var(--card-bg);
+                    padding: 2rem;
+                    border-radius: 12px;
+                    max-width: 500px;
+                    width: 90%;
+                    position: relative;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                    transform: translateY(-20px);
+                    transition: transform 0.3s ease;
+                }
+                
+                .modal-close {
+                    position: absolute;
+                    top: 1rem;
+                    right: 1rem;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    color: var(--light-text);
+                }
+                
+                .modal-content h2 {
+                    color: var(--primary-dark);
+                    margin-bottom: 1rem;
+                }
+                
+                .modal-content ul {
+                    margin: 1rem 0;
+                    padding-left: 1.5rem;
+                }
+                
+                .modal-content li {
+                    margin-bottom: 0.5rem;
+                    color: var(--text-color);
+                }
+                
+                .modal-cta {
+                    display: block;
+                    width: 100%;
+                    padding: 0.75rem;
+                    margin-top: 1.5rem;
+                    background-color: var(--primary-color);
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    transition: background-color 0.3s ease;
+                }
+                
+                .modal-cta:hover {
+                    background-color: var(--primary-dark);
+                }
+                
+                .modal-show {
+                    opacity: 1;
+                }
+                
+                .modal-show .modal-content {
+                    transform: translateY(0);
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add modal to the page
+            document.body.appendChild(modal);
+            
+            // Show modal after a short delay (for animation)
+            setTimeout(() => {
+                modal.classList.add('modal-show');
+            }, 10);
+            
+            // Close modal when clicking the close button or outside the modal
+            const closeButton = modal.querySelector('.modal-close');
+            closeButton.addEventListener('click', () => {
+                closeModal(modal);
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal);
+                }
+            });
+            
+            // Add functionality to CTA button
+            const ctaButton = modal.querySelector('.modal-cta');
+            ctaButton.addEventListener('click', () => {
+                alert(`You selected: ${toolName}\nThis would redirect to the tool's page in a real application.`);
+                closeModal(modal);
+            });
+        }
+
+        // Close modal with animation
+        function closeModal(modal) {
+            modal.classList.remove('modal-show');
+            
+            // Remove modal after animation completes
+            setTimeout(() => {
+                document.body.removeChild(modal);
+            }, 300);
+        }
+
+        // Add form validation for contact form (if added later)
+        function validateForm() {
+            const form = document.querySelector('.contact-form');
+            
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const nameInput = form.querySelector('input[name="name"]');
+                    const emailInput = form.querySelector('input[name="email"]');
+                    const messageInput = form.querySelector('textarea[name="message"]');
+                    
+                    let isValid = true;
+                    
+                    // Simple validation
+                    if (!nameInput.value.trim()) {
+                        showError(nameInput, 'Name is required');
+                        isValid = false;
+                    } else {
+                        clearError(nameInput);
+                    }
+                    
+                    if (!emailInput.value.trim()) {
+                        showError(emailInput, 'Email is required');
+                        isValid = false;
+                    } else if (!isValidEmail(emailInput.value)) {
+                        showError(emailInput, 'Please enter a valid email');
+                        isValid = false;
+                    } else {
+                        clearError(emailInput);
+                    }
+                    
+                    if (!messageInput.value.trim()) {
+                        showError(messageInput, 'Message is required');
+                        isValid = false;
+                    } else {
+                        clearError(messageInput);
+                    }
+                    
+                    if (isValid) {
+                        // Show success message
+                        alert('Your message has been sent. We will get back to you soon!');
+                        form.reset();
+                    }
+                });
+            }
+        }
+
+        // Helper function to show error message
+        function showError(input, message) {
+            const formGroup = input.parentElement;
+            const errorElement = formGroup.querySelector('.error-message') || document.createElement('div');
+            
+            errorElement.className = 'error-message';
+            errorElement.textContent = message;
+            
+            if (!formGroup.querySelector('.error-message')) {
+                formGroup.appendChild(errorElement);
+            }
+            
+            input.classList.add('input-error');
+        }
+
+        // Helper function to clear error message
+        function clearError(input) {
+            const formGroup = input.parentElement;
+            const errorElement = formGroup.querySelector('.error-message');
+            
+            if (errorElement) {
+                formGroup.removeChild(errorElement);
+            }
+            
+            input.classList.remove('input-error');
+        }
+
+        // Helper function to validate email format
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Add a gentle scroll-to-top button
+        function addScrollToTopButton() {
+            // Create the button
+            const scrollTopButton = document.createElement('button');
+            scrollTopButton.classList.add('scroll-top-button');
+            scrollTopButton.innerHTML = '↑';
+            scrollTopButton.setAttribute('aria-label', 'Scroll to top');
+            
+            // Add styles
+            const style = document.createElement('style');
+            style.textContent = `
+                .scroll-top-button {
+                    position: fixed;
+                    bottom: 30px;
+                    right: 30px;
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    background-color: var(--primary-color);
+                    color: white;
+                    border: none;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transform: translateY(20px);
+                    transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+                    z-index: 99;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+                
+                .scroll-top-button:hover {
+                    background-color: var(--primary-dark);
+                }
+                
+                .scroll-top-button.visible {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add button to the page
+            document.body.appendChild(scrollTopButton);
+            
+            // Show/hide button based on scroll position
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    scrollTopButton.classList.add('visible');
+                } else {
+                    scrollTopButton.classList.remove('visible');
+                }
+            });
+            
+            // Scroll to top when clicked
+            scrollTopButton.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        // Call the scroll-to-top function when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            addScrollToTopButton();
+            validateForm();
+        });
+
+        import React, { useState, useEffect } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+const MoodVisualization = () => {
+  // Sample data for mood tracking
+  const [moodData, setMoodData] = useState([
+    { day: 'Monday', mood: 7, stress: 4, sleep: 6 },
+    { day: 'Tuesday', mood: 6, stress: 5, sleep: 7 },
+    { day: 'Wednesday', mood: 8, stress: 3, sleep: 8 },
+    { day: 'Thursday', mood: 5, stress: 7, sleep: 5 },
+    { day: 'Friday', mood: 7, stress: 4, sleep: 6 },
+    { day: 'Saturday', mood: 9, stress: 2, sleep: 9 },
+    { day: 'Sunday', mood: 8, stress: 3, sleep: 8 },
+  ]);
+
+  const [newEntry, setNewEntry] = useState({
+    mood: 7,
+    stress: 3,
+    sleep: 7,
+  });
+
+  // Function to add new mood entry
+  const addMoodEntry = () => {
+    // Get the next day
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const lastDay = moodData[moodData.length - 1].day;
+    const lastDayIndex = days.indexOf(lastDay);
+    const nextDayIndex = (lastDayIndex + 1) % 7;
+    const nextDay = days[nextDayIndex];
+    
+    // Create new entry
+    const entry = {
+      day: nextDay,
+      mood: newEntry.mood,
+      stress: newEntry.stress,
+      sleep: newEntry.sleep
+    };
+    
+    // Add to data while keeping only the last 7 days
+    const updatedData = [...moodData.slice(1), entry];
+    setMoodData(updatedData);
+  };
+
+  
+
+export default MoodVisualization;
+    </script>
+</html>

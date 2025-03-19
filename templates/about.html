@@ -570,7 +570,7 @@
                     Experience games that adapt difficulty, storylines, and music based on your emotional state.
                     Our AI creates truly personalized gameplay that responds to your frustration, excitement, or fear.
                 </p>
-                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300">
+                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300" href="/gaming">
                     Explore Gaming Integration →
                 </button>
             </div>
@@ -584,7 +584,7 @@
                     Our system can prioritize support tickets based on emotional urgency and provide
                     tailored responses that improve satisfaction by 42%.
                 </p>
-                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300">
+                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300" href="/business">
                     See Business Solutions →
                 </button>
             </div>
@@ -598,7 +598,7 @@
                     Our technology provides early detection of anxiety patterns and suggests
                     personalized interventions before issues escalate.
                 </p>
-                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300">
+                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300" href="/wellness">
                     Discover Wellness Tools →
                 </button>
             </div>
@@ -612,7 +612,7 @@
                     Our emotion detection creates dynamic playlists that evolve with your emotional state
                     throughout the day, increasing engagement by 67%.
                 </p>
-                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300">
+                <button class="learn-more-btn mt-4 text-primary hover:text-white transition-colors duration-300" href="/music">
                     Try Music Recommendations →
                 </button>
             </div>
@@ -866,27 +866,63 @@
             
             // Learn more buttons
             const learnMoreBtns = document.querySelectorAll('.learn-more-btn');
+
+            // Define the page mapping for each href
+            const pageMap = {
+                '/wellness': 'wellness_tools.html',
+                '/gaming': 'gaming-integration.html',
+                '/business': 'business-solutions.html',
+                '/music': 'music-recommendations.html'
+                // Add more mappings as needed
+            };
+
             learnMoreBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
+                    
                     // Animation for button click
                     if (typeof gsap !== 'undefined') {
                         gsap.to(btn, {
                             scale: 1.1,
                             duration: 0.2,
                             yoyo: true,
-                            repeat: 1
+                            repeat: 1,
+                            onComplete: () => {
+                                // Get the href attribute from the button
+                                const href = btn.getAttribute('href');
+                                
+                                // Check if this button has a mapping
+                                if (href ) {
+                                    // Redirect to the corresponding HTML file
+                                    window.location.href = href;
+                                } else {
+                                    // For buttons without specific pages yet, show the default message
+                                    const card = btn.closest('.feature-card');
+                                    if (card) {
+                                        const titleElement = card.querySelector('h3');
+                                        const title = titleElement ? titleElement.textContent : 'this feature';
+                                        alert(`You're interested in learning more about ${title}. More information will be available soon!`);
+                                    } else {
+                                        alert('More information will be available soon!');
+                                    }
+                                }
+                            }
                         });
-                    }
-                    
-                    // Show a custom popup or redirect to more information
-                    const card = btn.closest('.feature-card');
-                    if (card) {
-                        const titleElement = card.querySelector('h3');
-                        const title = titleElement ? titleElement.textContent : 'this feature';
-                        alert(`You're interested in learning more about ${title}. More information will be available soon!`);
                     } else {
-                        alert('More information will be available soon!');
+                        // If GSAP is not available, handle navigation without animation
+                        const href = btn.getAttribute('href');
+                        if (href ) {
+                            window.location.href = href;
+                        } else {
+                            const card = btn.closest('.feature-card');
+                            if (card) {
+                                const titleElement = card.querySelector('h3');
+                                const title = titleElement ? titleElement.textContent : 'this feature';
+                                alert(`You're interested in learning more about ${title}. More information will be available soon!`);
+                            } else {
+                                alert('More information will be available soon!');
+                            }
+                        }
                     }
                 });
             });

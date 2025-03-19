@@ -872,9 +872,9 @@ def update_all_in_background(interval=5):
             # Step 3: Recommend Songs Based on Final Emotion
             latest_songs = recommend_songs("final_average_emotions.json")
             
-            # print("✅ Updated Final Emotion:", latest_final_emotion)  # Debugging print
-            # print("✅ Updated Songs:", latest_songs[:3])  # Print first 3 songs as a check
-            # print("✅ Music recommendations updated.")
+            print("✅ Updated Final Emotion:", latest_final_emotion)  # Debugging print
+            print("✅ Updated Songs:", latest_songs[:3])  # Print first 3 songs as a check
+            print("✅ Music recommendations updated.")
 
         except Exception as e:
             print(f"❌ Error updating: {e}")
@@ -928,6 +928,10 @@ def pricing():
 @app.route('/privacy')
 def privacy():
     return render_template('privacy.html')
+
+@app.route('/wellness')
+def wellness():
+    return render_template('wellness_tools.html')
 
 @app.route('/get_neutral_songs', methods=['GET'])
 def get_neutral_songs():
