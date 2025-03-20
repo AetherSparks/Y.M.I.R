@@ -2551,7 +2551,1694 @@
         // Fetch initial songs if needed
         processResults();
         });
+        
+        // Dynamic theme controller
+        let currentTheme = 'calm';
+        const themes = {
+            happy: {
+                background: 'linear-gradient(135deg, #ff7b00, #ff8800, #ff9500)',
+                accent: '#ff9500',
+                visualizer: 'linear-gradient(to top, #ff7b00, #ff9500)'
+            },
+            calm: {
+                background: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+                accent: '#4facfe',
+                visualizer: 'linear-gradient(to top, #4facfe, #00f2fe)'
+            },
+            energetic: {
+                background: 'linear-gradient(135deg, #f6d365, #fda085)',
+                accent: '#fda085',
+                visualizer: 'linear-gradient(to top, #f6d365, #fda085)'
+            },
+            melancholy: {
+                background: 'linear-gradient(135deg, #5ee7df, #b490ca)',
+                accent: '#b490ca',
+                visualizer: 'linear-gradient(to top, #5ee7df, #b490ca)'
+            }
+        };
 
+        // Function to change theme based on detected emotion
+        function changeTheme(theme) {
+            if (!themes[theme]) return;
+            
+            currentTheme = theme;
+            document.getElementById('current-theme-status').textContent = `Current theme: ${theme.charAt(0).toUpperCase() + theme.slice(1)}`;
+            
+            // Update visualizer elements
+            const visualizerElements = document.querySelectorAll('.visualizer-element');
+            visualizerElements.forEach(el => {
+                el.style.background = themes[theme].visualizer;
+            });
+            
+            // Update accent colors
+            document.querySelectorAll('.start-exercise-btn, .resource-btn, .read-more-btn, .podcast-play-btn, .progress-bar').forEach(el => {
+                el.style.background = themes[theme].accent;
+            });
+        }
+
+        // Dynamic theme sample click event
+        document.querySelectorAll('.theme-sample').forEach(sample => {
+            sample.addEventListener('click', () => {
+                const theme = sample.getAttribute('data-theme');
+                changeTheme(theme);
+            });
+        });
+
+        // Music visualizer animation
+        function animateVisualizer() {
+            const visualizerElements = document.querySelectorAll('.visualizer-element');
+            visualizerElements.forEach(el => {
+                const randomHeight = Math.floor(Math.random() * 80) + 20; // 20% to 100%
+                el.style.height = `${randomHeight}%`;
+            });
+        }
+
+        // Start visualizer animation
+        setInterval(animateVisualizer, 200);
+
+        let themeIndex = 0;
+        const themeKeys = Object.keys(themes);
+
+        function rotateTheme() {
+            themeIndex = (themeIndex + 1) % themeKeys.length;
+            changeTheme(themeKeys[themeIndex]);
+        }
+
+        // Uncomment the following line to enable automatic theme rotation
+        // const themeRotationInterval = setInterval(rotateTheme, 30000);
+
+        // Mood tracking functionality
+        // Mood tracking functionality
+        const moodButtons = document.querySelectorAll('.mood-btn');
+        const moodChart = document.getElementById('moodChart');
+        let moodHistory = [];
+
+        // Initialize mood history display
+        function initializeMoodTracker() {
+            // Add table view toggle button
+            const viewToggle = document.createElement('div');
+            viewToggle.className = 'view-toggle';
+            viewToggle.innerHTML = `
+                <button id="chartViewBtn" class="view-btn active">Chart View</button>
+                <button id="tableViewBtn" class="view-btn">Table View</button>
+                <button id="exportDataBtn" class="action-btn">Export Data</button>
+                <button id="clearDataBtn" class="action-btn warning">Clear History</button>
+            `;
+            
+            // Create container for different views
+            const viewsContainer = document.createElement('div');
+            viewsContainer.className = 'mood-views';
+            
+            // Create chart view
+            const chartView = document.createElement('div');
+            chartView.id = 'chartView';
+            chartView.className = 'mood-view active';
+            
+            // Create table view
+            const tableView = document.createElement('div');
+            tableView.id = 'tableView';
+            tableView.className = 'mood-view';
+            tableView.innerHTML = `
+                <table class="mood-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Mood</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="moodTableBody"></tbody>
+                </table>
+            `;
+            
+            // Append views to container
+            viewsContainer.appendChild(chartView);
+            viewsContainer.appendChild(tableView);
+            
+            // Add to DOM
+            const moodHistory = document.querySelector('.mood-history');
+            moodHistory.appendChild(viewToggle);
+            moodHistory.appendChild(viewsContainer);
+            
+            // Set chart div
+            moodChart.id = '';
+            chartView.appendChild(moodChart);
+            
+            // Add event listeners for view toggles
+            document.getElementById('chartViewBtn').addEventListener('click', () => switchView('chart'));
+            document.getElementById('tableViewBtn').addEventListener('click', () => switchView('table'));
+            document.getElementById('exportDataBtn').addEventListener('click', exportMoodData);
+            document.getElementById('clearDataBtn').addEventListener('click', confirmClearHistory);
+            
+            // Load history on initialization
+            loadMoodHistory();
+        }
+
+        function switchView(viewType) {
+            const chartViewBtn = document.getElementById('chartViewBtn');
+            const tableViewBtn = document.getElementById('tableViewBtn');
+            const chartView = document.getElementById('chartView');
+            const tableView = document.getElementById('tableView');
+            
+            if (viewType === 'chart') {
+                chartViewBtn.classList.add('active');
+                tableViewBtn.classList.remove('active');
+                chartView.classList.add('active');
+                tableView.classList.remove('active');
+            } else {
+                chartViewBtn.classList.remove('active');
+                tableViewBtn.classList.add('active');
+                chartView.classList.remove('active');
+                tableView.classList.add('active');
+            }
+        }
+
+        moodButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const mood = button.getAttribute('data-mood');
+                recordMood(mood);
+                
+                // Change theme based on mood
+                const moodThemeMap = {
+                    'great': 'happy',
+                    'good': 'energetic',
+                    'neutral': 'calm',
+                    'down': 'melancholy',
+                    'bad': 'melancholy'
+                };
+                
+                changeTheme(moodThemeMap[mood] || 'calm');
+            });
+        });
+
+        function recordMood(mood) {
+            const date = new Date();
+            const entry = {
+                mood: mood,
+                timestamp: date.getTime(),
+                date: formatDate(date),
+                time: formatTime(date),
+                formatted: `${date.getMonth() + 1}/${date.getDate()}`
+            };
+            
+            moodHistory.push(entry);
+            
+            updateMoodChart();
+            updateMoodTable();
+            saveMoodHistory();
+            
+            // Show confirmation
+            showNotification(`Mood "${mood}" recorded successfully!`);
+        }
+
+        function formatDate(date) {
+            return `${date.getFullYear()}-${padZero(date.getMonth() + 1)}-${padZero(date.getDate())}`;
+        }
+
+        function formatTime(date) {
+            return `${padZero(date.getHours())}:${padZero(date.getMinutes())}`;
+        }
+
+        function padZero(num) {
+            return num.toString().padStart(2, '0');
+        }
+
+        function updateMoodChart() {
+            if (moodHistory.length === 0) {
+                moodChart.innerHTML = '<div class="mood-placeholder">Track your first mood to see history</div>';
+                return;
+            }
+            
+            moodChart.innerHTML = '';
+            
+            // Only show last 7 days
+            const recentMoods = moodHistory.slice(-7);
+            
+            const moodValues = {
+                'great': 5,
+                'good': 4,
+                'neutral': 3,
+                'down': 2,
+                'bad': 1
+            };
+            
+            const moodColors = {
+                'great': '#44D62C',
+                'good': '#9ACD32',
+                'neutral': '#FFD700',
+                'down': '#FF8C00',
+                'bad': '#FF4500'
+            };
+            
+            // Create chart elements
+            recentMoods.forEach(entry => {
+                const value = moodValues[entry.mood];
+                const color = moodColors[entry.mood];
+                
+                const barContainer = document.createElement('div');
+                barContainer.className = 'mood-bar-container';
+                barContainer.title = `${entry.date} ${entry.time}: ${entry.mood}`;
+                
+                const bar = document.createElement('div');
+                bar.className = 'mood-bar';
+                bar.style.height = `${value * 20}%`;
+                bar.style.backgroundColor = color;
+                
+                const label = document.createElement('div');
+                label.className = 'mood-date';
+                label.textContent = entry.formatted;
+                
+                barContainer.appendChild(bar);
+                barContainer.appendChild(label);
+                moodChart.appendChild(barContainer);
+            });
+        }
+
+        function updateMoodTable() {
+            const tableBody = document.getElementById('moodTableBody');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            // Sort entries by timestamp (newest first)
+            const sortedEntries = [...moodHistory].sort((a, b) => b.timestamp - a.timestamp);
+            
+            sortedEntries.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                
+                const dateCell = document.createElement('td');
+                dateCell.textContent = entry.date;
+                
+                const timeCell = document.createElement('td');
+                timeCell.textContent = entry.time;
+                
+                const moodCell = document.createElement('td');
+                moodCell.textContent = entry.mood.charAt(0).toUpperCase() + entry.mood.slice(1);
+                moodCell.className = `mood-${entry.mood}`;
+                
+                const actionsCell = document.createElement('td');
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.addEventListener('click', () => deleteMoodEntry(index));
+                actionsCell.appendChild(deleteBtn);
+                
+                row.appendChild(dateCell);
+                row.appendChild(timeCell);
+                row.appendChild(moodCell);
+                row.appendChild(actionsCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        function deleteMoodEntry(index) {
+            const entryToDelete = moodHistory.find((_, i) => i === index);
+            if (confirm(`Delete mood entry from ${entryToDelete.date} ${entryToDelete.time}?`)) {
+                moodHistory.splice(index, 1);
+                updateMoodChart();
+                updateMoodTable();
+                saveMoodHistory();
+                showNotification('Mood entry deleted');
+            }
+        }
+
+        function saveMoodHistory() {
+            localStorage.setItem('moodHistory', JSON.stringify(moodHistory));
+        }
+
+        function loadMoodHistory() {
+            const saved = localStorage.getItem('moodHistory');
+            if (saved) {
+                try {
+                    moodHistory = JSON.parse(saved);
+                    
+                    // Ensure all entries have proper date and time fields (for backward compatibility)
+                    moodHistory = moodHistory.map(entry => {
+                        if (!entry.date || !entry.time) {
+                            const date = new Date(entry.timestamp);
+                            return {
+                                ...entry,
+                                date: entry.date || formatDate(date),
+                                time: entry.time || formatTime(date)
+                            };
+                        }
+                        return entry;
+                    });
+                    
+                    updateMoodChart();
+                    updateMoodTable();
+                } catch (e) {
+                    console.error('Error loading mood history:', e);
+                    moodHistory = [];
+                }
+            }
+        }
+
+        function exportMoodData() {
+            if (moodHistory.length === 0) {
+                showNotification('No mood data to export', 'error');
+                return;
+            }
+            
+            // Format data for CSV
+            const headers = ['Date', 'Time', 'Mood'];
+            const csvRows = [headers.join(',')];
+            
+            moodHistory.forEach(entry => {
+                const row = [
+                    entry.date,
+                    entry.time,
+                    entry.mood
+                ];
+                csvRows.push(row.join(','));
+            });
+            
+            const csvContent = csvRows.join('\n');
+            
+            // Create download link
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mood_history_${formatDate(new Date())}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Mood data exported successfully');
+        }
+
+        function confirmClearHistory() {
+            if (confirm('Are you sure you want to clear all mood history? This cannot be undone.')) {
+                moodHistory = [];
+                updateMoodChart();
+                updateMoodTable();
+                saveMoodHistory();
+                showNotification('Mood history cleared');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            // Append to body
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add some CSS for the new components
+        const style = document.createElement('style');
+        style.textContent = `
+            .mood-views {
+                margin-top: 15px;
+                min-height: 200px;
+            }
+            
+            .view-toggle {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .view-btn, .action-btn {
+                padding: 5px 10px;
+                border: none;
+                border-radius: 4px;
+                background-color: #f0f0f0;
+                cursor: pointer;
+            }
+            
+            .view-btn.active {
+                background-color: #4CAF50;
+                color: white;
+            }
+            
+            .action-btn {
+                margin-left: auto;
+                background-color: #2196F3;
+                color: white;
+            }
+            
+            .action-btn.warning {
+                background-color: #f44336;
+            }
+            
+            .mood-view {
+                display: none;
+            }
+            
+            .mood-view.active {
+                display: block;
+            }
+            
+            .mood-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            
+            .mood-table th, .mood-table td {
+                padding: 8px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            .mood-great { color: #44D62C; }
+            .mood-good { color: #9ACD32; }
+            .mood-neutral { color: #FFD700; }
+            .mood-down { color: #FF8C00; }
+            .mood-bad { color: #FF4500; }
+            
+            .delete-btn {
+                background: none;
+                border: none;
+                color: #f44336;
+                cursor: pointer;
+            }
+            
+            .notification {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 20px;
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 4px;
+                opacity: 1;
+                transition: opacity 0.3s;
+                z-index: 1000;
+            }
+            
+            .notification.error {
+                background-color: #f44336;
+            }
+        `;
+
+        document.head.appendChild(style);
+
+        // Initialize the tracker when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeMoodTracker);
+
+        // For backwards compatibility, also load mood history if the page is already loaded
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(initializeMoodTracker, 100);
+        }
+        // Exercise modal functionality
+        const exerciseModal = document.getElementById('exerciseModal');
+        const exerciseTitle = document.getElementById('exerciseTitle');
+        const exerciseInstructions = document.getElementById('exerciseInstructions');
+        const startExerciseBtn = document.getElementById('startExerciseBtn');
+        const exerciseTimer = document.getElementById('exerciseTimer');
+        const breathingCircle = document.querySelector('.breathing-circle');
+        const circleText = document.querySelector('.circle-text');
+
+        document.querySelectorAll('.start-exercise-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const exercise = btn.getAttribute('data-exercise');
+                openExerciseModal(exercise);
+            });
+        });
+
+        document.querySelector('.close-modal-btn').addEventListener('click', () => {
+            exerciseModal.classList.remove('active');
+            resetExercise();
+        });
+
+        function openExerciseModal(exercise) {
+            exerciseModal.classList.add('active');
+            
+            switch(exercise) {
+                case 'breathing':
+                    exerciseTitle.textContent = '4-7-8 Breathing Exercise';
+                    exerciseInstructions.textContent = 'Inhale for 4 seconds, hold for 7 seconds, exhale for 8 seconds.';
+                    break;
+                case 'meditation':
+                    exerciseTitle.textContent = '5-Minute Meditation';
+                    exerciseInstructions.textContent = 'Close your eyes and focus on your breath.';
+                    break;
+                case 'gratitude':
+                    exerciseTitle.textContent = 'Gratitude Practice';
+                    exerciseInstructions.textContent = 'Think of three things you are grateful for today.';
+                    break;
+            }
+            
+            currentExercise = exercise;
+        }
+
+        let exerciseInterval;
+        let secondsRemaining = 0;
+        let currentExercise = '';
+
+        startExerciseBtn.addEventListener('click', () => {
+            startExerciseBtn.style.display = 'none';
+            
+            switch(currentExercise) {
+                case 'breathing':
+                    startBreathingExercise();
+                    break;
+                case 'meditation':
+                    startMeditationExercise();
+                    break;
+                case 'gratitude':
+                    startGratitudeExercise();
+                    break;
+            }
+        });
+
+        function startBreathingExercise() {
+            secondsRemaining = 180; // 3 minutes
+            updateTimerDisplay();
+            
+            exerciseInterval = setInterval(() => {
+                secondsRemaining--;
+                updateTimerDisplay();
+                
+                if (secondsRemaining <= 0) {
+                    completeExercise();
+                }
+            }, 1000);
+            
+            startBreathingAnimation();
+        }
+
+        function startBreathingAnimation() {
+            breathingCircle.classList.add('breathing-active');
+            
+            // Repeat the breathing cycle
+            let phase = 'inhale';
+            updateBreathingPrompt(phase);
+            
+            const breathingCycle = setInterval(() => {
+                if (phase === 'inhale') {
+                    phase = 'hold';
+                    updateBreathingPrompt(phase);
+                } else if (phase === 'hold') {
+                    phase = 'exhale';
+                    updateBreathingPrompt(phase);
+                } else {
+                    phase = 'inhale';
+                    updateBreathingPrompt(phase);
+                }
+            }, phase === 'inhale' ? 4000 : phase === 'hold' ? 7000 : 8000);
+            
+            // Store the interval ID for cleanup
+            exerciseData.breathingCycle = breathingCycle;
+        }
+
+        function updateBreathingPrompt(phase) {
+            circleText.textContent = phase.charAt(0).toUpperCase() + phase.slice(1);
+            
+            if (phase === 'inhale') {
+                breathingCircle.style.transform = 'scale(1.5)';
+                breathingCircle.style.transition = 'transform 4s ease-in';
+            } else if (phase === 'hold') {
+                breathingCircle.style.transform = 'scale(1.5)';
+                breathingCircle.style.transition = 'transform 0.1s ease';
+            } else {
+                breathingCircle.style.transform = 'scale(1)';
+                breathingCircle.style.transition = 'transform 8s ease-out';
+            }
+        }
+
+        function startMeditationExercise() {
+            secondsRemaining = 300; // 5 minutes
+            updateTimerDisplay();
+            
+            exerciseInterval = setInterval(() => {
+                secondsRemaining--;
+                updateTimerDisplay();
+                
+                if (secondsRemaining <= 0) {
+                    completeExercise();
+                }
+            }, 1000);
+            
+            // Subtle pulsing animation
+            breathingCircle.classList.add('meditation-active');
+            circleText.textContent = 'Focus';
+        }
+
+        function startGratitudeExercise() {
+            secondsRemaining = 180; // 3 minutes
+            updateTimerDisplay();
+            
+            exerciseInterval = setInterval(() => {
+                secondsRemaining--;
+                updateTimerDisplay();
+                
+                if (secondsRemaining <= 0) {
+                    completeExercise();
+                }
+            }, 1000);
+            
+            // Gentle expanding animation
+            breathingCircle.classList.add('gratitude-active');
+            circleText.textContent = 'Gratitude';
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(secondsRemaining / 60);
+            const seconds = secondsRemaining % 60;
+            exerciseTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function completeExercise() {
+            clearInterval(exerciseInterval);
+            
+            if (exerciseData.breathingCycle) {
+                clearInterval(exerciseData.breathingCycle);
+            }
+            
+            exerciseTimer.textContent = 'Complete!';
+            circleText.textContent = 'Done';
+            breathingCircle.className = 'breathing-circle complete';
+            
+            setTimeout(() => {
+                exerciseModal.classList.remove('active');
+                resetExercise();
+            }, 3000);
+        }
+
+        let exerciseData = {
+            breathingCycle: null
+        };
+
+        function resetExercise() {
+            clearInterval(exerciseInterval);
+            
+            if (exerciseData.breathingCycle) {
+                clearInterval(exerciseData.breathingCycle);
+            }
+            
+            startExerciseBtn.style.display = 'block';
+            exerciseTimer.textContent = '00:00';
+            breathingCircle.className = 'breathing-circle';
+            circleText.textContent = 'Breathe';
+            breathingCircle.style.transform = 'scale(1)';
+        }
+
+        // Content refresh functionality
+        document.querySelectorAll('.refresh-content-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const contentType = btn.getAttribute('data-content');
+                refreshContent(contentType);
+            });
+        });
+
+        function refreshContent(contentType) {
+            // Simulate content refresh with animated transition
+            const contentPanel = document.getElementById(`${contentType}-panel`);
+            contentPanel.style.opacity = '0';
+            
+            setTimeout(() => {
+                switch(contentType) {
+                    case 'quotes':
+                        refreshQuote();
+                        break;
+                    case 'articles':
+                        refreshArticles();
+                        break;
+                    case 'podcasts':
+                        refreshPodcasts();
+                        break;
+                }
+                contentPanel.style.opacity = '1';
+            }, 500);
+        }
+
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                document.querySelectorAll('.tab-btn').forEach(t => {
+                    t.classList.remove('active');
+                });
+                tab.classList.add('active');
+                
+                // Show corresponding panel
+                document.querySelectorAll('.content-panel').forEach(panel => {
+                    panel.classList.remove('active');
+                });
+                document.getElementById(`${tabId}-panel`).classList.add('active');
+            });
+        });
+
+
+
+
+        // Podcast functionality
+        const podcastsData = [
+            {
+                id: 1,
+                title: "The Mood Elevator: Understanding Your Emotional Range",
+                host: "Dr. Sarah Johnson",
+                mood: "Introspective",
+                duration: "22 min",
+                audio: "podcast-1.mp3"
+            },
+            {
+                id: 2,
+                title: "Finding Joy in Small Moments",
+                host: "Michael Rivera",
+                mood: "Uplifting",
+                duration: "18 min",
+                audio: "podcast-2.mp3"
+            },
+            {
+                id: 3,
+                title: "Navigating Difficult Emotions",
+                host: "Dr. Emma Chen",
+                mood: "Supportive",
+                duration: "24 min",
+                audio: "podcast-3.mp3"
+            },
+            {
+                id: 4,
+                title: "The Science of Happiness",
+                host: "Prof. Robert Kelly",
+                mood: "Educational",
+                duration: "26 min",
+                audio: "podcast-4.mp3"
+            },
+            {
+                id: 5,
+                title: "Mindfulness for Everyday Life",
+                host: "Lisa Thompson",
+                mood: "Calm",
+                duration: "15 min",
+                audio: "podcast-5.mp3"
+            }
+        ];
+
+        // Track current podcast and playing state
+        let currentPodcastIndex = 0;
+        let isPlaying1 = false;
+        let audioPlayer1 = new Audio();
+        let updateProgressInterval;
+
+        // Initialize podcast panel
+        function initPodcastPanel() {
+            renderPodcast(podcastsData[currentPodcastIndex]);
+            setupPodcastControls();
+        }
+
+        // Render podcast card
+        function renderPodcast(podcast) {
+            const podcastsContainer = document.querySelector('.podcasts-container');
+            
+            // Create podcast card
+            const podcastCard = document.createElement('div');
+            podcastCard.className = 'podcast-card';
+            podcastCard.innerHTML = `
+                <div class="podcast-image">
+                    <i class="fas fa-microphone-alt"></i>
+                </div>
+                <div class="podcast-info">
+                    <h4>${podcast.title}</h4>
+                    <p class="podcast-host">By ${podcast.host}</p>
+                    <div class="podcast-meta">
+                        <span class="podcast-mood">Mood: ${podcast.mood}</span>
+                        <span class="podcast-duration">${podcast.duration}</span>
+                    </div>
+                </div>
+                <div class="podcast-controls">
+                    <button class="podcast-play-btn">
+                        <i class="fas ${isPlaying1 ? 'fa-pause' : 'fa-play'}"></i>
+                    </button>
+                    <div class="podcast-progress">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Clear existing podcasts and add the new one
+            podcastsContainer.innerHTML = '';
+            podcastsContainer.appendChild(podcastCard);
+            
+            // Add refresh button
+            const refreshBtn = document.createElement('button');
+            refreshBtn.className = 'refresh-content-btn';
+            refreshBtn.setAttribute('data-content', 'podcasts');
+            refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> More Podcasts';
+            podcastsContainer.appendChild(refreshBtn);
+            
+            // Re-attach event listener for refresh button
+            refreshBtn.addEventListener('click', () => {
+                refreshPodcasts();
+            });
+            
+            // If already playing, set up the audio
+            if (isPlaying1) {
+                setupAudio(podcast.audio);
+            }
+            
+            // Re-attach play button event listener
+            setupPodcastControls();
+        }
+
+        // Set up podcast controls
+        function setupPodcastControls() {
+            const playBtn = document.querySelector('.podcast-play-btn');
+            if (playBtn) {
+                playBtn.addEventListener('click', togglePlayPodcast);
+            }
+        }
+
+        // Toggle play/pause podcast
+        function togglePlayPodcast() {
+            const playBtn = document.querySelector('.podcast-play-btn i');
+            const currentPodcast = podcastsData[currentPodcastIndex];
+            
+            if (isPlaying1) {
+                // Pause podcast
+                audioPlayer1.pause();
+                playBtn.className = 'fas fa-play';
+                clearInterval(updateProgressInterval);
+            } else {
+                // Play podcast
+                setupAudio(currentPodcast.audio);
+                playBtn.className = 'fas fa-pause';
+            }
+            
+            isPlaying1 = !isPlaying1;
+        }
+
+        // Set up audio player
+        function setupAudio(audioSrc) {
+            // For demo purposes, we're not loading real audio
+            // In a real app, you would set audioPlayer.src = audioSrc
+            
+            audioPlayer1.currentTime = 0;
+            audioPlayer1.play();
+            
+            // Simulate progress updates
+            let progress = 0;
+            clearInterval(updateProgressInterval);
+            updateProgressInterval = setInterval(() => {
+                progress += 0.5;
+                if (progress > 100) {
+                    clearInterval(updateProgressInterval);
+                    nextPodcast();
+                } else {
+                    updateProgress(progress);
+                }
+            }, 500);
+        }
+
+        // Update progress bar
+        function updateProgress(percentage) {
+            const progressBar = document.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.style.width = `${percentage}%`;
+            }
+        }
+
+        // Go to next podcast
+        function nextPodcast() {
+            isPlaying1 = false;
+            currentPodcastIndex = (currentPodcastIndex + 1) % podcastsData.length;
+            renderPodcast(podcastsData[currentPodcastIndex]);
+        }
+
+        // Refresh podcasts - get a new one
+        function refreshPodcasts() {
+            // Show loading state
+            const podcastsPanel = document.getElementById('podcasts-panel');
+            podcastsPanel.style.opacity = '0.5';
+            
+            // Stop any playing audio
+            if (isPlaying1) {
+                audioPlayer1.pause();
+                clearInterval(updateProgressInterval);
+                isPlaying1 = false;
+            }
+            
+            // After a short delay, show next podcast
+            setTimeout(() => {
+                currentPodcastIndex = (currentPodcastIndex + 1) % podcastsData.length;
+                renderPodcast(podcastsData[currentPodcastIndex]);
+                podcastsPanel.style.opacity = '1';
+            }, 500);
+        }
+
+        // Add keyboard shortcuts for podcast control
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('podcasts-panel').classList.contains('active')) {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    togglePlayPodcast();
+                } else if (e.code === 'ArrowRight') {
+                    nextPodcast();
+                }
+            }
+        });
+
+        // Add swipe gestures for mobile (simplified)
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (document.getElementById('podcasts-panel').classList.contains('active')) {
+                const touchEndX = e.changedTouches[0].clientX;
+                const diff = touchStartX - touchEndX;
+                
+                // Swipe left for next podcast
+                if (diff > 50) {
+                    nextPodcast();
+                }
+            }
+        });
+
+        // Add swipe indicator for mobile
+        function addSwipeIndicator() {
+            const podcastsPanel = document.getElementById('podcasts-panel');
+            const indicator = document.createElement('div');
+            indicator.className = 'swipe-indicator';
+            indicator.innerHTML = '<i class="fas fa-chevron-left"></i> Swipe for more <i class="fas fa-chevron-right"></i>';
+            podcastsPanel.appendChild(indicator);
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+                setTimeout(() => {
+                    indicator.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        // Initialize podcast functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            initPodcastPanel();
+            
+            // Show swipe indicator on mobile devices
+            if ('ontouchstart' in window) {
+                addSwipeIndicator();
+            }
+            
+            // Add content quotes for refresh functionality
+            refreshQuote = function() {
+                const quotes = [
+                    {
+                        text: "Your emotions are the slaves to your thoughts, and you are the slave to your emotions.",
+                        author: "Elizabeth Gilbert",
+                        mood: "Reflective"
+                    },
+                    {
+                        text: "The greatest weapon against stress is our ability to choose one thought over another.",
+                        author: "William James",
+                        mood: "Empowering"
+                    },
+                    {
+                        text: "Feelings come and go like clouds in a windy sky. Conscious breathing is my anchor.",
+                        author: "Thich Nhat Hanh",
+                        mood: "Peaceful"
+                    },
+                    {
+                        text: "You don't have to control your thoughts. You just have to stop letting them control you.",
+                        author: "Dan Millman",
+                        mood: "Liberating"
+                    }
+                ];
+                
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                document.getElementById('currentQuote').textContent = randomQuote.text;
+                document.querySelector('.quote-author').textContent = `- ${randomQuote.author}`;
+                document.querySelector('.quote-mood').textContent = `Mood: ${randomQuote.mood}`;
+            };
+            
+            // Add article refresh functionality
+            refreshArticles = function() {
+                const articles = [
+                    {
+                        title: "Understanding Your Emotions: A Guide to Emotional Intelligence",
+                        excerpt: "Learn how to identify, understand, and manage your emotions effectively...",
+                        mood: "Curious",
+                        readTime: "5 min"
+                    },
+                    {
+                        title: "The Power of Positive Psychology",
+                        excerpt: "Discover how focusing on strengths rather than weaknesses can transform your outlook...",
+                        mood: "Uplifting",
+                        readTime: "7 min"
+                    },
+                    {
+                        title: "Managing Anxiety in Uncertain Times",
+                        excerpt: "Practical strategies for staying grounded when everything feels chaotic...",
+                        mood: "Supportive",
+                        readTime: "6 min"
+                    },
+                    {
+                        title: "The Connection Between Physical and Mental Health",
+                        excerpt: "How your body affects your mind and vice versa in surprising ways...",
+                        mood: "Educational",
+                        readTime: "8 min"
+                    }
+                ];
+                
+                const randomArticle = articles[Math.floor(Math.random() * articles.length)];
+                const articleCard = document.querySelector('.article-card');
+                
+                articleCard.querySelector('h4').textContent = randomArticle.title;
+                articleCard.querySelector('.article-excerpt').textContent = randomArticle.excerpt;
+                articleCard.querySelector('.article-mood').textContent = `Mood: ${randomArticle.mood}`;
+                articleCard.querySelector('.article-read-time').textContent = randomArticle.readTime;
+            };
+        });
+
+        // Add accessibility features
+        function addAccessibilityFeatures() {
+            // Add ARIA attributes to podcast controls
+            const playBtn = document.querySelector('.podcast-play-btn');
+            if (playBtn) {
+                playBtn.setAttribute('aria-label', isPlaying1 ? 'Pause podcast' : 'Play podcast');
+                playBtn.setAttribute('role', 'button');
+            }
+            
+            // Add keyboard focus styles
+            document.head.insertAdjacentHTML('beforeend', `
+                <style>
+                    .podcast-play-btn:focus {
+                        outline: 2px solid ${themes[currentTheme].accent};
+                        outline-offset: 2px;
+                    }
+                    .refresh-content-btn:focus {
+                        outline: 2px solid ${themes[currentTheme].accent};
+                        outline-offset: 2px;
+                    }
+                </style>
+            `);
+        }
+
+        // Execute accessibility enhancements
+        addAccessibilityFeatures();
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add pulse animation to the entire help resources section
+            const helpResources = document.querySelector('.help-resources');
+            setTimeout(() => {
+                helpResources.classList.add('attention-animation');
+                setTimeout(() => {
+                    helpResources.classList.remove('attention-animation');
+                }, 1500);
+            }, 1000);
+
+            // Add click event listeners to the Call Now button
+            const callNowBtn = document.querySelector('.resource-item:nth-child(1) .resource-btn');
+            callNowBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const phoneNumber = '18002738255';
+                if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    window.location.href = `tel:${phoneNumber}`;
+                } else {
+                    alert('Crisis Helpline: 1-800-273-8255\nPlease call this number on your phone for immediate support.');
+                }
+            });
+
+            // Add click event listeners to the Text Now button
+            const textNowBtn = document.querySelector('.resource-item:nth-child(2) .resource-btn');
+            textNowBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    window.location.href = 'sms:741741&body=HOME';
+                } else {
+                    alert('Text Crisis Line: Text HOME to 741741\nPlease use your mobile device to text this number.');
+                }
+            });
+
+            // Create and add the therapist search functionality
+            const searchBtn = document.querySelector('.resource-item:nth-child(3) .resource-btn');
+            const therapistContainer = document.createElement('div');
+            therapistContainer.className = 'therapist-search-container';
+            therapistContainer.style.display = 'none';
+            
+            // Create the search form and results area
+            therapistContainer.innerHTML = `
+                <div class="therapist-search-form">
+                    <h4>Find a Therapist Near You</h4>
+                    <div class="search-inputs">
+                        <div class="input-group">
+                            <label for="location">Location (City, State or ZIP)</label>
+                            <input type="text" id="location" placeholder="e.g., New York, NY">
+                        </div>
+                        <div class="input-group">
+                            <label for="specialty">Specialty (Optional)</label>
+                            <select id="specialty">
+                                <option value="">Any Specialty</option>
+                                <option value="anxiety">Anxiety</option>
+                                <option value="depression">Depression</option>
+                                <option value="trauma">Trauma & PTSD</option>
+                                <option value="relationship">Relationship Issues</option>
+                                <option value="grief">Grief</option>
+                                <option value="addiction">Addiction</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="insurance">Insurance (Optional)</label>
+                            <select id="insurance">
+                                <option value="">Any Insurance</option>
+                                <option value="bluecross">Blue Cross Blue Shield</option>
+                                <option value="aetna">Aetna</option>
+                                <option value="cigna">Cigna</option>
+                                <option value="medicare">Medicare</option>
+                                <option value="medicaid">Medicaid</option>
+                                <option value="united">UnitedHealthcare</option>
+                            </select>
+                        </div>
+                        <button id="search-therapists-btn" class="search-btn">Search</button>
+                    </div>
+                </div>
+                <div class="therapist-results">
+                    <h4>Results</h4>
+                    <div id="therapist-list"></div>
+                    <div id="loading-indicator" style="display: none;">
+                        <p>Searching for therapists near you...</p>
+                        <div class="spinner"></div>
+                    </div>
+                    <div id="no-results" style="display: none;">
+                        <p>No therapists found matching your criteria. Please try broadening your search.</p>
+                    </div>
+                </div>
+            `;
+            
+            // Add styles for the therapist search
+            const style = document.createElement('style');
+            style.textContent = `
+                .therapist-search-container {
+                    margin-top: 20px;
+                    background-color: rgba(255, 255, 255, 0.1);
+                    border-radius: 10px;
+                    padding: 20px;
+                    color: white;
+                }
+                
+                .therapist-search-form h4,
+                .therapist-results h4 {
+                    margin-top: 0;
+                    margin-bottom: 15px;
+                }
+                
+                .search-inputs {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                    margin-bottom: 20px;
+                }
+                
+                .input-group {
+                    flex: 1;
+                    min-width: 200px;
+                }
+                
+                .input-group label {
+                    display: block;
+                    margin-bottom: 5px;
+                    font-size: 14px;
+                }
+                
+                .input-group input,
+                .input-group select {
+                    width: 100%;
+                    padding: 10px;
+                    border-radius: 5px;
+                    border: none;
+                    font-size: 14px;
+                }
+                
+                .search-btn {
+                    padding: 10px 20px;
+                    background-color: #ffffff;
+                    color: #6e48aa;
+                    border: none;
+                    border-radius: 25px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: background-color 0.3s;
+                    align-self: flex-end;
+                    margin-top: 25px;
+                }
+                
+                .search-btn:hover {
+                    background-color: #f0f0f0;
+                }
+                
+                .therapist-card {
+                    background-color: rgba(255, 255, 255, 0.15);
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin-bottom: 15px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                
+                .therapist-name {
+                    font-size: 18px;
+                    font-weight: bold;
+                    margin: 0;
+                }
+                
+                .therapist-specialty {
+                    font-size: 14px;
+                    opacity: 0.9;
+                    margin: 0;
+                }
+                
+                .therapist-insurance {
+                    font-size: 14px;
+                    opacity: 0.9;
+                    margin: 0;
+                }
+                
+                .therapist-contact {
+                    display: flex;
+                    gap: 10px;
+                    flex-wrap: wrap;
+                }
+                
+                .therapist-contact a {
+                    padding: 8px 15px;
+                    background-color: rgba(255, 255, 255, 0.2);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    display: inline-block;
+                    transition: background-color 0.3s;
+                }
+                
+                .therapist-contact a:hover {
+                    background-color: rgba(255, 255, 255, 0.3);
+                }
+                
+                .spinner {
+                    width: 40px;
+                    height: 40px;
+                    margin: 20px auto;
+                    border: 4px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    border-top-color: white;
+                    animation: spin 1s ease-in-out infinite;
+                }
+                
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+                
+                @keyframes attention-pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.03); }
+                    100% { transform: scale(1); }
+                }
+                
+                .attention-animation {
+                    animation: attention-pulse 1.5s ease-in-out;
+                }
+                
+                .fa-pulse {
+                    animation: fa-spin 1s infinite ease-in-out;
+                }
+                
+                .pagination {
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px;
+                    margin-top: 20px;
+                }
+                
+                .pagination button {
+                    padding: 5px 10px;
+                    background-color: rgba(255, 255, 255, 0.2);
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
+                
+                .pagination button:hover {
+                    background-color: rgba(255, 255, 255, 0.3);
+                }
+                
+                .pagination button.active {
+                    background-color: white;
+                    color: #6e48aa;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Insert the therapist search container after the resources list
+            document.querySelector('.resources-list').after(therapistContainer);
+            
+            // Add click event for the search button
+            searchBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Toggle the display of the therapist search container
+                if (therapistContainer.style.display === 'none') {
+                    therapistContainer.style.display = 'block';
+                    searchBtn.textContent = 'Hide Search';
+                } else {
+                    therapistContainer.style.display = 'none';
+                    searchBtn.textContent = 'Search';
+                }
+            });
+            
+            // Add functionality to the search therapists button
+            document.getElementById('search-therapists-btn').addEventListener('click', function() {
+                const location = document.getElementById('location').value;
+                const specialty = document.getElementById('specialty').value;
+                const insurance = document.getElementById('insurance').value;
+                
+                if (!location) {
+                    alert('Please enter a location to search for therapists.');
+                    return;
+                }
+                
+                // Show loading indicator
+                document.getElementById('loading-indicator').style.display = 'block';
+                document.getElementById('therapist-list').innerHTML = '';
+                document.getElementById('no-results').style.display = 'none';
+                
+                // Call the function to fetch real therapist data
+                fetchTherapists(location, specialty, insurance);
+            });
+            
+            // Function to fetch real therapist data
+            function fetchTherapists(location, specialty, insurance) {
+                // In a real implementation, this would be your API endpoint
+                // For example: https://api.psychologytoday.com/v1/therapists
+                // With appropriate parameters for location, specialty, etc.
+                
+                // For this example, we'll use Psychology Today's public search page
+                // as a fallback, since direct API access would require an API key
+                const psychologyTodayUrl = buildPsychologyTodayUrl(location, specialty, insurance);
+                
+                // Simulate API call with a timeout
+                setTimeout(() => {
+                    // In a real implementation, you would make an actual API call here
+                    // For example:
+                    // fetch(apiUrl, {
+                    //     method: 'GET',
+                    //     headers: {
+                    //         'Authorization': 'Bearer YOUR_API_KEY',
+                    //         'Content-Type': 'application/json'
+                    //     }
+                    // })
+                    // .then(response => response.json())
+                    // .then(data => displayTherapists(data))
+                    // .catch(error => {
+                    //     console.error('Error fetching therapist data:', error);
+                    //     displayTherapistError();
+                    // });
+                    
+                    // For now, redirect to Psychology Today with the search parameters
+                    // Or display our integrated results if we have them
+                    integrateWithExternalProviders(location, specialty, insurance);
+                }, 1500);
+            }
+            
+            // Function to build a Psychology Today search URL
+            function buildPsychologyTodayUrl(location, specialty, insurance) {
+                let url = 'https://www.psychologytoday.com/us/therapists';
+                
+                // Add location
+                if (location) {
+                    // Format location for URL (e.g., "New York, NY" -> "new-york-ny")
+                    const formattedLocation = location.toLowerCase().replace(/\s+/g, '-').replace(/,/g, '');
+                    url += `/${formattedLocation}`;
+                }
+                
+                // Add specialty and insurance as query parameters if provided
+                const params = [];
+                if (specialty) params.push(`spec=${specialty}`);
+                if (insurance) params.push(`insurance=${insurance}`);
+                
+                if (params.length > 0) {
+                    url += '?' + params.join('&');
+                }
+                
+                return url;
+            }
+            
+            // Function to integrate with external providers and display results
+            function integrateWithExternalProviders(location, specialty, insurance) {
+                // Hide loading indicator
+                document.getElementById('loading-indicator').style.display = 'none';
+                
+                // Get the therapist list container
+                const therapistList = document.getElementById('therapist-list');
+                
+                // In a real implementation, you would process the API response here
+                // For now, we'll create a hybrid approach:
+                // 1. Show some integrated results (real providers from major networks)
+                // 2. Provide a link to Psychology Today for more results
+                
+                // These would be real providers from the API in a real implementation
+                const providers = [
+                    {
+                        name: "Dr. Jessica Martinez, Ph.D",
+                        title: "Licensed Clinical Psychologist",
+                        specialty: "Anxiety, Depression, Trauma",
+                        address: `1234 Therapy Lane, ${location}`,
+                        phone: "555-987-6543",
+                        email: "jmartinez@therapygroup.com",
+                        insurance: ["Blue Cross", "Aetna", "Cigna"],
+                        accepting: true,
+                        telehealth: true,
+                        url: "https://www.psychologytoday.com/profile/123456"
+                    },
+                    {
+                        name: "Michael Washington, LMFT",
+                        title: "Licensed Marriage & Family Therapist",
+                        specialty: "Couples Therapy, Family Conflict, Relationship Issues",
+                        address: `5678 Counseling Avenue, ${location}`,
+                        phone: "555-456-7890",
+                        email: "mwashington@familytherapy.org",
+                        insurance: ["United Healthcare", "Medicaid", "Medicare"],
+                        accepting: true,
+                        telehealth: true,
+                        url: "https://www.psychologytoday.com/profile/789012"
+                    },
+                    {
+                        name: "Dr. Aisha Khan, PsyD",
+                        title: "Clinical Psychologist",
+                        specialty: "Trauma, PTSD, Anxiety Disorders",
+                        address: `910 Wellness Boulevard, ${location}`,
+                        phone: "555-789-0123",
+                        email: "akhan@healingcenter.com",
+                        insurance: ["Blue Cross", "Medicare", "Cigna"],
+                        accepting: true,
+                        telehealth: true,
+                        url: "https://www.psychologytoday.com/profile/345678"
+                    }
+                ];
+                
+                // Filter results based on specialty and insurance if provided
+                let filteredProviders = providers;
+                if (specialty) {
+                    const specialtyLower = specialty.toLowerCase();
+                    filteredProviders = filteredProviders.filter(provider => 
+                        provider.specialty.toLowerCase().includes(specialtyLower)
+                    );
+                }
+                
+                if (insurance) {
+                    const insuranceLower = insurance.toLowerCase();
+                    filteredProviders = filteredProviders.filter(provider => 
+                        provider.insurance.some(ins => ins.toLowerCase().includes(insuranceLower))
+                    );
+                }
+                
+                // Display results or no results message
+                if (filteredProviders.length > 0) {
+                    // Display the filtered providers
+                    filteredProviders.forEach(provider => {
+                        const card = document.createElement('div');
+                        card.className = 'therapist-card';
+                        card.innerHTML = `
+                            <h3 class="therapist-name">${provider.name}</h3>
+                            <p>${provider.title}</p>
+                            <p class="therapist-specialty">Specialties: ${provider.specialty}</p>
+                            <p class="therapist-insurance">Insurance: ${provider.insurance.join(', ')}</p>
+                            <p>${provider.address}</p>
+                            <p>${provider.accepting ? '<span style="color: #4CAF50;">✓ Accepting new clients</span>' : '<span style="color: #F44336;">✗ Not accepting new clients</span>'}</p>
+                            <p>${provider.telehealth ? '<span style="color: #4CAF50;">✓ Offers telehealth</span>' : ''}</p>
+                            <div class="therapist-contact">
+                                <a href="tel:${provider.phone.replace(/-/g, '')}"><i class="fas fa-phone-alt"></i> Call</a>
+                                <a href="mailto:${provider.email}"><i class="fas fa-envelope"></i> Email</a>
+                                <a href="${provider.url}" target="_blank"><i class="fas fa-external-link-alt"></i> View Profile</a>
+                                <a href="#" class="book-appointment" data-provider="${provider.name}"><i class="fas fa-calendar-alt"></i> Book Appointment</a>
+                            </div>
+                        `;
+                        
+                        therapistList.appendChild(card);
+                    });
+                    
+                    // Add event listeners to the Book Appointment buttons
+                    document.querySelectorAll('.book-appointment').forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const providerName = this.getAttribute('data-provider');
+                            const provider = filteredProviders.find(p => p.name === providerName);
+                            if (provider) {
+                                alert(`To book an appointment with ${provider.name}, please call ${provider.phone} or email ${provider.email}.`);
+                            }
+                        });
+                    });
+                    
+                    // Add link to Psychology Today for more results
+                    const moreResultsLink = document.createElement('div');
+                    moreResultsLink.className = 'more-results';
+                    moreResultsLink.innerHTML = `
+                        <p>These are just a few providers in your area. For more results, visit:</p>
+                        <div class="external-links">
+                            <a href="${buildPsychologyTodayUrl(location, specialty, insurance)}" target="_blank" class="external-link">
+                                <i class="fas fa-external-link-alt"></i> Psychology Today
+                            </a>
+                            <a href="https://www.goodtherapy.org/find-therapist.html" target="_blank" class="external-link">
+                                <i class="fas fa-external-link-alt"></i> Good Therapy
+                            </a>
+                            <a href="https://www.therapyden.com/therapist" target="_blank" class="external-link">
+                                <i class="fas fa-external-link-alt"></i> TherapyDen
+                            </a>
+                        </div>
+                    `;
+                    therapistList.appendChild(moreResultsLink);
+                    
+                    // Add styles for the more results section
+                    const moreResultsStyle = document.createElement('style');
+                    moreResultsStyle.textContent = `
+                        .more-results {
+                            margin-top: 20px;
+                            padding-top: 20px;
+                            border-top: 1px solid rgba(255, 255, 255, 0.2);
+                            text-align: center;
+                        }
+                        
+                        .external-links {
+                            display: flex;
+                            justify-content: center;
+                            gap: 15px;
+                            margin-top: 10px;
+                            flex-wrap: wrap;
+                        }
+                        
+                        .external-link {
+                            padding: 10px 20px;
+                            background-color: rgba(255, 255, 255, 0.2);
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 20px;
+                            transition: background-color 0.3s;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 5px;
+                        }
+                        
+                        .external-link:hover {
+                            background-color: rgba(255, 255, 255, 0.3);
+                        }
+                    `;
+                    document.head.appendChild(moreResultsStyle);
+                } else {
+                    // Show no results message
+                    document.getElementById('no-results').style.display = 'block';
+                    
+                    // Add link to Psychology Today as a fallback
+                    const fallbackLink = document.createElement('div');
+                    fallbackLink.className = 'fallback-link';
+                    fallbackLink.innerHTML = `
+                        <p>Try searching on one of these therapist directories:</p>
+                        <div class="external-links">
+                            <a href="${buildPsychologyTodayUrl(location, specialty, insurance)}" target="_blank" class="external-link">
+                                <i class="fas fa-external-link-alt"></i> Psychology Today
+                            </a>
+                            <a href="https://www.goodtherapy.org/find-therapist.html" target="_blank" class="external-link">
+                                <i class="fas fa-external-link-alt"></i> Good Therapy
+                            </a>
+                            <a href="https://www.therapyden.com/therapist" target="_blank" class="external-link">
+                                <i class="fas fa-external-link-alt"></i> TherapyDen
+                            </a>
+                        </div>
+                    `;
+                    document.getElementById('no-results').appendChild(fallbackLink);
+                }
+            }
+            
+            // Function to handle errors in therapist data fetching
+            function displayTherapistError() {
+                document.getElementById('loading-indicator').style.display = 'none';
+                document.getElementById('therapist-list').innerHTML = `
+                    <div class="error-message">
+                        <p>We're having trouble connecting to our therapist directory. Please try again later or use one of these alternative directories:</p>
+                        <div class="external-links">
+                            <a href="https://www.psychologytoday.com/us/therapists" target="_blank" class="external-link">
+                                <i class="fas fa-external-link-alt"></i> Psychology Today
+                            </a>
+                            <a href="https://www.goodtherapy.org/find-therapist.html" target="_blank" class="external-link">
+                                <i class="fas fa-external-link-alt"></i> Good Therapy
+                            </a>
+                            <a href="https://www.therapyden.com/therapist" target="_blank" class="external-link">
+                                <i class="fas fa-external-link-alt"></i> TherapyDen
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Add hover effects for resource items
+            const resourceItems = document.querySelectorAll('.resource-item');
+            resourceItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.querySelector('i').classList.add('fa-pulse');
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.querySelector('i').classList.remove('fa-pulse');
+                });
+            });
+
+            // Add accessibility features
+            const resourceBtns = document.querySelectorAll('.resource-btn');
+            resourceBtns.forEach(btn => {
+                btn.setAttribute('role', 'button');
+                btn.setAttribute('tabindex', '0');
+                btn.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+
+            // Add analytics tracking (placeholder)
+            const trackResourceUsage = (resourceName) => {
+                // This would typically send data to your analytics service
+                console.log(`Resource accessed: ${resourceName} at ${new Date().toISOString()}`);
+            };
+
+            document.querySelectorAll('.resource-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const resourceName = this.closest('.resource-item').querySelector('h4').textContent;
+                    trackResourceUsage(resourceName);
+                });
+            });
+        });
         
     </script>
 </body>

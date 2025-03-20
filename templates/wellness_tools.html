@@ -559,6 +559,9 @@
                 text-align: center;
             }
         }
+
+
+        
     </style>
 </head>
 <body>
@@ -662,7 +665,7 @@
                             <span class="tool-tag">Focus</span>
                         </div>
                         <p>Our comprehensive meditation library includes over 200 guided sessions for every need and experience level. From quick breathing exercises to deep relaxation journeys, find the perfect meditation for any moment.</p>
-                        <a href="#" class="feature-link">Start meditating</a>
+                        <a href="#" id="meditationStart" class="feature-link">Start meditating</a>  
                     </div>
                 </div>
                 
@@ -737,7 +740,20 @@
                 </div>
             </div>
         </section>
-        
+
+        <div class="modal-overlay" id="meditationModal">
+            <div class="modal-content">
+              <h2>Guided Meditation Sessions</h2>
+              <ul class="session-list">
+                <li>🌿 5-Minute Breathing</li>
+                <li>🌙 Deep Sleep Meditation</li>
+                <li>🌞 Morning Mindfulness</li>
+                <li>✨ Stress Relief Session</li>
+              </ul>
+              <button id="closeMeditationModal" class="close-btn">Close</button>
+            </div>
+          </div>
+          
         <!-- Testimonials section -->
         <section class="testimonials" id="testimonials">
             <div class="section-title">
@@ -845,614 +861,458 @@
         </div>
     </footer>
 
-    <script>
-
-        // Wait for the DOM to fully load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Background animations
-            createGrassBlades();
-            createFloatingCircles();
-            
-            // Add scroll animations
-            addScrollAnimations();
-            
-            // Add interactive elements
-            makeCardsInteractive();
-        });
-
-        // Create grass blades in the background
-        function createGrassBlades() {
-            const grassContainer = document.querySelector('.grass');
-            const numberOfBlades = 150;
-            
-            for (let i = 0; i < numberOfBlades; i++) {
-                const blade = document.createElement('div');
-                blade.classList.add('grass-blade');
+        <script>
+            // Wait for the DOM to fully load
+            document.addEventListener('DOMContentLoaded', function() {
+                // Background animations
+                createGrassBlades();
+                createFloatingCircles();
+                createWindWithLeaves(); // New wind with leaves animation
                 
-                // Random properties for each blade
-                const height = 10 + Math.random() * 20; // Height between 10-30px
-                const left = Math.random() * 100; // Position across the width
-                const width = 1 + Math.random() * 3; // Width between 1-4px
-                const delay = Math.random() * 2; // Animation delay
+                // Add scroll animations
+                addScrollAnimations();
                 
-                // Apply styles
-                blade.style.height = `${height}px`;
-                blade.style.left = `${left}%`;
-                blade.style.width = `${width}px`;
-                blade.style.animationDelay = `${delay}s`;
+                // Add interactive elements
+                makeCardsInteractive();
                 
-                // Add subtle animation
-                blade.style.animation = 'sway 3s ease-in-out infinite alternate';
+                // Additional features
+                addScrollToTopButton();
+            });
+                    // Create floating circles in the background
+            function createFloatingCircles() {
+                const bgAnimation = document.querySelector('.bg-animation');
+                const numberOfCircles = 15;
                 
-                grassContainer.appendChild(blade);
-            }
-            
-            // Add keyframes for grass sway animation
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes sway {
-                    0% { transform: rotate(-2deg); }
-                    100% { transform: rotate(2deg); }
+                for (let i = 0; i < numberOfCircles; i++) {
+                    const circle = document.createElement('div');
+                    circle.classList.add('floating-circle');
+                    
+                    // Random properties
+                    const size = 50 + Math.random() * 150; // Size between 50-200px
+                    const top = Math.random() * 100; // Position vertically
+                    const left = Math.random() * 100; // Position horizontally
+                    const opacity = 0.1 + Math.random() * 0.2; // Opacity between 0.1-0.3
+                    const delay = Math.random() * 10; // Animation delay up to 10s
+                    const duration = 15 + Math.random() * 20; // Animation duration between 15-35s
+                    
+                    // Apply styles
+                    circle.style.width = `${size}px`;
+                    circle.style.height = `${size}px`;
+                    circle.style.top = `${top}%`;
+                    circle.style.left = `${left}%`;
+                    circle.style.opacity = opacity;
+                    circle.style.animationDelay = `${delay}s`;
+                    circle.style.animationDuration = `${duration}s`;
+                    
+                    bgAnimation.appendChild(circle);
                 }
-            `;
-            document.head.appendChild(style);
-        }
-
-        // Create floating circles in the background
-        function createFloatingCircles() {
-            const bgAnimation = document.querySelector('.bg-animation');
-            const numberOfCircles = 15;
-            
-            for (let i = 0; i < numberOfCircles; i++) {
-                const circle = document.createElement('div');
-                circle.classList.add('floating-circle');
-                
-                // Random properties
-                const size = 50 + Math.random() * 150; // Size between 50-200px
-                const top = Math.random() * 100; // Position vertically
-                const left = Math.random() * 100; // Position horizontally
-                const opacity = 0.1 + Math.random() * 0.2; // Opacity between 0.1-0.3
-                const delay = Math.random() * 10; // Animation delay up to 10s
-                const duration = 15 + Math.random() * 20; // Animation duration between 15-35s
-                
-                // Apply styles
-                circle.style.width = `${size}px`;
-                circle.style.height = `${size}px`;
-                circle.style.top = `${top}%`;
-                circle.style.left = `${left}%`;
-                circle.style.opacity = opacity;
-                circle.style.animationDelay = `${delay}s`;
-                circle.style.animationDuration = `${duration}s`;
-                
-                bgAnimation.appendChild(circle);
             }
-        }
-
-        // Add scroll animations to elements
-        function addScrollAnimations() {
-            // Get all elements that should animate on scroll
-            const featureCards = document.querySelectorAll('.feature-card');
-            const toolCards = document.querySelectorAll('.tool-card');
-            const testimonialCards = document.querySelectorAll('.testimonial-card');
-            
-            // Create IntersectionObserver
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, {
-                threshold: 0.2
-            });
-            
-            // Observe elements
-            [...featureCards, ...toolCards, ...testimonialCards].forEach(card => {
-                // Add initial state
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                
-                observer.observe(card);
-            });
-            
-            // Add fade-in class style
-            const style = document.createElement('style');
-            style.textContent = `
-                .fade-in {
-                    opacity: 1 !important;
-                    transform: translateY(0) !important;
+            // Create grass blades in the background
+            function createGrassBlades() {
+                let grassContainer = document.querySelector('.grass');
+                if (!grassContainer) {
+                    grassContainer = document.createElement('div');
+                    grassContainer.classList.add('grass');
+                    document.body.appendChild(grassContainer);
                 }
-            `;
-            document.head.appendChild(style);
-        }
 
-        // Make cards interactive
-        function makeCardsInteractive() {
-            // Tool cards - add click functionality
-            const toolCards = document.querySelectorAll('.tool-card');
-            
-            toolCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    // Get the tool name from the card
-                    const toolName = this.querySelector('h3').textContent;
-                    
-                    // Show a simple modal with more information
-                    showToolModal(toolName);
-                });
-            });
-            
-            // Feature cards - add hover effects
-            const featureCards = document.querySelectorAll('.feature-card');
-            
-            featureCards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.querySelector('.feature-icon').style.transform = 'scale(1.1) rotate(5deg)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.querySelector('.feature-icon').style.transform = 'scale(1) rotate(0)';
-                });
-            });
-            
-            // Add smooth scrolling to navigation links
-            const navLinks = document.querySelectorAll('nav a, .cta-button');
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    // Check if the link has a hash
-                    const href = this.getAttribute('href');
-                    if (href.startsWith('#')) {
-                        e.preventDefault();
-                        
-                        const targetId = href === '#' ? 'body' : href;
-                        const targetElement = document.querySelector(targetId);
-                        
-                        if (targetElement) {
-                            window.scrollTo({
-                                top: targetElement.offsetTop - 80,
-                                behavior: 'smooth'
-                            });
-                        }
+                const numberOfBlades = 150;
+                for (let i = 0; i < numberOfBlades; i++) {
+                    const blade = document.createElement('div');
+                    blade.classList.add('grass-blade');
+
+                    const height = 10 + Math.random() * 20;
+                    const left = Math.random() * 100;
+                    const width = 1 + Math.random() * 3;
+                    const delay = Math.random() * 2;
+
+                    blade.style.height = `${height}px`;
+                    blade.style.left = `${left}%`;
+                    blade.style.width = `${width}px`;
+                    blade.style.animationDelay = `${delay}s`;
+                    blade.style.animation = 'sway 3s ease-in-out infinite alternate';
+
+                    grassContainer.appendChild(blade);
+                }
+
+                const style = document.createElement('style');
+                style.textContent = `
+                    .grass {
+                        position: absolute;
+                        bottom: 0;
+                        width: 100vw;
+                        height: 100px;
+                        overflow: hidden;
+                        z-index: 10;
                     }
-                });
-            });
-        }
-
-        // Show a modal with tool information
-        function showToolModal(toolName) {
-            // Create modal elements
-            const modal = document.createElement('div');
-            modal.classList.add('tool-modal');
-            
-            // Modal content will depend on the tool
-            let modalContent = '';
-            
-            switch (toolName) {
-                case 'Guided Meditation Suite':
-                    modalContent = `
-                        <h2>Guided Meditation Suite</h2>
-                        <p>Choose from over 200 guided meditations:</p>
-                        <ul>
-                            <li>Beginner meditations (5-10 minutes)</li>
-                            <li>Sleep stories and relaxation</li>
-                            <li>Focus and productivity sessions</li>
-                            <li>Stress and anxiety relief</li>
-                            <li>Emotional wellbeing practices</li>
-                        </ul>
-                        <button class="modal-cta">Start 7-Day Free Trial</button>
-                    `;
-                    break;
-                    
-                case 'Emotion Journal':
-                    modalContent = `
-                        <h2>Emotion Journal</h2>
-                        <p>Track your emotions with our intelligent journal:</p>
-                        <ul>
-                            <li>Daily guided prompts</li>
-                            <li>Mood tracking with visual charts</li>
-                            <li>Pattern recognition insights</li>
-                            <li>Reflection exercises</li>
-                            <li>Weekly summary reports</li>
-                        </ul>
-                        <button class="modal-cta">Create Your Journal</button>
-                    `;
-                    break;
-                    
-                case 'Breathing Exercises':
-                    modalContent = `
-                        <h2>Breathing Exercises</h2>
-                        <p>Calm your mind and body with these techniques:</p>
-                        <ul>
-                            <li>Box breathing (4-4-4-4)</li>
-                            <li>4-7-8 technique for sleep</li>
-                            <li>Diaphragmatic breathing</li>
-                            <li>Alternate nostril breathing</li>
-                            <li>Guided breath awareness</li>
-                        </ul>
-                        <button class="modal-cta">Try Now</button>
-                    `;
-                    break;
-                    
-                case 'Goal Setting & Habit Tracker':
-                    modalContent = `
-                        <h2>Goal Setting & Habit Tracker</h2>
-                        <p>Build lasting wellness habits:</p>
-                        <ul>
-                            <li>Set SMART wellness goals</li>
-                            <li>Track daily habits with streaks</li>
-                            <li>Receive gentle reminders</li>
-                            <li>Celebrate milestones</li>
-                            <li>Adjust goals based on progress</li>
-                        </ul>
-                        <button class="modal-cta">Start Goal Setting</button>
-                    `;
-                    break;
-                    
-                case 'Sound Therapy':
-                    modalContent = `
-                        <h2>Sound Therapy</h2>
-                        <p>Experience the healing power of sound:</p>
-                        <ul>
-                            <li>Nature soundscapes</li>
-                            <li>Binaural beats for focus</li>
-                            <li>Ambient music for relaxation</li>
-                            <li>White noise for sleep</li>
-                            <li>Guided sound journeys</li>
-                        </ul>
-                        <button class="modal-cta">Listen Now</button>
-                    `;
-                    break;
-                    
-                case 'Community Support':
-                    modalContent = `
-                        <h2>Community Support</h2>
-                        <p>Connect with others on similar journeys:</p>
-                        <ul>
-                            <li>Moderated discussion forums</li>
-                            <li>Weekly virtual meetups</li>
-                            <li>Resource sharing</li>
-                            <li>Expert Q&A sessions</li>
-                            <li>Peer support groups</li>
-                        </ul>
-                        <button class="modal-cta">Join Community</button>
-                    `;
-                    break;
-                    
-                default:
-                    modalContent = `
-                        <h2>${toolName}</h2>
-                        <p>More information coming soon!</p>
-                        <button class="modal-cta">Notify Me</button>
-                    `;
+                    .grass-blade {
+                        position: absolute;
+                        bottom: 0;
+                        background-color: green;
+                        transform-origin: bottom;
+                    }
+                    @keyframes sway {
+                        0% { transform: rotate(-2deg); }
+                        100% { transform: rotate(2deg); }
+                    }
+                `;
+                document.head.appendChild(style);
             }
+
             
-            // Set modal content and add close button
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <span class="modal-close">&times;</span>
-                    ${modalContent}
-                </div>
-            `;
-            
-            // Add modal styles
-            const style = document.createElement('style');
-            style.textContent = `
-                .tool-modal {
+
+            // Create wind with flowing leaves animation
+            // Create wind with flowing leaves animation
+            function createWindWithLeaves() {
+                console.log("Wind and Leaves Animation Initializing...");
+
+                let windContainer = document.querySelector('.wind-container');
+                if (!windContainer) {
+                    windContainer = document.createElement('div');
+                    windContainer.classList.add('wind-container');
+                    document.body.appendChild(windContainer);
+                }
+                
+                console.log("Wind Container Created:", windContainer);
+
+                const numberOfWindStreams = 8;
+                for (let i = 0; i < numberOfWindStreams; i++) {
+                    createWindStream(windContainer);
+                }
+
+                const numberOfLeaves = 25;
+                for (let i = 0; i < numberOfLeaves; i++) {
+                    createLeaf(windContainer);
+                }
+
+                // Add styles for wind and leaves
+                const style = document.createElement('style');
+                style.textContent = `
+                    .wind-container {
                     position: fixed;
                     top: 0;
                     left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1000;
-                    opacity: 0;
-                    transition: opacity 0.3s ease;
+                    width: 100vw;
+                    height: 100vh;
+                    pointer-events: none;
+                    z-index: -1; /* Change from 1000 to -1 to place it behind other elements */
+                    overflow: hidden;
                 }
-                
-                .modal-content {
-                    background-color: var(--card-bg);
-                    padding: 2rem;
-                    border-radius: 12px;
-                    max-width: 500px;
-                    width: 90%;
-                    position: relative;
-                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-                    transform: translateY(-20px);
-                    transition: transform 0.3s ease;
-                }
-                
-                .modal-close {
+                    .wind-stream {
                     position: absolute;
-                    top: 1rem;
-                    right: 1rem;
-                    font-size: 1.5rem;
-                    cursor: pointer;
-                    color: var(--light-text);
-                }
-                
-                .modal-content h2 {
-                    color: var(--primary-dark);
-                    margin-bottom: 1rem;
-                }
-                
-                .modal-content ul {
-                    margin: 1rem 0;
-                    padding-left: 1.5rem;
-                }
-                
-                .modal-content li {
-                    margin-bottom: 0.5rem;
-                    color: var(--text-color);
-                }
-                
-                .modal-cta {
-                    display: block;
-                    width: 100%;
-                    padding: 0.75rem;
-                    margin-top: 1.5rem;
-                    background-color: var(--primary-color);
-                    color: white;
-                    border: none;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: 600;
-                    transition: background-color 0.3s ease;
-                }
-                
-                .modal-cta:hover {
-                    background-color: var(--primary-dark);
-                }
-                
-                .modal-show {
-                    opacity: 1;
-                }
-                
-                .modal-show .modal-content {
-                    transform: translateY(0);
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Add modal to the page
-            document.body.appendChild(modal);
-            
-            // Show modal after a short delay (for animation)
-            setTimeout(() => {
-                modal.classList.add('modal-show');
-            }, 10);
-            
-            // Close modal when clicking the close button or outside the modal
-            const closeButton = modal.querySelector('.modal-close');
-            closeButton.addEventListener('click', () => {
-                closeModal(modal);
-            });
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    closeModal(modal);
-                }
-            });
-            
-            // Add functionality to CTA button
-            const ctaButton = modal.querySelector('.modal-cta');
-            ctaButton.addEventListener('click', () => {
-                alert(`You selected: ${toolName}\nThis would redirect to the tool's page in a real application.`);
-                closeModal(modal);
-            });
-        }
-
-        // Close modal with animation
-        function closeModal(modal) {
-            modal.classList.remove('modal-show');
-            
-            // Remove modal after animation completes
-            setTimeout(() => {
-                document.body.removeChild(modal);
-            }, 300);
-        }
-
-        // Add form validation for contact form (if added later)
-        function validateForm() {
-            const form = document.querySelector('.contact-form');
-            
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const nameInput = form.querySelector('input[name="name"]');
-                    const emailInput = form.querySelector('input[name="email"]');
-                    const messageInput = form.querySelector('textarea[name="message"]');
-                    
-                    let isValid = true;
-                    
-                    // Simple validation
-                    if (!nameInput.value.trim()) {
-                        showError(nameInput, 'Name is required');
-                        isValid = false;
-                    } else {
-                        clearError(nameInput);
-                    }
-                    
-                    if (!emailInput.value.trim()) {
-                        showError(emailInput, 'Email is required');
-                        isValid = false;
-                    } else if (!isValidEmail(emailInput.value)) {
-                        showError(emailInput, 'Please enter a valid email');
-                        isValid = false;
-                    } else {
-                        clearError(emailInput);
-                    }
-                    
-                    if (!messageInput.value.trim()) {
-                        showError(messageInput, 'Message is required');
-                        isValid = false;
-                    } else {
-                        clearError(messageInput);
-                    }
-                    
-                    if (isValid) {
-                        // Show success message
-                        alert('Your message has been sent. We will get back to you soon!');
-                        form.reset();
-                    }
-                });
-            }
-        }
-
-        // Helper function to show error message
-        function showError(input, message) {
-            const formGroup = input.parentElement;
-            const errorElement = formGroup.querySelector('.error-message') || document.createElement('div');
-            
-            errorElement.className = 'error-message';
-            errorElement.textContent = message;
-            
-            if (!formGroup.querySelector('.error-message')) {
-                formGroup.appendChild(errorElement);
-            }
-            
-            input.classList.add('input-error');
-        }
-
-        // Helper function to clear error message
-        function clearError(input) {
-            const formGroup = input.parentElement;
-            const errorElement = formGroup.querySelector('.error-message');
-            
-            if (errorElement) {
-                formGroup.removeChild(errorElement);
-            }
-            
-            input.classList.remove('input-error');
-        }
-
-        // Helper function to validate email format
-        function isValidEmail(email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
-        }
-
-        // Add a gentle scroll-to-top button
-        function addScrollToTopButton() {
-            // Create the button
-            const scrollTopButton = document.createElement('button');
-            scrollTopButton.classList.add('scroll-top-button');
-            scrollTopButton.innerHTML = '↑';
-            scrollTopButton.setAttribute('aria-label', 'Scroll to top');
-            
-            // Add styles
-            const style = document.createElement('style');
-            style.textContent = `
-                .scroll-top-button {
-                    position: fixed;
-                    bottom: 30px;
-                    right: 30px;
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 50%;
-                    background-color: var(--primary-color);
-                    color: white;
-                    border: none;
-                    font-size: 1.5rem;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
+                    height: 2px;
                     opacity: 0;
-                    transform: translateY(20px);
-                    transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
-                    z-index: 99;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    transform-origin: left center;
+                    }
+                    
+                    .wind-blue { background: linear-gradient(90deg, transparent, rgba(0, 0, 139, 0.5), transparent); }
+                    .wind-white { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent); }
+                    .wind-grey { background: linear-gradient(90deg, transparent, rgba(169, 169, 169, 0.5), transparent); }
+                    
+                    @keyframes windFlow {
+                    0% { opacity: 0; transform: translateX(-100%) scaleX(0.5); }
+                    10% { opacity: 0.7; }
+                    90% { opacity: 0.7; }
+                    100% { opacity: 0; transform: translateX(100%) scaleX(1.2); }
+                    }
+
+                        .leaf {
+                        position: absolute;
+                        width: 30px;
+                        height: 30px;
+                        background-color: transparent;
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        opacity: 0.8;
+                    }
+                    
+                     /* Maple leaf */
+                    .leaf-1 { 
+                        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%2363a359' d='M50,5 C45,10 40,25 45,25 C35,30 20,25 15,35 C10,45 30,55 25,60 C15,65 5,80 10,85 C15,90 30,80 35,85 C35,95 45,100 50,95 C55,100 65,95 65,85 C70,80 85,90 90,85 C95,80 85,65 75,60 C70,55 90,45 85,35 C80,25 65,30 55,25 C60,25 55,10 50,5 Z'/%3E%3C/svg%3E");
+                    }
+                    
+                    /* Oak leaf */
+                    .leaf-2 { 
+                        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%2378b75b' d='M50,5 C40,10 30,20 15,15 C10,25 20,30 15,40 C5,45 5,55 10,60 C5,70 15,75 20,80 C15,90 35,95 45,90 C50,95 55,90 60,90 C70,95 85,90 85,80 C90,75 95,65 90,60 C95,50 90,40 85,40 C90,30 95,20 85,15 C75,25 60,10 50,5 Z'/%3E%3C/svg%3E");
+                    }
+                    
+                    /* Aspen leaf */
+                    .leaf-3 { 
+                        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%238ec470' d='M50,5 C40,5 30,15 30,25 C20,30 10,25 5,35 C0,45 15,50 15,60 C5,70 15,80 25,85 C35,90 45,80 50,90 C55,80 65,90 75,85 C85,80 95,70 85,60 C85,50 100,45 95,35 C90,25 80,30 70,25 C70,15 60,5 50,5 Z'/%3E%3Cpath fill='%23568b4a' d='M50,5 C49,40 51,40 50,90' stroke='%23568b4a' stroke-width='1'/%3E%3C/svg%3E");
+                    }
+                    
+                    /* Ginkgo leaf */
+                    .leaf-4 { 
+                        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23aed581' d='M50,5 C30,5 5,40 5,65 C5,80 20,90 35,95 C45,95 55,95 65,95 C80,90 95,80 95,65 C95,40 70,5 50,5 Z M50,90 C40,80 30,65 30,50 C30,40 40,25 50,20 C60,25 70,40 70,50 C70,65 60,80 50,90 Z'/%3E%3C/svg%3E");
+                    }
+                    
+                    /* Fall leaf (orange/red) */
+                    .leaf-5 { 
+                        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23e65100' d='M50,5 C45,10 25,10 20,20 C15,30 25,35 15,45 C5,55 15,70 25,75 C30,85 45,90 50,85 C55,90 70,85 75,75 C85,70 95,55 85,45 C75,35 85,30 80,20 C75,10 55,10 50,5 Z'/%3E%3Cpath fill='%23bf360c' d='M50,5 C49,40 51,40 50,85 M20,20 C30,30 40,40 50,45 M50,45 C60,40 70,30 80,20 M15,45 C30,50 40,55 50,55 M50,55 C60,55 70,50 85,45 M25,75 C35,70 45,65 50,65 M50,65 C55,65 65,70 75,75' stroke='%23bf360c' stroke-width='1'/%3E%3C/svg%3E");
+                    }
+                    
+                    @keyframes leafFall {
+                    0% { 
+                        transform: translateY(-100px) translateX(-10px) rotate(0deg); 
+                        opacity: 0; 
+                    }
+                    10% { 
+                        opacity: 0.8; 
+                    }
+                    25% { 
+                        transform: translateY(25vh) translateX(20px) rotate(90deg); 
+                    }
+                    50% { 
+                        transform: translateY(50vh) translateX(-20px) rotate(180deg); 
+                    }
+                    75% { 
+                        transform: translateY(75vh) translateX(30px) rotate(270deg); 
+                    }
+                    100% { 
+                        transform: translateY(100vh) translateX(0px) rotate(360deg); 
+                        opacity: 0.8; 
+                    }
                 }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // Create individual wind stream
+            function createWindStream(container) {
+                const windStream = document.createElement('div');
+                windStream.classList.add('wind-stream');
                 
-                .scroll-top-button:hover {
-                    background-color: var(--primary-dark);
-                }
+                // Randomly assign wind color
+                const windTypes = ['wind-blue', 'wind-white', 'wind-grey'];
+                windStream.classList.add(windTypes[Math.floor(Math.random() * windTypes.length)]);
                 
-                .scroll-top-button.visible {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Add button to the page
-            document.body.appendChild(scrollTopButton);
-            
-            // Show/hide button based on scroll position
-            window.addEventListener('scroll', () => {
-                if (window.pageYOffset > 300) {
-                    scrollTopButton.classList.add('visible');
-                } else {
-                    scrollTopButton.classList.remove('visible');
-                }
-            });
-            
-            // Scroll to top when clicked
-            scrollTopButton.addEventListener('click', () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
+                resetWindStream(windStream);
+                container.appendChild(windStream);
+                
+                setInterval(() => {
+                    resetWindStream(windStream);
+                }, 3000 + Math.random() * 7000);
+            }
+
+            // Reset wind stream position and animation
+            function resetWindStream(windStream) {
+                const top = 10 + Math.random() * 80;
+                const width = 100 + Math.random() * 200;
+                const height = 1 + Math.random() * 2;
+                const duration = 3 + Math.random() * 3;
+                const delay = Math.random() * 2;
+
+                windStream.style.top = `${top}%`;
+                windStream.style.width = `${width}px`;
+                windStream.style.height = `${height}px`;
+                windStream.style.opacity = '0';
+                windStream.style.animation = `windFlow ${duration}s linear ${delay}s forwards`;
+            }
+
+            // Create leaf element
+           // Create leaf element
+            function createLeaf(container) {
+                const leaf = document.createElement('div');
+                leaf.classList.add('leaf');
+                
+                // Add one of the leaf classes randomly with more variety
+                const leafTypes = ['leaf-1', 'leaf-2', 'leaf-3', 'leaf-4', 'leaf-5'];
+                leaf.classList.add(leafTypes[Math.floor(Math.random() * leafTypes.length)]);
+                
+                resetLeaf(leaf);
+                container.appendChild(leaf);
+                leaf.style.animation = `leafFall ${leaf.fallDuration}s linear ${leaf.delay}s infinite`;
+                setInterval(() => {
+                    resetLeaf(leaf);
+                }, leaf.fallDuration * 1000);
+            }
+
+            // Reset leaf position and properties
+            function resetLeaf(leaf) {
+                const size = 20 + Math.random() * 15;  // Slightly larger leaves
+                const startPosition = Math.random() * 100;
+                const fallDuration = 10 + Math.random() * 15;
+                const delay = Math.random() * 5;
+                
+                // Add some rotation to make it more natural
+                const initialRotation = Math.random() * 360;
+                
+                leaf.fallDuration = fallDuration;
+                leaf.delay = delay;
+                leaf.style.width = `${size}px`;
+                leaf.style.height = `${size}px`;
+                leaf.style.left = `${startPosition}%`;
+                leaf.style.top = '-50px';
+                leaf.style.transform = `rotate(${initialRotation}deg)`;
+            }
+
+            // Add scroll animations to elements
+            function addScrollAnimations() {
+                // Get all elements that should animate on scroll
+                const featureCards = document.querySelectorAll('.feature-card');
+                const toolCards = document.querySelectorAll('.tool-card');
+                const testimonialCards = document.querySelectorAll('.testimonial-card');
+                
+                // Create IntersectionObserver
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('fade-in');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.2
                 });
-            });
-        }
+                
+                // Observe elements
+                [...featureCards, ...toolCards, ...testimonialCards].forEach(card => {
+                    // Add initial state
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    
+                    observer.observe(card);
+                });
+                
+                // Add fade-in class style
+                const style = document.createElement('style');
+                style.textContent = `
+                    .fade-in {
+                        opacity: 1 !important;
+                        transform: translateY(0) !important;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
 
-        // Call the scroll-to-top function when the page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            addScrollToTopButton();
-            validateForm();
-        });
+            // Make cards interactive
+            function makeCardsInteractive() {
+                // Tool cards - add click functionality
+                const toolCards = document.querySelectorAll('.tool-card');
+                
+                toolCards.forEach(card => {
+                    card.addEventListener('click', function() {
+                        // Get the tool name from the card
+                        const toolName = this.querySelector('h3').textContent;
+                        
+                        // Show a simple modal with more information
+                        showToolModal(toolName);
+                    });
+                });
+                
+                // Feature cards - add hover effects
+                const featureCards = document.querySelectorAll('.feature-card');
+                
+                featureCards.forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        this.querySelector('.feature-icon').style.transform = 'scale(1.1) rotate(5deg)';
+                        
+                        // Add wind flow effect on hover
+                        createWindBurst(this);
+                    });
+                    
+                    card.addEventListener('mouseleave', function() {
+                        this.querySelector('.feature-icon').style.transform = 'scale(1) rotate(0)';
+                    });
+                });
+                
+                // Add smooth scrolling to navigation links
+                const navLinks = document.querySelectorAll('nav a, .cta-button');
+                
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        // Check if the link has a hash
+                        const href = this.getAttribute('href');
+                        if (href.startsWith('#')) {
+                            e.preventDefault();
+                            
+                            const targetId = href === '#' ? 'body' : href;
+                            const targetElement = document.querySelector(targetId);
+                            
+                            if (targetElement) {
+                                window.scrollTo({
+                                    top: targetElement.offsetTop - 80,
+                                    behavior: 'smooth'
+                                });
+                            }
+                        }
+                    });
+                });
+            }
 
-        import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+            
+            // Add a gentle scroll-to-top button
+            function addScrollToTopButton() {
+                const scrollTopButton = document.createElement('button');
+                scrollTopButton.classList.add('scroll-top-button');
+                scrollTopButton.innerHTML = '↑';
+                scrollTopButton.setAttribute('aria-label', 'Scroll to top');
 
-const MoodVisualization = () => {
-  // Sample data for mood tracking
-  const [moodData, setMoodData] = useState([
-    { day: 'Monday', mood: 7, stress: 4, sleep: 6 },
-    { day: 'Tuesday', mood: 6, stress: 5, sleep: 7 },
-    { day: 'Wednesday', mood: 8, stress: 3, sleep: 8 },
-    { day: 'Thursday', mood: 5, stress: 7, sleep: 5 },
-    { day: 'Friday', mood: 7, stress: 4, sleep: 6 },
-    { day: 'Saturday', mood: 9, stress: 2, sleep: 9 },
-    { day: 'Sunday', mood: 8, stress: 3, sleep: 8 },
-  ]);
+                // Add styles
+                const style = document.createElement('style');
+                style.textContent = `
+                    .scroll-top-button {
+                        position: fixed;
+                        bottom: 30px;
+                        right: 30px;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        background-color: var(--primary-color);
+                        color: white;
+                        border: none;
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        opacity: 0;
+                        transform: translateY(20px);
+                        transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+                        z-index: 99;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    }
+                    
+                    .scroll-top-button:hover {
+                        background-color: var(--primary-dark);
+                    }
+                    
+                    .scroll-top-button.visible {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                `;
+                document.head.appendChild(style);
 
-  const [newEntry, setNewEntry] = useState({
-    mood: 7,
-    stress: 3,
-    sleep: 7,
-  });
+                // Add button to the page
+                document.body.appendChild(scrollTopButton);
 
-  // Function to add new mood entry
-  const addMoodEntry = () => {
-    // Get the next day
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const lastDay = moodData[moodData.length - 1].day;
-    const lastDayIndex = days.indexOf(lastDay);
-    const nextDayIndex = (lastDayIndex + 1) % 7;
-    const nextDay = days[nextDayIndex];
-    
-    // Create new entry
-    const entry = {
-      day: nextDay,
-      mood: newEntry.mood,
-      stress: newEntry.stress,
-      sleep: newEntry.sleep
-    };
-    
-    // Add to data while keeping only the last 7 days
-    const updatedData = [...moodData.slice(1), entry];
-    setMoodData(updatedData);
-  };
+                // Show/hide button based on scroll position
+                window.addEventListener('scroll', () => {
+                    if (window.pageYOffset > 300) {
+                        scrollTopButton.classList.add('visible');
+                    } else {
+                        scrollTopButton.classList.remove('visible');
+                    }
+                });
 
-  
+                // Scroll to top when clicked
+                scrollTopButton.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
 
-export default MoodVisualization;
-    </script>
+
+
+
+
+
+            //functionalities
+                    
+        </script>
 </html>
