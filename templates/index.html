@@ -1741,6 +1741,255 @@
         </div>
     </div>
 
+
+        <!-- AI-Driven Dynamic UI Section -->
+    <div class="dynamic-ui-section card">
+        <h2>AI-Driven Dynamic Experience</h2>
+        <div class="theme-preview">
+            <div class="theme-info">
+                <i class="fas fa-palette theme-icon pulse-animation"></i>
+                <div>
+                    <h3>Adaptive Theme</h3>
+                    <p id="current-theme-status">Theme adapts to your emotional state</p>
+                </div>
+            </div>
+            <div class="theme-samples">
+                <div class="theme-sample happy-theme" data-theme="happy">
+                    <span class="theme-label">Happy</span>
+                </div>
+                <div class="theme-sample calm-theme" data-theme="calm">
+                    <span class="theme-label">Calm</span>
+                </div>
+                <div class="theme-sample energetic-theme" data-theme="energetic">
+                    <span class="theme-label">Energetic</span>
+                </div>
+                <div class="theme-sample melancholy-theme" data-theme="melancholy">
+                    <span class="theme-label">Melancholy</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="music-visualizer-container">
+            <h3>Music Visualizer</h3>
+            <p>Visual representation changes based on music tempo and your mood</p>
+            <div class="visualizer-wrapper">
+                <div class="visualizer-canvas">
+                    <div class="visualizer-element" id="visualizer-1"></div>
+                    <div class="visualizer-element" id="visualizer-2"></div>
+                    <div class="visualizer-element" id="visualizer-3"></div>
+                    <div class="visualizer-element" id="visualizer-4"></div>
+                    <div class="visualizer-element" id="visualizer-5"></div>
+                    <div class="visualizer-element" id="visualizer-6"></div>
+                    <div class="visualizer-element" id="visualizer-7"></div>
+                    <div class="visualizer-element" id="visualizer-8"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mental Health & Wellness Section -->
+    <div class="wellness-section card">
+        <h2>Mental Health & Wellness</h2>
+        
+        <div class="mood-check-in">
+            <h3>Daily Mood Check-In</h3>
+            <p>How are you feeling today?</p>
+            <div class="mood-options">
+                <button class="mood-btn" data-mood="great">
+                    <i class="fas fa-grin-stars"></i>
+                    <span>Great</span>
+                </button>
+                <button class="mood-btn" data-mood="good">
+                    <i class="fas fa-smile"></i>
+                    <span>Good</span>
+                </button>
+                <button class="mood-btn" data-mood="neutral">
+                    <i class="fas fa-meh"></i>
+                    <span>Neutral</span>
+                </button>
+                <button class="mood-btn" data-mood="down">
+                    <i class="fas fa-frown"></i>
+                    <span>Down</span>
+                </button>
+                <button class="mood-btn" data-mood="bad">
+                    <i class="fas fa-sad-tear"></i>
+                    <span>Bad</span>
+                </button>
+            </div>
+            <div class="mood-history">
+                <h4>Your Mood History</h4>
+                <div class="mood-chart" id="moodChart">
+                    <!-- Will be populated by JavaScript -->
+                    <div class="mood-placeholder">Track your first mood to see history</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="exercises-section">
+            <h3>Breathing & Meditation Exercises</h3>
+            <div class="exercise-cards">
+                <div class="exercise-card">
+                    <div class="exercise-icon">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <h4>4-7-8 Breathing</h4>
+                    <p>A calming breath exercise for anxiety relief</p>
+                    <button class="start-exercise-btn" data-exercise="breathing">Start Exercise</button>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-icon">
+                        <i class="fas fa-om"></i>
+                    </div>
+                    <h4>5-Minute Meditation</h4>
+                    <p>Quick mindfulness for stress reduction</p>
+                    <button class="start-exercise-btn" data-exercise="meditation">Start Exercise</button>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h4>Gratitude Practice</h4>
+                    <p>Focus on positivity and thankfulness</p>
+                    <button class="start-exercise-btn" data-exercise="gratitude">Start Exercise</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="help-resources">
+            <h3>Professional Help Resources</h3>
+            <p>If you're experiencing persistent negative emotions, consider reaching out for professional support.</p>
+            <div class="resources-list">
+                <div class="resource-item">
+                    <i class="fas fa-phone-alt"></i>
+                    <div class="resource-info">
+                        <h4>Crisis Helpline</h4>
+                        <p>24/7 Support: 1-800-273-8255</p>
+                    </div>
+                    <a href="#" class="resource-btn">Call Now</a>
+                </div>
+                <div class="resource-item">
+                    <i class="fas fa-comments"></i>
+                    <div class="resource-info">
+                        <h4>Text Crisis Line</h4>
+                        <p>Text HOME to 741741</p>
+                    </div>
+                    <a href="#" class="resource-btn">Text Now</a>
+                </div>
+                <div class="resource-item">
+                    <i class="fas fa-user-md"></i>
+                    <div class="resource-info">
+                        <h4>Find a Therapist</h4>
+                        <p>Search for mental health professionals near you</p>
+                    </div>
+                    <a href="#" class="resource-btn">Search</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mood-Based Content Section -->
+    <div class="mood-content-section card">
+        <h2>Mood-Based Content</h2>
+        
+        <div class="content-tabs">
+            <button class="tab-btn active" data-tab="quotes">Quotes</button>
+            <button class="tab-btn" data-tab="articles">Articles</button>
+            <button class="tab-btn" data-tab="podcasts">Podcasts</button>
+        </div>
+        
+        <div class="content-panels">
+            <div class="content-panel active" id="quotes-panel">
+                <div class="quote-container">
+                    <div class="quote-card">
+                        <div class="quote-text">
+                            <i class="fas fa-quote-left"></i>
+                            <p id="currentQuote">Your emotions are the slaves to your thoughts, and you are the slave to your emotions.</p>
+                            <i class="fas fa-quote-right"></i>
+                        </div>
+                        <div class="quote-author">- Elizabeth Gilbert</div>
+                        <div class="quote-mood">Mood: Reflective</div>
+                    </div>
+                    <button class="refresh-content-btn" data-content="quotes">
+                        <i class="fas fa-sync-alt"></i> New Quote
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content-panel" id="articles-panel">
+                <div class="articles-container">
+                    <div class="article-card">
+                        <div class="article-image">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <div class="article-info">
+                            <h4>Understanding Your Emotions: A Guide to Emotional Intelligence</h4>
+                            <p class="article-excerpt">Learn how to identify, understand, and manage your emotions effectively...</p>
+                            <div class="article-meta">
+                                <span class="article-mood">Mood: Curious</span>
+                                <span class="article-read-time">5 min read</span>
+                            </div>
+                        </div>
+                        <a href="#" class="read-more-btn">Read More</a>
+                    </div>
+                    <button class="refresh-content-btn" data-content="articles">
+                        <i class="fas fa-sync-alt"></i> More Articles
+                    </button>
+                </div>
+            </div>
+            
+            <div class="content-panel" id="podcasts-panel">
+                <div class="podcasts-container">
+                    <div class="podcast-card">
+                        <div class="podcast-image">
+                            <i class="fas fa-microphone-alt"></i>
+                        </div>
+                        <div class="podcast-info">
+                            <h4>The Mood Elevator: Understanding Your Emotional Range</h4>
+                            <p class="podcast-host">By Dr. Sarah Johnson</p>
+                            <div class="podcast-meta">
+                                <span class="podcast-mood">Mood: Introspective</span>
+                                <span class="podcast-duration">22 min</span>
+                            </div>
+                        </div>
+                        <div class="podcast-controls">
+                            <button class="podcast-play-btn">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <div class="podcast-progress">
+                                <div class="progress-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="refresh-content-btn" data-content="podcasts">
+                        <i class="fas fa-sync-alt"></i> More Podcasts
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exercise Modal -->
+    <div class="exercise-modal" id="exerciseModal">
+        <div class="exercise-modal-content">
+            <button class="close-modal-btn">×</button>
+            <div class="exercise-header">
+                <h3 id="exerciseTitle">4-7-8 Breathing Exercise</h3>
+            </div>
+            <div class="exercise-instructions">
+                <p id="exerciseInstructions">Follow the animated circle to control your breathing.</p>
+            </div>
+            <div class="exercise-animation">
+                <div class="breathing-circle">
+                    <div class="circle-text">Breathe</div>
+                </div>
+            </div>
+            <div class="exercise-controls">
+                <button class="start-btn" id="startExerciseBtn">Begin</button>
+                <div class="timer" id="exerciseTimer">00:00</div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Simple Footer -->
     <footer class="bg-gradient-to-r from-blue-700 to-blue-500 text-white py-8">
         <div class="container mx-auto px-4">
