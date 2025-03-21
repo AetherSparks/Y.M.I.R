@@ -8,3 +8,4 @@ venv
 static/music
 .env
 /static/Images
+/flask_session

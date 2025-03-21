@@ -1,5 +1,13 @@
 #ALL IMPORTS
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+from email.message import EmailMessage
+import smtplib
+from dotenv import load_dotenv
+load_dotenv()
+import os
+print("EMAIL_USER:", os.getenv('EMAIL_USER'))
+print("EMAIL_PASS:", os.getenv('EMAIL_PASS'))
+
 import atexit
 import json
 import pickle
@@ -12,7 +20,9 @@ import dlib
 import warnings
 from deepface import DeepFace
 from concurrent.futures import ThreadPoolExecutor
-from flask import Flask, render_template, Response, jsonify, request
+from flask import Flask, render_template, Response, jsonify, render_template_string, request, send_from_directory, url_for, redirect ,flash
+from flask_mail import Mail , Message
+from flask_session import Session
 from flask_cors import CORS
 from scipy.spatial import distance as dist
 from collections import deque
@@ -24,29 +34,53 @@ import requests
 import time
 import re
 from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
-from flask import send_from_directory, url_for
-from dotenv import load_dotenv
-import os
-
-load_dotenv()  # 👈 THIS must come before os.getenv()
-
+from datetime import datetime
 #══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
 
 
 
 
 #Flask App════════════════════════════════════════════════════════Initialised══════════════════════════════════════════════════════════════════════════════
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY' , 'fallbackkey123')
+
 #══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
 
+# Email Config
+# Email Config
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME=os.environ.get('EMAIL_USER'),
+    MAIL_PASSWORD=os.environ.get('EMAIL_PASS'),
+    MAIL_DEFAULT_SENDER=os.environ.get('EMAIL_USER')
+)
+
+# Initialize mail with app explicitly
+mail = Mail(app)
+
+# Print to verify mail is initialized
+print("Mail initialized:", mail)
+print("Mail in app extensions:", 'mail' in app.extensions)
 
 
+print("EMAIL CONFIG CHECK:")
+print(f"MAIL_USERNAME: {app.config['MAIL_USERNAME']}")
+print(f"MAIL_PASSWORD: {'*****' if app.config['MAIL_PASSWORD'] else 'NOT SET'}")
+print(f"MAIL_SERVER: {app.config['MAIL_SERVER']}")
+print(f"MAIL_PORT: {app.config['MAIL_PORT']}")
 
-
-
+# print("Mail config:", {
+#     "server": app.config['MAIL_SERVER'],
+#     "port": app.config['MAIL_PORT'],
+#     "username": bool(app.config['MAIL_USERNAME']),  # Just print if it exists
+#     "password": bool(app.config['MAIL_PASSWORD']),  # Jus   t print if it exists
+#     "use_tls": app.config['MAIL_USE_TLS']
+# })
 
 
 
@@ -904,10 +938,148 @@ def ai_app():
 def about():
     return render_template('about.html')
 
-# Contact Page Route    
-@app.route('/contact')
+@app.route('/contact', methods=['GET', 'POST'])
 def contact():
+    if request.method == 'POST':
+        try:
+            print("======= CONTACT FORM SUBMISSION =======")
+            print("Form data:", request.form)
+
+            # Get form data
+            name = request.form.get('name', '')
+            email = request.form.get('email', '')
+            subject = request.form.get('subject', 'No Subject')
+            message = request.form.get('message', '')
+            phone = request.form.get('phone', 'Not provided')
+
+            # Timestamp for submission
+            submission_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            # Create the email message
+            print("Creating message...")
+            msg = Message(
+                subject=f"New Contact Inquiry: {subject}",
+                sender=("Your Website Contact Form", app.config.get('MAIL_DEFAULT_SENDER') or os.getenv('EMAIL_USER')),
+                recipients=[app.config.get('MAIL_USERNAME') or os.getenv('EMAIL_USER')],
+                reply_to=email
+            )
+
+            # Plain text body (ASCII-safe fallback)
+            msg.body = f"""Hello Admin,
+
+You have received a new contact form submission on your website.
+
+Submitted On: {submission_time}
+
+Name: {name}
+Email: {email}
+Phone: {phone}
+Subject: {subject}
+Message:
+{message}
+
+Please respond promptly.
+"""
+
+            # HTML body (UTF-8 + emoji support)
+            html_body = render_template_string("""
+<html>
+  <body style="font-family: Arial, sans-serif; color: #333;">
+    <h2> New Contact Form Submission</h2>
+    <p><strong> Submitted On:</strong> {{ submission_time }}</p>
+    <p><strong> Name:</strong> {{ name }}</p>
+    <p><strong> Email:</strong> {{ email }}</p>
+    <p><strong> Phone:</strong> {{ phone }}</p>
+    <p><strong> Subject:</strong> {{ subject }}</p>
+    <p><strong> Message:</strong><br>{{ message }}</p>
+    <hr>
+    <p>Regards,<br><strong>Your Website Bot</strong></p>
+  </body>
+</html>
+""", submission_time=submission_time, name=name, email=email, phone=phone, subject=subject, message=message.replace('\n', '<br>'))
+
+            msg.html = html_body  # Attach HTML email
+
+            # Optional: Handle attachments
+            if 'attachment' in request.files:
+                file = request.files['attachment']
+                if file and file.filename != '':
+                    print(f"Attaching file: {file.filename}")
+                    file_content = file.read()
+                    msg.attach(file.filename, file.content_type, file_content)
+                    print("Attachment added.")
+
+            # Send email
+            print("Sending email...")
+            mail.send(msg)
+            print("Email sent!")
+
+            return jsonify({"success": True, "message": "Thank you! Your message has been sent."})
+
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print("======= CONTACT FORM ERROR =======")
+            print(f"Error type: {type(e).__name__}")
+            print(f"Error message: {str(e)}")
+            print(f"Traceback:\n{error_details}")
+
+            return jsonify({
+                "success": False,
+                "message": "Oops! Something went wrong. Please try again later."
+            }), 500
+
+    # GET request → render contact form
     return render_template('contact.html')
+
+from flask import jsonify
+
+@app.route('/book-appointment', methods=['POST'])
+def book_appointment():
+    user_name = request.form['user_name']
+    user_email = request.form['user_email']
+    appointment_date = request.form['appointment_date']
+    time_slot = request.form['time_slot']
+    duration = request.form['meeting_duration']
+    timezone = request.form['timezone']
+    notes = request.form['appointment_notes']
+
+    subject = 'New appointment Booking!'
+    body = f"""
+    New Appointment Booked!
+
+    Name: {user_name}
+    Email: {user_email}
+    Appointment Date: {appointment_date}
+    Time Slot: {time_slot}
+    Duration: {duration} minutes
+    Timezone: {timezone}
+    Notes: {notes}
+    """
+
+    sender_email = os.environ.get('EMAIL_USER')
+    receiver_email = os.environ.get('EMAIL_USER')
+    password = os.environ.get('EMAIL_PASS')
+
+    try:
+        msg = EmailMessage()
+        msg['Subject'] = subject
+        msg['From'] = sender_email
+        msg['To'] = receiver_email
+        msg.set_content(body)
+
+        # Send Email
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(sender_email, password)
+            smtp.send_message(msg)
+
+        # ✅ Return JSON success message (instead of flash)
+        return jsonify({"success": True, "message": "Appointment booked successfully!"})
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"success": False, "message": "Failed to send email!"}), 500
+
 
 @app.route('/features')
 def features():

@@ -1169,19 +1169,19 @@
                             <div class="contact-icon">
                                 <i class="fas fa-envelope"></i>
                             </div>
-                            <div class="contact-text">contact@emotionai.com</div>
+                            <div class="contact-text">pallavs2020@gmail.com</div>
                         </div>
                         <div class="contact-item">
                             <div class="contact-icon">
                                 <i class="fas fa-phone"></i>
                             </div>
-                            <div class="contact-text">+1 (555) 123-4567</div>
+                            <div class="contact-text">+91 858999382</div>
                         </div>
                         <div class="contact-item">
                             <div class="contact-icon">
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
-                            <div class="contact-text">San Francisco, CA, USA</div>
+                            <div class="contact-text">India , Noida-Delhi</div>
                         </div>
                     </div>
 
@@ -1210,129 +1210,132 @@
                     </div>
                 </div>
 
-                    <!-- Right Side - Contact Form -->
-                    <div class="contact-form-container">
-                        <div class="form-header">
-                            <h2 class="form-title">Send Me a Message</h2>
-                            <p class="form-subtitle">I'll get back to you as soon as possible</p>
-                        </div>
+                <!-- Right Side - Contact Form -->
+                <div class="contact-form-container">
+                    <div class="form-header">
+                        <h2 class="form-title">Send Me a Message</h2>
+                        <p class="form-subtitle">I'll get back to you as soon as possible</p>
+                    </div>
 
-                        <!-- Form progress indicator -->
-                        <div class="form-progress">
-                            <div class="progress-step active" data-step="1">
-                                <span class="step-number">1</span>
-                                <span class="step-text">Contact</span>
-                            </div>
-                            <div class="progress-step" data-step="2">
-                                <span class="step-number">2</span>
-                                <span class="step-text">Message</span>
-                            </div>
-                            <div class="progress-step" data-step="3">
-                                <span class="step-number">3</span>
-                                <span class="step-text">Review</span>
-                            </div>
+                    <!-- Form progress indicator -->
+                    <div class="form-progress">
+                        <div class="progress-step active" data-step="1">
+                            <span class="step-number">1</span>
+                            <span class="step-text">Contact</span>
                         </div>
-
-                        <form class="contact-form" id="contactForm">
-                            <div class="form-step active" data-step="1">
-                                <div class="input-group">
-                                    <input type="text" id="name" name="name" placeholder="Your name" required>
-                                    <label for="name">Your Name</label>
-                                    <i class="fas fa-user input-icon"></i>
-                                    <span class="error-message" id="name-error"></span>
-                                </div>
-        
-                                <div class="input-group">
-                                    <input type="email" id="email" name="email" placeholder="Your email" required>
-                                    <label for="email">Your Email</label>
-                                    <i class="fas fa-envelope input-icon"></i>
-                                    <span class="error-message" id="email-error"></span>
-                                </div>
-        
-                                <div class="input-group">
-                                    <input type="tel" id="phone" name="phone" placeholder="Your phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
-                                    <label for="phone">Your Phone (optional)</label>
-                                    <i class="fas fa-phone input-icon"></i>
-                                    <span class="helper-text">Format: 123-456-7890</span>
-                                </div>
-        
-                                <div class="form-nav">
-                                    <button type="button" class="next-btn" data-next="2">Next <i class="fas fa-arrow-right"></i></button>
-                                </div>
-                            </div>
-        
-                            <div class="form-step" data-step="2">
-                                <div class="input-group">
-                                    <input type="text" id="subject" name="subject" placeholder="Subject" required>
-                                    <label for="subject">Subject</label>
-                                    <i class="fas fa-heading input-icon"></i>
-                                    <span class="error-message" id="subject-error"></span>
-                                </div>
-        
-                                <div class="input-group">
-                                    <textarea id="message" name="message" placeholder="Your message" required></textarea>
-                                    <label for="message">Your Message</label>
-                                    <i class="fas fa-comment input-icon"></i>
-                                    <div class="textarea-footer">
-                                        <span class="character-counter">0/500</span>
-                                    </div>
-                                    <span class="error-message" id="message-error"></span>
-                                </div>
-        
-                                <div class="input-group">
-                                    <div class="file-upload">
-                                        <input type="file" id="attachment" name="attachment" multiple>
-                                        <label for="attachment" class="file-label">
-                                            <i class="fas fa-paperclip"></i> Attach Files
-                                        </label>
-                                        <div class="file-list" id="file-list"></div>
-                                    </div>
-                                </div>
-        
-                                <div class="form-nav">
-                                    <button type="button" class="prev-btn" data-prev="1"><i class="fas fa-arrow-left"></i> Back</button>
-                                    <button type="button" class="next-btn" data-next="3">Next <i class="fas fa-arrow-right"></i></button>
-                                </div>
-                            </div>
-        
-                            <div class="form-step" data-step="3">
-                                <div class="review-section">
-                                    <h3>Review Your Message</h3>
-                                    <div class="review-data">
-                                        <p><strong>Name:</strong> <span id="review-name"></span></p>
-                                        <p><strong>Email:</strong> <span id="review-email"></span></p>
-                                        <p><strong>Phone:</strong> <span id="review-phone"></span></p>
-                                        <p><strong>Subject:</strong> <span id="review-subject"></span></p>
-                                        <p><strong>Message:</strong> <span id="review-message"></span></p>
-                                        <p><strong>Attachments:</strong> <span id="review-attachments"></span></p>
-                                    </div>
-                                </div>
-        
-                                <div class="recaptcha-container">
-                                    <div id="recaptcha-placeholder"></div>
-                                </div>
-        
-                                <div class="form-nav">
-                                    <button type="button" class="prev-btn" data-prev="2"><i class="fas fa-arrow-left"></i> Back</button>
-                                    <button type="submit" class="submit-btn">
-                                        Send Message <i class="fas fa-paper-plane ml-2"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                        
-                        <div class="form-loading" id="formLoading">
-                            <div class="spinner"></div>
-                            <p>Sending your message...</p>
+                        <div class="progress-step" data-step="2">
+                            <span class="step-number">2</span>
+                            <span class="step-text">Message</span>
                         </div>
-
-                        <div class="success-message" id="successMessage">
-                            <i class="fas fa-check-circle success-icon"></i>
-                            <h3 class="text-2xl font-bold mb-2">Message Sent!</h3>
-                            <p>We'll get back to you soon.</p>
+                        <div class="progress-step" data-step="3">
+                            <span class="step-number">3</span>
+                            <span class="step-text">Review</span>
                         </div>
                     </div>
+
+                    <form class="contact-form" id="contactForm" method="POST" enctype="multipart/form-data" action="/contact">
+
+                        <div class="form-step active" data-step="1">
+                            <div class="input-group">
+                                <input type="text" id="name" name="name" placeholder="Your name" required>
+                                <label for="name">Your Name</label>
+                                <i class="fas fa-user input-icon"></i>
+                                <span class="error-message" id="name-error"></span>
+                            </div>
+    
+                            <div class="input-group">
+                                <input type="email" id="email" name="email" placeholder="Your email" required>
+                                <label for="email">Your Email</label>
+                                <i class="fas fa-envelope input-icon"></i>
+                                <span class="error-message" id="email-error"></span>
+                            </div>
+    
+                            <div class="input-group">
+                                <input type="tel" id="phone" name="phone" placeholder="Your phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+                                <label for="phone">Your Phone (optional)</label>
+                                <i class="fas fa-phone input-icon"></i>
+                                <span class="helper-text">Format: 123-456-7890</span>
+                            </div>
+    
+                            <div class="form-nav">
+                                <button type="button" class="next-btn" data-next="2">Next <i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+    
+                        <div class="form-step" data-step="2">
+                            <div class="input-group">
+                                <input type="text" id="subject" name="subject" placeholder="Subject" required>
+                                <label for="subject">Subject</label>
+                                <i class="fas fa-heading input-icon"></i>
+                                <span class="error-message" id="subject-error"></span>
+                            </div>
+    
+                            <div class="input-group">
+                                <textarea id="message" name="message" placeholder="Your message" required></textarea>
+                                <label for="message">Your Message</label>
+                                <i class="fas fa-comment input-icon"></i>
+                                <div class="textarea-footer">
+                                    <span class="character-counter">0/500</span>
+                                </div>
+                                <span class="error-message" id="message-error"></span>
+                            </div>
+    
+                            <div class="input-group">
+                                <div class="file-upload">
+                                    <input type="file" id="attachment" name="attachment" multiple>
+                                    <label for="attachment" class="file-label">
+                                        <i class="fas fa-paperclip"></i> Attach Files
+                                    </label>
+                                    <div class="file-list" id="file-list"></div>
+                                </div>
+                            </div>
+    
+                            <div class="form-nav">
+                                <button type="button" class="prev-btn" data-prev="1"><i class="fas fa-arrow-left"></i> Back</button>
+                                <button type="button" class="next-btn" data-next="3">Next <i class="fas fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+    
+                        <div class="form-step" data-step="3">
+                            <div class="review-section">
+                                <h3>Review Your Message</h3>
+                                <div class="review-data">
+                                    <p><strong>Name:</strong> <span id="review-name"></span></p>
+                                    <p><strong>Email:</strong> <span id="review-email"></span></p>
+                                    <p><strong>Phone:</strong> <span id="review-phone"></span></p>
+                                    <p><strong>Subject:</strong> <span id="review-subject"></span></p>
+                                    <p><strong>Message:</strong> <span id="review-message"></span></p>
+                                    <p><strong>Attachments:</strong> <span id="review-attachments"></span></p>
+                                </div>
+                            </div>
+    
+                            <div class="recaptcha-container">
+                                <div id="recaptcha-placeholder"></div>
+                            </div>
+    
+                            <div class="form-nav">
+                                <button type="button" class="prev-btn" data-prev="2"><i class="fas fa-arrow-left"></i> Back</button>
+                                <button type="submit" class="submit-btn">
+                                    Send Message <i class="fas fa-paper-plane ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <div class="form-loading" id="formLoading">
+                        <div class="spinner"></div>
+                        <p>Sending your message...</p>
+                    </div>
+
+                    <div class="success-message" id="successMessage">
+                        <i class="fas fa-check-circle success-icon"></i>
+                        <h3 class="text-2xl font-bold mb-2">Message Sent!</h3>
+                        <p>We'll get back to you soon.</p>
+                    </div>
                 </div>
+            </div>
+
+
 
             <!-- Map Section -->
             <div class="map-section">
@@ -1355,7 +1358,7 @@
                     <!-- Replace the placeholder with an actual Google Maps iframe -->
                     <iframe 
                         id="google-map"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d100939.98755677695!2d-122.50764089228032!3d37.75781499644112!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA%2C%20USA!5e0!3m2!1sen!2sus!4v1710778506027!5m2!1sen!2sus" 
+                        src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7008.675828226528!2d77.3901792!3d28.559614!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cef5a9dd5d947%3A0x574e0749e41e7e1f!2sAntriksh%20Golf%20View%2C%20Assotech%20Windsor%20Court%2C%20Sector%2078%2C%20Noida%2C%20Uttar%20Pradesh%20201305!5e0!3m2!1sen!2sin!4v1742545018103!5m2!1sen!2sin" 
                         width="100%" 
                         height="100%" 
                         style="border:0; border-radius: 15px;" 
@@ -1393,57 +1396,86 @@
                     </div>
                     <div id="calendar-days" class="calendar-days"></div>
                 </div>
+                
                 <div class="appointment-details">
                     <h3>Appointment Details</h3>
-                    <div class="appointment-form">
-                        <div class="input-group">
-                            <input type="text" id="selected-date" readonly>
-                            <label for="selected-date">Selected Date</label>
-                        </div>
-                        <div class="input-group">
-                            <select id="time-slot">
-                                <option value="">Select Time</option>
-                                <option value="09:00">9:00 AM</option>
-                                <option value="10:00">10:00 AM</option>
-                                <option value="11:00">11:00 AM</option>
-                                <option value="12:00">12:00 PM</option>
-                                <option value="13:00">1:00 PM</option>
-                                <option value="14:00">2:00 PM</option>
-                                <option value="15:00">3:00 PM</option>
-                                <option value="16:00">4:00 PM</option>
-                            </select>
-                            <label for="time-slot">Time Slot</label>
-                        </div>
-                        <div class="input-group">
-                            <select id="meeting-duration">
-                                <option value="30">30 minutes</option>
-                                <option value="60">1 hour</option>
-                                <option value="90">1.5 hours</option>
-                                <option value="120">2 hours</option>
-                            </select>
-                            <label for="meeting-duration">Duration</label>
-                        </div>
-                        <div class="input-group">
-                            <select id="timezone">
-                                <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                                <option value="America/Denver">Mountain Time (MT)</option>
-                                <option value="America/Chicago">Central Time (CT)</option>
-                                <option value="America/New_York">Eastern Time (ET)</option>
-                                <option value="Europe/London">GMT</option>
-                                <option value="Europe/Paris">CET</option>
-                                <option value="Asia/Tokyo">JST</option>
-                            </select>
-                            <label for="timezone">Time Zone</label>
-                        </div>
-                        <div class="input-group">
-                            <textarea id="appointment-notes" placeholder="What would you like to discuss?"></textarea>
-                            <label for="appointment-notes">Meeting Notes</label>
-                        </div>
-                        <button id="book-appointment" class="appointment-btn">
-                            Book Appointment <i class="fas fa-calendar-check ml-2"></i>
-                        </button>
+                    <div class="appointment-details">
+                        <h3>Appointment Details</h3>
+                        
+                        <form action="/book-appointment" method="POST" class="appointment-form">
+                            <!-- Name Field -->
+                            <div class="input-group">
+                                <input type="text" name="user_name" id="user-name" required>
+                                <label for="user-name">Your Name</label>
+                            </div>
+                    
+                            <!-- Email Field -->
+                            <div class="input-group">
+                                <input type="email" name="user_email" id="user-email" required>
+                                <label for="user-email">Your Email</label>
+                            </div>
+                    
+                            <!-- Appointment Date (Auto-filled from JS calendar) -->
+                            <div class="input-group">
+                                <input type="text" name="appointment_date" id="selected-date" readonly required>
+                                <label for="selected-date">Selected Date</label>
+                            </div>
+                    
+                            <!-- Time Slot -->
+                            <div class="input-group">
+                                <select name="time_slot" id="time-slot" required>
+                                    <option value="">Select Time</option>
+                                    <option value="09:00">9:00 AM</option>
+                                    <option value="10:00">10:00 AM</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="12:00">12:00 PM</option>
+                                    <option value="13:00">1:00 PM</option>
+                                    <option value="14:00">2:00 PM</option>
+                                    <option value="15:00">3:00 PM</option>
+                                    <option value="16:00">4:00 PM</option>
+                                </select>
+                                <label for="time-slot">Time Slot</label>
+                            </div>
+                    
+                            <!-- Duration -->
+                            <div class="input-group">
+                                <select name="meeting_duration" id="meeting-duration">
+                                    <option value="30">30 minutes</option>
+                                    <option value="60">1 hour</option>
+                                    <option value="90">1.5 hours</option>
+                                    <option value="120">2 hours</option>
+                                </select>
+                                <label for="meeting-duration">Duration</label>
+                            </div>
+                    
+                            <!-- Timezone -->
+                            <div class="input-group">
+                                <select name="timezone" id="timezone">
+                                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                    <option value="America/Denver">Mountain Time (MT)</option>
+                                    <option value="America/Chicago">Central Time (CT)</option>
+                                    <option value="America/New_York">Eastern Time (ET)</option>
+                                    <option value="Europe/London">GMT</option>
+                                    <option value="Europe/Paris">CET</option>
+                                    <option value="Asia/Tokyo">JST</option>
+                                </select>
+                                <label for="timezone">Time Zone</label>
+                            </div>
+                    
+                            <!-- Notes -->
+                            <div class="input-group">
+                                <textarea name="appointment_notes" id="appointment-notes" placeholder="What would you like to discuss?"></textarea>
+                                <label for="appointment-notes">Meeting Notes</label>
+                            </div>
+                    
+                            <!-- Submit Button -->
+                            <button type="submit" class="appointment-btn">
+                                Book Appointment <i class="fas fa-calendar-check ml-2"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -1711,7 +1743,8 @@
                     calendarDays.appendChild(dayElement);
                 }
             }
-        
+            renderCalendar();
+
             function selectDate(date, element) {
                 if (selectedDate && selectedDate.getTime() === date.getTime()) {
                     // If the same date is clicked, deselect it
@@ -1795,7 +1828,6 @@
                 }, 2000);
             }
         
-            renderCalendar();
         });
         
         
@@ -1807,27 +1839,77 @@
             const contactForm = document.getElementById('contactForm');
             const successMessage = document.getElementById('successMessage');
             
+            // Form submission handler
+            // Form submission handler
+            // Form submission handler
             if (contactForm) {
                 contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
+                    e.preventDefault(); // Prevent default submission
                     
-                    // Simple validation
-                    const name = document.getElementById('name').value;
-                    const email = document.getElementById('email').value;
-                    const message = document.getElementById('message').value;
+                    // Show loading spinner
+                    document.getElementById('formLoading').style.display = 'flex';
                     
-                    if (name && email && message) {
+                    // Create FormData object
+                    const formData = new FormData(contactForm);
+                    
+                    // For debugging - log form data that's being sent
+                    console.log("Submitting form with data:");
+                    for (let pair of formData.entries()) {
+                        console.log(pair[0] + ': ' + pair[1]);
+                    }
+                    
+                    // Send the form data via fetch
+                    fetch('/contact', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        console.log("Response status:", response.status);
+                        const contentType = response.headers.get('content-type');
+                        console.log("Content type:", contentType);
+                        
+                        if (contentType && contentType.includes('application/json')) {
+                            return response.json().then(data => {
+                                if (!response.ok) {
+                                    throw new Error(data.message || 'Server error occurred');
+                                }
+                                return data;
+                            });
+                        } else {
+                            if (!response.ok) {
+                                throw new Error('Server returned non-JSON response. Status: ' + response.status);
+                            }
+                            return { success: response.ok, message: 'Operation completed' };
+                        }
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        
+                        // Hide loading spinner
+                        document.getElementById('formLoading').style.display = 'none';
+                        
                         // Show success message
-                        successMessage.classList.add('show');
+                        document.getElementById('successMessage').style.display = 'block';
                         
                         // Reset form
                         contactForm.reset();
+                        if (document.getElementById('file-list')) {
+                            document.getElementById('file-list').innerHTML = '';
+                        }
                         
-                        // Hide success message after 3 seconds
-                        setTimeout(() => {
-                            successMessage.classList.remove('show');
-                        }, 3000);
-                    }
+                        // Reset steps if applicable
+                        if (document.querySelector('.form-step')) {
+                            document.querySelectorAll('.form-step').forEach(step => {
+                                step.classList.remove('active');
+                            });
+                            document.querySelector('.form-step[data-step="1"]').classList.add('active');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('formLoading').style.display = 'none';
+                        alert('Error sending message: ' + error.message);
+                    });
                 });
             }
 

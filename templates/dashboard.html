@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personalized Analytics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 0;
+    }
+    .dashboard-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #2b6cb0;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .input-section {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    .input-group {
+      flex: 1;
+      margin: 10px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    input[type=range] {
+      width: 100%;
+    }
+    .btn {
+      background-color: #2b6cb0;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    canvas {
+      margin-top: 30px;
+    }
+    /* Popup Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+      max-width: 1000px;
+      position: relative;
+      animation: fadeIn 0.5s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: black;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Trigger Button -->
+  <div style="text-align:center; margin-top:40px;">
+    <a href="#" id="openModalBtn" class="btn">📊 Preview Personalized Analytics</a>
+  </div>
+
+  <!-- Modal -->
+  <div id="analyticsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <div class="dashboard-container">
+        <h2>Weekly Wellness Dashboard</h2>
+
+        <div class="input-section">
+          <div class="input-group">
+            <label for="mood">Mood (0-10)</label>
+            <input type="range" min="0" max="10" value="7" id="mood" />
+          </div>
+          <div class="input-group">
+            <label for="stress">Stress Level (0-10)</label>
+            <input type="range" min="0" max="10" value="3" id="stress" />
+          </div>
+          <div class="input-group">
+            <label for="sleep">Sleep Quality (0-10)</label>
+            <input type="range" min="0" max="10" value="7" id="sleep" />
+          </div>
+        </div>
+
+        <button class="btn" onclick="addMoodEntry()">Save Entry</button>
+
+        <canvas id="moodChart"></canvas>
+
+        <div class="weekly-insights">
+          <h3>Weekly Insights</h3>
+          <p id="insights"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    let moodData = [
+      { day: 'Monday', mood: 7, stress: 4, sleep: 6 },
+      { day: 'Tuesday', mood: 6, stress: 5, sleep: 7 },
+      { day: 'Wednesday', mood: 8, stress: 3, sleep: 8 },
+      { day: 'Thursday', mood: 5, stress: 7, sleep: 5 },
+      { day: 'Friday', mood: 7, stress: 4, sleep: 6 },
+      { day: 'Saturday', mood: 9, stress: 2, sleep: 9 },
+      { day: 'Sunday', mood: 8, stress: 3, sleep: 8 },
+    ];
+
+    let chart;
+
+    function renderChart() {
+      const ctx = document.getElementById('moodChart').getContext('2d');
+      const labels = moodData.map(d => d.day);
+      const moodPoints = moodData.map(d => d.mood);
+      const stressPoints = moodData.map(d => d.stress);
+      const sleepPoints = moodData.map(d => d.sleep);
+
+      if (chart) chart.destroy();
+
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Mood',
+              data: moodPoints,
+              borderColor: '#4299e1',
+              fill: false
+            },
+            {
+              label: 'Stress',
+              data: stressPoints,
+              borderColor: '#f56565',
+              fill: false
+            },
+            {
+              label: 'Sleep',
+              data: sleepPoints,
+              borderColor: '#68d391',
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              min: 0,
+              max: 10
+            }
+          }
+        }
+      });
+
+      updateInsights();
+    }
+
+    function addMoodEntry() {
+      const mood = parseInt(document.getElementById('mood').value);
+      const stress = parseInt(document.getElementById('stress').value);
+      const sleep = parseInt(document.getElementById('sleep').value);
+
+      const lastDay = moodData[moodData.length - 1].day;
+      const lastIndex = days.indexOf(lastDay);
+      const nextDay = days[(lastIndex + 1) % 7];
+
+      moodData = [...moodData.slice(1), { day: nextDay, mood, stress, sleep }];
+      renderChart();
+    }
+
+    function updateInsights() {
+      const avgMood = (moodData.reduce((sum, d) => sum + d.mood, 0) / moodData.length).toFixed(1);
+      const avgStress = (moodData.reduce((sum, d) => sum + d.stress, 0) / moodData.length).toFixed(1);
+      const avgSleep = (moodData.reduce((sum, d) => sum + d.sleep, 0) / moodData.length).toFixed(1);
+      const bestDay = moodData.reduce((best, d) => d.mood > best.mood ? d : best, moodData[0]).day;
+
+      document.getElementById('insights').innerHTML = `
+        <strong>Mood Avg:</strong> ${avgMood}/10 | 
+        <strong>Stress Avg:</strong> ${avgStress}/10 | 
+        <strong>Sleep Avg:</strong> ${avgSleep}/10 | 
+        <strong>Best Day:</strong> ${bestDay}
+      `;
+    }
+
+    // Modal control
+    const modal = document.getElementById("analyticsModal");
+    const openBtn = document.getElementById("openModalBtn");
+    const analyticsTrigger = document.getElementById("analyticsTrigger");
+analyticsTrigger.addEventListener('click', (e) => {
+  e.preventDefault();
+  modal.style.display = "block";
+  renderChart();
+});
+    const closeBtn = document.getElementById("closeModal");
+
+    openBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.style.display = "block";
+      renderChart();
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = "none";
+    });
+
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    });
+
+  </script>
+</body>
+</html>
