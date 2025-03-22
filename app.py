@@ -1105,6 +1105,10 @@ def privacy():
 def wellness():
     return render_template('wellness_tools.html')
 
+@app.route('/gaming')
+def gaming():
+    return render_template('gaming.html')
+
 @app.route('/get_neutral_songs', methods=['GET'])
 def get_neutral_songs():
     neutral_songs = [

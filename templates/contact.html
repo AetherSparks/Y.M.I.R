@@ -700,57 +700,491 @@
 
         /* Newsletter Section */
         .newsletter-section {
-            margin-top: 40px;
+            position: relative;
+            margin: 60px auto;
             width: 90%;
-            max-width: 1200px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 1100px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px); /* Safari support */
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: var(--border-radius);
+            padding: 60px 40px;
+            box-shadow: 
+              0px 20px 50px rgba(0, 0, 0, 0.3),
+              0px 5px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
+            overflow: hidden;
+            transition: all var(--transition-speed) ease-in-out;
+            z-index: 1;
         }
-
+        
+        .newsletter-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+              0px 25px 55px rgba(0, 0, 0, 0.35),
+              0px 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Improved Gradient Border */
+        .newsletter-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 6px;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color), var(--primary-color));
+            background-size: 200% 100%;
+            animation: gradientBorder 6s linear infinite;
+        }
+        
+        @keyframes gradientBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Background Decorative Elements */
+        .newsletter-section::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(0,198,255,0.1) 0%, rgba(0,114,255,0) 70%);
+            z-index: -1;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Enhanced Title */
         .newsletter-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            background: linear-gradient(90deg, #fff, #aaf);
+            font-size: clamp(28px, 5vw, 38px);
+            font-weight: 800;
+            background: linear-gradient(90deg, #fff, #aaf, #fff);
+            background-size: 200% auto;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            position: relative;
+            animation: shine 6s linear infinite;
+            letter-spacing: -0.5px;
         }
-
+        
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+        
+        .newsletter-title::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            border-radius: 50px;
+            opacity: 0.8;
+        }
+        
+        /* Enhanced Description */
+        .newsletter-section p {
+            color: var(--text-light);
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 35px;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Improved Form */
         .newsletter-form {
             display: flex;
-            max-width: 600px;
-            margin: 20px auto 0;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
         }
-
+        
         .newsletter-input {
-            flex: 1;
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px 0 0 12px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            flex: 1 1 300px;
+            padding: 16px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: var(--input-radius);
+            background: rgba(255,255,255,0.12);
+            color: #fff;
             outline: none;
+            transition: all var(--transition-speed) ease-in-out;
+            font-size: 16px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
         }
-
+        
+        .newsletter-input::placeholder {
+            color: var(--text-medium);
+            opacity: 0.8;
+        }
+        
+        .newsletter-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 
+              inset 0 2px 5px rgba(0,0,0,0.1),
+              0 0 10px rgba(0, 114, 255, 0.4);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        /* Enhanced Button */
         .newsletter-btn {
-            padding: 0 25px;
-            background: linear-gradient(90deg, #ffcc00, #ff6600);
+            padding: 16px 28px;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            background-size: 200% auto;
+            color: #fff;
             border: none;
-            border-radius: 0 12px 12px 0;
-            color: black;
-            font-weight: 600;
+            border-radius: var(--input-radius);
+            font-weight: bold;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-speed) ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
-
+        
         .newsletter-btn:hover {
-            background: linear-gradient(90deg, #ffb300, #ff3300);
+            background-position: right center;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
         }
-
+        
+        /* Button pulse effect */
+        .newsletter-btn::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150%;
+            height: 150%;
+            background: rgba(255, 255, 255, 0.15);
+            z-index: -1;
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            opacity: 0;
+            transition: transform 0.6s, opacity 0.6s;
+        }
+        
+        .newsletter-btn:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            transition: 0s;
+        }
+        
+        /* Improved Checkboxes */
+        .newsletter-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 35px;
+        }
+        
+        .checkbox-container {
+            position: relative;
+            padding-left: 35px;
+            font-size: 16px;
+            color: var(--text-light);
+            cursor: pointer;
+            user-select: none;
+            transition: color var(--transition-speed);
+        }
+        
+        .checkbox-container:hover {
+            color: #fff;
+        }
+        
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 22px;
+            width: 22px;
+            background-color: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            transition: all var(--transition-speed);
+        }
+        
+        .checkbox-container:hover .checkmark {
+            background-color: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.5);
+        }
+        
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: var(--primary-color);
+            border-color: transparent;
+            box-shadow: 0 0 12px rgba(0, 114, 255, 0.5);
+        }
+        
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            transition: all var(--transition-speed);
+        }
+        
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+            animation: checkmark-appear 0.2s ease-in-out;
+        }
+        
+        @keyframes checkmark-appear {
+            0% { opacity: 0; transform: scale(0) rotate(45deg); }
+            100% { opacity: 1; transform: scale(1) rotate(45deg); }
+        }
+        
+        .checkbox-container .checkmark:after {
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        /* Enhanced Frequency Selection */
+        .frequency-selection {
+            margin-top: 40px;
+        }
+        
+        .frequency-title {
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .frequency-options {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .frequency-option {
+            padding: 12px 24px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.08);
+            color: var(--text-light);
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all var(--transition-speed);
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .frequency-option:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(0, 114, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .frequency-option.active {
+            background: linear-gradient(135deg, var(--primary-color), rgba(0, 114, 255, 0.85));
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 114, 255, 0.4);
+            border-color: transparent;
+            font-weight: 500;
+        }
+        
+        .frequency-option.active::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 25%, rgba(255,255,255,0.1) 50%, transparent 75%);
+            background-size: 200% 200%;
+            animation: shimmer 2s infinite linear;
+            z-index: -1;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Better Alerts */
+        .alert {
+            margin-top: 25px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 85%;
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            transform: translateY(10px);
+            animation: alertAppear 0.3s forwards;
+        }
+        
+        @keyframes alertAppear {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.15);
+            border-left: 5px solid var(--success-color);
+            color: #2ecc71;
+        }
+        
+        .alert-error {
+            background-color: rgba(220, 53, 69, 0.15);
+            border-left: 5px solid var(--error-color);
+            color: #ff6b6b;
+        }
+        
+        .alert-icon {
+            font-size: 20px;
+        }
+        
+        .alert-message {
+            flex: 1;
+            text-align: left;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .alert-close {
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity var(--transition-speed);
+        }
+        
+        .alert-close:hover {
+            opacity: 1;
+        }
+        
+        /* Enhanced Spinner */
+        .spinner {
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(255,255,255,.2);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Loading State for Button */
+        .newsletter-btn.loading {
+            background: linear-gradient(90deg, #999, #777);
+            cursor: not-allowed;
+        }
+        
+        .newsletter-btn.loading .button-text {
+            opacity: 0.7;
+        }
+        
+        .btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .newsletter-section {
+                padding: 40px 25px;
+            }
+            
+            .newsletter-section p {
+                max-width: 95%;
+            }
+            
+            .newsletter-title {
+                font-size: 28px;
+            }
+            
+            .newsletter-btn {
+                flex: 1 1 100%;
+            }
+        }
+        
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            .newsletter-section {
+                background: linear-gradient(135deg, rgba(30,30,40,0.8), rgba(20,20,30,0.9));
+                border-color: rgba(255,255,255,0.1);
+            }
+            
+            .newsletter-input {
+                background: rgba(0,0,0,0.2);
+            }
+            
+            .checkmark {
+                background-color: rgba(0,0,0,0.3);
+            }
+            
+            .frequency-option {
+                background: rgba(0,0,0,0.2);
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .newsletter-section {
+                background: #fff !important;
+                color: #000 !important;
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+            }
+            
+            .newsletter-title {
+                -webkit-text-fill-color: #000 !important;
+                background: none !important;
+                color: #000 !important;
+            }
+            
+            .newsletter-section p {
+                color: #333 !important;
+            }
+            
+            .newsletter-input, .newsletter-btn, .frequency-option, .checkbox-container {
+                border: 1px solid #ddd !important;
+                background: #fff !important;
+                color: #333 !important;
+            }
+        }   
+        
         /* Responsive Design */
         @media (max-width: 1024px) {
             .contact-container {
@@ -1482,100 +1916,139 @@
 
 
 
-            <!-- FAQ Section -->
-            <div class="faq-section">
-                <h2 class="faq-title">Frequently Asked Questions</h2>
-                <div class="faq-container">
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>How does the emotion detection work?</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Our system uses advanced AI algorithms to analyze facial expressions from your webcam and text sentiment from your chat interactions. These signals are combined to determine your emotional state with high accuracy.
-                        </div>
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How does the emotion detection work?</span>
+                        <i class="fas fa-chevron-down faq-toggle"></i>
                     </div>
-                    
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>Is my data kept private?</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Yes, absolutely! We take privacy very seriously. All processing happens locally in your browser, and no facial recognition data is stored on our servers. We only save anonymized emotion logs to improve our recommendation engine.
-                        </div>
+                    <div class="faq-answer">
+                        Our system uses advanced AI algorithms to analyze facial expressions from your webcam and text sentiment from your chat interactions. These signals are combined to determine your emotional state with high accuracy.
                     </div>
-                    
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>How are music recommendations generated?</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            We use a Content-Based Filtering model that matches your detected emotional state with music features, mood labels, and potential mental health benefits from our curated music database.
-                        </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Is my data kept private?</span>
+                        <i class="fas fa-chevron-down faq-toggle"></i>
                     </div>
-                    
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>Can I use the system offline?</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Once loaded, parts of the system can function offline, but an internet connection is required for full functionality including music streaming and AI chatbot responses.
-                        </div>
+                    <div class="faq-answer">
+                        Yes, absolutely! We take privacy very seriously. All processing happens locally in your browser, and no facial recognition data is stored on our servers. We only save anonymized emotion logs to improve our recommendation engine.
                     </div>
-    
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>What technology is used for the AI system?</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Our system uses a combination of deep learning models for facial expression analysis (CNN), natural language processing for text sentiment analysis (BERT), and recommendation systems based on collaborative filtering techniques.
-                        </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How are music recommendations generated?</span>
+                        <i class="fas fa-chevron-down faq-toggle"></i>
                     </div>
-    
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            <span>How do I start using EmotionAI?</span>
-                            <i class="fas fa-chevron-down faq-toggle"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Simply sign up for an account, grant camera permissions when prompted, and you're ready to go! The system will begin analyzing your emotions and providing personalized recommendations right away.
-                        </div>
+                    <div class="faq-answer">
+                        We use a Content-Based Filtering model that matches your detected emotional state with music features, mood labels, and potential mental health benefits from our curated music database.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can I use the system offline?</span>
+                        <i class="fas fa-chevron-down faq-toggle"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Once loaded, parts of the system can function offline, but an internet connection is required for full functionality including music streaming and AI chatbot responses.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What technology is used for the AI system?</span>
+                        <i class="fas fa-chevron-down faq-toggle"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Our system uses a combination of deep learning models for facial expression analysis (CNN), natural language processing for text sentiment analysis (BERT), and recommendation systems based on collaborative filtering techniques.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How do I start using EmotionAI?</span>
+                        <i class="fas fa-chevron-down faq-toggle"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Simply sign up for an account, grant camera permissions when prompted, and you're ready to go! The system will begin analyzing your emotions and providing personalized recommendations right away.
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Newsletter Section -->
-            <div class="newsletter-section">
-                <h2 class="newsletter-title">Stay Updated</h2>
-                <p>Subscribe to our newsletter for the latest news and feature updates</p>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Your email address" class="newsletter-input" required>
-                    <button type="submit" class="newsletter-btn">Subscribe</button>
-                </form>
+        <!-- Newsletter Section -->
+        <div class="newsletter-section">
+            <h2 class="newsletter-title">Stay Updated</h2>
+            <p class="newsletter-description">Subscribe to our newsletter for the latest news, product features, and exclusive content delivered directly to your inbox.</p>
+            
+            <form id="newsletterForm" class="newsletter-form">
+                <div class="input-group">
+                    <div class="form-group">
+                        <input type="email" id="emailInput" placeholder="Your email address" class="newsletter-input" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                    <button type="submit" id="submitBtn" class="newsletter-btn">
+                        <span>Subscribe</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                
                 <div class="newsletter-options">
                     <label class="checkbox-container">
-                        <input type="checkbox" checked>
+                        <input type="checkbox" name="subscription" value="product_updates" checked>
                         <span class="checkmark"></span>
                         <span>Product Updates</span>
                     </label>
                     <label class="checkbox-container">
-                        <input type="checkbox" checked>
+                        <input type="checkbox" name="subscription" value="industry_news" checked>
                         <span class="checkmark"></span>
                         <span>Industry News</span>
                     </label>
                     <label class="checkbox-container">
-                        <input type="checkbox">
+                        <input type="checkbox" name="subscription" value="events" checked>
                         <span class="checkmark"></span>
                         <span>Events & Webinars</span>
                     </label>
+                    <label class="checkbox-container">
+                        <input type="checkbox" name="subscription" value="tips">
+                        <span class="checkmark"></span>
+                        <span>Tips & Tutorials</span>
+                    </label>
                 </div>
-            </div>
+                
+                <div class="frequency-selection">
+                    <p class="frequency-title">How often would you like to hear from us?</p>
+                    <div class="frequency-options">
+                        <div class="frequency-option" data-value="daily">Daily</div>
+                        <div class="frequency-option active" data-value="weekly">Weekly</div>
+                        <div class="frequency-option" data-value="biweekly">Every 2 Weeks</div>
+                        <div class="frequency-option" data-value="monthly">Monthly</div>
+                    </div>
+                </div>
+                
+                <div id="successAlert" class="alert alert-success hidden">
+                    <i class="fas fa-check-circle alert-icon"></i>
+                    <div>
+                        <strong>Success!</strong> Thank you for subscribing to our newsletter. Please check your email to confirm your subscription.
+                    </div>
+                </div>
+                
+                <div id="errorAlert" class="alert alert-error hidden">
+                    <i class="fas fa-exclamation-circle alert-icon"></i>
+                    <div>
+                        <strong>Error!</strong> <span id="errorMessage">Something went wrong. Please try again.</span>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
     {% include 'footer.html' %}
 
@@ -2025,7 +2498,125 @@
         });
 //===============================================================================================================================================================================
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('newsletterForm');
+            const emailInput = document.getElementById('emailInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const frequencyOptions = document.querySelectorAll('.frequency-option');
             
+            let selectedFrequency = 'weekly'; // Default frequency
+            
+            // Handle frequency selection
+            frequencyOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove active class from all options
+                    frequencyOptions.forEach(opt => opt.classList.remove('active'));
+                    // Add active class to selected option
+                    option.classList.add('active');
+                    // Update selected frequency
+                    selectedFrequency = option.getAttribute('data-value');
+                });
+            });
+            
+            // Email validation function
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // Hide any existing alerts
+                successAlert.classList.add('hidden');
+                errorAlert.classList.add('hidden');
+                
+                const email = emailInput.value.trim();
+                
+                // Validate email
+                if (!isValidEmail(email)) {
+                    errorMessage.textContent = 'Please enter a valid email address.';
+                    errorAlert.classList.remove('hidden');
+                    emailInput.focus();
+                    return;
+                }
+                
+                // Get selected subscription options
+                const checkboxes = document.querySelectorAll('.newsletter-options input[type="checkbox"]:checked');
+                let selectedOptions = [];
+                checkboxes.forEach((checkbox) => {
+                    selectedOptions.push(checkbox.value);
+                });
+                
+                // Validate that at least one option is selected
+                if (selectedOptions.length === 0) {
+                    errorMessage.textContent = 'Please select at least one newsletter category.';
+                    errorAlert.classList.remove('hidden');
+                    return;
+                }
+                
+                // Show loading state
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<div class="spinner"></div> Subscribing...';
+                submitBtn.disabled = true;
+                
+                try {
+                    // Create subscription data object
+                    const subscriptionData = {
+                        email: email,
+                        preferences: selectedOptions,
+                        frequency: selectedFrequency,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Simulate API call to backend
+                    await simulateBackendCall(subscriptionData);
+                    
+                    // Show success message
+                    successAlert.classList.remove('hidden');
+                    
+                    // Reset the form
+                    form.reset();
+                    
+                    // Log data (would be sent to backend in production)
+                    console.log('Subscription data:', subscriptionData);
+                    
+                } catch (error) {
+                    // Show error message
+                    errorMessage.textContent = error.message || 'Something went wrong. Please try again.';
+                    errorAlert.classList.remove('hidden');
+                } finally {
+                    // Restore button state
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                }
+            });
+            
+            // Function to simulate backend API call
+            function simulateBackendCall(data) {
+                return new Promise((resolve, reject) => {
+                    // Simulate network delay
+                    setTimeout(() => {
+                        // Simulate successful API call (95% success rate)
+                        if (Math.random() > 0.05) {
+                            resolve({
+                                success: true,
+                                message: 'Subscription successful'
+                            });
+                        } else {
+                            reject({
+                                success: false,
+                                message: 'Server error. Please try again later.'
+                            });
+                        }
+                    }, 1500);
+                });
+            }
+        });
+                        
     </script>
 </body>
 </html>

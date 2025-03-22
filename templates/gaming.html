@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Gaming Hub - Personalized Gaming Experience</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
+
+        :root {
+            --primary: #6d28d9;
+            --secondary: #1e40af;
+            --accent: #10b981;
+            --bg-dark: #0f172a;
+            --text-glow: 0 0 10px rgba(139, 92, 246, 0.7);
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--bg-dark);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .gaming-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .hud-element {
+            background: rgba(16, 24, 64, 0.8);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            border-radius: 0.5rem;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .hud-element:hover {
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .hud-header {
+            border-bottom: 1px solid rgba(139, 92, 246, 0.5);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .glow-text {
+            text-shadow: var(--text-glow);
+        }
+
+        .npc-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+        }
+
+        .chat-message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 1rem;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: rgba(139, 92, 246, 0.3);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            margin-left: auto;
+            border-top-right-radius: 0;
+        }
+
+        .npc-message {
+            background: rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            border-top-left-radius: 0;
+        }
+
+        .game-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .music-player {
+            background: linear-gradient(to right, rgba(16, 24, 64, 0.8), rgba(59, 130, 246, 0.3));
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            width: 35%;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(139, 92, 246, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(139, 92, 246, 0.5);
+            transform: scale(1.1);
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(16, 24, 64, 0.8);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        /* Glitch animation for header */
+        @keyframes glitch {
+            0% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(-2px, 2px);
+            }
+            40% {
+                transform: translate(-2px, -2px);
+            }
+            60% {
+                transform: translate(2px, 2px);
+            }
+            80% {
+                transform: translate(2px, -2px);
+            }
+            100% {
+                transform: translate(0);
+            }
+        }
+
+        .glitch {
+            animation: glitch 3s infinite;
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            color: #ff00ff;
+            z-index: -1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            color: #00ffff;
+            z-index: -2;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% {
+                clip: rect(31px, 9999px, 94px, 0);
+                transform: skew(0.85deg);
+            }
+            5% {
+                clip: rect(70px, 9999px, 30px, 0);
+                transform: skew(0.45deg);
+            }
+            10% {
+                clip: rect(33px, 9999px, 25px, 0);
+                transform: skew(0.2deg);
+            }
+            15% {
+                clip: rect(33px, 9999px, 49px, 0);
+                transform: skew(0.1deg);
+            }
+            20% {
+                clip: rect(61px, 9999px, 1px, 0);
+                transform: skew(0.95deg);
+            }
+            25% {
+                clip: rect(6px, 9999px, 72px, 0);
+                transform: skew(0.4deg);
+            }
+            30% {
+                clip: rect(95px, 9999px, 2px, 0);
+                transform: skew(0.3deg);
+            }
+            35% {
+                clip: rect(24px, 9999px, 96px, 0);
+                transform: skew(0.65deg);
+            }
+            40% {
+                clip: rect(70px, 9999px, 48px, 0);
+                transform: skew(0.15deg);
+            }
+            45% {
+                clip: rect(95px, 9999px, 84px, 0);
+                transform: skew(0.5deg);
+            }
+            50% {
+                clip: rect(66px, 9999px, 8px, 0);
+                transform: skew(0.75deg);
+            }
+            55% {
+                clip: rect(3px, 9999px, 22px, 0);
+                transform: skew(0.25deg);
+            }
+            60% {
+                clip: rect(82px, 9999px, 98px, 0);
+                transform: skew(0.55deg);
+            }
+            65% {
+                clip: rect(54px, 9999px, 96px, 0);
+                transform: skew(0.35deg);
+            }
+            70% {
+                clip: rect(65px, 9999px, 58px, 0);
+                transform: skew(0.85deg);
+            }
+            75% {
+                clip: rect(38px, 9999px, 46px, 0);
+                transform: skew(0.6deg);
+            }
+            80% {
+                clip: rect(47px, 9999px, 31px, 0);
+                transform: skew(0.7deg);
+            }
+            85% {
+                clip: rect(91px, 9999px, 80px, 0);
+                transform: skew(0.3deg);
+            }
+            90% {
+                clip: rect(47px, 9999px, 26px, 0);
+                transform: skew(0.9deg);
+            }
+            95% {
+                clip: rect(40px, 9999px, 93px, 0);
+                transform: skew(0.8deg);
+            }
+            100% {
+                clip: rect(57px, 9999px, 67px, 0);
+                transform: skew(0.05deg);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Background canvas for WebGL/Three.js -->
+    <div id="gaming-background" class="gaming-background"></div>
+    
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-12">
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <h1 class="text-5xl font-bold mb-6 glitch glow-text" data-text="AI Gaming Hub">AI Gaming Hub</h1>
+            <p class="text-xl text-purple-300 max-w-2xl mx-auto">
+                Experience gaming that adapts to your emotions and preferences. Our AI tailors every aspect of your gameplay.
+            </p>
+            <div class="mt-6 inline-block bg-gradient-to-r from-purple-600 to-blue-500 py-1 px-3 rounded-full">
+                <span class="text-sm" id="emotion-display">Detected Mood: <span class="font-bold">{{ emotion }}</span></span>
+            </div>
+        </header>
+        
+        <!-- Main Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Left Column: Game Recommendations -->
+            <div class="col-span-1 md:col-span-2">
+                <div class="hud-element p-6 mb-8">
+                    <div class="hud-header">
+                        <h2 class="text-2xl glow-text">Recommended For Your Mood</h2>
+                        <span class="px-3 py-1 bg-purple-800 rounded-full text-sm" id="mood-badge">{{ emotion }}</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="game-recommendations">
+                        <!-- Game cards will be dynamically inserted here -->
+                        <div class="game-card">
+                            <div class="relative h-48 bg-gradient-to-br from-purple-900 to-blue-900">
+                                <div class="absolute inset-0 flex items-center justify-center text-4xl">🎮</div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-1">Loading Game...</h3>
+                                <p class="text-sm text-gray-300 mb-2">Personalizing based on your emotion...</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs bg-purple-800 px-2 py-1 rounded">{{ emotion }}</span>
+                                    <button class="text-sm text-purple-400 hover:text-purple-300">Details →</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Story Generator -->
+                <div class="hud-element p-6 mb-8">
+                    <div class="hud-header">
+                        <h2 class="text-2xl glow-text">AI Story Generator</h2>
+                        <button class="px-3 py-1 bg-purple-800 rounded-full text-sm" id="generate-story-btn">Generate</button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex gap-2 mb-4">
+                            <button data-theme="fantasy" class="theme-btn px-3 py-1 bg-purple-900 hover:bg-purple-800 rounded-md text-sm">Fantasy</button>
+                            <button data-theme="sci-fi" class="theme-btn px-3 py-1 bg-blue-900 hover:bg-blue-800 rounded-md text-sm">Sci-Fi</button>
+                            <button data-theme="cyberpunk" class="theme-btn px-3 py-1 bg-pink-900 hover:bg-pink-800 rounded-md text-sm">Cyberpunk</button>
+                            <button data-theme="medieval" class="theme-btn px-3 py-1 bg-yellow-900 hover:bg-yellow-800 rounded-md text-sm">Medieval</button>
+                        </div>
+                        
+                        <div id="story-content" class="p-4 border border-purple-800 rounded-lg bg-purple-900 bg-opacity-30 min-h-[150px]">
+                            Select a theme and click Generate to create a personalized game story.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Music Player -->
+                <div class="music-player">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-medium">Adaptive Soundtrack</h3>
+                        <span class="text-xs bg-blue-900 px-2 py-1 rounded-full">Mood-synced</span>
+                    </div>
+                    
+                    <div class="flex items-center mb-2">
+                        <span class="text-sm font-medium mr-4" id="current-track">Loading...</span>
+                        <span class="text-xs text-gray-400">1:24 / 3:45</span>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
+                    
+                    <div class="controls mt-4">
+                        <div class="control-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M4 4a.5.5 0 0 1 1 0v3.248l6.267-3.636c.54-.313 1.232.066 1.232.696v7.384c0 .63-.692 1.01-1.232.697L5 8.753V12a.5.5 0 0 1-1 0V4z"/>
+                            </svg>
+                        </div>
+                        <div class="control-btn play-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
+                            </svg>
+                        </div>
+                        <div class="control-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M12.5 4a.5.5 0 0 0-1 0v3.248L5.233 3.612C4.693 3.3 4 3.678 4 4.308v7.384c0 .63.692 1.01 1.233.697L11.5 8.753V12a.5.5 0 0 0 1 0V4z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: NPC Chat & Avatar -->
+            <div class="md:col-span-1">
+                <div class="hud-element p-6 mb-8">
+                    <div class="hud-header">
+                        <h2 class="text-2xl glow-text">Gaming Assistant</h2>
+                        <span class="px-3 py-1 bg-green-800 rounded-full text-sm">AI</span>
+                    </div>
+                    
+                    <div class="flex flex-col items-center mb-6">
+                        <div class="npc-avatar mb-4">🤖</div>
+                        <h3 class="text-xl font-medium mb-1">NOVA</h3>
+                        <p class="text-sm text-purple-300">Your AI Gaming Companion</p>
+                    </div>
+                    
+                    <div id="chat-container" class="mb-4 max-h-64 overflow-y-auto">
+                        <div class="npc-message chat-message">
+                            Hey there, gamer! I'm NOVA, your AI gaming assistant. I can sense your mood and help you find the perfect gaming experience. What kind of games are you into today?
+                        </div>
+                    </div>
+                    
+                    <div class="flex">
+                        <input type="text" id="chat-input" placeholder="Chat with NOVA..." class="flex-grow bg-purple-900 bg-opacity-40 border border-purple-700 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                        <button id="send-chat" class="bg-purple-700 hover:bg-purple-600 px-4 rounded-r-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- User Preferences & Stats -->
+                <div class="hud-element p-6">
+                    <div class="hud-header">
+                        <h2 class="text-2xl glow-text">Your Gaming Profile</h2>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm">Preferred Environment</span>
+                            <span class="text-sm font-medium">{{ environment }}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm">Game Style</span>
+                            <span class="text-sm font-medium">Adventure/RPG</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm">Difficulty Preference</span>
+                            <span class="text-sm font-medium">Moderate</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 50%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <button class="w-full bg-purple-800 hover:bg-purple-700 py-2 rounded-lg flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" class="mr-2">
+                                <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+                            </svg>
+                            Update Preferences
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript for AI Integration -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Three.js Background
+            initGamingBackground();
+            
+            // Load game recommendations based on emotion
+            loadGameRecommendations();
+            
+            // Set up chat functionality
+            setupChat();
+            
+            // Initialize story generator
+            setupStoryGenerator();
+            
+            // Setup adaptive music player
+            setupMusicPlayer();
+        });
+        
+        // Three.js Background Setup
+        function initGamingBackground() {
+            const container = document.getElementById('gaming-background');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            
+            // Get the emotion from the page
+            const emotion = document.getElementById('emotion-display').textContent.includes('excited') ? 'excited' : 
+                            document.getElementById('emotion-display').textContent.includes('calm') ? 'calm' : 
+                            document.getElementById('emotion-display').textContent.includes('focused') ? 'focused' : 'competitive';
+            
+            // Create particles
+            const particlesCount = 1000;
+            const particles = new THREE.BufferGeometry();
+            const positions = new Float32Array(particlesCount * 3);
+            
+            const colorMap = {
+                'excited': new THREE.Color(0xf472b6), // pink
+                'calm': new THREE.Color(0x60a5fa),    // blue
+                'focused': new THREE.Color(0x34d399), // green
+                'competitive': new THREE.Color(0xf59e0b) // amber
+            };
+            
+            const particleColor = colorMap[emotion] || new THREE.Color(0x8b5cf6); // purple default
+            
+            for (let i = 0; i < particlesCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 20;
+                positions[i + 1] = (Math.random() - 0.5) * 20;
+                positions[i + 2] = (Math.random() - 0.5) * 20;
+            }
+            
+            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const particleMaterial = new THREE.PointsMaterial({
+                color: particleColor,
+                size: 0.05,
+                transparent: true
+            });
+            
+            const particleSystem = new THREE.Points(particles, particleMaterial);
+            scene.add(particleSystem);
+            
+            camera.position.z = 5;
+            
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particleSystem.rotation.x += 0.0005;
+                particleSystem.rotation.y += 0.0005;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+        
+        // Load Game Recommendations
+        function loadGameRecommendations() {
+            const recommendationsContainer = document.getElementById('game-recommendations');
+            const emotion = document.getElementById('mood-badge').textContent.trim();
+            
+            // Clear loading placeholder
+            recommendationsContainer.innerHTML = '';
+            
+            // Simulate API call to get recommendations
+            fetch('/api/get_emotion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Get recommendations based on emotion
+                const recommendations = data.game_recommendations || [];
+                
+                // Generate game cards
+                recommendations.forEach((game, index) => {
+                    if (index < 4) { // Limit to 4 games
+                        const gameCard = document.createElement('div');
+                        gameCard.className = 'game-card';
+                        
+                        const bgColors = {
+                            'excited': 'from-pink-900 to-purple-900',
+                            'calm': 'from-blue-900 to-indigo-900',
+                            'focused': 'from-green-900 to-emerald-900',
+                            'competitive': 'from-amber-900 to-orange-900'
+                        };
+                        
+                        const bgColor = bgColors[emotion.toLowerCase()] || 'from-purple-900 to-blue-900';
+                        
+                        gameCard.innerHTML = `
+                            <div class="relative h-48 bg-gradient-to-br ${bgColor}">
+                                <div class="absolute inset-0 flex items-center justify-center text-4xl">🎮</div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-bold mb-1">${game}</h3>
+                                <p class="text-sm text-gray-300 mb-2">Recommended for ${emotion} players</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs bg-purple-800 px-2 py-1 rounded">${emotion}</span>
+                                    <button class="text-sm text-purple-400 hover:text-purple-300">Play →</button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        recommendationsContainer.appendChild(gameCard);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error loading game recommendations:', error);
+                recommendationsContainer.innerHTML = `
+                    <div class="col-span-2 text-center p-6">
+                        <p>Unable to load recommendations. Please try again later.</p>
+                    </div>
+                `;
+            });
+        }
+        
+        // Setup
+        // Setup Chat Functionality
+function setupChat() {
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-chat');
+    const chatContainer = document.getElementById('chat-container');
+    
+    // Function to add message to chat
+    function addMessage(message, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = isUser ? 'user-message chat-message' : 'npc-message chat-message';
+        messageDiv.textContent = message;
+        chatContainer.appendChild(messageDiv);
+        
+        // Scroll to bottom of chat
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    
+    // Handle send button click
+    sendButton.addEventListener('click', function() {
+        const message = chatInput.value.trim();
+        if (message) {
+            // Add user message
+            addMessage(message, true);
+            
+            // Clear input
+            chatInput.value = '';
+            
+            // Simulate AI response (would be replaced with actual AI API call)
+            setTimeout(() => {
+                // Simulate API call to get AI response
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    addMessage(data.response || "I'm processing your request. Give me a moment.");
+                })
+                .catch(error => {
+                    console.error('Error getting AI response:', error);
+                    addMessage("Sorry, I'm having trouble processing your request. Please try again.");
+                });
+            }, 1000);
+        }
+    });
+    
+    // Handle enter key press
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendButton.click();
+        }
+    });
+}
+
+// Setup Story Generator
+function setupStoryGenerator() {
+    const generateButton = document.getElementById('generate-story-btn');
+    const storyContent = document.getElementById('story-content');
+    const themeButtons = document.querySelectorAll('.theme-btn');
+    
+    let selectedTheme = 'fantasy'; // Default theme
+    
+    // Add event listeners to theme buttons
+    themeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            themeButtons.forEach(btn => btn.classList.remove('bg-purple-700', 'bg-blue-700', 'bg-pink-700', 'bg-yellow-700'));
+            
+            // Add active class to clicked button
+            if (this.dataset.theme === 'fantasy') {
+                this.classList.add('bg-purple-700');
+            } else if (this.dataset.theme === 'sci-fi') {
+                this.classList.add('bg-blue-700');
+            } else if (this.dataset.theme === 'cyberpunk') {
+                this.classList.add('bg-pink-700');
+            } else if (this.dataset.theme === 'medieval') {
+                this.classList.add('bg-yellow-700');
+            }
+            
+            // Update selected theme
+            selectedTheme = this.dataset.theme;
+        });
+    });
+    
+    // Add event listener to generate button
+    generateButton.addEventListener('click', function() {
+        // Update UI to show loading
+        storyContent.innerHTML = 'Generating your personalized story...';
+        
+        // Get current emotion
+        const emotion = document.getElementById('mood-badge').textContent.trim();
+        
+        // Simulate API call to generate story
+        setTimeout(() => {
+            fetch('/api/generate_story', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ theme: selectedTheme, emotion: emotion })
+            })
+            .then(response => response.json())
+            .then(data => {
+                storyContent.innerHTML = data.story || "Once upon a time in a " + selectedTheme + " world, a hero embarked on an epic journey...";
+            })
+            .catch(error => {
+                console.error('Error generating story:', error);
+                storyContent.innerHTML = "Sorry, I couldn't generate a story at this time. Please try again later.";
+            });
+        }, 1500);
+    });
+}
+
+// Setup Music Player
+function setupMusicPlayer() {
+    const playButton = document.querySelector('.play-btn');
+    const currentTrackElement = document.getElementById('current-track');
+    const progressBar = document.querySelector('.progress');
+    
+    let isPlaying = false;
+    let progressInterval;
+    
+    // Get emotion for track selection
+    const emotion = document.getElementById('mood-badge').textContent.trim().toLowerCase();
+    
+    // Map emotions to track names
+    const trackMap = {
+        'excited': 'Energetic Beats',
+        'calm': 'Ambient Serenity',
+        'focused': 'Deep Concentration',
+        'competitive': 'Battle Theme'
+    };
+    
+    // Set initial track based on emotion
+    currentTrackElement.textContent = trackMap[emotion] || 'Adaptive Soundtrack';
+    
+    // Toggle play/pause
+    playButton.addEventListener('click', function() {
+        isPlaying = !isPlaying;
+        
+        if (isPlaying) {
+            // Update button to pause icon
+            this.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M5 6.25a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0v-3.5zm3.5 0a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0v-3.5z"/>
+                </svg>
+            `;
+            
+            // Animate progress bar
+            let progress = 0;
+            progressInterval = setInterval(() => {
+                progress = (progress + 1) % 100;
+                progressBar.style.width = progress + '%';
+            }, 100);
+            
+        } else {
+            // Update button to play icon
+            this.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
+                </svg>
+            `;
+            
+            // Stop progress animation
+            clearInterval(progressInterval);
+        }
+    });
+    
+    // Simulate API call to get adaptive music
+    fetch('/api/get_music', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ emotion: emotion })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.track) {
+            currentTrackElement.textContent = data.track;
+        }
+    })
+    .catch(error => {
+        console.error('Error loading music:', error);
+    });
+}
+
+// Mock API responses (for demo purposes)
+// In a real implementation, these would be replaced with actual server endpoints
+if (!window.fetch) {
+    window.fetch = function(url, options) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (url === '/api/get_emotion') {
+                    resolve({
+                        json: () => Promise.resolve({
+                            emotion: 'excited',
+                            game_recommendations: [
+                                'Neon Racer 2077',
+                                'Cosmic Odyssey',
+                                'Dragon's Legacy',
+                                'Battle Arena Champions'
+                            ]
+                        })
+                    });
+                } else if (url === '/api/chat') {
+                    const userMessage = JSON.parse(options.body).message.toLowerCase();
+                    let response = "I'm here to help with your gaming needs!";
+                    
+                    if (userMessage.includes('recommend')) {
+                        response = "Based on your current mood, I'd recommend trying 'Neon Racer 2077' for an exciting experience!";
+                    } else if (userMessage.includes('hello') || userMessage.includes('hi')) {
+                        response = "Hey there! Ready to jump into some games today?";
+                    } else if (userMessage.includes('story')) {
+                        response = "I can generate a custom game story for you! Just select a theme and click the Generate button.";
+                    }
+                    
+                    resolve({
+                        json: () => Promise.resolve({ response: response })
+                    });
+                } else if (url === '/api/generate_story') {
+                    const { theme, emotion } = JSON.parse(options.body);
+                    let story = "Once upon a time in a " + theme + " world, a hero with " + emotion + " energy embarked on an epic journey...";
+                    
+                    if (theme === 'fantasy') {
+                        story = "In the mystical lands of Eldoria, a young mage discovered their powers during a time of great darkness. With " + emotion + " determination, they set forth to master ancient spells that could save their village from the approaching shadow.";
+                    } else if (theme === 'sci-fi') {
+                        story = "Year 2350: Humanity has spread across the stars. Captain Lex, feeling " + emotion + " about their new mission, prepares to explore an uncharted wormhole that scientists believe could lead to a parallel universe.";
+                    } else if (theme === 'cyberpunk') {
+                        story = "The neon-lit streets of Neo Tokyo pulsed with energy. A " + emotion + " hacker named Zero prepared for the biggest data heist of their career—breaking into MegaCorp's quantum server to expose their dark secrets.";
+                    } else if (theme === 'medieval') {
+                        story = "The kingdom of Valoria stood on the brink of war. A " + emotion + " knight, the last of their order, journeyed to retrieve the ancient sword that could unite the fractured lands once more.";
+                    }
+                    
+                    resolve({
+                        json: () => Promise.resolve({ story: story })
+                    });
+                } else if (url === '/api/get_music') {
+                    const { emotion } = JSON.parse(options.body);
+                    let track = 'Adaptive Soundtrack';
+                    
+                    if (emotion === 'excited') {
+                        track = 'Energetic Beats Vol. 3';
+                    } else if (emotion === 'calm') {
+                        track = 'Ambient Serenity Suite';
+                    } else if (emotion === 'focused') {
+                        track = 'Deep Concentration Mix';
+                    } else if (emotion === 'competitive') {
+                        track = 'Epic Battle Theme IX';
+                    }
+                    
+                    resolve({
+                        json: () => Promise.resolve({ track: track })
+                    });
+                }
+            }, 500);
+        });
+    };
+}
+
+</script>
+
+</body>
+</html>
