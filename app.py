@@ -19,7 +19,7 @@ import dlib
 import warnings
 from deepface import DeepFace
 from concurrent.futures import ThreadPoolExecutor
-from flask import Flask, render_template, Response, jsonify, render_template_string, request, send_from_directory, url_for, redirect ,flash
+from flask import Flask, render_template, Response, jsonify, render_template_string, request, send_from_directory, session, url_for, redirect ,flash
 from flask_mail import Mail , Message
 from flask_session import Session
 from flask_cors import CORS
@@ -34,6 +34,8 @@ import time
 import re
 from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+
 #══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
@@ -63,6 +65,10 @@ app.config.update(
 mail = Mail(app)
 
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///emotion_ai.db'  # or use PostgreSQL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
 
 # print("Mail config:", {
 #     "server": app.config['MAIL_SERVER'],
@@ -73,7 +79,19 @@ mail = Mail(app)
 # })
 
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    favorites = db.relationship('FavoriteSong', backref='user', lazy=True)
 
+class FavoriteSong(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(120), nullable=False)
+    artist = db.Column(db.String(120), nullable=False)
+    link = db.Column(db.String(255), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 
 
@@ -651,6 +669,7 @@ def draw_hand_landmarks(frame, hand_results):
                         
 
 # Function for Video Streaming
+# Function for Video Streaming
 def generate_frames():
     global FRAME_COUNT, cap
     last_frame_time = time.time()
@@ -928,6 +947,16 @@ def ai_app():
 def about():
     return render_template('about.html')
 
+@app.route('/stop_camera', methods=['POST'])
+def stop_camera():
+    global cap
+    print("🛑 Stopping camera...")
+    if cap is not None:
+        cap.release()
+        cap = None
+    return ('', 204)
+
+
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
@@ -1108,6 +1137,39 @@ def mood_transition():
     return render_template('mood_transition.html')
 
 
+@app.route('/save_favorite', methods=['POST'])
+def save_favorite():
+    data = request.json
+    song = {
+        'title': data['title'],
+        'artist': data['artist'],
+        'link': data['link']
+    }
+
+    # Load current list
+    if os.path.exists('favorites.json'):
+        with open('favorites.json', 'r') as f:
+            favorites = json.load(f)
+    else:
+        favorites = []
+
+    # Avoid duplicates
+    if not any(f['title'] == song['title'] and f['artist'] == song['artist'] for f in favorites):
+        favorites.append(song)
+        with open('favorites.json', 'w') as f:
+            json.dump(favorites, f, indent=4)
+        return jsonify({'status': 'saved'})
+    else:
+        return jsonify({'status': 'duplicate'})
+
+# Get favorites
+@app.route('/get_favorites')
+def get_favorites():
+    if os.path.exists('favorites.json'):
+        with open('favorites.json', 'r') as f:
+            return jsonify(json.load(f))
+    return jsonify([])
+
 @app.route('/get_neutral_songs', methods=['GET'])
 def get_neutral_songs():
     neutral_songs = [
@@ -1126,6 +1188,26 @@ def get_neutral_songs():
     return jsonify({"songs": neutral_songs})
 
 
+@app.route('/remove_favorite', methods=['POST'])
+def remove_favorite():
+    data = request.get_json()
+    title = data.get('title')
+    artist = data.get('artist')
+    
+    # Load existing favorites
+    if os.path.exists('favorites.json'):
+        with open('favorites.json', 'r') as f:
+            favorites = json.load(f)
+    else:
+        favorites = []
+
+    # Remove the song
+    updated = [song for song in favorites if not (song['title'] == title and song['artist'] == artist)]
+
+    with open('favorites.json', 'w') as f:
+        json.dump(updated, f, indent=4)
+
+    return jsonify({'success': True})
 
 
 
@@ -1750,7 +1832,7 @@ def process_results():
         # Calculate final averaged emotions
         final_emotions = calculate_final_emotions()
         
-        # Check for errors in emotion calculation
+        # Check for errors in emotion calculationk
         if not isinstance(final_emotions, dict):
             return jsonify({"error": "Emotion processing failed, invalid data received."}), 500
         

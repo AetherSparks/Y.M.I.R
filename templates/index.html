@@ -167,12 +167,22 @@
             position: relative;
             margin-top: 20px;
         }
-        
         .song-slider {
             display: flex;
-            gap: 20px;
-            transition: transform 0.5s ease-in-out;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            gap: 1rem;
+            padding: 1rem;
         }
+        
+        /* Optional but good UX */
+        .song-slider::-webkit-scrollbar {
+            height: 8px;
+        }
+        .song-slider::-webkit-scrollbar-thumb {
+            background-color: #999;
+            border-radius: 4px;
+        } 
         
         .song-card {
             min-width: 200px;
@@ -1600,6 +1610,140 @@
                 height: 120px;
             }
         }   
+
+
+        /* Song Actions */
+        .song-actions {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 0.8rem;
+        }
+        
+        /* Buttons */
+        .listen-btn,
+        .save-btn {
+            background: #00bcd4;
+            color: #0a0f2c;
+            border: none;
+            border-radius: 8px;
+            padding: 0.4rem 0.7rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .listen-btn:hover,
+        .save-btn:hover {
+            background: #03a9f4;
+            color: #fff;
+        }
+        
+        .save-btn.saved {
+            background-color: #ff4081 !important;
+            color: white;
+        }
+        
+        /* Playlist Section */
+        #favorites-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #10194b;
+            border-radius: 12px;
+            box-shadow: 0 0 8px rgba(0, 188, 212, 0.4);
+        }
+        
+        #favorites-section h3 {
+            color: #ffffff;
+            border-bottom: 1px solid #00bcd4;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        #playlist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        #playlist li {
+            background: #1a234d;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #playlist li:hover {
+            background: #243066;
+        }
+        
+        .remove-btn {
+            background: transparent;
+            color: #ff4081;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+
+        /* Song List */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background-color: #1a2c4f;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 188, 212, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Song Text */
+li strong {
+  font-size: 1.1rem;
+  color: #ffffff;
+}
+
+li p {
+  margin: 0.3rem 0;
+}
+
+
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #1e1e2f;
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+    font-size: 1rem;
+    font-weight: 500;
+    z-index: 9999;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .toast.hidden {
+    display: none;
+  }
+  
     </style>
 </head>
 
@@ -1659,7 +1803,7 @@
                 </div>
                 
                 <div id="cameraSection" style="text-align:center; margin-top:20px;">
-                    <button id="cameraToggleBtn" style="padding:10px 20px; font-size:16px;">Start Camera</button><br><br>
+                    <button id="cameraToggleBtn" style="padding:10px 20px; font-size:16px;">Close Camera</button><br><br>
                     <video id="videoFeed" autoplay playsinline width="400" height="300" style="display:none; border:1px solid #ccc;"></video>
                 </div>
             </div>
@@ -1718,7 +1862,8 @@
                       <div class="bar"></div>
                     </div>
                   </div>
-                  
+
+
                   <audio id="audioPlayer" controls></audio>
                   
                   <div class="player-controls">
@@ -1745,6 +1890,32 @@
         </div>
     </div>
 
+
+
+    <h1>🎧 AI-Recommended Songs</h1>
+    <ul>
+      {% for song in songs %}
+      <li>
+        <strong>{{ song.title }}</strong> - {{ song.artist }}
+        <a href="{{ song.link }}" target="_blank">▶️ Play</a>
+        <button 
+        class="save-btn" 
+        data-title="{{ song.title }}" 
+        data-artist="{{ song.artist }}" 
+        data-link="{{ song.link }}">
+        💖 Save
+      </button>
+      
+      </li>
+      {% endfor %}
+    </ul>
+  
+    <!-- 🟦 Playlist section -->
+    <div id="favorites-section">
+        <h3>🎵 Your Playlist</h3>
+        <ul id="playlist"></ul>
+      </div>
+      
 
         <!-- AI-Driven Dynamic UI Section -->
     <div class="dynamic-ui-section card">
@@ -2075,7 +2246,75 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 
     <script>
-        let stream = null;  // Store camera stream
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<span style="font-size: 1.2rem;">${message}</span>`;
+            toast.classList.remove('hidden');
+            toast.classList.add('show');
+        
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+        
+
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            // Attach event listeners to all buttons with class 'save-btn'
+            document.querySelectorAll(".save-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    const title = this.dataset.title;
+                    const artist = this.dataset.artist;
+                    const link = this.dataset.link;
+        
+                    saveToFavorites(title, artist, link);
+                });
+            });
+        
+            // Load the playlist when the page loads
+            loadPlaylist();
+        });
+        
+        function saveToFavorites(title, artist, link) {
+            fetch('/save_favorite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, artist, link })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'saved') {
+                    showToast(`🎶 "${title}" added to your playlist!`);
+                    loadPlaylist();
+                } else {
+                    showToast(`⚠️ Already in your playlist!`);
+                }
+            });
+            
+        }
+        
+        function loadPlaylist() {
+            fetch('/get_favorites')
+                .then(res => res.json())
+                .then(songs => {
+                    const list = document.getElementById('playlist');
+                    list.innerHTML = '';
+                    songs.forEach(song => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            ${song.title} — ${song.artist}
+                            <button class="remove-btn" onclick="removeFavorite('${song.title}', '${song.artist}')">✖</button>
+                        `;
+                        list.appendChild(li);
+                    });
+                });
+        }
+        
+
+
+        
+        let stream = null;
         const video = document.getElementById('videoFeed');
         const cameraBtn = document.getElementById('cameraToggleBtn');
     
@@ -2087,8 +2326,13 @@
                     video.srcObject = stream;
                     video.style.display = 'block';
                     cameraBtn.innerText = 'Stop Camera';
+    
+                    // Optional: Start backend video feed (Flask)
+                    await fetch('/start_camera', { method: 'POST' });
+    
                 } catch (err) {
-                    alert('Camera permission denied!');
+                    console.error(err);
+                    alert('Camera permission denied or unavailable!');
                 }
             } else {
                 // Stop Camera
@@ -2098,12 +2342,17 @@
     
         function stopCamera() {
             if (stream) {
-                stream.getTracks().forEach(track => track.stop());
+                stream.getTracks().forEach(track => track.stop()); // Properly stop all tracks
+                video.srcObject = null;
+                stream = null;
                 video.style.display = 'none';
                 cameraBtn.innerText = 'Start Camera';
-                stream = null;
+    
+                // Optional: Stop backend camera too
+                fetch('/stop_camera', { method: 'POST' });
             }
         }
+        
     
         // Auto-stop camera when leaving/reloading tab
         window.addEventListener('beforeunload', () => {
@@ -2170,7 +2419,7 @@
             }
 
             fetchEmotions();
-            setInterval(fetchEmotions, 1000);
+            setInterval(fetchEmotions, 50000);
 
             document.addEventListener("visibilitychange", function () {
                 if (document.hidden) {
@@ -2205,7 +2454,7 @@
                 }
             });
 
-            setInterval(processResults, 5000); // Update song recommendations every 5 seconds
+            setInterval(processResults, 50000); // Update song recommendations every 5 seconds
         });
 
         function sendMessage() {
@@ -2278,27 +2527,30 @@
 
         // ✅ **Continuous Scroll Effect**
         function startInfiniteScroll() {
-            let slider = document.getElementById("songSlider");
-            let clone = slider.cloneNode(true);
-            slider.parentNode.appendChild(clone);  // Clone for Infinite Scroll
+            const slider = document.getElementById("songSlider");
         
-            let totalWidth = slider.scrollWidth;
-            let currentPosition = 0;
+            let intervalId;
         
-            function scrollLoop() {
-                currentPosition -= 1;  // Move left
-                if (Math.abs(currentPosition) >= totalWidth) {
-                    currentPosition = 0;  // Reset
-                }
-                slider.style.transform = `translateX(${currentPosition}px)`;
-                requestAnimationFrame(scrollLoop);  // Smooth Frame Updates
+            function startScroll() {
+                intervalId = setInterval(() => {
+                    slider.scrollLeft += 1;
+                }, 20);
             }
         
-            scrollLoop();  // Start scrolling
+            function stopScroll() {
+                clearInterval(intervalId);
+            }
+        
+            slider.addEventListener("mouseenter", stopScroll);
+            slider.addEventListener("mouseleave", startScroll);
+            slider.addEventListener("mousedown", stopScroll); // Stops when dragging
+        
+            startScroll(); // Kick it off
         }
         
+        
         // ✅ **Update songs every 15 seconds**
-        setInterval(processResults, 10000);
+        setInterval(processResults, 50000);
         // Global variables for the music player
         let currentSongIndex = 0;
         let audioPlayer;
@@ -2401,8 +2653,24 @@
                 windAnimation.style.display = 'none';
                 playerContent.classList.remove('player-hidden');
                 
+                audioPlayer.pause();
+                audioPlayer.currentTime = 0;
+                audioPlayer.src = ''; // Clear current src
                 audioPlayer.src = data.audio_link;
-                return audioPlayer.play();
+                
+                const playPromise = audioPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            document.getElementById('playPauseBtn').textContent = '⏸';
+                            updateNextSong(currentIndex);
+                        })
+                        .catch(error => {
+                            console.error("Auto-play blocked or interrupted:", error);
+                            document.getElementById('currentSongTitle').textContent = 'Playback error';
+                            document.getElementById('currentArtist').textContent = error.message;
+                        });
+                }
             })
             .then(() => {
                 document.getElementById('playPauseBtn').textContent = '⏸';
@@ -2449,39 +2717,105 @@
 
         // Function to display songs and create Listen buttons
         function displaySongs(songs) {
-        // Store songs in the global songsList for player access
-        songsList = songs;
-        
-        let songContainer = document.getElementById("results");
-        songContainer.innerHTML = `
-            <h3>🎵 Recommended Songs</h3>
-            <div id="sliderContainer">
-            <div id="songSlider" class="song-slider"></div>
-            </div>
-        `;
+            songsList = songs; // Store songs globally for audio player
+            let songContainer = document.getElementById("results");
+            songContainer.innerHTML = ''; // This will remove all children
 
-        let songSlider = document.getElementById("songSlider");
-        songSlider.innerHTML = ""; // Clear previous songs
+            console.log("Rendering songs...");
 
-        songs.slice(0, 10).forEach((song, index) => {
-            let songBox = document.createElement("div");
-            songBox.classList.add("song-card");
-
-            // Escape quotes in track and artist names
-            const safeTrack = song.track.replace(/'/g, "\\'").replace(/"/g, '\\"');
-            const safeArtist = song.artist.replace(/'/g, "\\'").replace(/"/g, '\\"');
-
-            songBox.innerHTML = `
-            <p><strong>${song.track}</strong></p>
-            <p>🎤 ${song.artist}</p>
-            <button class="listen-btn" onclick="playSong('${safeTrack}', '${safeArtist}')">▶ Listen</button>
+            songContainer.innerHTML = `
+                <h3>🎵 Recommended Songs</h3>
+                <div id="sliderContainer">
+                    <div id="songSlider" class="song-slider"></div>
+                </div>
             `;
+        
+            const songSlider = document.getElementById("songSlider");
+            songSlider.innerHTML = ''; // Optional, for double safety
 
-            songSlider.appendChild(songBox);
-        });
 
-        startInfiniteScroll();
+            // Triple clear to prevent ghost re-renders
+            songSlider.innerHTML = "";
+            songSlider.textContent = "";
+            while (songSlider.firstChild) {
+                songSlider.removeChild(songSlider.firstChild);
+            }
+        
+            songs.slice(0, 10).forEach((song, index) => {
+                let songBox = document.createElement("div");
+                songBox.classList.add("song-card");
+        
+                // Escape quotes
+                const safeTrack = song.track.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                const safeArtist = song.artist.replace(/'/g, "\\'").replace(/"/g, '\\"');
+        
+                songBox.innerHTML = `
+                    <p><strong>${song.track}</strong></p>
+                    <p>🎤 ${song.artist}</p>
+                    <div class="song-actions">
+                        <button class="listen-btn" data-track="${safeTrack}" data-artist="${safeArtist}">▶ Listen</button>
+                        <button class="save-btn" data-title="${safeTrack}" data-artist="${safeArtist}" data-link="#">💖 Save</button>
+                    </div>
+                `;
+        
+                songSlider.appendChild(songBox);
+            });
+        
+            attachSongButtonHandlers(); // Attach click events
+            startInfiniteScroll(); // Optional scrolling
         }
+
+        function attachSongButtonHandlers() {
+            // 🎧 PLAY
+            document.querySelectorAll('.listen-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const track = button.dataset.track;
+                    const artist = button.dataset.artist;
+                    playSong(track, artist);
+                });
+            });
+        
+            // 💖 SAVE
+            document.querySelectorAll('.save-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const title = button.dataset.title;
+                    const artist = button.dataset.artist;
+                    const link = "#"; // Replace with actual link if available
+        
+                    fetch('/save_favorite', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title, artist, link })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'saved') {
+                            showToast(`🎶 "${title}" added to your playlist!`);
+                            loadPlaylist(); // Refresh playlist section if needed
+                        } else {
+                            showToast(`Already in playlist!`);
+                        }
+                    });
+                });
+            });
+        }
+        
+        function removeFavorite(title, artist) {
+            fetch('/remove_favorite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: title, artist: artist })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadPlaylist();  // Refresh playlist
+                } else {
+                    alert('Failed to remove song');
+                }
+            });
+        }
+        
 
         // Initialize the music player controls
         function initializeMusicPlayer() {
@@ -2503,9 +2837,13 @@
         document.getElementById('playPauseBtn').addEventListener('click', function() {
             const audioPlayer = document.getElementById('audioPlayer');
             if (audioPlayer.paused) {
-                audioPlayer.play();
-                this.innerText = '⏸';
-            } else {
+                audioPlayer.play().then(() => {
+                    this.innerText = '⏸';
+                }).catch((err) => {
+                    console.log("Playback failed:", err);
+                });
+            }
+            else {
                 audioPlayer.pause();
                 this.innerText = '▶';
             }
@@ -2526,18 +2864,23 @@
             openPlayer(songsList[currentSongIndex], currentSongIndex);
             }
         });
-        
+        let songFinishedNaturally = true;
+songFinishedNaturally = true; // Reset when a new song starts
+
         // Handle audio ended event - play next song
         audioPlayer.addEventListener('ended', function() {
+            if (!songFinishedNaturally) return; // Don't skip if it ended unexpectedly
+        
             if (songsList.length > 0 && currentSongIndex < songsList.length - 1) {
-            currentSongIndex++;
-            openPlayer(songsList[currentSongIndex], currentSongIndex);
+                currentSongIndex++;
+                openPlayer(songsList[currentSongIndex], currentSongIndex);
             } else {
-            isPlaying = false;
-            document.getElementById('playPauseBtn').textContent = '▶';
-            visualizerBars.classList.remove('playing');
+                isPlaying = false;
+                document.getElementById('playPauseBtn').textContent = '▶';
+                visualizerBars.classList.remove('playing');
             }
         });
+        
         
         // Create animated visualizer
         updateVisualizer();
@@ -4259,5 +4602,7 @@
         });
         
     </script>
+    <div id="toast" class="toast hidden"></div>
+
 </body>
 </html>
