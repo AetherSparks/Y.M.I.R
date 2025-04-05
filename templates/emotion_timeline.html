@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Timeline</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f8fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+        .color-box {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Emotion Timeline</h1>
+        
+        <div class="controls">
+            <button id="view-day">Today</button>
+            <button id="view-week">Last Week</button>
+            <button id="view-month">Last Month</button>
+            <button id="view-all">All Time</button>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="emotionChart"></canvas>
+        </div>
+        
+        <div class="legend" id="emotionLegend"></div>
+    </div>
+
+    <script>
+        // Define colors for each emotion
+        const emotionColors = {
+            'happy': 'rgba(255, 193, 7, 0.7)',
+            'sad': 'rgba(0, 123, 255, 0.7)',
+            'angry': 'rgba(220, 53, 69, 0.7)',
+            'surprised': 'rgba(23, 162, 184, 0.7)',
+            'neutral': 'rgba(108, 117, 125, 0.7)',
+            'fearful': 'rgba(111, 66, 193, 0.7)',
+            'disgusted': 'rgba(40, 167, 69, 0.7)',
+            'calm': 'rgba(32, 201, 151, 0.7)'
+        };
+        
+        let emotionChart;
+        let timelineData = [];
+        
+        // Fetch emotion timeline data
+        async function fetchEmotionTimeline() {
+            try {
+                const response = await fetch('/emotion_timeline');
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error("Error fetching timeline:", data.error);
+                    return;
+                }
+                
+                timelineData = data.timeline;
+                renderChart(timelineData, 'all');
+                createLegend();
+            } catch (error) {
+                console.error("Failed to fetch emotion timeline:", error);
+            }
+        }
+        
+        // Render the chart with filtered data
+        function renderChart(data, timeRange) {
+            const ctx = document.getElementById('emotionChart').getContext('2d');
+            
+            // Filter data based on time range
+            const now = new Date();
+            let filteredData = [...data];
+            
+            if (timeRange === 'day') {
+                const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000);
+                filteredData = data.filter(item => new Date(item.timestamp) >= oneDayAgo);
+            } else if (timeRange === 'week') {
+                const oneWeekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+                filteredData = data.filter(item => new Date(item.timestamp) >= oneWeekAgo);
+            } else if (timeRange === 'month') {
+                const oneMonthAgo = new Date(now);
+                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                filteredData = data.filter(item => new Date(item.timestamp) >= oneMonthAgo);
+            }
+            
+            // Process data for chart
+            const labels = filteredData.map(item => new Date(item.timestamp).toLocaleTimeString());
+            
+            // Get all emotion types from the data
+            const emotionTypes = new Set();
+            filteredData.forEach(item => {
+                if (item.emotions) {
+                    Object.keys(item.emotions).forEach(emotion => emotionTypes.add(emotion));
+                }
+            });
+            
+            // Create datasets for each emotion
+            const datasets = Array.from(emotionTypes).map(emotion => {
+                return {
+                    label: emotion.charAt(0).toUpperCase() + emotion.slice(1),
+                    data: filteredData.map(item => item.emotions?.[emotion] || 0),
+                    backgroundColor: emotionColors[emotion] || 'rgba(0, 0, 0, 0.7)',
+                    borderColor: emotionColors[emotion] || 'rgba(0, 0, 0, 1)',
+                    borderWidth: 1,
+                    tension: 0.4
+                };
+            });
+            
+            // Destroy previous chart if it exists
+            if (emotionChart) {
+                emotionChart.destroy();
+            }
+            
+            // Create new chart
+            emotionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Confidence Score (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Emotion Changes Over Time',
+                            font: {
+                                size: 18
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            });
+        }
+        
+        // Create custom legend
+        function createLegend() {
+            const legendContainer = document.getElementById('emotionLegend');
+            legendContainer.innerHTML = '';
+            
+            Object.entries(emotionColors).forEach(([emotion, color]) => {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                
+                const colorBox = document.createElement('div');
+                colorBox.className = 'color-box';
+                colorBox.style.backgroundColor = color;
+                
+                const label = document.createElement('span');
+                label.textContent = emotion.charAt(0).toUpperCase() + emotion.slice(1);
+                
+                item.appendChild(colorBox);
+                item.appendChild(label);
+                legendContainer.appendChild(item);
+            });
+        }
+        
+        // Event listeners for time range buttons
+        document.getElementById('view-day').addEventListener('click', () => renderChart(timelineData, 'day'));
+        document.getElementById('view-week').addEventListener('click', () => renderChart(timelineData, 'week'));
+        document.getElementById('view-month').addEventListener('click', () => renderChart(timelineData, 'month'));
+        document.getElementById('view-all').addEventListener('click', () => renderChart(timelineData, 'all'));
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', fetchEmotionTimeline);
+    </script>
+</body>
+</html>

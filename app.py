@@ -1109,6 +1109,15 @@ def wellness():
 def gaming():
     return render_template('gaming.html')
 
+@app.route('/emotion_history')
+def emotion_history():
+    return render_template('emotion_timeline.html')
+
+@app.route('/mood_transition')
+def mood_transition():
+    return render_template('mood_transition.html')
+
+
 @app.route('/get_neutral_songs', methods=['GET'])
 def get_neutral_songs():
     neutral_songs = [
@@ -1266,10 +1275,145 @@ def stop_server():
     print("🛑 Received exit request. Shutting down server...")
     cleanup()  # Perform cleanup action
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+    
+
+@app.route('/emotion_timeline', methods=['GET'])
+def emotion_timeline():
+    """Returns emotion data over time for visualization"""
+    try:
+        # Get saved emotion records from the log
+        timeline_data = list(emotion_log)
+        
+        # If we have chat data, add that too
+        if os.path.exists("chat_results.json"):
+            with open("chat_results.json", "r") as f:
+                chat_data = json.load(f)
+                if "emotion_scores" in chat_data:
+                    # Add timestamps to chat emotions
+                    chat_emotions = {
+                        "timestamp": chat_data["timestamp"],
+                        "emotions": chat_data["emotion_scores"]
+                    }
+                    timeline_data.append(chat_emotions)
+        
+        return jsonify({"timeline": timeline_data})
+    except Exception as e:
+        print(f"Error generating emotion timeline: {str(e)}")
+        return jsonify({"error": "Failed to generate emotion timeline"}), 500
 
 
+@app.route('/transition_playlist', methods=['POST'])
+def transition_playlist():
+    """Creates a playlist that transitions from current emotion to target emotion"""
+    try:
+        data = request.json
+        start_emotion = data.get('start_emotion', '')
+        target_emotion = data.get('target_emotion', '')
+        
+        if not start_emotion or not target_emotion:
+            return jsonify({"error": "Start and target emotions are required"}), 400
+            
+        # Get transition playlist
+        playlist = generate_transition_playlist(start_emotion, target_emotion)
+        
+        return jsonify({"playlist": playlist})
+    except Exception as e:
+        print(f"Error generating transition playlist: {str(e)}")
+        return jsonify({"error": "Failed to generate transition playlist"}), 500
 
-
+def generate_transition_playlist(start_emotion, target_emotion):
+    """
+    Generate a playlist that gradually transitions from one emotion to another.
+    
+    Args:
+        start_emotion: The starting emotion
+        target_emotion: The target emotion
+    
+    Returns:
+        A list of song recommendations for the transition
+    """
+    # Map emotions to arousal and valence values (psychological dimensions of emotion)
+    emotion_mapping = {
+        "angry": {"arousal": 0.9, "valence": 0.2},
+        "disgusted": {"arousal": 0.6, "valence": 0.2},
+        "fearful": {"arousal": 0.7, "valence": 0.1},
+        "happy": {"arousal": 0.7, "valence": 0.9},
+        "neutral": {"arousal": 0.5, "valence": 0.5},
+        "sad": {"arousal": 0.3, "valence": 0.2},
+        "surprised": {"arousal": 0.8, "valence": 0.7},
+        "calm": {"arousal": 0.2, "valence": 0.7}
+    }
+    
+    # Define song database with arousal and valence values
+    # In a real app, this would come from a database or music API
+    song_database = [
+        {"track": "Thunderstruck", "artist": "AC/DC", "arousal": 0.9, "valence": 0.7},
+        {"track": "Someone Like You", "artist": "Adele", "arousal": 0.3, "valence": 0.3},
+        {"track": "Happy", "artist": "Pharrell Williams", "arousal": 0.8, "valence": 0.9},
+        {"track": "Relaxing Piano", "artist": "Various Artists", "arousal": 0.2, "valence": 0.7},
+        {"track": "Seven Nation Army", "artist": "The White Stripes", "arousal": 0.7, "valence": 0.6},
+        {"track": "Sweet Child O' Mine", "artist": "Guns N' Roses", "arousal": 0.8, "valence": 0.7},
+        {"track": "Bohemian Rhapsody", "artist": "Queen", "arousal": 0.6, "valence": 0.6},
+        {"track": "Let It Go", "artist": "Idina Menzel", "arousal": 0.7, "valence": 0.8},
+        {"track": "Hello", "artist": "Adele", "arousal": 0.4, "valence": 0.3},
+        {"track": "Dancing Queen", "artist": "ABBA", "arousal": 0.7, "valence": 0.9},
+        {"track": "Piano Sonata No. 14", "artist": "Beethoven", "arousal": 0.3, "valence": 0.4},
+        {"track": "In Da Club", "artist": "50 Cent", "arousal": 0.8, "valence": 0.7},
+        {"track": "Boulevard of Broken Dreams", "artist": "Green Day", "arousal": 0.6, "valence": 0.4},
+        {"track": "Eye of the Tiger", "artist": "Survivor", "arousal": 0.8, "valence": 0.8},
+        {"track": "Hallelujah", "artist": "Leonard Cohen", "arousal": 0.2, "valence": 0.4},
+        {"track": "Shape of You", "artist": "Ed Sheeran", "arousal": 0.7, "valence": 0.8},
+        {"track": "Fix You", "artist": "Coldplay", "arousal": 0.5, "valence": 0.5},
+        {"track": "We Will Rock You", "artist": "Queen", "arousal": 0.8, "valence": 0.7},
+        {"track": "Numb", "artist": "Linkin Park", "arousal": 0.7, "valence": 0.3},
+        {"track": "All of Me", "artist": "John Legend", "arousal": 0.4, "valence": 0.6}
+    ]
+    
+    # Get start and target emotion values
+    start_values = emotion_mapping.get(start_emotion.lower(), {"arousal": 0.5, "valence": 0.5})
+    target_values = emotion_mapping.get(target_emotion.lower(), {"arousal": 0.5, "valence": 0.5})
+    
+    # Calculate number of steps for transition (5 songs)
+    steps = 5
+    
+    # Calculate step sizes
+    arousal_step = (target_values["arousal"] - start_values["arousal"]) / steps
+    valence_step = (target_values["valence"] - start_values["valence"]) / steps
+    
+    transition_playlist = []
+    
+    # Generate playlist with songs that gradually transition
+    for i in range(steps + 1):
+        current_arousal = start_values["arousal"] + (arousal_step * i)
+        current_valence = start_values["valence"] + (valence_step * i)
+        
+        # Find song with closest match to current values
+        best_match = None
+        best_distance = float('inf')
+        
+        for song in song_database:
+            # Calculate Euclidean distance in arousal-valence space
+            distance = ((song["arousal"] - current_arousal) ** 2 + 
+                        (song["valence"] - current_valence) ** 2) ** 0.5
+            
+            if distance < best_distance:
+                best_distance = distance
+                best_match = song
+        
+        if best_match and best_match not in transition_playlist:
+            # Add emotion info to the song
+            song_with_info = {
+                "track": best_match["track"],
+                "artist": best_match["artist"],
+                "arousal": best_match["arousal"],
+                "valence": best_match["valence"],
+                "transition_step": i,
+                "arousal_target": current_arousal,
+                "valence_target": current_valence
+            }
+            transition_playlist.append(song_with_info)
+    
+    return transition_playlist
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 @app.route('/chat', methods=['POST'])
@@ -1392,4 +1536,3 @@ if __name__ == '__main__':
 
         
 
-        

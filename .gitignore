@@ -9,3 +9,4 @@ static/music
 .env
 /static/Images
 /flask_session
+/audio_files
