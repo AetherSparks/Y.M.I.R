@@ -10,10 +10,8 @@ from deepface import DeepFace
 from concurrent.futures import ThreadPoolExecutor
 from scipy.spatial import distance as dist
 
-# Suppress Warnings
 warnings.filterwarnings("ignore")
 
-# Initialize Mediapipe Modules
 mp_face_detection = mp.solutions.face_detection
 mp_face_mesh = mp.solutions.face_mesh
 mp_pose = mp.solutions.pose
@@ -24,10 +22,8 @@ face_mesh = mp_face_mesh.FaceMesh(max_num_faces=5, min_detection_confidence=0.6)
 pose = mp_pose.Pose(min_detection_confidence=0.6, min_tracking_confidence=0.6)
 hands = mp_hands.Hands(min_detection_confidence=0.6, min_tracking_confidence=0.6)
 
-# OpenCV Haar Cascade (Backup)
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml")
 
-# Dlib for High Precision Face Landmark Detection
 DLIB_LANDMARK_PATH = "shape_predictor_68_face_landmarks.dat"
 try:
     dlib_detector = dlib.get_frontal_face_detector()
@@ -47,24 +43,20 @@ if not cap.isOpened():
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-# If No Faces Are Detected, Keep Last Known Faces for a While
 NO_FACE_LIMIT = 30  # Number of frames to retain last known faces
-no_face_counter = 0  # Tracks how many frames we’ve had no face detected
+no_face_counter = 0  
 fps = 0
 frame_count = 0
 start_time = time.time()
 frame_skip = 3  # Optimized FPS
 
-# Create FPS Slider
 cv2.namedWindow("Advanced Emotion Detection & Multimodal Analysis")
 cv2.createTrackbar("FPS Control", "Advanced Emotion Detection & Multimodal Analysis", 27, 29, lambda val: None)
 
 
-# Store emotions per face in a thread-safe dictionary
 emotion_data = {"faces": {}, "lock": threading.Lock()}
-last_known_faces = []  # Stores last detected faces
+last_known_faces = []  
 
-# Colors for different landmarks
 COLORS = {
     "eyes": (0, 255, 255),
     "mouth": (255, 0, 0),
@@ -73,13 +65,10 @@ COLORS = {
     "body": (255, 255, 0)
 }
 
-# Thread Pool for Emotion Analysis
 executor = ThreadPoolExecutor(max_workers=4)
 
-# Gaze Tracking Variables
-EYE_AR_THRESH = 0.30  # Eye aspect ratio threshold for gaze detection
+EYE_AR_THRESH = 0.30  
 
-# Multi-threaded Emotion Analysis with a time delay
 import time
 import json
 import cv2
@@ -103,14 +92,11 @@ def analyze_emotion(face_id, face_roi):
             emotions = emotion_result[0]['emotion']
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(current_time))  # Format timestamp
 
-            # Store emotions and timestamp
             emotion_data["faces"][face_id] = emotions
             emotion_data["log"].append({"timestamp": timestamp, "emotions": emotions})
 
-            # Print emotions with timestamp
             print(f"🕒 {timestamp} - Emotions: {emotions}")
 
-        # Save to JSON file (thread-safe)
         with emotion_data["lock"]:
             with open("emotion_log.json", "w") as f:
                 json.dump(emotion_data["log"], f, indent=4)
@@ -122,12 +108,9 @@ def analyze_emotion(face_id, face_roi):
 
 # Gaze Tracking
 def eye_aspect_ratio(eye):
-    # Compute the Euclidean distances between the two sets of vertical eye landmarks
     A = dist.euclidean(eye[1], eye[5])
     B = dist.euclidean(eye[2], eye[4])
-    # Compute the Euclidean distance between the horizontal eye landmarks
     C = dist.euclidean(eye[0], eye[3])
-    # Compute the eye aspect ratio
     ear = (A + B) / (2.0 * C)
     return ear
 
@@ -135,30 +118,24 @@ def draw_gaze(frame, mesh_results):
     if mesh_results.multi_face_landmarks:
         for face_landmarks in mesh_results.multi_face_landmarks:
             landmarks = face_landmarks.landmark
-            # Extract left and right eye landmarks
             left_eye = [(landmarks[33].x, landmarks[33].y), (landmarks[160].x, landmarks[160].y),
                         (landmarks[158].x, landmarks[158].y), (landmarks[133].x, landmarks[133].y),
                         (landmarks[153].x, landmarks[153].y), (landmarks[144].x, landmarks[144].y)]
             right_eye = [(landmarks[362].x, landmarks[362].y), (landmarks[385].x, landmarks[385].y),
                          (landmarks[387].x, landmarks[387].y), (landmarks[263].x, landmarks[263].y),
                          (landmarks[373].x, landmarks[373].y), (landmarks[380].x, landmarks[380].y)]
-            # Convert to pixel coordinates
             left_eye = [(int(l[0] * frame.shape[1]), int(l[1] * frame.shape[0])) for l in left_eye]
             right_eye = [(int(r[0] * frame.shape[1]), int(r[1] * frame.shape[0])) for r in right_eye]
-            # Draw eyes
             for (x, y) in left_eye + right_eye:
                 cv2.circle(frame, (x, y), 2, COLORS["eyes"], -1)
-            # Calculate eye aspect ratio
             left_ear = eye_aspect_ratio(left_eye)
             right_ear = eye_aspect_ratio(right_eye)
             ear = (left_ear + right_ear) / 2.0
-            # Display gaze direction
             if ear < EYE_AR_THRESH:
                 cv2.putText(frame, "Looking forward", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             else:
                 cv2.putText(frame, "Looking away", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-# Draw Face Mesh
 def draw_face_mesh(frame, mesh_results):
     if mesh_results.multi_face_landmarks:
         for face_landmarks in mesh_results.multi_face_landmarks:
@@ -166,14 +143,12 @@ def draw_face_mesh(frame, mesh_results):
                 x_l, y_l = int(landmark.x * frame.shape[1]), int(landmark.y * frame.shape[0])
                 cv2.circle(frame, (x_l, y_l), 1, COLORS["face"], -1)
 
-# Draw Body Landmarks
 def draw_body_landmarks(frame, pose_results):
     if pose_results.pose_landmarks:
         for landmark in pose_results.pose_landmarks.landmark:
             x_b, y_b = int(landmark.x * frame.shape[1]), int(landmark.y * frame.shape[0])
             cv2.circle(frame, (x_b, y_b), 5, COLORS["body"], -1)
 
-# Draw Hand Landmarks
 def draw_hand_landmarks(frame, hand_results):
     if hand_results.multi_hand_landmarks:
         for hand_landmarks in hand_results.multi_hand_landmarks:
@@ -203,24 +178,21 @@ while True:
             h, w, _ = frame.shape
             x, y, w_box, h_box = int(bboxC.xmin * w), int(bboxC.ymin * h), int(bboxC.width * w), int(bboxC.height * h)
             face_bboxes.append((x, y, w_box, h_box))
-            break  # Only process the first detected face
+            break  
 
-    # If Mediapipe Fails, Use Haar Cascade
     if not face_bboxes:
         face_bboxes = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=4, minSize=(50, 50))
 
-    # If Still No Face, Use Last Known Position
     if not face_bboxes:
         face_bboxes = last_known_faces
 
-    # Store Last Known Face Positions
     if face_bboxes:
-     last_known_faces = face_bboxes  # Update last known faces
-     no_face_counter = 0  # Reset counter
+     last_known_faces = face_bboxes  
+     no_face_counter = 0  
     else:
-       no_face_counter += 1  # Increase the counteri
+       no_face_counter += 1  
        if no_face_counter < NO_FACE_LIMIT:
-          face_bboxes = last_known_faces  # Use last known positions
+          face_bboxes = last_known_faces  
 
     # Face Mesh
     mesh_results = face_mesh.process(rgb_frame)

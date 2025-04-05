@@ -1,12 +1,11 @@
 #ALL IMPORTS
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 from email.message import EmailMessage
+import random
 import smtplib
 from dotenv import load_dotenv
 load_dotenv()
 import os
-print("EMAIL_USER:", os.getenv('EMAIL_USER'))
-print("EMAIL_PASS:", os.getenv('EMAIL_PASS'))
 
 import atexit
 import json
@@ -63,16 +62,7 @@ app.config.update(
 # Initialize mail with app explicitly
 mail = Mail(app)
 
-# Print to verify mail is initialized
-print("Mail initialized:", mail)
-print("Mail in app extensions:", 'mail' in app.extensions)
 
-
-print("EMAIL CONFIG CHECK:")
-print(f"MAIL_USERNAME: {app.config['MAIL_USERNAME']}")
-print(f"MAIL_PASSWORD: {'*****' if app.config['MAIL_PASSWORD'] else 'NOT SET'}")
-print(f"MAIL_SERVER: {app.config['MAIL_SERVER']}")
-print(f"MAIL_PORT: {app.config['MAIL_PORT']}")
 
 # print("Mail config:", {
 #     "server": app.config['MAIL_SERVER'],
@@ -1136,6 +1126,271 @@ def get_neutral_songs():
     return jsonify({"songs": neutral_songs})
 
 
+
+
+
+def fetch_soundcloud(song, artist):
+    """Try to fetch from SoundCloud"""
+    filename = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
+    output_path = os.path.join(MUSIC_DIR, filename)
+    
+    query = f"scsearch:{artist} - {song}"
+    
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'outtmpl': os.path.join(MUSIC_DIR, os.path.splitext(filename)[0]),
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }],
+        'quiet': True,
+    }
+    
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([query])
+        
+        if os.path.exists(output_path):
+            return output_path
+    except Exception as e:
+        print(f"SoundCloud error: {e}")
+        return None
+    
+def fetch_youtube_playlist_search(song, artist):
+    """Search for the song in popular music playlists"""
+    filename = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
+    output_path = os.path.join(MUSIC_DIR, filename)
+    
+    # Try to find the song in popular playlists
+    playlist_queries = [
+        f"top hits {artist}",
+        f"{artist} essentials",
+        f"best of {artist}"
+    ]
+    
+    for query in playlist_queries:
+        try:
+            ydl_opts = {
+                'quiet': True,
+                'extract_flat': True,
+                'force_generic_extractor': False
+            }
+            
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                results = ydl.extract_info(f"ytsearch1:{query} playlist", download=False)
+                
+                if not results or not results.get('entries'):
+                    continue
+                    
+                playlist_url = results['entries'][0].get('url')
+                if not playlist_url:
+                    continue
+                
+                # Now get the playlist contents
+                playlist_opts = {
+                    'quiet': True,
+                    'extract_flat': True,
+                    'ignoreerrors': True,
+                }
+                
+                with yt_dlp.YoutubeDL(playlist_opts) as ydl_playlist:
+                    playlist_results = ydl_playlist.extract_info(playlist_url, download=False)
+                    
+                    if not playlist_results or not playlist_results.get('entries'):
+                        continue
+                    
+                    # Look for our song in the playlist
+                    song_lower = song.lower()
+                    for entry in playlist_results['entries']:
+                        if not entry:
+                            continue
+                            
+                        entry_title = entry.get('title', '').lower()
+                        if song_lower in entry_title:
+                            # Found the song! Download it
+                            song_url = entry.get('url')
+                            if not song_url:
+                                continue
+                                
+                            if not song_url.startswith('http'):
+                                song_url = f"https://www.youtube.com/watch?v={song_url}"
+                            
+                            download_opts = {
+                                'format': 'bestaudio/best',
+                                'outtmpl': os.path.join(MUSIC_DIR, os.path.splitext(filename)[0]),
+                                'postprocessors': [{
+                                    'key': 'FFmpegExtractAudio',
+                                    'preferredcodec': 'mp3',
+                                    'preferredquality': '192',
+                                }],
+                                'quiet': True,
+                            }
+                            
+                            with yt_dlp.YoutubeDL(download_opts) as ydl_download:
+                                ydl_download.download([song_url])
+                                
+                            if os.path.exists(output_path):
+                                return output_path
+        except Exception as e:
+            print(f"Playlist search error: {e}")
+            continue
+    
+    return None
+
+
+
+
+
+def filter_music_videos(videos, song, artist):
+    """Filter videos to prioritize official music content"""
+    if not videos:
+        return []
+    
+    scored_videos = []
+    song_lower = song.lower()
+    artist_lower = artist.lower()
+    
+    for video in videos:
+        if not video:
+            continue
+            
+        title = video.get('title', '').lower()
+        channel = video.get('channel', '').lower()
+        
+        score = 0
+        
+        # Check if it's a music video
+        if song_lower in title and artist_lower in title:
+            score += 10
+        elif song_lower in title:
+            score += 5
+        
+        # Prefer official artist channels
+        if artist_lower in channel:
+            score += 8
+        
+        # Prefer videos with "official" or "audio" in the title
+        if "official" in title:
+            score += 5
+        if "audio" in title:
+            score += 3
+            
+        # Avoid instrumental or cover versions
+        if "instrumental" in title or "karaoke" in title:
+            score -= 10
+        if "cover" in title and artist_lower not in title:
+            score -= 5
+            
+        # Prefer videos with appropriate duration (3-8 minutes typically)
+        duration = video.get('duration')
+        if duration and 180 <= duration <= 480:
+            score += 3
+            
+        if score > 0:
+            scored_videos.append((video, score))
+    
+    # Sort by score
+    scored_videos.sort(key=lambda x: x[1], reverse=True)
+    return [v[0] for v in scored_videos]
+
+
+def get_youtube_info(query, max_results=5):
+    """Get info about YouTube videos without downloading"""
+    ydl_opts = {
+        'quiet': True,
+        'extract_flat': True,
+        'force_generic_extractor': False,
+        'ignoreerrors': True,
+        'noplaylist': True
+    }
+    
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            results = ydl.extract_info(f"ytsearch{max_results}:{query}", download=False)
+            return results.get('entries', [])
+    except Exception as e:
+        print(f"YouTube search error: {e}")
+        return []
+
+
+
+def fetch_youtube_smart(song, artist):
+    """Enhanced YouTube downloader with smarter search and filtering"""
+    filename = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
+    output_path = os.path.join(MUSIC_DIR, filename)
+    
+    # Generate multiple search queries
+    queries = [
+        f"{artist} - {song} official audio",
+        f"{artist} - {song} official",
+        f"{artist} {song} official audio",
+        f"{song} by {artist} audio"
+    ]
+    
+    for query in queries:
+        # First get video info for better filtering
+        videos = get_youtube_info(query)
+        filtered_videos = filter_music_videos(videos, song, artist)
+        
+        if not filtered_videos:
+            continue
+            
+        # Get the best video URL
+        video_url = filtered_videos[0].get('url') or filtered_videos[0].get('id')
+        if not video_url:
+            continue
+            
+        if not video_url.startswith('http'):
+            video_url = f"https://www.youtube.com/watch?v={video_url}"
+        
+        # Download the best match
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'outtmpl': os.path.join(MUSIC_DIR, os.path.splitext(filename)[0]),
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }],
+            'quiet': True,
+        }
+        
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([video_url])
+            
+            if os.path.exists(output_path):
+                return output_path
+        except Exception as e:
+            print(f"Download error: {e}")
+            continue
+    
+    return None
+
+def fetch_with_retries(song, artist, max_retries=3):
+    """Try multiple methods with retries and backoff"""
+    methods = [
+        fetch_youtube_smart,
+        fetch_soundcloud,
+        fetch_youtube_playlist_search
+    ]
+    
+    for method in methods:
+        for attempt in range(max_retries):
+            try:
+                result = method(song, artist)
+                if result:
+                    return result
+                
+                # Add a small delay between retries
+                time.sleep(1 + random.random())
+            except Exception as e:
+                print(f"Error in {method.__name__}: {e}")
+                continue
+    
+    return None
+
 JAMENDO_CLIENT_ID = os.getenv('JAMENDO_CLIENT_ID')
 MUSIC_DIR = os.path.join('static', 'music')
 
@@ -1146,10 +1401,15 @@ os.makedirs(MUSIC_DIR, exist_ok=True)
 def get_audio():
     song = request.args.get('song')
     artist = request.args.get('artist')
+    
+    if not song or not artist:
+        return jsonify({
+            'error': 'Missing song or artist parameter'
+        }), 400
+    
     song_file_name = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
-  # Normalize filename
 
-    # 🔽 1. Check if already downloaded locally (from YouTube previously)
+    # 1. Check if already downloaded locally
     local_path = os.path.join(MUSIC_DIR, song_file_name)
     if os.path.exists(local_path):
         return jsonify({
@@ -1157,33 +1417,29 @@ def get_audio():
             'source': 'local'
         })
 
-    # 🔽 2. First try Jamendo API
-    jamendo_url = "https://api.jamendo.com/v3.0/tracks"
-    params = {
-        'client_id': JAMENDO_CLIENT_ID,
-        'format': 'json',
-        'namesearch': song,
-        'artist_name': artist,
-        'limit': 1,
-        'audioformat': 'mp32'
-    }
-
-    response = requests.get(jamendo_url, params=params)
-    data = response.json()
-
-    if data['results']:
-        track_info = data['results'][0]
-        mp3_link = track_info['audio']
+    
+    # 3. Fallback to YouTube using the methods from the first document
+    try:
+        # Try multiple methods to fetch the song
+        result_path = fetch_with_retries(song, artist, max_retries=2)
+        
+        if result_path and os.path.exists(result_path):
+            filename = os.path.basename(result_path)
+            return jsonify({
+                'track': song,
+                'artist': artist,
+                'audio_link': url_for('static', filename=f'music/{filename}'),
+                'source': 'youtube'
+            })
+        else:
+            return jsonify({
+                'error': 'Failed to fetch audio from all sources'
+            }), 404
+    except Exception as e:
+        print(f"YouTube fetch error: {e}")
         return jsonify({
-            'track': track_info['name'],
-            'artist': track_info['artist_name'],
-            'audio_link': mp3_link,
-            'source': 'jamendo'
-        })
-
-    # 🔽 3. Fallback to YouTube using yt-dlp
-    # Return a placeholder response immediately to show "Searching..."
-    return download_youtube_async(song, artist, song_file_name)
+            'error': f'Error fetching audio: {str(e)}'
+        }), 500
 
 
 

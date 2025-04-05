@@ -5,13 +5,11 @@ import json
 import re
 import pickle
 
-# === 📌 Load Required Models & Dataset ===
 MODEL_PATH = "models/ensemble_model.pkl"
 ENCODER_PATH = "models/label_encoder.pkl"
 SCALER_PATH = "models/scaler.pkl"
 DATASET_PATH = "datasets/therapeutic_music_enriched.csv"
 
-# ✅ Load Model, Label Encoder, and Scaler
 with open(MODEL_PATH, "rb") as f:
     ensemble_model = pickle.load(f)
 
@@ -21,10 +19,8 @@ with open(ENCODER_PATH, "rb") as f:
 with open(SCALER_PATH, "rb") as f:
     scaler = pickle.load(f)
 
-# ✅ Load Song Dataset
 df = pd.read_csv(DATASET_PATH)
 
-# === 📌 Emotion to Audio Mapping ===
 EMOTION_TO_AUDIO = {
     "angry":       [0.4, 0.9, 5, -5.0, 0.3, 0.1, 0.0, 0.6, 0.2, 120],
     "disgust":     [0.3, 0.7, 6, -7.0, 0.5, 0.2, 0.0, 0.5, 0.3, 100],
@@ -38,7 +34,6 @@ EMOTION_TO_AUDIO = {
     "relaxation":  [0.6, 0.3, 5, -10.0, 0.2, 0.9, 0.5, 0.3, 0.7, 80]
 }
 
-# === 📌 Emotion to Mood Mapping ===
 EMOTION_TO_MOOD = {
     "angry":       ["Relaxation", "Serenity"],
     "disgust":     ["Calm", "Neutral"],
@@ -52,24 +47,19 @@ EMOTION_TO_MOOD = {
     "relaxation":  ["Calm", "Peaceful"]
 }
 
-# === 📌 Process Emotion Scores & Compute Features ===
 def process_emotions(emotion_file):
     """Reads JSON emotion file, extracts values, and converts to audio features."""
 
-    # ✅ Load Emotion Data
     with open(emotion_file, "r") as file:
         emotions = json.load(file)
     
     print(f"\n📂 Loaded JSON Content:\n{json.dumps(emotions, indent=4)}\n")
 
-    # ✅ Fix: Extract the correct dictionary
     emotions = emotions["final_average_emotions"]
 
-    # ✅ Debugging Print (to verify)
     print(f"DEBUG: extracted emotions -> {emotions}")
     print(f"DEBUG: type of each value -> {[type(v) for v in emotions.values()]}")
 
-    # ✅ Now, this should work fine
     emotion_scores = {emotion: float(score) for emotion, score in emotions.items()}
 
 
@@ -89,7 +79,6 @@ def process_emotions(emotion_file):
             weighted_audio_features += contribution
             print(f"🔹 {emotion} ({weight}): {contribution}")
 
-    # ✅ Normalize Features Before Model Input
     weighted_audio_features = scaler.transform([weighted_audio_features])[0]
 
     print(f"\n🎵 Final Normalized Audio Features (Input to Model):\n{weighted_audio_features}\n")
@@ -101,31 +90,25 @@ def process_emotions(emotion_file):
 def recommend_songs(emotion_file):
     """Predicts mood based on emotions and recommends matching songs."""
 
-    # ✅ Get Emotion-Based Features
     emotion_vector, emotion_scores = process_emotions(emotion_file)
-    # Load pre-trained transformations
     with open("models/scaler.pkl", "rb") as f:
         scaler = pickle.load(f)
 
     with open("models/pca.pkl", "rb") as f:
         pca = pickle.load(f)
 
-    # Apply transformations
     emotion_vector = scaler.transform(emotion_vector.reshape(1, -1))  # Standardize
     emotion_vector = pca.transform(emotion_vector)  # Reduce dimensions
 
-    # Predict using ensemble model
     mood_probs = ensemble_model.predict_proba(emotion_vector)
 
     print(f"\n🔍 Model Confidence Scores for Moods: {dict(zip(le.classes_, mood_probs[0]))}\n")
 
-    # ✅ Predict Mood
     predicted_mood_index = ensemble_model.predict(emotion_vector)[0]
     predicted_mood = le.inverse_transform([predicted_mood_index])[0]
 
     print(f"\n🎯 Initial Predicted Mood (Model Output): {predicted_mood}\n")
 
-    # ✅ Find Top 2 Dominant Emotions
     dominant_emotions = sorted(emotion_scores.items(), key=lambda x: x[1], reverse=True)[:2]
     mapped_moods = set()
     for emotion, _ in dominant_emotions:
@@ -133,16 +116,13 @@ def recommend_songs(emotion_file):
 
     print(f"\n🎭 Dominant Emotions: {dominant_emotions} → Adjusted Moods: {mapped_moods}\n")
 
-    # ✅ Adjust Mood If Necessary
     if predicted_mood not in mapped_moods:
         predicted_mood = list(mapped_moods)[0]  # Take the first mapped mood
 
     print(f"\n🎯 Final Adjusted Mood: {predicted_mood}\n")
 
-    # ✅ Filter Songs Based on Mood
     filtered_songs = df[df["Mood_Label"] == predicted_mood]
 
-    # ✅ Use Fallback Moods If No Songs Found
     if filtered_songs.empty:
         filtered_songs = df[df["Mood_Label"].isin(mapped_moods)]
 
@@ -160,6 +140,44 @@ def recommend_songs(emotion_file):
 
     return f"\n🎶 Recommended Songs:\n{song_list}"
 
-# === 🚀 Run Recommendation System ===
+def calculate_final_emotions():
+    try:
+        # Load JSON files
+        with open("chat_results.json", "r") as f1, open("emotion_log.json", "r") as f2:
+            chat_data = json.load(f1)
+            emotion_log_data = json.load(f2)
+
+        # Extract dominant emotion from chat_results.json
+        dominant_emotion = chat_data["dominant_emotion"]
+
+        # Handle possible list structure in emotion_log.json
+        if isinstance(emotion_log_data["average_emotions"], list):
+            average_emotions = emotion_log_data["average_emotions"][0]  # Take the first entry if it's a list
+        else:
+            average_emotions = emotion_log_data["average_emotions"]
+
+        average_emotions = {emotion: confidence / 100 for emotion, confidence in average_emotions.items()}
+
+        dominant_emotion_dict = {emotion: 0.0 for emotion in average_emotions}
+        dominant_emotion_dict[dominant_emotion] = 1.0  # 100% as 1.0
+
+        # Convert both to DataFrames
+        df1 = pd.DataFrame([dominant_emotion_dict])  # From chat_results.json
+        df2 = pd.DataFrame([average_emotions])  # From emotion_log.json
+
+        final_average_df = pd.concat([df1, df2], ignore_index=True)
+        final_average_emotions = final_average_df.mean().round(4)  # Keep two decimal places
+
+        final_emotion_result = final_average_emotions.to_dict()
+
+        with open("final_average_emotions.json", "w") as f:
+            json.dump({"final_average_emotions": final_emotion_result}, f, indent=4)
+
+        return final_emotion_result
+
+    except Exception as e:
+        return {"error": str(e)}
+
+calculate_final_emotions()
 emotion_file_path = "final_average_emotions.json"
 print(recommend_songs(emotion_file_path))

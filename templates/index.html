@@ -707,11 +707,15 @@
         }
         
         .wind-particle {
+            width: 6px;
+            height: 6px;
           position: absolute;
           background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.1));
           border-radius: 50%;
           pointer-events: none;
           opacity: 0;
+          margin: 0 4px;
+          animation: wind 1.5s infinite ease-in-out;
         }
         
         .wind-animation.active .wind-particle {
@@ -2361,44 +2365,58 @@
 
         function openPlayer(song, index) {
             const audioPlayer = document.getElementById('audioPlayer');
-            const playPauseBtn = document.getElementById('playPauseBtn');
-            const nextSongTitle = document.getElementById('nextSongTitle');
-            const nextArtist = document.getElementById('nextArtist');
+            const playerContent = document.getElementById('playerContent');
             const loadingMessage = document.getElementById('loadingMessage');
-
-            // Show Loading Message Immediately
+            const windAnimation = document.querySelector('.wind-animation');
+            
+            // Show loading state
             loadingMessage.style.display = 'block';
-            document.getElementById('currentSongTitle').innerText = `Searching for ${song.track}...`;
-            document.getElementById('currentArtist').innerText = song.artist;
-
-            // Set current song title and artist
-            document.getElementById('currentSongTitle').innerText = song.track;
-            document.getElementById('currentArtist').innerText = song.artist;
-
-            currentIndex = index; // Update global current index
-
-            fetch(`/get_audio?song=${encodeURIComponent(song.track)}&artist=${encodeURIComponent(song.artist)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.audio_link) {
-
-                        loadingMessage.style.display = 'none';
-
-                        audioPlayer.src = data.audio_link;
-
-                        // Wait for src to be set, then play
-                        audioPlayer.play().then(() => {
-                            playPauseBtn.innerText = '⏸'; // Sync button to pause
-                        }).catch(error => {
-                            console.error('Playback error:', error);
-                        });
-
-                        // Update next song info
-                        updateNextSong(currentIndex);
-                    } else {
-                        alert('Song not found or unavailable.');
-                    }
-                });
+            playerContent.classList.add('player-hidden');
+            windAnimation.style.display = 'flex';
+            
+            document.getElementById('currentSongTitle').textContent = song.track;
+            document.getElementById('currentArtist').textContent = song.artist;
+            currentIndex = index;
+            
+            // Add timeout for the fetch request
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+            
+            fetch(`/get_audio?song=${encodeURIComponent(song.track)}&artist=${encodeURIComponent(song.artist)}`, {
+                signal: controller.signal
+            })
+            .then(response => {
+                clearTimeout(timeoutId);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                loadingMessage.style.display = 'none';
+                windAnimation.style.display = 'none';
+                playerContent.classList.remove('player-hidden');
+                
+                audioPlayer.src = data.audio_link;
+                return audioPlayer.play();
+            })
+            .then(() => {
+                document.getElementById('playPauseBtn').textContent = '⏸';
+                updateNextSong(currentIndex);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loadingMessage.style.display = 'none';
+                windAnimation.style.display = 'none';
+                playerContent.classList.remove('player-hidden');
+                
+                document.getElementById('currentSongTitle').textContent = 'Error loading song';
+                document.getElementById('currentArtist').textContent = error.message;
+            });
         }
         
         // Update Next Song
