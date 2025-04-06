@@ -1759,13 +1759,13 @@ li p {
       
             <!-- Desktop Navigation -->
             <nav class="header-menu">
-              <a href="/" class="nav-link">Home</a>
-              <a href="/ai_app" class="nav-link">AI App</a>
-              <a href="/about" class="nav-link">About</a>
-              <a href="/contact" class="nav-link">Contact</a>
-              <a href="/features" class="nav-link">Features</a>
-              <a href="/ai_app" class="header-btn">Try Demo</a>
-            </nav>
+                <a href="/" class="nav-link">Home</a>
+                <a href="/ai_app" class="nav-link">AI App</a>
+                <a href="/about" class="nav-link">About</a>
+                <a href="/contact" class="nav-link">Contact</a>
+                <a href="/features" class="nav-link">Features</a>
+                <a href="/ai_app" class="header-btn">Try Demo</a>
+              </nav>
       
             <!-- Mobile Menu Button -->
             <div class="mobile-menu-btn">
@@ -2246,6 +2246,33 @@ li p {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 
     <script>
+
+
+
+        function navigate(event, pageName) {
+            event.preventDefault(); // Stop full reload
+        
+            fetch(`/${pageName}`) // ✅ Correct string interpolation
+              .then(response => {
+                if (!response.ok) throw new Error('Page load failed');
+                return response.text();
+              })
+              .then(html => {
+                document.getElementById("mainContent").innerHTML = html;
+                history.pushState(null, '', `/${pageName}`); // ✅ Correct string interpolation
+              })
+              .catch(error => {
+                console.error('Navigation error:', error);
+                document.getElementById("mainContent").innerHTML = "<p>Could not load page.</p>";
+              });
+          }
+        
+          // ✅ Handles back/forward button navigation
+          window.onpopstate = () => {
+            const path = window.location.pathname.slice(1) || 'home';
+            navigate({ preventDefault: () => {} }, path);
+          };
+
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.innerHTML = `<span style="font-size: 1.2rem;">${message}</span>`;

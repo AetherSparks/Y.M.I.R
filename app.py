@@ -1220,7 +1220,7 @@ def fetch_soundcloud(song, artist):
     
     ydl_opts = {
         'format': 'bestaudio/best',
-        'outtmpl': os.path.join(MUSIC_DIR, os.path.splitext(filename)[0]),
+        'outtmpl': os.path.join(MUSIC_DIR, os.path.splitext(filename)[0] + '.%(ext)s'),
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
@@ -1363,11 +1363,14 @@ def filter_music_videos(videos, song, artist):
             score -= 10
         if "cover" in title and artist_lower not in title:
             score -= 5
-            
+        if 'trailer' in title or 'teaser' in title or 'preview' in title:
+            continue
+
         # Prefer videos with appropriate duration (3-8 minutes typically)
         duration = video.get('duration')
-        if duration and 180 <= duration <= 480:
-            score += 3
+        if not duration or duration < 60:  # Less than 1 min
+            continue  # skip short/incomplete videos
+
             
         if score > 0:
             scored_videos.append((video, score))
@@ -1381,9 +1384,11 @@ def get_youtube_info(query, max_results=5):
     """Get info about YouTube videos without downloading"""
     ydl_opts = {
         'quiet': True,
-        'extract_flat': True,
+        'extract_flat': False,
         'force_generic_extractor': False,
         'ignoreerrors': True,
+        'verbose': True,
+        'no_warnings': False,
         'noplaylist': True
     }
     
@@ -1473,7 +1478,6 @@ def fetch_with_retries(song, artist, max_retries=3):
     
     return None
 
-JAMENDO_CLIENT_ID = os.getenv('JAMENDO_CLIENT_ID')
 MUSIC_DIR = os.path.join('static', 'music')
 
 # Ensure music folder exists
@@ -1862,12 +1866,19 @@ def process_results():
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 if __name__ == '__main__':
-    # Start background processing thread
-    background_thread = threading.Thread(target=update_all_in_background, daemon=True)
-    background_thread.start()
+    # Only start background thread in development
+    if os.environ.get('FLASK_ENV') != 'production':
+        background_thread = threading.Thread(target=update_all_in_background, daemon=True)
+        background_thread.start()
+    
     try:
-        app.run(debug=True, host='127.0.0.1', port=5000)
-
+        port = int(os.environ.get('PORT', 10000))
+        # Use gunicorn in production (configured in Render.yaml)
+        if os.environ.get('FLASK_ENV') == 'production':
+            app.run(host='0.0.0.0', port=port)
+        else:
+            # Debug mode for local development
+            app.run(host='0.0.0.0', port=port, debug=True)
     except KeyboardInterrupt:
         print("\n🔴 Server stopped manually.")
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
