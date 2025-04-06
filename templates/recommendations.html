@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendations Based on Your Mood</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .mood-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .mood-button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .mood-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        #happy {
+            background-color: #ffd700;
+            color: #333;
+        }
+        
+        #sad {
+            background-color: #6495ed;
+            color: white;
+        }
+        
+        #angry {
+            background-color: #ff6347;
+            color: white;
+        }
+        
+        #neutral {
+            background-color: #7fb77e;
+            color: white;
+        }
+        
+        #getRecommendations {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #getRecommendations:hover {
+            background-color: #1a252f;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .recommendations {
+            margin-top: 40px;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        
+        .movie-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .movie-title {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 15px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        
+        .movie-genres {
+            padding: 0 15px 15px;
+            color: #7f8c8d;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .imdb-link {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            background-color: #f3ce13;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        
+        .imdb-link:hover {
+            background-color: #e3be03;
+        }
+        
+        .no-recommendations {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .active-mood {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <h1>Movie Recommendations Based on Your Mood</h1>
+    
+    <div class="mood-container">
+        <button id="happy" class="mood-button">Happy</button>
+        <button id="sad" class="mood-button">Sad</button>
+        <button id="angry" class="mood-button">Angry</button>
+        <button id="neutral" class="mood-button">Neutral</button>
+    </div>
+    
+    <button id="getRecommendations">Get Recommendations</button>
+    
+    <div class="recommendations" id="recommendationsContainer">
+        <div class="no-recommendations">
+            No recommendations available for the selected mood. Please select a mood.
+        </div>
+    </div>
+    
+    <footer>
+        © 2025 Mood-Based Movie Recommender. All rights reserved.
+    </footer>
+
+    <script>
+        // Sample movie data (in a real app, this would come from a backend)
+        const movieDatabase = {
+            happy: [
+                { title: "La La Land", genres: "Comedy, Drama, Musical", imdbId: "tt3783958" },
+                { title: "The Intouchables", genres: "Biography, Comedy, Drama", imdbId: "tt1675434" },
+                { title: "Sing Street", genres: "Comedy, Drama, Music", imdbId: "tt3544112" },
+                { title: "The Secret Life of Walter Mitty", genres: "Adventure, Comedy, Drama", imdbId: "tt0359950" }
+            ],
+            sad: [
+                { title: "The Shawshank Redemption", genres: "Drama", imdbId: "tt0111161" },
+                { title: "Life Is Beautiful", genres: "Comedy, Drama, Romance", imdbId: "tt0118799" },
+                { title: "The Green Mile", genres: "Crime, Drama, Fantasy", imdbId: "tt0120689" },
+                { title: "Schindler's List", genres: "Biography, Drama, History", imdbId: "tt0108052" }
+            ],
+            angry: [
+                { title: "John Wick", genres: "Action, Crime, Thriller", imdbId: "tt2911666" },
+                { title: "The Dark Knight", genres: "Action, Crime, Drama", imdbId: "tt0468569" },
+                { title: "Fight Club", genres: "Drama", imdbId: "tt0137523" },
+                { title: "Mad Max: Fury Road", genres: "Action, Adventure, Sci-Fi", imdbId: "tt1392190" }
+            ],
+            neutral: [
+                { title: "Inception", genres: "Action, Adventure, Sci-Fi", imdbId: "tt1375666" },
+                { title: "The Grand Budapest Hotel", genres: "Adventure, Comedy, Crime", imdbId: "tt2278388" },
+                { title: "The Martian", genres: "Adventure, Drama, Sci-Fi", imdbId: "tt3659388" },
+                { title: "Interstellar", genres: "Adventure, Drama, Sci-Fi", imdbId: "tt0816692" }
+            ]
+        };
+
+        // Variables to track the current mood
+        let selectedMood = null;
+        const moodButtons = document.querySelectorAll('.mood-button');
+        const getRecommendationsButton = document.getElementById('getRecommendations');
+        const recommendationsContainer = document.getElementById('recommendationsContainer');
+
+        // Event listeners for mood buttons
+        moodButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                moodButtons.forEach(btn => btn.classList.remove('active-mood'));
+                
+                // Add active class to the clicked button
+                this.classList.add('active-mood');
+                
+                // Store the selected mood
+                selectedMood = this.id;
+            });
+        });
+
+        // Event listener for the get recommendations button
+        getRecommendationsButton.addEventListener('click', function() {
+            if (!selectedMood) {
+                alert('Please select a mood first!');
+                return;
+            }
+
+            const movies = movieDatabase[selectedMood];
+            
+            if (movies && movies.length > 0) {
+                // Create HTML for recommended movies
+                let html = `
+                    <h2>Recommended Movies for ${selectedMood.charAt(0).toUpperCase() + selectedMood.slice(1)} Mood</h2>
+                    <div class="movie-grid">
+                `;
+                
+                movies.forEach(movie => {
+                    html += `
+                        <div class="movie-card">
+                            <div class="movie-title">${movie.title}</div>
+                            <div class="movie-genres">${movie.genres}</div>
+                            <a href="https://www.imdb.com/title/${movie.imdbId}" target="_blank" class="imdb-link">View on IMDb</a>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                recommendationsContainer.innerHTML = html;
+            } else {
+                recommendationsContainer.innerHTML = `
+                    <div class="no-recommendations">
+                        No recommendations available for ${selectedMood} mood.
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

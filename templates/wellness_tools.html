@@ -669,10 +669,7 @@
             <div class="logo">
 
 
-                <a href="/" class="header-logo">
-                    <span class="header-emoji">🎭</span>
-                    <span class="header-title">AI Emotion Detection</span>
-                </a>
+
                 
                   <span class="logo-icon">🌿</span>
                   <span>MindfulSpace</span>
@@ -989,6 +986,8 @@
             </div>
         </div>
     </footer>
+
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <script>
@@ -1575,15 +1574,17 @@
 
             // Show a modal with tool information
 function showToolModal(toolName) {
-    // Create modal elements
-    const modal = document.createElement('div');
+ // Create modal elements
+ const modal = document.createElement('div');
     modal.classList.add('tool-modal');
-    
+
     // Modal content will depend on the tool
     let modalContent = '';
-    
+    let redirectPath = '#';  // Default path
+
     switch (toolName) {
         case 'Guided Meditation Suite':
+            redirectPath = '/meditation';
             modalContent = `
                 <h2>Guided Meditation Suite</h2>
                 <p>Choose from over 200 guided meditations:</p>
@@ -1594,11 +1595,12 @@ function showToolModal(toolName) {
                     <li>Stress and anxiety relief</li>
                     <li>Emotional wellbeing practices</li>
                 </ul>
-                <button class="modal-cta">Start 7-Day Free Trial</button>
+                <button class="modal-cta" data-redirect="${redirectPath}">Start 7-Day Free Trial</button>
             `;
             break;
-            
+
         case 'Emotion Journal':
+            redirectPath = '/journal';
             modalContent = `
                 <h2>Emotion Journal</h2>
                 <p>Track your emotions with our intelligent journal:</p>
@@ -1609,11 +1611,12 @@ function showToolModal(toolName) {
                     <li>Reflection exercises</li>
                     <li>Weekly summary reports</li>
                 </ul>
-                <button class="modal-cta">Create Your Journal</button>
+                <button class="modal-cta" data-redirect="${redirectPath}">Create Your Journal</button>
             `;
             break;
-            
+
         case 'Breathing Exercises':
+            redirectPath = '/breathing';
             modalContent = `
                 <h2>Breathing Exercises</h2>
                 <p>Calm your mind and body with these techniques:</p>
@@ -1624,11 +1627,12 @@ function showToolModal(toolName) {
                     <li>Alternate nostril breathing</li>
                     <li>Guided breath awareness</li>
                 </ul>
-                <button class="modal-cta">Try Now</button>
+                <button class="modal-cta" data-redirect="${redirectPath}">Try Now</button>
             `;
             break;
-            
+
         case 'Goal Setting & Habit Tracker':
+            redirectPath = '/goals';
             modalContent = `
                 <h2>Goal Setting & Habit Tracker</h2>
                 <p>Build lasting wellness habits:</p>
@@ -1639,11 +1643,12 @@ function showToolModal(toolName) {
                     <li>Celebrate milestones</li>
                     <li>Adjust goals based on progress</li>
                 </ul>
-                <button class="modal-cta">Start Goal Setting</button>
+                <button class="modal-cta" data-redirect="${redirectPath}">Start Goal Setting</button>
             `;
             break;
-            
+
         case 'Sound Therapy':
+            redirectPath = '/sound-therapy';
             modalContent = `
                 <h2>Sound Therapy</h2>
                 <p>Experience the healing power of sound:</p>
@@ -1654,11 +1659,12 @@ function showToolModal(toolName) {
                     <li>White noise for sleep</li>
                     <li>Guided sound journeys</li>
                 </ul>
-                <button class="modal-cta">Listen Now</button>
+                <button class="modal-cta" data-redirect="${redirectPath}">Listen Now</button>
             `;
             break;
-            
+
         case 'Community Support':
+            redirectPath = '/community';
             modalContent = `
                 <h2>Community Support</h2>
                 <p>Connect with others on similar journeys:</p>
@@ -1669,26 +1675,42 @@ function showToolModal(toolName) {
                     <li>Expert Q&A sessions</li>
                     <li>Peer support groups</li>
                 </ul>
-                <button class="modal-cta">Join Community</button>
+                <button class="modal-cta" data-redirect="${redirectPath}">Join Community</button>
             `;
             break;
             
-        default:
+            default:
+            redirectPath = '/comingsoon';
             modalContent = `
                 <h2>${toolName}</h2>
                 <p>More information coming soon!</p>
-                <button class="modal-cta">Notify Me</button>
+                <button class="modal-cta" data-redirect="${redirectPath}">Notify Me</button>
             `;
     }
+
     
     // Set modal content and add close button
+    // Add content to modal
     modal.innerHTML = `
-        <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            ${modalContent}
-        </div>
-    `;
-    
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        ${modalContent}
+    </div>
+`;
+
+
+        // Event listener for redirect
+        const ctaButton = modal.querySelector('.modal-cta');
+        ctaButton.addEventListener('click', () => {
+        const target = ctaButton.getAttribute('data-redirect');
+        closeModal(modal);
+        setTimeout(() => {
+            window.location.href = target;
+        }, 300);
+    });
+
+    document.body.appendChild(modal);
+
     // Add modal styles
     const style = document.createElement('style');
     style.textContent = `
@@ -1789,13 +1811,6 @@ function showToolModal(toolName) {
         if (e.target === modal) {
             closeModal(modal);
         }
-    });
-    
-    // Add functionality to CTA button
-    const ctaButton = modal.querySelector('.modal-cta');
-    ctaButton.addEventListener('click', () => {
-        alert(`You selected: ${toolName}\nThis would redirect to the tool's page in a real application.`);
-        closeModal(modal);
     });
 }
 

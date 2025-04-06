@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Meditation Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 30px;
+        }
+        h2 {
+            color: #4A7C59;
+        }
+        .mood-button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: #DFF0D8;
+            transition: background-color 0.3s ease;
+        }
+        .mood-button:hover {
+            background-color: #C8E6C9;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h2>How are you feeling right now?</h2>
+
+    <form action="/meditation/result" method="post">
+        <button class="mood-button" type="submit" name="feeling" value="anxious">😟 Anxious</button>
+        <button class="mood-button" type="submit" name="feeling" value="stressed">😣 Stressed</button>
+        <button class="mood-button" type="submit" name="feeling" value="tired">😴 Tired</button>
+        <button class="mood-button" type="submit" name="feeling" value="happy">😊 Happy</button>
+    </form>
+
+    <a class="back-link" href="/">← Back to Wellness Tools</a>
+</body>
+</html>

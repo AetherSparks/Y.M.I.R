@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sound Therapy</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --accent: #f472b6;
+            --gradient-start: #f5f7fa;
+            --gradient-end: #e4e9f2;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            padding: 2rem;
+            margin: 0;
+            color: var(--dark);
+            min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+        
+        body.dark-mode {
+            --gradient-start: #1a202c;
+            --gradient-end: #2d3748;
+            --dark: #f8fafc;
+            --light: #2d3748;
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease;
+            position: relative;
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+        }
+        
+        .dark-mode .card {
+            background: #2d3748;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+            transition: width 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+        }
+        
+        .card:hover::before {
+            width: 8px;
+        }
+        
+        .mood-selector {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dark-mode .mood-selector {
+            background: #2d3748;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .mood-selector::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+            background-size: 200% 100%;
+            animation: gradientMove 3s linear infinite;
+        }
+        
+        @keyframes gradientMove {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+        
+        select {
+            padding: 0.75rem 1.5rem;
+            margin: 1rem;
+            font-size: 1rem;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: var(--light);
+            width: 80%;
+            max-width: 300px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--dark);
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1) translate(-50%, -50%);
+            transform-origin: 0 0;
+        }
+        
+        button:hover {
+            background: var(--primary-light);
+            transform: scale(1.05);
+        }
+        
+        button:active::after {
+            animation: ripple 0.6s linear;
+        }
+        
+        @keyframes ripple {
+            0% { transform: scale(0) translate(-50%, -50%); opacity: 1; }
+            100% { transform: scale(40) translate(-50%, -50%); opacity: 0; }
+        }
+        
+        audio {
+            width: 100%;
+            margin-top: 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        audio:hover {
+            transform: scale(1.02);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin: 3rem 0 1.5rem;
+            position: relative;
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .section-title::before, .section-title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0), var(--primary));
+        }
+        
+        .section-title::before {
+            left: 20%;
+        }
+        
+        .section-title::after {
+            right: 20%;
+            background: linear-gradient(90deg, var(--primary), rgba(99, 102, 241, 0));
+        }
+        
+        .sound-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sound-title::before {
+            content: "🎵";
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        
+        .sound-description {
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+            50% { transform: scale(1.03); box-shadow: 0 15px 30px rgba(0,0,0,0.12); }
+            100% { transform: scale(1); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .sound-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            color: var(--dark);
+            opacity: 0.7;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0), var(--primary), rgba(99, 102, 241, 0));
+        }
+        
+        .visualizer {
+            height: 40px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+        
+        .visualizer-bar {
+            width: 3px;
+            height: 5px;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: height 0.2s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+            <h2>🎧 Sound Therapy</h2>
+            <p class="tagline">Discover soundscapes to match your mood and improve wellbeing</p>
+        </header>
+        
+        <div class="mood-selector">
+            <form method="POST">
+                <label for="mood" style="font-size: 1.2rem">How are you feeling today?</label><br>
+                <select name="mood" id="mood" required>
+                    <option value="">-- Select Your Mood --</option>
+                    <option value="relaxed">Relaxed & Calm</option>
+                    <option value="anxious">Anxious & Stressed</option>
+                    <option value="sad">Sad or Melancholy</option>
+                    <option value="tired">Tired & Low Energy</option>
+                    <option value="focus">Need to Focus</option>
+                </select><br>
+                <button type="submit" class="pulse">Find My Sound</button>
+            </form>
+        </div>
+
+        {% if recommended %}
+            <div class="card">
+                <div class="sound-title">Recommended for You: {{ recommended.title }}</div>
+                <p class="sound-description">This sound is perfect for your current mood.</p>
+                <audio controls data-index="recommended">
+                    <source src="{{ url_for('static', filename=recommended.file) }}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <div class="visualizer" id="vis-recommended"></div>
+            </div>
+        {% endif %}
+
+        <h3 class="section-title">Explore All Soundscapes</h3>
+        <div class="sound-cards">
+            {% for sound in all_sounds %}
+                <div class="card">
+                    <div class="sound-title">{{ sound.title }}</div>
+                    <audio controls data-index="{{ loop.index }}">
+                        <source src="{{ url_for('static', filename=sound.file) }}" type="audio/mpeg">
+                    </audio>
+                    <div class="visualizer" id="vis-{{ loop.index }}"></div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <footer>
+        <p>Sound Therapy © 2025 • Take a moment to breathe deeply</p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animations
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+            
+            // Add audio enhancements
+            const audios = document.querySelectorAll('audio');
+            audios.forEach(audio => {
+                const index = audio.dataset.index;
+                const visualizer = document.getElementById(`vis-${index}`);
+                
+                // Create visualizer bars
+                if (visualizer) {
+                    for (let i = 0; i < 15; i++) {
+                        const bar = document.createElement('div');
+                        bar.className = 'visualizer-bar';
+                        visualizer.appendChild(bar);
+                    }
+                }
+                
+                audio.addEventListener('play', function() {
+                    // Add pulse animation
+                    this.closest('.card').classList.add('pulse');
+                    
+                    // Animate visualizer when playing
+                    if (visualizer) {
+                        animateVisualizer(visualizer);
+                    }
+                });
+                
+                audio.addEventListener('pause', function() {
+                    this.closest('.card').classList.remove('pulse');
+                    
+                    // Stop visualizer animation
+                    if (visualizer) {
+                        stopVisualizer(visualizer);
+                    }
+                });
+            });
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                this.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            });
+            
+            // Visualizer animations
+            function animateVisualizer(visualizer) {
+                visualizer.dataset.animating = "true";
+                const bars = visualizer.querySelectorAll('.visualizer-bar');
+                
+                function animate() {
+                    if (visualizer.dataset.animating !== "true") return;
+                    
+                    bars.forEach(bar => {
+                        const height = Math.floor(Math.random() * 35) + 5;
+                        bar.style.height = `${height}px`;
+                    });
+                    
+                    requestAnimationFrame(() => {
+                        setTimeout(animate, 180);
+                    });
+                }
+                
+                animate();
+            }
+            
+            function stopVisualizer(visualizer) {
+                visualizer.dataset.animating = "false";
+                const bars = visualizer.querySelectorAll('.visualizer-bar');
+                bars.forEach(bar => {
+                    bar.style.height = "5px";
+                });
+            }
+        });
+    </script>
+</body>
+</html>

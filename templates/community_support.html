@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Community Support</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 2rem;
+            background: #eef2f5;
+        }
+
+        .post-box, .post {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .ai-reply {
+            margin-top: 0.5rem;
+            background: #f0f8ff;
+            padding: 0.5rem;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h2>💬 Community Support</h2>
+    <div class="post-box">
+        <form method="POST">
+            <input type="text" name="username" placeholder="Your name (optional)">
+            <textarea name="message" placeholder="What's on your mind?" required></textarea>
+            <button type="submit">Post</button>
+        </form>
+    </div>
+
+    {% for post in posts %}
+        <div class="post">
+            <strong>{{ post.username or 'Anonymous' }}</strong>
+            <p>{{ post.message }}</p>
+            <div class="ai-reply">🤖 {{ post.reply }}</div>
+        </div>
+    {% endfor %}
+</body>
+</html>

@@ -6,7 +6,7 @@ import smtplib
 from dotenv import load_dotenv
 load_dotenv()
 import os
-
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import atexit
 import json
 import pickle
@@ -956,6 +956,241 @@ def stop_camera():
         cap = None
     return ('', 204)
 
+analyzer = SentimentIntensityAnalyzer()
+
+app.secret_key = "your_secret_key"
+
+DATA_FILE = 'goals.json'
+POSTS_FILE = 'data/posts.json'
+
+# Mood-based meditation scripts (more human-like and varied)
+SCRIPTS = {
+    "anxious": [
+        "Take a deep breath in... and out. Imagine a calm ocean. Let the waves carry your anxiety away.",
+        "Inhale peace. Exhale worry. Picture a peaceful forest with birds gently chirping.",
+        "You are safe. You are grounded. With every breath, let go of anxious thoughts."
+    ],
+    "stressed": [
+        "Let go of tension with every breath. Relax your shoulders. You are safe.",
+        "You are not your stress. You are strength, you are calm. Let each exhale ground you.",
+        "Breathe deeply. Picture your thoughts floating like clouds, drifting far away."
+    ],
+    "tired": [
+        "Close your eyes. Imagine a soft, glowing light recharging your body and mind.",
+        "Sink into stillness. Every breath is a wave of renewal flowing through you.",
+        "Let your body rest. Let your mind slow down. You deserve peace and rest."
+    ],
+    "happy": [
+        "Let’s deepen your joy. Smile softly and be present with the happiness within.",
+        "Breathe in gratitude. Breathe out love. Stay with this beautiful feeling.",
+        "Feel the warmth inside you. Your happiness is a gift — cherish this moment."
+    ]
+}
+
+# Optional: Motivational quotes to display with the meditation
+QUOTES = [
+    "You are enough. Just as you are.",
+    "Breathe. You’ve got this.",
+    "Peace begins with a single breath.",
+    "Today is a fresh start.",
+    "Inner calm is your superpower."
+]
+
+@app.route("/meditation")
+def meditation():
+    return render_template("meditation.html")
+
+@app.route("/meditation/result", methods=["POST"])
+def meditation_result():
+    feeling = request.form.get("feeling", "").lower()
+
+    # Find matching script list based on mood keyword
+    for mood, scripts in SCRIPTS.items():
+        if mood in feeling:
+            script = random.choice(scripts)
+            break
+    else:
+        # Default script if mood not found
+        script = f"Let’s take a few moments to be still. You mentioned feeling '{feeling}'. Breathe deeply and allow peace to fill your body."
+
+    quote = random.choice(QUOTES)
+
+    return render_template("meditation_result.html", script=script, quote=quote)
+
+@app.route('/journal', methods=['GET', 'POST'])
+def journal():
+    if request.method == 'POST':
+        entry = request.form['entry']
+        sentiment, suggestion = analyze_journal(entry)
+        return render_template('journal.html', sentiment=sentiment, suggestion=suggestion, entry=entry)
+    return render_template('journal.html')
+
+def analyze_journal(text):
+    scores = analyzer.polarity_scores(text)
+    compound = scores['compound']
+
+    if compound >= 0.05:
+        sentiment = 'positive'
+    elif compound <= -0.05:
+        sentiment = 'negative'
+    else:
+        sentiment = 'neutral'
+
+    suggestions = {
+        "positive": "Keep up the positive energy! 😊",
+        "negative": "Try writing about what made you feel this way. 💬",
+        "neutral": "Explore your thoughts more deeply next time. ✍️"
+    }
+
+    return sentiment, suggestions.get(sentiment)
+
+@app.route('/breathing', methods=['GET', 'POST'])
+def breathing():
+    suggestion = None
+    if request.method == 'POST':
+        mood = request.form['mood'].lower()
+        suggestion = suggest_breathing(mood)
+    return render_template('breathing.html', suggestion=suggestion)
+
+def suggest_breathing(mood):
+    techniques = {
+        "anxious": "Box Breathing (4-4-4-4) – Inhale, hold, exhale, hold for 4 seconds each.",
+        "stressed": "4-7-8 Breathing – Inhale 4s, hold 7s, exhale 8s. Great for calming nerves.",
+        "tired": "Diaphragmatic Breathing – Deep belly breaths to refresh energy.",
+        "distracted": "Alternate Nostril Breathing – Helps center your focus.",
+        "neutral": "Guided Breath Awareness – Simply observe your breath."
+    }
+    return techniques.get(mood, "Try Box Breathing to get started.")
+
+def load_goals():
+    if not os.path.exists(DATA_FILE):
+        return []
+    with open(DATA_FILE, 'r') as f:
+        return json.load(f)
+
+def save_goals(goals):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(goals, f, indent=4)
+
+@app.route('/goals', methods=['GET', 'POST'])
+def goals():
+    if request.method == 'POST':
+        new_goal = request.form.get('goal')
+        if new_goal:
+            goals = load_goals()
+            goals.append({
+                "goal": new_goal,
+                "created": datetime.today().strftime('%Y-%m-%d'),
+                "streak": 0,
+                "last_checked": ""
+            })
+            save_goals(goals)
+            return redirect(url_for('goals'))
+    
+    goals = load_goals()
+    return render_template('goals.html', goals=goals)
+
+@app.route('/check_goal/<int:goal_index>')
+def check_goal(goal_index):
+    goals = load_goals()
+    today = datetime.today().strftime('%Y-%m-%d')
+
+    if goals[goal_index]["last_checked"] != today:
+        goals[goal_index]["last_checked"] = today
+        goals[goal_index]["streak"] += 1
+        save_goals(goals)
+
+    return redirect(url_for('goals'))
+
+@app.route('/sound-therapy', methods=['GET', 'POST'])
+def sound_therapy():
+    mood = request.form.get('mood') if request.method == 'POST' else None
+
+    mood_to_sound = {
+        "relaxed": {
+            "title": "Sunset Landscape",
+            "file": "Sunset-Landscape(chosic.com).mp3"
+        },
+        "anxious": {
+            "title": "White Petals",
+            "file": "keys-of-moon-white-petals(chosic.com).mp3"
+        },
+        "sad": {
+            "title": "Rainforest Sounds",
+            "file": "Rain-Sound-and-Rainforest(chosic.com).mp3"
+        },
+        "tired": {
+            "title": "Meditation",
+            "file": "meditation.mp3"
+        },
+        "focus": {
+            "title": "Magical Moments",
+            "file": "Magical-Moments-chosic.com_.mp3"
+        }
+    }
+
+    recommended = mood_to_sound.get(mood, None)
+
+    # All available sounds (for browsing below)
+    all_sounds = list(mood_to_sound.values())
+
+    return render_template('sound_therapy.html', recommended=recommended, all_sounds=all_sounds)
+
+def load_posts():
+    if os.path.exists(POSTS_FILE):
+        with open(POSTS_FILE, 'r') as f:
+            return json.load(f)
+    return []
+
+def save_posts(posts):
+    with open(POSTS_FILE, 'w') as f:
+        json.dump(posts, f, indent=4)
+
+@app.route('/community', methods=['GET', 'POST'])
+def community_support():
+    posts = load_posts()
+
+    if request.method == 'POST':
+        username = request.form['username']
+        message = request.form['message']
+        # Very basic AI reply simulation (you can plug in sentiment/local AI later)
+        ai_response = "Thanks for sharing. You're not alone on this journey 🌟"
+
+        posts.insert(0, {
+            'username': username,
+            'message': message,
+            'reply': ai_response
+        })
+
+        save_posts(posts)
+        return redirect(url_for('community_support'))
+
+    return render_template('community_support.html', posts=posts)
+
+# Sample movie list
+movie_data = [
+    {"title": "Inception", "genres": "Action|Sci-Fi|Thriller"},
+    {"title": "The Dark Knight", "genres": "Action|Crime|Drama"},
+    {"title": "Titanic", "genres": "Drama|Romance"},
+    {"title": "The Shawshank Redemption", "genres": "Drama"},
+    {"title": "Avatar", "genres": "Action|Adventure|Fantasy"}
+]
+
+@app.route('/recommend', methods=['GET', 'POST'])
+def home():
+    mood = None
+    recommendations = None
+    
+    if request.method == 'POST':
+        mood = request.form['mood']
+        recommendations = get_movie_recommendations(mood)
+
+    return render_template('recommendations.html', mood=mood, recommendations=recommendations)
+
+def get_movie_recommendations(mood):
+    # Filter movies based on mood, for simplicity we just return all movies here
+    # You can customize this logic to filter movies based on the mood
+    return movie_data
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Meditation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 15px;
+            display: inline-block;
+            max-width: 600px;
+        }
+
+        h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        audio {
+            margin-top: 15px;
+        }
+
+        .quote {
+            font-style: italic;
+            margin-top: 30px;
+            font-size: 1.1em;
+            color: #cde;
+        }
+
+        a {
+            display: inline-block;
+            margin: 20px 10px 0;
+            text-decoration: none;
+            color: #ffd;
+            font-weight: bold;
+        }
+
+        .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #88c999;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            color: #222;
+        }
+
+        .button:hover {
+            background: #a4d4b4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Your Guided Meditation</h2>
+        <p id="script">{{ script }}</p>
+
+        <!-- Play Meditation (Text-to-Speech) -->
+        <button class="button" onclick="speakScript()">🔈 Play Meditation</button>
+
+        <!-- Background Music Controls -->
+        <audio id="meditationMusic" src="{{ url_for('static', filename='meditation.mp3') }}" loop></audio>
+        <div style="margin-top: 15px;">
+            <button class="button" onclick="document.getElementById('meditationMusic').play()">🎵 Play Music</button>
+            <button class="button" onclick="document.getElementById('meditationMusic').pause()">⏸️ Pause Music</button>
+        </div>
+
+        <!-- Motivational Quote -->
+        {% if quote %}
+        <div class="quote">
+            <p>“{{ quote }}”</p>
+        </div>
+        {% endif %}
+
+        <!-- Navigation Links -->
+        <br>
+        <a href="/meditation">Try Another</a> |
+        <a href="/">Back to Wellness Tools</a>
+    </div>
+
+    <script>
+        function speakScript() {
+            const text = document.getElementById("script").innerText;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.9; // slow pace for calmness
+            utterance.pitch = 1;
+            speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>

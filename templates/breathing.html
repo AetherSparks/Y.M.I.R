@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breathing Exercises</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            transition: all 0.3s ease;
+        }
+        
+        h1 {
+            color: #00838f;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            position: relative;
+        }
+        
+        h1:after {
+            content: "";
+            display: block;
+            width: 60px;
+            height: 4px;
+            background-color: #00838f;
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+        }
+        
+        label {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #006064;
+            font-weight: 500;
+        }
+        
+        input {
+            padding: 15px;
+            border: 2px solid #b2ebf2;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: #00acc1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 172, 193, 0.2);
+        }
+        
+        button {
+            background-color: #00acc1;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            background-color: #00838f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.12);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            padding: 25px;
+            border-radius: 10px;
+            background-color: #e0f7fa;
+            margin-top: 20px;
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .result h3 {
+            color: #00838f;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .result p {
+            color: #006064;
+            line-height: 1.6;
+            font-size: 17px;
+        }
+        
+        .breathing-animation {
+            width: 120px;
+            height: 120px;
+            background-color: #80deea;
+            border-radius: 50%;
+            margin: 30px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            display: none;
+        }
+        
+        .breathing-text {
+            color: #006064;
+            font-weight: bold;
+            font-size: 18px;
+            z-index: 2;
+        }
+        
+        @keyframes breathe {
+            0% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Breathing Exercises</h1>
+        <form id="moodForm">
+            <label for="mood">How are you feeling?</label>
+            <input type="text" id="mood" name="mood" placeholder="anxious, stressed, tired..." required>
+            <button type="submit">Suggest Exercise</button>
+        </form>
+
+        <div class="result" id="resultSection">
+            <h3>Suggested Breathing Technique:</h3>
+            <p id="suggestion"></p>
+            
+            <div class="breathing-animation" id="breathingCircle">
+                <div class="breathing-text" id="breathingText">Breathe</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('moodForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const moodInput = document.getElementById('mood').value.toLowerCase();
+            let suggestion = '';
+            let animationDuration = 8000; // Default duration in ms
+            let inhaleTime = 4;
+            let holdTime = 0;
+            let exhaleTime = 4;
+            
+            // Generate suggestions based on mood
+            if (moodInput.includes('anxious') || moodInput.includes('anxiety') || moodInput.includes('panic')) {
+                suggestion = "Try the 4-7-8 breathing technique: Inhale through your nose for 4 seconds, hold your breath for 7 seconds, and exhale through your mouth for 8 seconds. Repeat 4-5 times.";
+                inhaleTime = 4;
+                holdTime = 7;
+                exhaleTime = 8;
+                animationDuration = 19000; // 4+7+8=19 seconds
+            } else if (moodInput.includes('stress') || moodInput.includes('overwhelm')) {
+                suggestion = "Practice box breathing: Inhale for 4 seconds, hold for 4 seconds, exhale for 4 seconds, and hold for 4 seconds before inhaling again. Repeat for 2-3 minutes.";
+                inhaleTime = 4;
+                holdTime = 4;
+                exhaleTime = 4;
+                animationDuration = 16000; // 4+4+4+4=16 seconds
+            } else if (moodInput.includes('tired') || moodInput.includes('fatigue') || moodInput.includes('low energy')) {
+                suggestion = "Energizing breath: Inhale quickly through your nose for 2 seconds, then exhale forcefully through your mouth for 1 second. Repeat 10-15 times to increase alertness.";
+                inhaleTime = 2;
+                holdTime = 0;
+                exhaleTime = 1;
+                animationDuration = 3000; // 2+1=3 seconds
+            } else if (moodInput.includes('anger') || moodInput.includes('frustrat')) {
+                suggestion = "Cooling breath: Inhale slowly through your nose for 5 seconds, hold briefly, then exhale slowly through your mouth for 6 seconds, imagining the tension leaving your body. Repeat 6-8 times.";
+                inhaleTime = 5;
+                holdTime = 1;
+                exhaleTime = 6;
+                animationDuration = 12000; // 5+1+6=12 seconds
+            } else if (moodInput.includes('focus') || moodInput.includes('concentrate')) {
+                suggestion = "Alternate nostril breathing: Using your right thumb to close your right nostril, inhale through your left nostril. Then close your left nostril with your ring finger, release your thumb, and exhale through your right nostril. Alternate sides for 5-10 rounds.";
+                inhaleTime = 4;
+                holdTime = 0;
+                exhaleTime = 4;
+                animationDuration = 8000; // 4+4=8 seconds
+            } else {
+                suggestion = "Deep belly breathing: Place one hand on your belly and one on your chest. Inhale slowly through your nose for 4 seconds, feeling your belly expand (not your chest). Hold briefly, then exhale slowly through your mouth for 6 seconds. Repeat 10 times.";
+                inhaleTime = 4;
+                holdTime = 1;
+                exhaleTime = 6;
+                animationDuration = 11000; // 4+1+6=11 seconds
+            }
+            
+            // Show result section and update suggestion
+            document.getElementById('suggestion').textContent = suggestion;
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('breathingCircle').style.display = 'flex';
+            
+            // Start breathing animation
+            startBreathingAnimation(inhaleTime, holdTime, exhaleTime);
+        });
+        
+        function startBreathingAnimation(inhaleTime, holdTime, exhaleTime) {
+            const circle = document.getElementById('breathingCircle');
+            const text = document.getElementById('breathingText');
+            const totalCycleTime = (inhaleTime + holdTime + exhaleTime) * 1000;
+            
+            // Reset any existing animation
+            circle.style.animation = 'none';
+            
+            // Force reflow to ensure animation restart
+            void circle.offsetWidth;
+            
+            // Start the animation cycle
+            runBreathingCycle();
+            
+            function runBreathingCycle() {
+                // Inhale phase
+                text.textContent = "Inhale";
+                circle.style.animation = `breathe ${inhaleTime * 2}s ease-in-out forwards`;
+                circle.style.animationDirection = 'alternate';
+                
+                // Hold phase (if applicable)
+                if (holdTime > 0) {
+                    setTimeout(() => {
+                        text.textContent = "Hold";
+                        circle.style.animationPlayState = 'paused';
+                    }, inhaleTime * 1000);
+                }
+                
+                // Exhale phase
+                setTimeout(() => {
+                    text.textContent = "Exhale";
+                    circle.style.animationPlayState = 'running';
+                    circle.style.animationDirection = 'alternate-reverse';
+                }, (inhaleTime + holdTime) * 1000);
+                
+                // Reset for next cycle
+                setTimeout(() => {
+                    runBreathingCycle();
+                }, totalCycleTime);
+            }
+        }
+    </script>
+</body>
+</html>
