@@ -2106,16 +2106,11 @@ if __name__ == '__main__':
         background_thread = threading.Thread(target=update_all_in_background, daemon=True)
         background_thread.start()
     
-    try:
-        port = int(os.environ.get('PORT', 10000))
-        # Use gunicorn in production (configured in Render.yaml)
-        if os.environ.get('FLASK_ENV') == 'production':
-            app.run(host='0.0.0.0', port=port)
-        else:
-            # Debug mode for local development
-            app.run(host='0.0.0.0', port=port, debug=True)
-    except KeyboardInterrupt:
-        print("\n🔴 Server stopped manually.")
+    # Get port from environment variable or use default
+    port = int(os.environ.get('PORT', 10000))
+    
+    # Always bind to 0.0.0.0 and the specified port
+    app.run(host='0.0.0.0', port=port,debug=True)
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
         
