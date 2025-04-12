@@ -2481,7 +2481,7 @@ li p {
                 }
             });
 
-            setInterval(processResults, 50000); // Update song recommendations every 5 seconds
+            setInterval(processResults, 1000); // Update song recommendations every 5 seconds
         });
 
         function sendMessage() {
@@ -2512,6 +2512,8 @@ li p {
             .catch(error => console.error("Error:", error));
         }
 
+
+        //dikkat
         function processResults() {
             fetch('/process_results')
                 .then(response => response.json())
