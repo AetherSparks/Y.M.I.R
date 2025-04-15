@@ -148,7 +148,7 @@ We’d love your input!
 ## 👨‍💻 **Team**
 
 - **Abhiraj Ghose** – E23CSEU0014
-- [Abhiraj's GitHub Profile]https://github.com/AetherSparks 
+- [Abhiraj's GitHub Profile](https://github.com/AetherSparks) 
 - **Pallav Sharma** – E23CSEU0022  
 - [Pallav's GitHub Profile](https://github.com/pallav)
 
