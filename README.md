@@ -1,55 +1,69 @@
-# **EmotiMuse: AI-Powered Emotion Detection & Music Recommendation System** 🎵🤖
+# Y.M.I.R: Yielding Melodies for Internal Restoration 🎵🧠  
+*A Mood-Based AI Emotion Detection & Music Recommendation System*
 
-![EmotiMuse Banner](https://github.com/user-attachments/assets/3f4b822c-71db-4360-a202-a64f098c1137)
+![Y.M.I.R Banner](./Website-Images/banner.jpg)  
+<!-- Replace with your actual image path once added -->
+
+---
+
+## 🎥 **Watch the Demo Video**
+[![Watch on YouTube](https://img.shields.io/badge/Watch%20Demo%20Video-Youtube-red?logo=youtube)](https://your-youtube-link.com)  
+<!-- Replace with actual YouTube video link -->
+
+---
 
 ## **Overview**  
-EmotiMuse is a cutting-edge AI system that personalizes your music experience through emotional intelligence:
+**Y.M.I.R** is a cutting-edge AI-powered system that personalizes your music and wellness experience using emotional intelligence:
 
-- **Multi-Channel Emotion Detection** - Analyzes both facial expressions and text interactions 🔍
-- **Intelligent Music Matching** - Recommends music tailored to your emotional state 🎧
-- **Seamless User Experience** - Real-time analysis and recommendations through an intuitive interface 💻
+- **Multi-Channel Emotion Detection** – Facial expression + text-based interaction 🔍  
+- **Intelligent Music Matching** – Personalized recommendations based on your current mood 🎷  
+- **Wellness-First Experience** – Chat support, daily motivation, and real-time emotional assistance 💬💡  
+
+---
 
 ## **Key Features**
 
 | Feature | Description |
 |---------|-------------|
-| **🎭 Multimodal Emotion Detection** | Combines DeepFace visual analysis with natural language processing for comprehensive emotional assessment |
+| **🌝 Multimodal Emotion Detection** | Combines DeepFace visual analysis with natural language processing for comprehensive emotional assessment |
 | **💬 Interactive Emotion Chatbot** | Engages users in conversation to gather emotional context beyond facial expressions |
 | **📊 Emotion Fusion Algorithm** | Integrates visual and text-based emotional signals for enhanced accuracy |
 | **🎶 Personalized Music Recommendations** | Content-based recommendation engine tailored to emotional states |
-| **🔄 Real-Time Processing** | Continuous emotion monitoring and dynamic recommendation updates |
+| **🔀 Real-Time Processing** | Continuous emotion monitoring and dynamic recommendation updates |
 | **🌐 Responsive Web Interface** | Flask-powered application accessible across devices |
+
+---
 
 ## **Technical Architecture**
 
-### Project Structure
+### 📁 Project Structure
 ```
-emotion-music-recommendation/
+Y.M.I.R/
 ├── datasets/
-│   ├── therapeutic_music_enriched.csv        # Enhanced music dataset with emotional mappings
-│   ├── Y.M.I.R. original dataset.csv         # Original YMIR dataset
-│   └── imagesofdataset/                      # Data visualization images
+│   ├── therapeutic_music_enriched.csv
+│   ├── Y.M.I.R. original dataset.csv
+│   └── imagesofdataset/
 │       ├── Figure_1.png
-│       └── ...
 ├── src/
-│   ├── chatbot.py                            # NLP-based emotion detection
-│   ├── dataset.py                            # Dataset management utilities
-│   ├── fer1.py                               # Facial emotion recognition
-│   ├── modules.py                            # Core system components
-│   ├── recommend.py                          # Music recommendation engine
-│   └── train_music_recommendation.py         # Model training script
+│   ├── chatbot.py
+│   ├── dataset.py
+│   ├── fer1.py
+│   ├── modules.py
+│   ├── recommend.py
+│   └── train_music_recommendation.py
 ├── static/
-│   └── styles.css                            # Application styling
-├── templates/                                # Web interface templates
+│   └── styles.css
+├── templates/
 │   ├── about.html
 │   ├── contact.html
+├── Website-Images/
+│   ├── Homepage.jpg
 │   └── ...
-└── Website-Images/                           # UI screenshots and marketing assets
-    ├── Homepage.jpg
-    └── ...
 ```
 
-## **Installation Guide**
+---
+
+## 🚀 **Installation Guide**
 
 ### Prerequisites
 - Python 3.8+
@@ -60,8 +74,8 @@ emotion-music-recommendation/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/emotion-music-recommendation.git
-   cd emotion-music-recommendation
+   git clone https://github.com/yourusername/Y.M.I.R.git
+   cd Y.M.I.R
    ```
 
 2. **Set up virtual environment**
@@ -80,65 +94,80 @@ emotion-music-recommendation/
    python app.py
    ```
 
-5. **Access the web interface**
-   - Open your browser and navigate to `http://127.0.0.1:5000/`
-   - Grant camera permissions when prompted
-
-## **How It Works**
-
-### The EmotiMuse Pipeline
-1. **Emotion Capture** - Your emotions are captured through:
-   - Real-time facial analysis via webcam
-   - Conversational text analysis through the chatbot interface
-
-2. **Emotion Processing** - Our fusion algorithm combines these signals to determine your emotional state with greater accuracy than single-mode systems
-
-3. **Music Matching** - The recommendation engine searches our curated music database to find tracks that complement or enhance your current emotional state
-
-4. **Continuous Adaptation** - The system continuously monitors emotional changes, updating recommendations as your mood evolves
-
-## **Development Roadmap**
-
-### Current Development Status
-- ✅ Core emotion detection system
-- ✅ Basic recommendation engine
-- ✅ Web interface prototype
-- ✅ Initial dataset integration
-
-### Upcoming Enhancements
-- 🔄 **UI/UX Improvements** - Enhanced design and responsive layouts
-- 🔄 **Advanced Recommendation Algorithm** - More nuanced emotion-music matching
-- 🔄 **Camera Controls** - Improved start/stop functionality and permissions handling
-- 🔄 **Favorites System** - Save and organize recommended music
-- 🔄 **Extended Button Functionality** - Complete implementation of all interface controls
-
-> **Note:** This project is under active development. Features and interfaces may change as we refine the system.
-
-## **Contributing**
-
-We welcome contributions to improve EmotiMuse! Here's how you can help:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## **Team**
-
-- **Pallav Sharma** - [GitHub Profile](https://github.com/pallav)
-
-## **Acknowledgments**
-
-- The DeepFace library for facial emotion recognition
-- OpenAI for NLP technologies
-- The Flask development community
-- Contributors to the YMIR dataset
-
-## **License**
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+5. **Access the interface**
+   Open your browser at `http://127.0.0.1:5000/` and grant webcam permissions.
 
 ---
 
-⚠️ **Development Status:** EmotiMuse is currently in beta. Some features may be incomplete or subject to change.
+## 🧠 **How It Works**
+
+### The Y.M.I.R Emotional Pipeline
+
+1. **Emotion Capture**  
+   - Facial recognition using webcam (DeepFace)  
+   - Chatbot-based emotional interpretation (NLP)
+
+2. **Signal Fusion**  
+   - Combined analysis for deeper mood recognition
+
+3. **Music Matching**  
+   - Emotion-aware recommendation engine suggests therapeutic or uplifting tracks
+
+4. **Continuous Support**  
+   - Recommendations evolve with your emotional state
+
+---
+
+## 🛠️ **Development Roadmap**
+
+### ✅ Current Progress
+- Emotion detection system (visual & textual)
+- Music recommendation engine
+- Web UI prototype
+- Dataset integration (YMIR & therapeutic music)
+
+### 🔧 In Progress
+- Improved UI & camera control
+- Favorites system & user personalization
+- Advanced emotion-music mapping
+- Button functionality & chatbot refinement
+
+---
+
+## 💡 **Contributing**
+
+We’d love your input!
+
+1. Fork the repo  
+2. Create a branch (`git checkout -b feature/awesome-idea`)  
+3. Commit changes (`git commit -m 'Add cool stuff'`)  
+4. Push and submit a Pull Request
+
+---
+
+## 👨‍💻 **Team**
+
+- **Abhiraj Ghose** – E23CSEU0014
+- [Abhiraj's GitHub Profile]https://github.com/AetherSparks 
+- **Pallav Sharma** – E23CSEU0022  
+- [Pallav's GitHub Profile](https://github.com/pallav)
+
+---
+
+## 🙌 **Acknowledgments**
+
+- [DeepFace](https://github.com/serengil/deepface) – Facial emotion detection  
+- OpenAI – Natural Language Processing  
+- Flask & Python Community  
+- Contributors to the YMIR dataset  
+
+---
+
+## 📄 **License**
+
+This project is licensed under the MIT License. See `LICENSE` for details.
+
+---
+
+⚠️ **Note:** Y.M.I.R is currently in beta. Expect ongoing changes and new features as development continues.
+
