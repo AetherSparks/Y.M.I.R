@@ -10,3 +10,8 @@ static/music
 /static/Images
 /flask_session
 /audio_files
+/shape_predictor_68_face_landmarks
+/src
+/Render.yaml
+
+/Render.yaml
