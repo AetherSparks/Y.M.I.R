@@ -1,7 +1,7 @@
 # Y.M.I.R: Yielding Melodies for Internal Restoration 🎵🧠  
 *A Mood-Based AI Emotion Detection & Music Recommendation System*
 
-![Y.M.I.R Banner](./Website-Images/banner.jpg)  
+![Y.M.I.R Banner](https://github.com/pallav110/DTI-AND-AI-PROJECT/blob/main/YMIR%20thumbnail.jpg?raw=true)
 <!-- Replace with your actual image path once added -->
 
 ---
