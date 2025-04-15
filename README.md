@@ -7,7 +7,9 @@
 ---
 
 ## 🎥 **Watch the Demo Video**
-[![Watch on YouTube](https://img.shields.io/badge/Watch%20Demo%20Video-Youtube-red?logo=youtube)](https://youtu.be/qzxqyhuB_XU?si=i65ziCP-z99yOAIZ)  
+<a href="https://youtu.be/qzxqyhuB_XU?si=i65ziCP-z99yOAIZ" target="_blank">
+  <img src="https://img.shields.io/badge/Watch%20Demo%20Video-Youtube-red?logo=youtube" alt="Watch on YouTube" style="height:30px;">
+</a>
 <!-- Replace with actual YouTube video link -->
 
 ---
