@@ -1987,16 +1987,14 @@ def process_results():
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 if __name__ == '__main__':
-    # Only start background thread in development
-    if os.environ.get('FLASK_ENV') != 'production':
-        background_thread = threading.Thread(target=update_all_in_background, daemon=True)
-        background_thread.start()
-    
-    # Get port from environment variable or use default
-    port = int(os.environ.get('PORT', 10000))
-    
-    # Always bind to 0.0.0.0 and the specified port
-    app.run(host='0.0.0.0', port=port,debug=True)
+    # Start background processing thread
+    background_thread = threading.Thread(target=update_all_in_background, daemon=True)
+    background_thread.start()
+    try:
+        app.run(debug=True, host='127.0.0.1', port=10000)
+
+    except KeyboardInterrupt:
+        print("\n🔴 Server stopped manually.")
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
         
