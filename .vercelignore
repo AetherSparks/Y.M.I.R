@@ -1,0 +1,33 @@
+# Prevent large model files or unnecessary stuff from being uploaded to Vercel
+*.h5
+*.pt
+*.pkl
+*.wav
+*.mp3
+*.mp4
+.DS_Store
+__pycache__/
+.venv/
+*.zip
+*.tar.gz
+
+# Ignore virtual environment
+.venv/
+**/.venv/
+
+# Ignore model weights
+models/lyrics_generator.pth
+
+# Common heavy file extensions
+*.pth
+*.pkl
+*.h5
+*.pt
+*.dll
+*.lib
+*.pyd
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
