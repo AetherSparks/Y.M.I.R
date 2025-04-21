@@ -2446,7 +2446,7 @@ li p {
             }
 
             fetchEmotions();
-            setInterval(fetchEmotions, 50000);
+            setInterval(fetchEmotions, 10000);
 
             document.addEventListener("visibilitychange", function () {
                 if (document.hidden) {
@@ -2481,7 +2481,7 @@ li p {
                 }
             });
 
-            setInterval(processResults, 1000); // Update song recommendations every 5 seconds
+            setInterval(processResults, 3000); // Update song recommendations every 5 seconds
         });
 
         function sendMessage() {
@@ -2579,7 +2579,7 @@ li p {
         
         
         // ✅ **Update songs every 15 seconds**
-        setInterval(processResults, 50000);
+        setInterval(processResults, 1000);
         // Global variables for the music player
         let currentSongIndex = 0;
         let audioPlayer;
@@ -3015,7 +3015,7 @@ songFinishedNaturally = true; // Reset when a new song starts
         }
 
         // Uncomment the following line to enable automatic theme rotation
-        // const themeRotationInterval = setInterval(rotateTheme, 30000);
+        const themeRotationInterval = setInterval(rotateTheme, 30000);
 
         // Mood tracking functionality
         // Mood tracking functionality
