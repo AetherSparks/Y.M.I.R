@@ -202,71 +202,138 @@ def process_emotions(emotion_file):
 
 # === 📌 Mood Prediction & Song Recommendation ===
 def recommend_songs(emotion_file):
-    """Predicts mood based on emotions and recommends matching songs."""
+    """Predicts mood based on emotions and recommends matching songs.
+    
+    Args:
+        emotion_file: Path to file containing emotion data
+        
+    Returns:
+        list: List of dictionaries containing recommended songs with track, artist, and mood
+    """
+    import pickle
+    import logging
+    
+    # Set up logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # ✅ Get Emotion-Based Features
+        emotion_vector, emotion_scores = process_emotions(emotion_file)
+        
+        # Load pre-trained transformations with error handling
+        try:
+            with open("models/scaler.pkl", "rb") as f:
+                scaler = pickle.load(f)
+        except (FileNotFoundError, pickle.PickleError) as e:
+            logger.error(f"Error loading scaler model: {e}")
+            raise RuntimeError("Failed to load scaler model")
 
-    # ✅ Get Emotion-Based Features
-    emotion_vector, emotion_scores = process_emotions(emotion_file)
-    # Load pre-trained transformations
-    with open("models/scaler.pkl", "rb") as f:
-        scaler = pickle.load(f)
+        try:
+            with open("models/pca.pkl", "rb") as f:
+                pca = pickle.load(f)
+        except (FileNotFoundError, pickle.PickleError) as e:
+            logger.error(f"Error loading PCA model: {e}")
+            raise RuntimeError("Failed to load PCA model")
 
-    with open("models/pca.pkl", "rb") as f:
-        pca = pickle.load(f)
+        # Apply transformations with validation
+        if emotion_vector.ndim == 1:
+            emotion_vector = emotion_vector.reshape(1, -1)
+            
+        # Standardize
+        emotion_vector_scaled = scaler.transform(emotion_vector)
+        # Reduce dimensions
+        emotion_vector_pca = pca.transform(emotion_vector_scaled)
 
-    # Apply transformations
-    emotion_vector = scaler.transform(emotion_vector.reshape(1, -1))  # Standardize
-    emotion_vector = pca.transform(emotion_vector)  # Reduce dimensions
+        # Debug confidence scores if needed
+        mood_probs = ensemble_model.predict_proba(emotion_vector_pca)
+        logger.debug(f"Model Confidence Scores: {dict(zip(le.classes_, mood_probs[0]))}")
 
-    # Predict using ensemble model
-    mood_probs = ensemble_model.predict_proba(emotion_vector)
+        # ✅ Predict Mood
+        predicted_mood_index = ensemble_model.predict(emotion_vector_pca)[0]
+        predicted_mood = le.inverse_transform([predicted_mood_index])[0]
+        logger.info(f"Initial Predicted Mood: {predicted_mood}")
 
-    # print(f"\n🔍 Model Confidence Scores for Moods: {dict(zip(le.classes_, mood_probs[0]))}\n")
+        # ✅ Find Top 2 Dominant Emotions with validation
+        if not emotion_scores:
+            logger.warning("No emotion scores found, using default neutral mood")
+            dominant_emotions = [("Neutral", 1.0)]
+        else:
+            dominant_emotions = sorted(emotion_scores.items(), key=lambda x: x[1], reverse=True)[:2]
+            
+        mapped_moods = set()
+        for emotion, score in dominant_emotions:
+            mapped_moods.update(EMOTION_TO_MOOD.get(emotion, ["Neutral"]))
+        
+        logger.info(f"Dominant Emotions: {dominant_emotions} → Adjusted Moods: {mapped_moods}")
 
-    # ✅ Predict Mood
-    predicted_mood_index = ensemble_model.predict(emotion_vector)[0]
-    predicted_mood = le.inverse_transform([predicted_mood_index])[0]
+        # ✅ Adjust Mood If Necessary
+        if predicted_mood not in mapped_moods and mapped_moods:
+            predicted_mood = list(mapped_moods)[0]  # Take the first mapped mood
+            logger.info(f"Adjusted mood to: {predicted_mood}")
 
-    # print(f"\n🎯 Initial Predicted Mood (Model Output): {predicted_mood}\n")
+        # ✅ Filter Songs Based on Mood with validation
+        try:
+            filtered_songs = df[df["Mood_Label"] == predicted_mood].copy()
+        except KeyError:
+            logger.error("Missing required column 'Mood_Label' in dataframe")
+            raise ValueError("Dataset missing required columns")
 
-    # ✅ Find Top 2 Dominant Emotions
-    dominant_emotions = sorted(emotion_scores.items(), key=lambda x: x[1], reverse=True)[:2]
-    mapped_moods = set()
-    for emotion, _ in dominant_emotions:
-        mapped_moods.update(EMOTION_TO_MOOD.get(emotion, ["Neutral"]))
+        # ✅ Use Fallback Moods If No Songs Found
+        if filtered_songs.empty and mapped_moods:
+            logger.info(f"No songs found for {predicted_mood}, trying mapped moods: {mapped_moods}")
+            filtered_songs = df[df["Mood_Label"].isin(mapped_moods)].copy()
 
-    # print(f"\n🎭 Dominant Emotions: {dominant_emotions} → Adjusted Moods: {mapped_moods}\n")
+        # ✅ Final Fallback to Neutral if Still Empty
+        if filtered_songs.empty:
+            logger.warning("No songs found for any mapped mood, falling back to Neutral")
+            filtered_songs = df[df["Mood_Label"] == "Neutral"].copy()
+            
+            # If still empty, return empty list with warning
+            if filtered_songs.empty:
+                logger.error("No songs found for any mood category, including Neutral")
+                return []
 
-    # ✅ Adjust Mood If Necessary
-    if predicted_mood not in mapped_moods:
-        predicted_mood = list(mapped_moods)[0]  # Take the first mapped mood
+        # ✅ Select Up to 10 Songs with duplicate handling
+        required_columns = ["Track Name", "Artist Name", "Mood_Label"]
+        if not all(col in filtered_songs.columns for col in required_columns):
+            logger.error(f"Missing required columns in dataframe. Required: {required_columns}")
+            raise ValueError("Dataset missing required columns")
+            
+        try:
+            # Drop duplicates more efficiently
+            filtered_songs.drop_duplicates(subset=["Track Name", "Artist Name"], inplace=True)
+            sample_size = min(10, len(filtered_songs))
+            
+            if sample_size == 0:
+                logger.warning("No songs available after filtering duplicates")
+                return []
+                
+            recommended_songs = filtered_songs.sample(sample_size)
+        except Exception as e:
+            logger.error(f"Error during sampling: {e}")
+            # Fallback to first N records if sampling fails
+            recommended_songs = filtered_songs.head(min(10, len(filtered_songs)))
 
-    # print(f"\n🎯 Final Adjusted Mood: {predicted_mood}\n")
-
-    # ✅ Filter Songs Based on Mood
-    filtered_songs = df[df["Mood_Label"] == predicted_mood]
-
-    # ✅ Use Fallback Moods If No Songs Found
-    if filtered_songs.empty:
-        filtered_songs = df[df["Mood_Label"].isin(mapped_moods)]
-
-    # ✅ Final Fallback to Neutral if Still Empty
-    if filtered_songs.empty:
-        filtered_songs = df[df["Mood_Label"] == "Neutral"]
-
-    # ✅ Select Up to 10 Songs
-    recommended_songs = filtered_songs.drop_duplicates(subset=["Track Name", "Artist Name"]).sample(min(10, len(filtered_songs)))
-
-
-    song_list = [
-        {
-            "track": row["Track Name"],
-            "artist": row["Artist Name"],
-            "mood": row["Mood_Label"],
-        }
-        for _, row in recommended_songs.iterrows()
-    ]
-
-    return song_list
+        # ✅ Create song list with error handling for missing values
+        song_list = []
+        for _, row in recommended_songs.iterrows():
+            try:
+                song_list.append({
+                    "track": row["Track Name"],
+                    "artist": row["Artist Name"],
+                    "mood": row["Mood_Label"],
+                })
+            except KeyError as e:
+                logger.warning(f"Skipping song due to missing data: {e}")
+                
+        logger.info(f"Successfully recommended {len(song_list)} songs")
+        return song_list
+        
+    except Exception as e:
+        logger.error(f"Unexpected error in recommend_songs: {e}")
+        # Return empty list rather than crashing
+        return []
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
@@ -897,7 +964,7 @@ latest_songs = []  # Store recommended songs
 latest_final_emotion = {}  # Store latest emotion data
 running = True  # Flag to control background process
 
-def update_all_in_background(interval=5):
+def update_all_in_background(interval=4):
     """Continuously updates emotions, calculates final averages, and recommends songs."""
     global latest_songs, latest_final_emotion
 
