@@ -1,7 +1,12 @@
 /.venv
 /shape_predictor_68_face_landmarks.dat
 /models
-/*.json
+/chat_results.json
+/emotion_log.json
+/favorites.json
+/final_average_emotions.json
+preprocessor_data.json
+
 venv
 /shape_predictor_68_face_landmarks.dat
 /templates/Images
