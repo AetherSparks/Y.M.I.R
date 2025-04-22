@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - AI Emotion Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Root Variables */
+        :root {
+            --color-primary: #000000;
+            --color-secondary: #0f172a;
+            --color-accent: #3b82f6;
+            --color-text: #ffffff;
+            --color-card: rgba(15, 23, 42, 0.7);
+            --color-card-hover: rgba(30, 41, 59, 0.8);
+            --color-border: rgba(59, 130, 246, 0.3);
+            --color-glow: rgba(59, 130, 246, 0.6);
+            --color-neon-blue: rgba(59, 130, 246, 0.9);
+            --color-neon-white: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Smooth Gradient Background */
+        body {
+            background: linear-gradient(125deg, #000000, #0f172a, #1e293b);
+            background-size: 300% 300%;
+            animation: gradientFlow 15s ease infinite;
+            color: var(--color-text);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Background Particle Animation */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        
+        /* Gradient Animation */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Particles */
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.7); }
+            100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        }
+
+        /* Glowing Text */
+        .glow-text {
+            text-shadow: 0 0 8px rgba(59, 130, 246, 0.6), 0 0 12px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Glowing Button */
+        .neon-button {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: var(--color-text);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .neon-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+        }
+
+        /* Modern Glass Card Effect */
+        .card {
+            background: var(--color-card);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid var(--color-border);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s ease;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        /* Card Border Glow on Hover */
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: var(--color-accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px var(--color-glow);
+        }
+
+        /* Card Inner Highlight */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* Fade In Animation */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+            animation-delay: var(--delay, 0s);
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Sliding & Fade Effects */
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: slideLeft 1s forwards;
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideRight 1s forwards;
+        }
+
+        @keyframes slideLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Hover Scale Effect */
+        .hover-scale {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+
+        /* Parallax Effect */
+        .parallax {
+            perspective: 1000px;
+        }
+
+        .parallax .parallax-layer {
+            transform-style: preserve-3d;
+            transform: translateZ(-1px) scale(2);
+        }
+
+        /* Image Container */
+        .img-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        /* Black Gradient Background */
+        .bg-gradient-dark {
+            background: linear-gradient(135deg, #000000, #121212, #222222);
+        }
+
+        /* Cards with Black Gradient */
+        .bg-gradient-card {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(40, 40, 40, 0.95));
+        }
+
+        /* Black Gradient Buttons */
+        .bg-gradient-btn {
+            background: linear-gradient(135deg, #1a1a1a, #292929);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .bg-gradient-btn:hover {
+            background: linear-gradient(135deg, #292929, #3a3a3a);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Subtle Glowing Shadows */
+        .shadow-glow {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Added: Decorative Circles */
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 1;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+        
+        /* Modified: Typing Animation - Fixed */
+        /* Typing Animation */
+        .typing-container {
+            display: inline-block;
+        }
+        
+        .typing-text {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid var(--color-accent);
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--color-accent) }
+        }
+        
+        .typing-text {
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 0;
+            display: inline-block;
+            border-right: .15em solid var(--color-accent);
+            animation: blink-caret .75s step-end infinite;
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--color-accent) }
+        }
+        
+        /* Curtain Animation (Enhanced) */
+        .curtain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        
+        .curtain-left, .curtain-right {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(135deg, #000000, #0f172a);
+            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        
+        .curtain-left {
+            left: 0;
+            transform: translateX(-100%);
+        }
+        
+        .curtain-right {
+            right: 0;
+            transform: translateX(100%);
+        }
+        
+        .curtain-closed .curtain-left {
+            transform: translateX(0);
+        }
+        
+        .curtain-closed .curtain-right {
+            transform: translateX(0);
+        }
+        
+
+        
+        /* Staggered Slide Animation */
+        .slide-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 0.8s forwards;
+            animation-delay: var(--delay, 0s);
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+         /* Circle Profile Image Enhancement */
+        .circle-profile {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 1.5rem;
+            border: 2px solid var(--color-accent);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .circle-profile:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.7);
+        }
+
+        .circle-profile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .circle-profile img {
+            width: 100%; /* Make image fit the container */
+            height: 100%;
+            object-fit: cover; /* Ensures the image fills the circle properly */
+            border-radius: 50%; /* Ensures the image remains circular */
+        }
+        
+        /* Grid Layout Enhancements */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Smooth Particles */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            top: 0;
+            left: 0;
+        }
+
+        /* Accent Line Decorations */
+        .accent-line {
+            height: 3px;
+            width: 60px;
+            background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+            margin: 0 auto 2rem;
+        }
+
+        /* Section Transitions */
+        .section-transition {
+            position: relative;
+            height: 6rem;
+            overflow: hidden;
+        }
+
+        .section-transition::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 4rem;
+            background: linear-gradient(to bottom, transparent, var(--color-secondary));
+            bottom: 0;
+        }
+
+        /* Image Gallery Enhancement */
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .gallery-image {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease;
+        }
+
+        .gallery-image:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px var(--color-glow);
+        }
+
+        /* Stats Counter */
+        .stat-counter {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Feature Icon Style */
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(59, 130, 246, 0.15);
+            border-radius: 50%;
+            font-size: 1.5rem;
+            color: var(--color-accent);
+        }
+
+    </style>
+</head>
+
+<body>
+    <!-- Include Navbar -->
+    {% include 'header.html' %}
+
+    <!-- Added: Curtain Animation -->
+    <div class="curtain-container curtain-closed" id="curtain">
+        <div class="curtain-left"></div>
+        <div class="curtain-right"></div>
+    </div>
+
+    <!-- Added: Decorative Circles -->
+    <div class="decorative-circle" style="width: 500px; height: 500px; top: 10%; left: 5%; background: rgba(59, 130, 246, 0.1);"></div>
+    <div class="decorative-circle" style="width: 400px; height: 400px; top: 30%; right: 5%; background: rgba(255, 255, 255, 0.1);"></div>
+    <div class="decorative-circle" style="width: 600px; height: 600px; bottom: 10%; left: 20%; background: rgba(0, 191, 255, 0.1);"></div>
+    <div class="decorative-circle" style="width: 350px; height: 350px; bottom: 30%; right: 15%; background: rgba(59, 130, 246, 0.1);"></div>
+    
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+
+    <!-- Hero Section with Black Gradient -->
+    <section class="flex items-center justify-center min-h-screen px-6 py-20 relative">
+        <div class="max-w-4xl text-center z-10 fade-in">
+            <h1 class="text-6xl font-bold mb-6 glow-text typing-text" id="typing-text">Welcome to AI Emotion Detection</h1>
+            <div class="accent-line"></div>
+            <p class="text-xl mb-10 text-blue-100 max-w-2xl mx-auto">Experience cutting-edge facial emotion recognition powered by advanced AI. Unlock personalized interactions based on your emotional state.</p>
+            <button onclick="window.location.href='/ai_app'" class="neon-button">Get Started 🚀</button>
+        </div>
+    </section>
+
+    <!-- Features Section with Floating Cards -->
+    <section class="py-24 relative">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold mb-3 text-center glow-text">Core Capabilities</h2>
+            <div class="accent-line"></div>
+            <p class="text-center text-blue-100 mb-16 max-w-2xl mx-auto">Our technology combines advanced neural networks with real-time processing to deliver an unmatched emotional intelligence experience.</p>
+            
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="card p-8 text-center slide-up" style="--delay: 0.1s">
+                    <div class="circle-profile">
+                        <img src="{{ url_for('static', filename='Images/DeepFace_Accuracy.png') }}" alt="High Accuracy" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3">High Accuracy Detection</h3>
+                    <p class="text-gray-300">Our DeepFace AI system achieves industry-leading accuracy in emotion recognition across diverse user demographics.</p>
+                </div>
+                
+                <div class="card p-8 text-center slide-up" style="--delay: 0.2s">
+                    <div class="circle-profile">
+                        <img src="Images\RealTimeFace.png" alt="Real-Time Analysis" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3">Real-Time Processing</h3>
+                    <p class="text-gray-300">Experience instant emotion detection with our optimized neural network that processes facial data in milliseconds.</p>
+                </div>
+                
+                <div class="card p-8 text-center slide-up" style="--delay: 0.3s">
+                    <div class="circle-profile">
+                        <img src="Images\image copy 3.png" alt="AI-Powered Chatbot" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3">Emotional AI Assistant</h3>
+                    <p class="text-gray-300">Our intelligent chatbot adapts its responses based on your detected emotional state for more meaningful interactions.</p>
+                </div>
+                
+                <div class="card p-8 text-center slide-up" style="--delay: 0.4s">
+                    <div class="circle-profile">
+                        <img src="..\Images\image copy.png" alt="Music Recommendations" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3">Mood-Based Media</h3>
+                    <p class="text-gray-300">Discover personalized music and content recommendations that perfectly align with your current emotional state.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section with Black Gradient & Glowing Effects -->
+    <section class="py-24 bg-black bg-opacity-40 relative">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold mb-3 text-center glow-text">The Experience</h2>
+            <div class="accent-line"></div>
+            <p class="text-center text-blue-100 mb-16 max-w-2xl mx-auto">Our seamless four-step process brings emotional intelligence to your digital interaction.</p>
+            
+            <div class="grid md:grid-cols-4 gap-10">
+                <div class="relative card p-8 text-center floating" style="animation-delay: 0s">
+                    <div class="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-2xl">1</div>
+                    <div class="circle-profile">
+                        <img src="/api/placeholder/120/120" alt="Capture" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3">Capture</h3>
+                    <p class="text-gray-300">Securely connect your camera to begin the emotion detection process with just a single click.</p>
+                </div>
+                
+                <div class="relative card p-8 text-center floating" style="animation-delay: 0.5s">
+                    <div class="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-2xl">2</div>
+                    <div class="circle-profile">
+                        <img src="/api/placeholder/120/120" alt="Analyze" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3">Analyze</h3>
+                    <p class="text-gray-300">Our neural networks identify 43 facial landmarks to precisely detect your emotional expressions.</p>
+                </div>
+                
+                <div class="relative card p-8 text-center floating" style="animation-delay: 1s">
+                    <div class="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-2xl">3</div>
+                    <div class="circle-profile">
+                        <img src="/api/placeholder/120/120" alt="Detect" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3">Identify</h3>
+                    <p class="text-gray-300">Our system classifies your emotion across 7 primary states with precision that rivals human recognition.</p>
+                </div>
+                
+                <div class="relative card p-8 text-center floating" style="animation-delay: 1.5s">
+                    <div class="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-2xl">4</div>
+                    <div class="circle-profile">
+                        <img src="/api/placeholder/120/120" alt="Respond" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3">Respond</h3>
+                    <p class="text-gray-300">Experience adaptive AI responses uniquely tailored to your current emotional state and needs.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI in Action Section with Carousel & Black Glow -->
+    <section class="py-24 bg-black bg-opacity-40 relative">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold mb-3 text-center glow-text">AI in Action</h2>
+            <div class="accent-line"></div>
+            <p class="text-center text-blue-100 mb-16 max-w-2xl mx-auto">See how our technology transforms everyday digital interactions with emotional intelligence.</p>
+            
+            <div class="image-gallery slide-up" style="--delay: 0.3s">
+                <div class="gallery-image">
+                    <img src="{{ url_for('static', filename='Images/AI_Emotion_Detection.png') }}" class="w-full h-64 object-cover" alt="AI Emotion Detection">
+                </div>
+                <div class="gallery-image">
+                    <img src="Images\image.png" class="w-full h-64 object-cover" alt="AI Music Suggestions">
+                </div>
+                <div class="gallery-image">
+                    <img src="Images\image copy 3.png" class="w-full h-64 object-cover" alt="AI Chatbot Response">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-24 relative">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold mb-3 text-center glow-text">User Experiences</h2>
+            <div class="accent-line"></div>
+            <p class="text-center text-blue-100 mb-16 max-w-2xl mx-auto">Discover how our emotion detection platform is transforming how people interact with technology.</p>
+            
+            <div class="grid md:grid-cols-3 gap-10">
+                <div class="card p-8 slide-up" style="--delay: 0.1s">
+                    <div class="text-blue-400 text-4xl font-serif mb-6 text-center">"</div>
+                    <p class="text-lg text-gray-300 mb-6">This AI emotion detection is revolutionary! The accuracy is incredible, and it feels like the system truly understands my mood and responds accordingly.</p>
+                    <div class="flex items-center mt-6">
+                        <div class="circle-profile" style="width: 60px; height: 60px; margin: 0 1rem 0 0;">
+                            <img src="{{ url_for('static', filename='Images/1st_profile.png') }}" alt="User Profile" />
+                        </div>
+                        <div>
+                            <p class="font-semibold text-blue-400">John Doe</p>
+                            <p class="text-sm text-gray-400">Software Engineer</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card p-8 slide-up" style="--delay: 0.3s">
+                    <div class="text-blue-400 text-4xl font-serif mb-6 text-center">"</div>
+                    <p class="text-lg text-gray-300 mb-6">The music recommendations are uncannily perfect. It's fascinating how accurately the AI reads my emotions and suggests exactly what I need to hear.</p>
+                    <div class="flex items-center mt-6">
+                        <div class="circle-profile" style="width: 60px; height: 60px; margin: 0 1rem 0 0;">
+                            <img src="{{ url_for('static', filename='Images/2nd_profile.jpg') }}" alt="User Profile" />
+                        </div>
+                        <div>
+                            <p class="font-semibold text-blue-400">Jane Smith</p>
+                            <p class="text-sm text-gray-400">Music Producer</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card p-8 slide-up" style="--delay: 0.5s">
+                    <div class="text-blue-400 text-4xl font-serif mb-6 text-center">"</div>
+                    <p class="text-lg text-gray-300 mb-6">The AI assistant's ability to adapt to my emotional state has made my digital interactions feel genuinely human. It's an emotional connection I never expected from technology.</p>
+                    <div class="flex items-center mt-6">
+                        <div class="circle-profile" style="width: 60px; height: 60px; margin: 0 1rem 0 0;">
+                            <img src="{{ url_for('static', filename='Images/3rd_profile.png') }}" alt="User Profile" />
+                        </div>
+                        <div>
+                            <p class="font-semibold text-blue-400">Mike Johnson</p>
+                            <p class="text-sm text-gray-400">UX Designer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Added: Technology Section -->
+    <section class="py-24 relative">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold mb-3 text-center glow-text">Advanced Technology</h2>
+            <div class="accent-line"></div>
+            <p class="text-center text-blue-100 mb-16 max-w-2xl mx-auto">Our platform leverages cutting-edge AI research and development to deliver unprecedented emotional intelligence.</p>
+            
+            <div class="grid md:grid-cols-3 gap-10">
+                <div class="card p-8 fade-in" style="--delay: 0.2s">
+                    <div class="circle-profile">
+                        <img src="/api/placeholder/120/120" alt="Deep Learning" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3 text-center">Neural Architecture</h3>
+                    <p class="text-gray-300">Our multi-layered convolutional neural networks have been trained on diverse datasets containing over 10 million facial expressions to ensure accuracy across all demographics and lighting conditions.</p>
+                </div>
+                
+                <div class="card p-8 fade-in" style="--delay: 0.4s">
+                    <div class="circle-profile">
+                        <img src="/api/placeholder/120/120" alt="Real-time Processing" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3 text-center">Edge Computing</h3>
+                    <p class="text-gray-300">Utilizing advanced optimization techniques, our algorithms perform local processing with only 30ms latency, ensuring seamless real-time interaction without privacy concerns.</p>
+                </div>
+                
+                <div class="card p-8 fade-in" style="--delay: 0.6s">
+                    <div class="circle-profile">
+                        <img src="/api/placeholder/120/120" alt="NLP Technology" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-400 mb-3 text-center">Emotional Intelligence</h3>
+                    <p class="text-gray-300">Our proprietary emotional intelligence engine combines facial recognition with contextual understanding to create truly empathetic digital interactions that adapt to your needs.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section - New Addition -->
+    <section class="py-24 bg-black bg-opacity-40 relative">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-10 text-center">
+                <div class="fade-in" style="--delay: 0.1s">
+                    <div class="stat-counter">98.7%</div>
+                    <p class="text-blue-300 font-medium">Accuracy Rate</p>
+                </div>
+                <div class="fade-in" style="--delay: 0.2s">
+                    <div class="stat-counter">7</div>
+                    <p class="text-blue-300 font-medium">Detectable Emotions</p>
+                </div>
+                <div class="fade-in" style="--delay: 0.3s">
+                    <div class="stat-counter">50K+</div>
+                    <p class="text-blue-300 font-medium">Daily Users</p>
+                </div>
+                <div class="fade-in" style="--delay: 0.4s">
+                    <div class="stat-counter">30ms</div>
+                    <p class="text-blue-300 font-medium">Processing Speed</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FAQ Section with Black Theme -->
+    <!-- FAQ Section - Redesigned -->
+    <section class="py-24 relative">
+        <div class="container mx-auto px-6">
+            <h2 class="text-4xl font-bold mb-3 text-center glow-text">Common Questions</h2>
+            <div class="accent-line"></div>
+            <p class="text-center text-blue-100 mb-16 max-w-2xl mx-auto">Everything you need to know about our emotion detection technology.</p>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="card p-8 hover:border-blue-400 transition-all duration-300">
+                    <h3 class="text-xl font-semibold text-blue-400 mb-4">How accurate is the emotion detection?</h3>
+                    <p class="text-gray-300">Our system achieves 98.7% accuracy in controlled environments and over 92% accuracy in varied lighting conditions. The AI continually improves through federated learning while maintaining strict privacy standards.</p>
+                </div>
+                
+                <div class="card p-8 hover:border-blue-400 transition-all duration-300">
+                    <h3 class="text-xl font-semibold text-blue-400 mb-4">Is my facial data stored or shared?</h3>
+                    <p class="text-gray-300">No. We process all facial data locally in your browser. No images or facial recognition data are stored on our servers, ensuring complete privacy and security at all times.</p>
+                </div>
+                
+                <div class="card p-8 hover:border-blue-400 transition-all duration-300">
+                    <h3 class="text-xl font-semibold text-blue-400 mb-4">What emotions can the system detect?</h3>
+                    <p class="text-gray-300">Our system detects seven primary emotions: happiness, sadness, anger, fear, surprise, disgust, and neutral, with additional capability to recognize complex emotional states like contemplation and confusion.</p>
+                </div>
+                
+                <div class="card p-8 hover:border-blue-400 transition-all duration-300">
+                    <h3 class="text-xl font-semibold text-blue-400 mb-4">Can I use this on mobile devices?</h3>
+                    <p class="text-gray-300">Yes. Our platform is fully responsive and optimized for both desktop and mobile devices. The mobile version uses specialized lightweight models for efficient processing without compromising accuracy.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="py-16 bg-gradient-dark text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-8 text-blue-400 glow-text">Ready to Experience the Future?</h2>
+            <p class="text-lg mb-6">Join thousands of users who are already benefiting from our AI Emotion Detection platform.</p>
+            <button onclick="window.location.href='/ai_app'" 
+                class="bg-gradient-btn text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition transform hover:scale-105 animate-bounce">
+                Get Started 🚀
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer Decorative Shapes -->
+    <div class="relative w-full h-20">
+        <div class="absolute bottom-0 left-0 w-20 h-20 bg-gradient-blue rounded-tr-full"></div>
+        <div class="absolute bottom-0 right-0 w-20 h-20 bg-gradient-blue-dark rounded-tl-full"></div>
+    </div>
+
+    <!-- Include Footer -->
+    {% include 'footer.html' %}
+
+    <!-- Load Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        /* Initialize Particles.js */
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 80 },
+                "size": { "value": 3 },
+                "move": { "speed": 3 }
+            }
+        });
+        
+        //* Enhanced Curtain Animation */
+        document.addEventListener("DOMContentLoaded", function() {
+            const curtain = document.getElementById("curtain");
+            
+            // Initial state
+            curtain.classList.remove("curtain-open");
+            curtain.classList.add("curtain-closed");
+            
+            // Reveal content after delay
+            setTimeout(function() {
+                curtain.classList.remove("curtain-closed");
+                curtain.classList.add("curtain-open");
+                
+                // Remove curtain after animation completes
+                setTimeout(function() {
+                    curtain.style.display = "none";
+                }, 1200);
+            }, 600);
+        });
+        
+        /* Refined Typing Animation */
+        document.addEventListener("DOMContentLoaded", function() {
+            const text = "Welcome to AI Emotion Detection";
+            const typingText = document.getElementById("typing-text");
+            
+            // Clear initial text
+            typingText.textContent = "";
+            
+            // Create typing effect
+            let charIndex = 0;
+            const typingInterval = setInterval(function() {
+                if (charIndex < text.length) {
+                    typingText.textContent += text.charAt(charIndex);
+                    charIndex++;
+                } else {
+                    clearInterval(typingInterval);
+                }
+            }, 80);
+        });
+        
+        /* Intersection Observer for Animations */
+        document.addEventListener("DOMContentLoaded", function() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.2
+            };
+            
+            const fadeElements = document.querySelectorAll('.fade-in, .slide-up');
+            
+            const observer = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            fadeElements.forEach(element => {
+                element.style.animationPlayState = 'paused';
+                observer.observe(element);
+            });
+        });
+    </script>
+
+</body>
+</html>

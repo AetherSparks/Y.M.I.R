@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal Setting & Habit Tracker</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --neutral-dark: #1f2937;
+            --neutral-medium: #4b5563;
+            --neutral-light: #f3f4f6;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: var(--neutral-dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        h1 {
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        h1 span {
+            font-size: 40px;
+        }
+        
+        p.subtitle {
+            color: var(--neutral-medium);
+            font-size: 18px;
+        }
+        
+        .form-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            animation: slideUp 0.6s ease;
+        }
+        
+        form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0px);
+        }
+        
+        .goals-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.8s ease;
+        }
+        
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--neutral-dark);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+        
+        .goal-list {
+            list-style-type: none;
+        }
+        
+        .goal-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .goal-item:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transform: translateY(-3px);
+        }
+        
+        .goal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--neutral-dark);
+        }
+        
+        .goal-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .goal-date, .goal-streak {
+            font-size: 14px;
+            color: var(--neutral-medium);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .goal-streak {
+            font-weight: 600;
+        }
+        
+        .fire-icon {
+            color: #f97316;
+        }
+        
+        .goal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .check-button {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+        
+        .check-button:hover {
+            background-color: #059669;
+        }
+        
+        .checked-label {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            width: 100%;
+            background-color: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success-color);
+            transition: width 0.5s ease;
+        }
+        
+        .milestone {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #fef3c7;
+            color: #92400e;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .no-goals {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--neutral-medium);
+            font-size: 16px;
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-color);
+            opacity: 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            form {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .goal-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1><span>🎯</span> Goal Setting & Habit Tracker</h1>
+            <p class="subtitle">Track your wellness journey one day at a time</p>
+        </header>
+        
+        <div class="form-container">
+            <form id="goalForm">
+                <input type="text" name="goal" id="goalInput" placeholder="Enter your wellness goal (e.g., Meditate daily, Drink 2L of water)" required>
+                <button type="submit">Add Goal</button>
+            </form>
+        </div>
+        
+        <div class="goals-section">
+            <h2>Your Goals</h2>
+            <ul class="goal-list" id="goalList">
+                <!-- Sample goal items for display purposes -->
+                <li class="goal-item" id="goal-1">
+                    <div class="milestone">7 Day Streak! 🔥</div>
+                    <div class="goal-title">Meditate for 10 minutes daily</div>
+                    <div class="goal-meta">
+                        <div class="goal-date">📅 Started on: April 1, 2025</div>
+                        <div class="goal-streak"><span class="fire-icon">🔥</span> Streak: 7 days</div>
+                    </div>
+                    <div class="goal-actions">
+                        <button class="check-button" onclick="checkGoal(1)">✔ Mark Done Today</button>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 70%;"></div>
+                    </div>
+                </li>
+                
+                <li class="goal-item" id="goal-2">
+                    <div class="goal-title">Drink 2L of water daily</div>
+                    <div class="goal-meta">
+                        <div class="goal-date">📅 Started on: April 3, 2025</div>
+                        <div class="goal-streak"><span class="fire-icon">🔥</span> Streak: 3 days</div>
+                    </div>
+                    <div class="goal-actions">
+                        <div class="checked-label">✅ Already checked today!</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%;"></div>
+                    </div>
+                </li>
+            </ul>
+            
+            <div class="no-goals" id="noGoals" style="display: none;">
+                You haven't added any goals yet. Add your first goal above to get started!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for demonstration
+        let goals = [
+            {
+                id: 1,
+                goal: "Meditate for 10 minutes daily",
+                created: "April 1, 2025",
+                streak: 7,
+                last_checked: "April 6, 2025",
+                progress: 70
+            },
+            {
+                id: 2,
+                goal: "Drink 2L of water daily",
+                created: "April 3, 2025",
+                streak: 3,
+                last_checked: "April 6, 2025",
+                progress: 30
+            }
+        ];
+        
+        // Current date (for demo purposes)
+        const today = "April 6, 2025";
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderGoals();
+            
+            // Form submission
+            document.getElementById('goalForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addGoal();
+            });
+        });
+        
+        // Render goals from data
+        function renderGoals() {
+            const goalList = document.getElementById('goalList');
+            const noGoals = document.getElementById('noGoals');
+            
+            if (goals.length === 0) {
+                goalList.innerHTML = '';
+                noGoals.style.display = 'block';
+                return;
+            }
+            
+            noGoals.style.display = 'none';
+            goalList.innerHTML = ''; // Clear current list
+            
+            goals.forEach(goal => {
+                const li = document.createElement('li');
+                li.className = 'goal-item';
+                li.id = `goal-${goal.id}`;
+                
+                // Show milestone banner for streaks >= 7
+                let milestoneHTML = '';
+                if (goal.streak >= 7) {
+                    milestoneHTML = `<div class="milestone" style="display: block;">${goal.streak} Day Streak! 🔥</div>`;
+                }
+                
+                // Create action button based on check status
+                let actionButton = '';
+                if (goal.last_checked === today) {
+                    actionButton = `<div class="checked-label">✅ Already checked today!</div>`;
+                } else {
+                    actionButton = `<button class="check-button" onclick="checkGoal(${goal.id})">✔ Mark Done Today</button>`;
+                }
+                
+                li.innerHTML = `
+                    ${milestoneHTML}
+                    <div class="goal-title">${goal.goal}</div>
+                    <div class="goal-meta">
+                        <div class="goal-date">📅 Started on: ${goal.created}</div>
+                        <div class="goal-streak"><span class="fire-icon">🔥</span> Streak: ${goal.streak} days</div>
+                    </div>
+                    <div class="goal-actions">
+                        ${actionButton}
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${goal.progress}%;"></div>
+                    </div>
+                `;
+                
+                goalList.appendChild(li);
+            });
+        }
+        
+        // Add a new goal
+        function addGoal() {
+            const goalInput = document.getElementById('goalInput');
+            const goalText = goalInput.value.trim();
+            
+            if (goalText) {
+                // Create new goal object
+                const newGoal = {
+                    id: goals.length + 1,
+                    goal: goalText,
+                    created: today,
+                    streak: 0,
+                    last_checked: "",
+                    progress: 0
+                };
+                
+                // Add to goals array
+                goals.push(newGoal);
+                
+                // Clear input
+                goalInput.value = '';
+                
+                // Re-render goals
+                renderGoals();
+                
+                // Add animation to new goal
+                setTimeout(() => {
+                    const newGoalElement = document.getElementById(`goal-${newGoal.id}`);
+                    if (newGoalElement) {
+                        newGoalElement.style.backgroundColor = "#f0fdf4";
+                        setTimeout(() => {
+                            newGoalElement.style.backgroundColor = "white";
+                        }, 1000);
+                    }
+                }, 100);
+            }
+        }
+        
+        // Mark a goal as completed for today
+        function checkGoal(goalId) {
+            // Find goal
+            const goalIndex = goals.findIndex(g => g.id === goalId);
+            if (goalIndex === -1) return;
+            
+            // Update goal data
+            goals[goalIndex].last_checked = today;
+            goals[goalIndex].streak += 1;
+            goals[goalIndex].progress = Math.min(100, goals[goalIndex].progress + 10);
+            
+            // Re-render goals
+            renderGoals();
+            
+            // Highlight the updated goal
+            const goalElement = document.getElementById(`goal-${goalId}`);
+            if (goalElement) {
+                goalElement.style.backgroundColor = "#f0fdf4";
+                setTimeout(() => {
+                    goalElement.style.backgroundColor = "white";
+                }, 1000);
+            }
+            
+            // Create celebration effect for achievements
+            if (goals[goalIndex].streak === 7 || goals[goalIndex].streak === 30 || goals[goalIndex].streak === 100) {
+                createConfetti();
+            }
+        }
+        
+        // Create confetti effect for celebrations
+        function createConfetti() {
+            const confettiColors = ['#4f46e5', '#10b981', '#f97316', '#f59e0b', '#ef4444'];
+            const confettiCount = 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                // Random styling
+                const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                const left = Math.random() * 100;
+                const width = Math.random() * 10 + 5;
+                const height = Math.random() * 10 + 5;
+                const delay = Math.random() * 3;
+                const duration = Math.random() * 3 + 2;
+                
+                // Apply styles
+                confetti.style.backgroundColor = color;
+                confetti.style.left = `${left}%`;
+                confetti.style.width = `${width}px`;
+                confetti.style.height = `${height}px`;
+                confetti.style.opacity = '1';
+                confetti.style.animation = `confetti-fall ${duration}s ease-in-out ${delay}s`;
+                
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    document.body.removeChild(confetti);
+                }, (duration + delay) * 1000);
+            }
+        }
+    </script>
+</body>
+</html>

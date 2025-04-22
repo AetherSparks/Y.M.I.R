@@ -1,0 +1,79 @@
+<footer class="bg-gradient-to-r from-blue-700 to-blue-500 text-white py-8">
+    <div class="container mx-auto px-4">
+        <!-- Main Footer Content -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <!-- Company Info -->
+            <div class="text-left">
+                <h3 class="text-xl font-bold mb-3">AI Emotion Detection</h3>
+                <p class="text-blue-100 mb-4">Transforming human-computer interaction through advanced emotional intelligence.</p>
+                <div class="flex space-x-4 justify-start">
+                    <!-- Social Media Icons -->
+                    <a href="#" class="text-white hover:text-blue-200 transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/pallav-sharma" class="text-white hover:text-blue-200 transition-colors">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="https://github.com/pallav110" class="text-white hover:text-blue-200 transition-colors">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="text-left">
+                <h3 class="text-xl font-bold mb-3">Quick Links</h3>
+                <ul>
+                    <li class="mb-2"><a href="/" class="text-blue-100 hover:text-white transition-colors">Home</a></li>
+                    <li class="mb-2"><a href="/about" class="text-blue-100 hover:text-white transition-colors">About Us</a></li>
+                    <li class="mb-2"><a href="/features" class="text-blue-100 hover:text-white transition-colors">Features</a></li>
+                    <li class="mb-2"><a href="{{ url_for('pricing') }}" class="text-blue-100 hover:text-white transition-colors">Pricing</a></li>
+                    <li class="mb-2"><a href="/contact" class="text-blue-100 hover:text-white transition-colors">Contact</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="text-left">
+                <h3 class="text-xl font-bold mb-3">Contact Us</h3>
+                <p class="mb-2 flex items-center">
+                    <i class="fas fa-envelope mr-2"></i>
+                    <a href="mailto:info@aiemotion.tech" class="text-blue-100 hover:text-white transition-colors">pallavs2020@gmail.com</a>
+                </p>
+                <p class="mb-2 flex items-center">
+                    <i class="fas fa-phone mr-2"></i>
+                    <a href="tel:+15551234567" class="text-blue-100 hover:text-white transition-colors">+91 8588999382</a>
+                </p>
+                <p class="mb-4 flex items-center">
+                    <i class="fas fa-map-marker-alt mr-2"></i>
+                    <span class="text-blue-100">India, Noida-Delhi</span>
+                </p>
+                <a href="/contact" class="bg-white text-blue-600 font-medium px-4 py-2 rounded hover:bg-blue-100 transition-colors inline-block">Get in Touch</a>
+            </div>
+        </div>
+        
+        <!-- Divider -->
+        <div class="border-t border-blue-400 my-4"></div>
+        
+        <!-- Bottom Footer -->
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <p>&copy; 2025 AI Emotion Detection. All rights reserved.</p>
+            <div class="mt-2 md:mt-0">
+                <a href="/privacy" class="text-sm text-blue-100 hover:text-white mr-4 transition-colors">Privacy Policy</a>
+                <a href="/services" class="text-sm text-blue-100 hover:text-white mr-4 transition-colors">Terms of Service</a>
+                <a href="/cookies" class="text-sm text-blue-100 hover:text-white transition-colors">Cookie Policy</a>
+            </div>
+        </div>
+        
+        <!-- Back to top button -->
+        <div class="text-center mt-6">
+            <a href="#top" class="inline-flex items-center text-blue-100 hover:text-white transition-colors">
+                <span>Back to top</span>
+                <i class="fas fa-chevron-up ml-1"></i>
+            </a>
+        </div>
+
+    </div>
+</footer>
+
+<!-- Note: You'll need Font Awesome for the icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>

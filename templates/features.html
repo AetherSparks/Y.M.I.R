@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmoMusic Features</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #8A2BE2;
+            --secondary: #4B0082;
+            --accent: #9370DB;
+            --light: #E6E6FA;
+            --dark: #191970;
+        }
+
+        header {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+        
+        /* Header/Hero Section */
+        header {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 100%);
+        }
+        
+        /* Animated Floating Circles */
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            filter: blur(8px);
+            animation: float 8s infinite ease-in-out alternate;
+        }
+        
+        /* Overlapping effect */
+        .circle-1 {
+            width: 420px;
+            height: 420px;
+            top: -50px;
+            left: -50px;
+            background: rgba(255, 0, 128, 0.05);
+            animation-delay: 0s;
+        }
+        
+        .circle-2 {
+            width: 350px;
+            height: 350px;
+            bottom: -50px;
+            right: 50px;
+            background: rgba(64, 0, 255, 0.08);
+            animation-delay: 2s;
+        }
+        
+        .circle-3 {
+            width: 250px;
+            height: 250px;
+            top: 150px;
+            right: -50px;
+            background: rgba(255, 138, 0, 0.12);
+            animation-delay: 4s;
+        }
+        
+        /* Additional circles for more visual interest */
+        .circle-4 {
+            width: 200px;
+            height: 200px;
+            bottom: 100px;
+            left: 15%;
+            background: rgba(0, 255, 208, 0.07);
+            animation-delay: 3s;
+            animation-duration: 12s;
+        }
+        
+        .circle-5 {
+            width: 180px;
+            height: 180px;
+            top: 25%;
+            left: 50%;
+            background: rgba(255, 0, 0, 0.06);
+            animation-delay: 1s;
+            animation-duration: 10s;
+        }
+        
+        /* Floating effect */
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(15px) rotate(5deg);
+            }
+            100% {
+                transform: translateY(-10px) rotate(10deg);
+            }
+        }
+        
+        /* Particle Animations */
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: particles 6s infinite ease-in-out alternate;
+        }
+        
+        /* Expanded particles for more visual interest */
+        .particle:nth-child(1) { top: 20%; left: 10%; animation-duration: 4s; background: #ff8a00; }
+        .particle:nth-child(2) { top: 40%; left: 60%; animation-duration: 6s; background: #e52e71; }
+        .particle:nth-child(3) { top: 70%; left: 30%; animation-duration: 5s; background: #00e6ff; }
+        .particle:nth-child(4) { top: 90%; left: 80%; animation-duration: 7s; background: #fffc00; }
+        .particle:nth-child(5) { top: 15%; left: 70%; animation-duration: 5.5s; background: #ff00e6; }
+        .particle:nth-child(6) { top: 55%; left: 20%; animation-duration: 6.5s; background: #00ff88; }
+        .particle:nth-child(7) { top: 85%; left: 40%; animation-duration: 7.5s; background: #ff0055; }
+        .particle:nth-child(8) { top: 35%; left: 85%; animation-duration: 4.5s; background: #0088ff; }
+        
+        /* Particle Movement */
+        @keyframes particles {
+            0% {
+                transform: translateY(0) translateX(0) scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-15px) translateX(10px) scale(1.5);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-30px) translateX(20px) scale(1);
+                opacity: 0.3;
+            }
+        }
+        
+        /* Sound Wave Animation */
+        .sound-wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 20px;
+        }
+        
+        .wave-bar {
+            width: 4px;
+            margin: 0 3px;
+            background: linear-gradient(to top, #ff8a00, #e52e71);
+            border-radius: 2px;
+            animation: wave 1.5s infinite ease-in-out alternate;
+        }
+        
+        @keyframes wave {
+            0% {
+                height: 10px;
+            }
+            100% {
+                height: 60px;
+            }
+        }
+        
+        /* Different delays for each bar */
+        .wave-bar:nth-child(1) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(2) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.5s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.6s; }
+        .wave-bar:nth-child(6) { animation-delay: 0.5s; }
+        .wave-bar:nth-child(7) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(8) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(9) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(10) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(11) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(12) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(13) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(14) { animation-delay: 0.5s; }
+        .wave-bar:nth-child(15) { animation-delay: 0.6s; }
+        
+        /* Hero Content */
+        .hero-content {
+            max-width: 900px;
+            text-align: center;
+            padding: 2rem;
+            z-index: 2;
+            position: relative;
+            animation: fadeUp 1.5s ease-out;
+        }
+        
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .typing-animation {
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typing 3.5s steps(40, end), fadeIn 1s ease-in-out;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, #ff8a00, #e52e71, #00e6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 138, 0, 0.3);
+        }
+        
+        p.lead {
+            font-size: 1.6rem;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(229, 46, 113, 0.4);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #e52e71, #ff8a00);
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(229, 46, 113, 0.6);
+        }
+        
+        .btn:hover:before {
+            opacity: 1;
+        }
+        
+        /* Music Note Icons */
+        .music-note {
+            position: absolute;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.3);
+            animation: floatNote 8s infinite ease-in-out;
+            opacity: 0;
+        }
+        
+        @keyframes floatNote {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) rotate(20deg);
+                opacity: 0;
+            }
+        }
+        
+        .music-note:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .music-note:nth-child(2) { left: 20%; animation-delay: 2s; }
+        .music-note:nth-child(3) { left: 30%; animation-delay: 4s; }
+        .music-note:nth-child(4) { left: 70%; animation-delay: 1s; }
+        .music-note:nth-child(5) { left: 80%; animation-delay: 3s; }
+        .music-note:nth-child(6) { left: 90%; animation-delay: 5s; }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            
+            p.lead {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+            
+            .sound-wave {
+                height: 80px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .circle-1, .circle-2, .circle-3, .circle-4, .circle-5 {
+                opacity: 0.5;
+            }
+        }
+        
+
+        nav {
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background-color: rgba(0, 0, 0, 0.95);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+        }
+
+        .bar {
+            display: block;
+            width: 25px;
+            height: 3px;
+            margin: 5px auto;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+
+        section {
+            padding: 5rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .section-title .underline {
+            height: 4px;
+            width: 100px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            margin: 0 auto;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.2;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .feature-desc {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .demo {
+            background-color: rgba(47, 45, 45, 0.7);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .demo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .demo-video {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+
+        .demo-video img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .recommendations {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .song-list {
+            list-style: none;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .song-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .song-item:last-child {
+            border-bottom: none;
+        }
+
+        .song-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            margin-right: 1rem;
+            object-fit: cover;
+        }
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .song-artist {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .mini-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            z-index: 100;
+            width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .now-playing-cover {
+            width: 60px;
+            height: 60px;
+            border-radius: 5px;
+            margin-right: 1rem;
+            object-fit: cover;
+        }
+
+        .now-playing-info {
+            flex: 1;
+            padding-right: 1rem;
+        }
+
+        .now-playing-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .now-playing-artist {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .control-button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .control-button:hover {
+            color: var(--accent);
+        }
+
+        .play-button {
+            font-size: 1.5rem;
+        }
+
+        .how-it-works {
+            background: linear-gradient(135deg, #121212, #1a1a1a);
+        }
+
+        .process {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .process-step {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--accent);
+            opacity: 0.5;
+            line-height: 1;
+        }
+
+        .step-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .step-content p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        
+
+        /* Animation classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered animation delays */
+        .fade-in:nth-child(1) { transition-delay: 0.1s; }
+        .fade-in:nth-child(2) { transition-delay: 0.2s; }
+        .fade-in:nth-child(3) { transition-delay: 0.3s; }
+        .fade-in:nth-child(4) { transition-delay: 0.4s; }
+        .fade-in:nth-child(5) { transition-delay: 0.5s; }
+        .fade-in:nth-child(6) { transition-delay: 0.6s; }
+
+
+
+        /* Footer Styles */
+        footer {
+            padding: 2rem 0;
+            background-image: linear-gradient(to right, #1d4ed8, #3b82f6);
+            color: white;
+        }
+
+        footer .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        footer h3 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            border-bottom: none;
+        }
+
+        footer p {
+            margin-bottom: 1rem;
+        }
+
+        footer .text-blue-100 {
+            color: #dbeafe;
+        }
+
+        footer .text-blue-200 {
+            color: #bfdbfe;
+        }
+
+        footer .text-blue-400 {
+            color: #60a5fa;
+        }
+
+        footer .text-blue-600 {
+            color: #2563eb;
+        }
+
+        footer .hover\:text-blue-100:hover {
+            color: #dbeafe;
+        }
+
+        footer .hover\:text-blue-200:hover {
+            color: #bfdbfe;
+        }
+
+        footer .hover\:bg-blue-100:hover {
+            background-color: #dbeafe;
+        }
+
+        footer .hover\:text-white:hover {
+            color: white;
+        }
+
+        footer .grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        footer .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+
+        footer .border-t {
+            border-top-width: 1px;
+        }
+
+        footer .border-blue-400 {
+            border-color: #60a5fa;
+        }
+
+        footer .my-4 {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        footer .space-x-4 > * + * {
+            margin-left: 1rem;
+        }
+
+        footer .justify-start {
+            justify-content: flex-start;
+        }
+
+        footer .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        footer .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+
+        footer .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        footer .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        footer .mr-2 {
+            margin-right: 0.5rem;
+        }
+
+        footer .mr-4 {
+            margin-right: 1rem;
+        }
+
+        footer .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        footer .mt-6 {
+            margin-top: 1.5rem;
+        }
+
+        footer .ml-1 {
+            margin-left: 0.25rem;
+        }
+
+        footer .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        footer .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        footer .py-8 {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        footer .rounded {
+            border-radius: 0.25rem;
+        }
+
+        footer .text-center {
+            text-align: center;
+        }
+
+        footer .text-left {
+            text-align: left;
+        }
+
+        footer .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        footer .text-xl {
+            font-size: 1.25rem;
+            line-height: 1.75rem;
+        }
+
+        footer .font-medium {
+            font-weight: 500;
+        }
+
+        footer .font-bold {
+            font-weight: 700;
+        }
+
+        footer .transition-colors {
+            transition-property: color, background-color, border-color;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+
+        footer .flex {
+            display: flex;
+        }
+
+        footer .items-center {
+            align-items: center;
+        }
+
+        footer .bg-white {
+            background-color: white;
+        }
+
+        footer .inline-block {
+            display: inline-block;
+        }
+
+        footer .inline-flex {
+            display: inline-flex;
+        }
+
+        footer a {
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        /* Responsive footer */
+        @media (min-width: 768px) {
+            footer .md\:grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            
+            footer .md\:flex-row {
+                flex-direction: row;
+            }
+            
+            footer .md\:mt-0 {
+                margin-top: 0;
+            }
+        }
+
+        footer .flex-col {
+            flex-direction: column;
+        }
+
+        footer .justify-between {
+            justify-content: space-between;
+        }
+
+        .neon-button {
+            padding: 12px 18px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--color-accent), var(--color-secondary));
+            color: var(--color-text);
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--color-neon-blue);
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .neon-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--color-neon-white), 0 0 30px var(--color-neon-blue);
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="/" class="header-logo">
+                <span class="header-emoji">🎭</span>
+                <span class="header-title">AI Emotion Detection</span>
+              </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/features">Features</a></li>
+                <li><a href="#demo">Demo</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/ai_app" class="ml-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition-all shadow-md pulse-btn">Try Demo</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero section -->
+    <header>
+        <!-- Animated Circles -->
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+        <div class="circle circle-4"></div>
+        <div class="circle circle-5"></div>
+
+        <!-- Floating Particles -->
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+
+        <!-- Music Notes -->
+        <div class="music-note">♪</div>
+        <div class="music-note">♫</div>
+        <div class="music-note">♬</div>
+        <div class="music-note">♩</div>
+        <div class="music-note">♪</div>
+        <div class="music-note">♫</div>
+
+        <!-- Hero Content -->
+        <div class="hero-content">
+            <h1 class="typing-animation">Emotion Meets Music</h1>
+            <p class="lead">Experience an AI-powered system that detects your emotions and recommends the perfect soundtrack for your mood. Let the rhythm of your feelings guide your musical journey.</p>
+            <a href="#features" class="btn">Explore Features</a>
+        </div>
+
+        <!-- Sound Wave Animation -->
+        <div class="sound-wave">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+        </div>
+    </header>
+    <!-- Features section -->
+    <section id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Key Features</h2>
+                <div class="underline"></div>
+            </div>
+            <div class="features">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3 class="feature-title">Facial Emotion Recognition</h3>
+                    <p class="feature-desc">Our system continuously detects and analyzes your facial expressions via webcam to understand your current emotional state in real-time.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3 class="feature-title">AI Chatbot</h3>
+                    <p class="feature-desc">Interact with our intelligent chatbot that detects emotions from your text and analyzes conversation history to better understand your mood.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Emotion Logging</h3>
+                    <p class="feature-desc">We track and log your emotions from both facial recognition and text analysis, averaging them to determine your dominant emotional state.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3 class="feature-title">Smart Music Recommendations</h3>
+                    <p class="feature-desc">Using a Content-Based Filtering model, we recommend the perfect songs based on your emotional state and music preferences.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3 class="feature-title">Integrated Music Player</h3>
+                    <p class="feature-desc">Listen to your recommended songs instantly with our Spotify-like floating mini-player without leaving the page.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3 class="feature-title">Seamless Integration</h3>
+                    <p class="feature-desc">The entire system runs seamlessly on your browser, combining frontend and backend technologies for a smooth user experience.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <h3 class="feature-title">Personalized User Profiles</h3>
+                    <p class="feature-desc">Create and manage user profiles, allowing the system to learn and adapt to your unique emotional patterns over time.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="feature-title">Privacy & Security</h3>
+                    <p class="feature-desc">Your emotions and data remain confidential with our secure, privacy-focused design, ensuring no data is stored without your consent.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 class="feature-title">Future Expansions</h3>
+                    <p class="feature-desc">We plan to introduce AI-driven mood forecasting and integration with external apps like Spotify & Apple Music.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Demo section -->
+    <section id="demo" class="demo">
+        <div class="container demo-container">
+            <div class="section-title">
+                <h2>See It In Action</h2>
+                <div class="underline"></div>
+            </div>
+            <div>
+                <button onclick="window.location.href='/ai_app'" class="neon-button">Get Started 🚀</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-title">
+                <h2>How It Works</h2>
+                <div class="underline"></div>
+            </div>
+            <div class="process">
+                <div class="process-step fade-in">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Emotion Detection</h3>
+                        <p>Our system uses your webcam to analyze facial expressions and detects emotions from your chat interactions. These inputs are processed in real-time using advanced AI algorithms.</p>
+                    </div>
+                </div>
+                <div class="process-step fade-in">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Emotion Analysis</h3>
+                        <p>We combine and average the emotions detected from your face and text to determine your dominant emotional state. This data is securely stored to improve future recommendations.</p>
+                    </div>
+                </div>
+                <div class="process-step fade-in">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Music Selection</h3>
+                        <p>Our Content-Based Filtering model analyzes your emotional state and matches it with songs from our database based on mood labels, mental health benefits, and musical features.</p>
+                    </div>
+                </div>
+                <div class="process-step fade-in">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Playback</h3>
+                        <p>The system fetches the recommended songs and plays them in our custom mini-player. The audio plays seamlessly in the background without showing external player interfaces.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Simple Footer -->
+    <footer class="bg-gradient-to-r from-blue-700 to-blue-500 text-white py-8">
+        <div class="container mx-auto px-4">
+            <!-- Main Footer Content -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Company Info -->
+                <div class="text-left">
+                    <h3 class="text-xl font-bold mb-3">AI Emotion Detection</h3>
+                    <p class="text-blue-100 mb-4">Transforming human-computer interaction through advanced emotional intelligence.</p>
+                    <div class="flex space-x-4 justify-start">
+                        <!-- Social Media Icons -->
+                        <a href="#" class="text-white hover:text-blue-200 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/pallav-sharma" class="text-white hover:text-blue-200 transition-colors">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="https://github.com/pallav110" class="text-white hover:text-blue-200 transition-colors">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="text-left">
+                    <h3 class="text-xl font-bold mb-3">Quick Links</h3>
+                    <ul>
+                        <li class="mb-2"><a href="/" class="text-blue-100 hover:text-white transition-colors">Home</a></li>
+                        <li class="mb-2"><a href="/about" class="text-blue-100 hover:text-white transition-colors">About Us</a></li>
+                        <li class="mb-2"><a href="/features" class="text-blue-100 hover:text-white transition-colors">Features</a></li>
+                        <li class="mb-2"><a href="/pricing" class="text-blue-100 hover:text-white transition-colors">Pricing</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-blue-100 hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="text-left">
+                    <h3 class="text-xl font-bold mb-3">Contact Us</h3>
+                    <p class="mb-2 flex items-center">
+                        <i class="fas fa-envelope mr-2"></i>
+                        <a href="mailto:info@aiemotion.tech" class="text-blue-100 hover:text-white transition-colors">pallavs2020@gmail.com</a>
+                    </p>
+                    <p class="mb-2 flex items-center">
+                        <i class="fas fa-phone mr-2"></i>
+                        <a href="tel:+15551234567" class="text-blue-100 hover:text-white transition-colors">+91 8588999382</a>
+                    </p>
+                    <p class="mb-4 flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        <span class="text-blue-100">India, Noida-Delhi</span>
+                    </p>
+                    <a href="/contact" class="bg-white text-blue-600 font-medium px-4 py-2 rounded hover:bg-blue-100 transition-colors inline-block">Get in Touch</a>
+                </div>
+            </div>
+            
+            <!-- Divider -->
+            <div class="border-t border-blue-400 my-4"></div>
+            
+            <!-- Bottom Footer -->
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p>&copy; 2025 AI Emotion Detection. All rights reserved.</p>
+                <div class="mt-2 md:mt-0">
+                    <a href="/privacy" class="text-sm text-blue-100 hover:text-white mr-4 transition-colors">Privacy Policy</a>
+                    <a href="/services" class="text-sm text-blue-100 hover:text-white mr-4 transition-colors">Terms of Service</a>
+                    <a href="/cookies" class="text-sm text-blue-100 hover:text-white transition-colors">Cookie Policy</a>
+                </div>
+            </div>
+            
+            <!-- Back to top button -->
+            <div class="text-center mt-6">
+                <a href="#top" class="inline-flex items-center text-blue-100 hover:text-white transition-colors">
+                    <span>Back to top</span>
+                    <i class="fas fa-chevron-up ml-1"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    
+
+    <script>
+        // Hamburger menu functionality
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Fade-in animation on scroll
+        const fadeElements = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        fadeElements.forEach(element => {
+            observer.observe(element);
+        });
+
+        // Mini-player functionality
+        const playButton = document.querySelector('.play-button i');
+        let isPlaying = false;
+
+        playButton.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                playButton.classList.remove('fa-play');
+                playButton.classList.add('fa-pause');
+                // Logic to play audio would go here
+            } else {
+                playButton.classList.remove('fa-pause');
+                playButton.classList.add('fa-play');
+                // Logic to pause audio would go here
+            }
+        });
+
+        // Song list click functionality
+        const songItems = document.querySelectorAll('.song-item');
+        const nowPlayingTitle = document.querySelector('.now-playing-title');
+        const nowPlayingArtist = document.querySelector('.now-playing-artist');
+        const nowPlayingCover = document.querySelector('.now-playing-cover');
+
+        songItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Get song info
+                const title = item.querySelector('.song-title').textContent;
+                const artist = item.querySelector('.song-artist').textContent;
+                const cover = item.querySelector('.song-cover').src;
+                
+                // Update mini player
+                nowPlayingTitle.textContent = title;
+                nowPlayingArtist.textContent = artist;
+                nowPlayingCover.src = cover;
+                
+                // Set play state
+                if (!isPlaying) {
+                    playButton.click();
+                }
+                
+                // Logic to play selected song would go here
+            });
+        });
+    </script>
+</body>
+</html>

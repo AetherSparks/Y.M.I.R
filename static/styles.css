@@ -1,0 +1,22 @@
+/* Global Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', Arial, sans-serif;
+    scroll-behavior: smooth;
+}
+
+/* Responsive Tweaks */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .space-x-6 {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
