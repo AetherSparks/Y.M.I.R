@@ -964,7 +964,7 @@ latest_songs = []  # Store recommended songs
 latest_final_emotion = {}  # Store latest emotion data
 running = True  # Flag to control background process
 
-def update_all_in_background(interval=4):
+def update_all_in_background(interval=1):
     """Continuously updates emotions, calculates final averages, and recommends songs."""
     global latest_songs, latest_final_emotion
 

@@ -2446,7 +2446,7 @@ li p {
             }
 
             fetchEmotions();
-            setInterval(fetchEmotions, 10000);
+            setInterval(fetchEmotions, 8000);
 
             document.addEventListener("visibilitychange", function () {
                 if (document.hidden) {
@@ -2481,7 +2481,7 @@ li p {
                 }
             });
 
-            setInterval(processResults, 3000); // Update song recommendations every 5 seconds
+            setInterval(processResults, 8000); // Update song recommendations every 5 seconds
         });
 
         function sendMessage() {
@@ -2579,7 +2579,7 @@ li p {
         
         
         // ✅ **Update songs every 15 seconds**
-        setInterval(processResults, 1000);
+        setInterval(processResults, 5000);
         // Global variables for the music player
         let currentSongIndex = 0;
         let audioPlayer;
