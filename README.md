@@ -579,7 +579,7 @@ We welcome contributions from developers, researchers, and mental health profess
 |                                                **Abhiraj Ghose**                                                |                                             **Pallav Sharma**                                             |
 | :-------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------: |
 |                                                   E23CSEU0014                                                   |                                                E23CSEU0022                                                |
-|                                         Lead Developer & AI Specialist                                          |                                   Full-Stack Developer & UI/UX Designer                                   |
+|                                         Full-Stack Developer & AI Specialist                                          |                                   Full-Stack Developer & UI/UX Designer                                   |
 | [![GitHub](https://img.shields.io/badge/GitHub-AetherSparks-blue?logo=github)](https://github.com/AetherSparks) | [![GitHub](https://img.shields.io/badge/GitHub-pallav110-blue?logo=github)](https://github.com/pallav110) |
 
 </div>
