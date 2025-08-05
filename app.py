@@ -2,7 +2,9 @@
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 from email.message import EmailMessage
 import random
+from signal import signal
 import smtplib
+import sys
 from dotenv import load_dotenv
 load_dotenv()
 import os
