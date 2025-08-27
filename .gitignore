@@ -38,7 +38,7 @@ services/__pycache__
 config/__pycache__
 yolov8n.pt
 yolov8x.pt
-
+yolo11x.pt
 emotion_export_1756289347.json
 emotion_data.db
 

@@ -346,16 +346,52 @@ class EnhancedEmotionDetector:
             # YOLO initialization - Use latest and most powerful model
             if YOLO_AVAILABLE:
                 try:
-                    # Try YOLOv8x (most accurate) first, fallback to smaller models
-                    model_options = ['yolov8x.pt', 'yolov8l.pt', 'yolov8m.pt', 'yolov8s.pt', 'yolov8n.pt']
+                    # Try latest YOLO models first (YOLOv11 is the latest as of 2024)
+                    model_options = [
+                        # YOLOv11 (latest generation - 2024)
+                        'yolo11x.pt', 'yolo11l.pt', 'yolo11m.pt', 'yolo11s.pt', 'yolo11n.pt',
+                        
+                        # YOLOv10 (optimized for speed and accuracy)  
+                        'yolov10x.pt', 'yolov10l.pt', 'yolov10m.pt', 'yolov10s.pt', 'yolov10n.pt',
+                        
+                        # YOLOv9 (advanced architecture with better feature extraction)
+                        'yolov9e.pt', 'yolov9c.pt', 'yolov9m.pt', 'yolov9s.pt',
+                        
+                        # Specialized YOLO variants for specific use cases
+                        'yolov8x-worldv2.pt',  # World model - more object classes
+                        'yolov8x-oiv7.pt',     # Open Images Dataset - 600 classes
+                        'yolov8x-seg.pt',      # Segmentation model
+                        
+                        # YOLOv8 (proven stable baseline)
+                        'yolov8x.pt', 'yolov8l.pt', 'yolov8m.pt', 'yolov8s.pt', 'yolov8n.pt'
+                    ]
                     self.yolo_model = None
                     
                     for model_name in model_options:
                         try:
                             print(f"🔄 Loading {model_name}...")
                             self.yolo_model = YOLO(model_name)
-                            print(f"✅ {model_name} loaded successfully")
+                            
+                            # Get model info
+                            model_info = f"{model_name} - "
+                            if 'yolo11' in model_name.lower():
+                                model_info += "Latest 2024 generation"
+                            elif 'yolo10' in model_name.lower():
+                                model_info += "Speed optimized"
+                            elif 'yolo9' in model_name.lower():
+                                model_info += "Enhanced architecture"
+                            elif 'worldv2' in model_name.lower():
+                                model_info += "1000+ object classes"
+                            elif 'oiv7' in model_name.lower():
+                                model_info += "600+ object classes"
+                            elif 'seg' in model_name.lower():
+                                model_info += "Segmentation model"
+                            else:
+                                model_info += "Standard detection"
+                                
+                            print(f"✅ {model_info} loaded successfully")
                             self.yolo_model_name = model_name
+                            self.yolo_model_info = model_info
                             break
                         except Exception as e:
                             print(f"⚠️ {model_name} failed: {e}")
