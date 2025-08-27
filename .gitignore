@@ -39,3 +39,8 @@ config/__pycache__
 yolov8n.pt
 emotion_export_1756289347.json
 emotion_data.db
+
+# Firebase credentials - NEVER commit these!
+firebase_credentials.json
+src/firebase_credentials.json
+**/firebase_credentials.json
