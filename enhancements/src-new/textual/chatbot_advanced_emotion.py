@@ -205,13 +205,19 @@ class AdvancedEmotionAnalyzer:
                 confidence = dominant_emotion[1]
                 dominant_emotion = dominant_emotion[0]
             
-            return {
+            # Post-process to catch obvious misclassifications
+            result = {
                 'dominant_emotion': dominant_emotion,
                 'confidence': confidence,
                 'all_emotions': emotions,
                 'mixed_emotions': len(high_confidence_emotions) > 1,
                 'method': 'ml_model'
             }
+            
+            # Apply confidence adjustments for obvious misclassifications
+            result = self._adjust_confidence_for_context(text, result)
+            
+            return result
             
         except Exception as e:
             print(f"⚠️ ML emotion analysis failed: {e}")
@@ -309,11 +315,111 @@ class AdvancedEmotionAnalyzer:
             print(f"⚠️ Gemini emotion analysis failed: {e}")
             return None
     
+    def _preprocess_text_for_emotion(self, text: str) -> str:
+        """Preprocess text to handle slang and casual language for better emotion detection"""
+        
+        # Common slang/casual replacements that confuse emotion models
+        slang_replacements = {
+            # Casual terms that aren't emotional
+            r'\bbruh\b': 'hey',
+            r'\bbro\b': 'friend', 
+            r'\bdude\b': 'person',
+            r'\byeah\b': 'yes',
+            r'\bnah\b': 'no',
+            r'\bokay\b': 'alright',
+            r'\bomg\b': 'wow',
+            r'\blol\b': 'funny',
+            r'\bhaha\b': 'funny',
+            r'\bwtf\b': 'what',
+            r'\bikr\b': 'I know right',
+            r'\btbh\b': 'honestly',
+            r'\bfr\b': 'for real',
+            r'\bngl\b': 'honestly',
+            
+            # Positive slang
+            r'\blit\b': 'great',
+            r'\bfire\b': 'amazing',
+            r'\bsick\b': 'cool',  # when used positively
+            r'\bdope\b': 'cool',
+            r'\bvibes\b': 'feeling',
+            
+            # Negative emotion clarifiers
+            r'\bmeh\b': 'indifferent',
+            r'\bugh\b': 'frustrated',
+            
+            # Remove excessive punctuation that confuses models
+            r'[!]{2,}': '!',
+            r'[?]{2,}': '?',
+            r'\.{3,}': '...',
+        }
+        
+        processed_text = text
+        for pattern, replacement in slang_replacements.items():
+            processed_text = re.sub(pattern, replacement, processed_text, flags=re.IGNORECASE)
+        
+        return processed_text.strip()
+    
+    def _adjust_confidence_for_context(self, original_text: str, result: Dict[str, Any]) -> Dict[str, Any]:
+        """Adjust confidence based on contextual understanding"""
+        text_lower = original_text.lower()
+        emotion = result['dominant_emotion']
+        confidence = result['confidence']
+        
+        # Patterns that suggest misclassification
+        misclassification_patterns = {
+            'disgusted': {
+                # If someone says "bruh", "bro", etc. and gets "disgusted", it's likely wrong
+                'false_triggers': [r'\bbruh\b', r'\bbro\b', r'\bdude\b', r'\bman\b'],
+                'confidence_penalty': 0.7  # Reduce confidence by 70%
+            },
+            'angry': {
+                # Casual expressions that aren't really anger
+                'false_triggers': [r'\bokay\b', r'\balright\b', r'\bfine\b'],
+                'confidence_penalty': 0.5
+            },
+            'sad': {
+                # When someone is just being casual
+                'false_triggers': [r'\bjust saying\b', r'\bwhatever\b'],
+                'confidence_penalty': 0.4
+            }
+        }
+        
+        # Check for neutral indicators that should override strong emotions
+        neutral_indicators = [
+            r'\bjust calling\b', r'\bjust saying\b', r'\bi mean\b', 
+            r'\byou know\b', r'\bbasically\b', r'\bobviously\b',
+            r'\bactually\b', r'\bhonestly\b'
+        ]
+        
+        # If text has neutral indicators and high emotion confidence, reduce confidence
+        if any(re.search(pattern, text_lower) for pattern in neutral_indicators):
+            if confidence > 0.8 and emotion != 'neutral':
+                result['confidence'] = min(confidence * 0.6, 0.7)
+                result['method'] = 'ml_model_adjusted'
+        
+        # Apply specific emotion adjustments
+        if emotion in misclassification_patterns:
+            patterns = misclassification_patterns[emotion]
+            if any(re.search(pattern, text_lower) for pattern in patterns['false_triggers']):
+                result['confidence'] = confidence * patterns['confidence_penalty']
+                result['method'] = 'ml_model_adjusted'
+                
+                # If confidence drops too low, switch to neutral
+                if result['confidence'] < 0.3:
+                    result['dominant_emotion'] = 'neutral'
+                    result['confidence'] = 0.6
+                    result['method'] = 'context_override'
+        
+        return result
+    
     def analyze_text_emotion(self, text: str) -> Dict[str, Any]:
         """Advanced emotion analysis with multiple fallbacks"""
         
+        # Preprocess text for better emotion detection
+        preprocessed_text = self._preprocess_text_for_emotion(text)
+        
         # Method 1: Try ML model first (most accurate)
-        result = self._analyze_with_ml_model(text)
+        result = self._analyze_with_ml_model(preprocessed_text)
         if result:
             return result
         
