@@ -25,6 +25,10 @@ import threading
 from collections import deque
 import re
 
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
+
 # Google Gemini API
 try:
     import google.generativeai as genai
@@ -993,12 +997,13 @@ def main():
     console.print("🚀 Y.M.I.R Advanced AI Chatbot with ML Emotion Detection", style="bold blue")
     console.print("=" * 70)
     
-    # API key
-    api_key = "AIzaSyCUBBmoFqMsIV7ThaByO1gUFHr5hZmts2Q"  # Your provided key
+    # Get API key from environment variable
+    api_key = os.getenv('GEMINI_API_KEY')
     
     if not api_key:
         console.print("❌ Gemini API key not found!", style="red")
-        console.print("Please set your API key in the script or environment variable.")
+        console.print("Please set GEMINI_API_KEY in your .env file or environment variable.")
+        console.print("Create a .env file with: GEMINI_API_KEY=your_api_key_here")
         return
     
     try:
