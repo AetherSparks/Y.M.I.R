@@ -343,9 +343,29 @@ class EnhancedEmotionDetector:
                 min_tracking_confidence=self.config.min_pose_confidence
             )
             
-            # YOLO initialization
+            # YOLO initialization - Use latest and most powerful model
             if YOLO_AVAILABLE:
-                self.yolo_model = YOLO('yolov8n.pt')
+                try:
+                    # Try YOLOv8x (most accurate) first, fallback to smaller models
+                    model_options = ['yolov8x.pt', 'yolov8l.pt', 'yolov8m.pt', 'yolov8s.pt', 'yolov8n.pt']
+                    self.yolo_model = None
+                    
+                    for model_name in model_options:
+                        try:
+                            print(f"🔄 Loading {model_name}...")
+                            self.yolo_model = YOLO(model_name)
+                            print(f"✅ {model_name} loaded successfully")
+                            self.yolo_model_name = model_name
+                            break
+                        except Exception as e:
+                            print(f"⚠️ {model_name} failed: {e}")
+                            continue
+                    
+                    if not self.yolo_model:
+                        print("❌ All YOLO models failed to load")
+                except Exception as e:
+                    print(f"❌ YOLO initialization error: {e}")
+                    self.yolo_model = None
             else:
                 self.yolo_model = None
             
@@ -679,14 +699,36 @@ class EnhancedEmotionDetector:
             return False
     
     def detect_objects_yolo(self, frame: np.ndarray) -> List[Dict]:
-        """YOLO object detection for environmental context"""
+        """Enhanced YOLO object detection - Maximum utilization of all 80 COCO classes"""
         objects = []
         
         if not self.yolo_model:
             return objects
         
         try:
-            results = self.yolo_model(frame, verbose=False)
+            # Run YOLO with optimized settings for maximum detection
+            results = self.yolo_model(
+                frame, 
+                verbose=False,
+                conf=0.25,  # Lower confidence for more detections
+                iou=0.45,   # Non-maximum suppression threshold
+                max_det=300,  # Maximum detections per image
+                device='cpu'  # Ensure CPU usage for stability
+            )
+            
+            # Priority categories for emotional context analysis
+            priority_objects = {
+                'person', 'face', 'eye', 'nose', 'mouth',  # Human-related
+                'laptop', 'computer', 'keyboard', 'mouse', 'cell phone', 'tablet',  # Tech
+                'book', 'newspaper', 'magazine',  # Reading materials  
+                'tv', 'monitor', 'remote',  # Entertainment
+                'chair', 'couch', 'bed', 'desk', 'table',  # Furniture
+                'cup', 'bottle', 'wine glass', 'fork', 'knife', 'spoon',  # Dining
+                'car', 'bicycle', 'motorcycle', 'bus', 'train',  # Transportation
+                'dog', 'cat', 'bird', 'horse',  # Animals
+                'potted plant', 'vase', 'clock', 'picture frame',  # Home decor
+                'backpack', 'handbag', 'suitcase', 'tie', 'hat'  # Personal items
+            }
             
             for result in results:
                 if result.boxes is not None:
@@ -696,13 +738,43 @@ class EnhancedEmotionDetector:
                         class_id = int(box.cls[0].cpu().numpy())
                         class_name = self.yolo_model.names[class_id]
                         
-                        # Filter by confidence and relevant objects
-                        if confidence > 0.5 and class_name in ['person', 'laptop', 'cell phone', 'book', 'tv', 'chair', 'couch']:
+                        # Calculate object area for importance weighting
+                        object_area = (x2 - x1) * (y2 - y1)
+                        frame_area = frame.shape[0] * frame.shape[1]
+                        area_ratio = object_area / frame_area
+                        
+                        # Enhanced filtering with multiple criteria
+                        include_object = False
+                        priority_boost = 1.0
+                        
+                        # Priority objects get lower threshold
+                        if class_name in priority_objects:
+                            include_object = confidence > 0.25
+                            priority_boost = 1.5
+                        # All other objects need higher confidence
+                        elif confidence > 0.4:
+                            include_object = True
+                        
+                        # Boost confidence for larger objects
+                        if area_ratio > 0.1:  # Object covers >10% of frame
+                            priority_boost *= 1.3
+                        
+                        if include_object:
                             objects.append({
                                 "class": class_name,
-                                "confidence": float(confidence),
-                                "bbox": (int(x1), int(y1), int(x2), int(y2))
+                                "confidence": float(confidence * priority_boost),
+                                "bbox": (int(x1), int(y1), int(x2), int(y2)),
+                                "area_ratio": float(area_ratio),
+                                "priority": class_name in priority_objects,
+                                "class_id": class_id,
+                                "center": (int((x1 + x2) / 2), int((y1 + y2) / 2))
                             })
+            
+            # Sort by priority and confidence
+            objects.sort(key=lambda x: (x['priority'], x['confidence']), reverse=True)
+            
+            # Limit to top 20 most relevant objects for performance
+            objects = objects[:20]
                             
         except Exception as e:
             print(f"⚠️ YOLO detection error: {e}")
@@ -834,13 +906,42 @@ class EnhancedEmotionDetector:
             cv2.putText(frame, f"Q: {quality_score:.2f}", (x, y - 10),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
         
-        # Draw YOLO objects
+        # Enhanced YOLO object visualization
         if self.config.show_yolo_objects:
-            for obj in self.detected_objects:
+            for i, obj in enumerate(self.detected_objects):
                 x1, y1, x2, y2 = obj["bbox"]
-                cv2.rectangle(frame, (x1, y1), (x2, y2), self.colors["objects"], 2)
-                cv2.putText(frame, f"{obj['class']}: {obj['confidence']:.2f}",
-                          (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.colors["objects"], 2)
+                confidence = obj["confidence"]
+                class_name = obj["class"]
+                is_priority = obj.get("priority", False)
+                area_ratio = obj.get("area_ratio", 0)
+                
+                # Color coding based on priority and confidence
+                if is_priority:
+                    color = (0, 255, 0) if confidence > 0.7 else (0, 255, 255)  # Green/Yellow for priority
+                    thickness = 3
+                else:
+                    color = (255, 0, 0) if confidence > 0.7 else (255, 255, 0)  # Blue/Cyan for others  
+                    thickness = 2
+                
+                # Draw bounding box
+                cv2.rectangle(frame, (x1, y1), (x2, y2), color, thickness)
+                
+                # Enhanced label with more info
+                label = f"{class_name}: {confidence:.2f}"
+                if area_ratio > 0.1:  # Large objects
+                    label += f" (L)"
+                if is_priority:
+                    label += f" ★"
+                
+                # Background for text readability
+                (text_width, text_height), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
+                cv2.rectangle(frame, (x1, y1 - text_height - 10), (x1 + text_width, y1), color, -1)
+                cv2.putText(frame, label, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+                
+                # Draw center point for high-confidence objects
+                if confidence > 0.8:
+                    center = obj.get("center", ((x1 + x2) // 2, (y1 + y2) // 2))
+                    cv2.circle(frame, center, 3, color, -1)
     
     def draw_enhanced_emotions(self, frame: np.ndarray):
         """Draw enhanced emotion information with analytics"""
@@ -892,13 +993,21 @@ class EnhancedEmotionDetector:
     
     def draw_enhanced_controls(self, frame: np.ndarray):
         """Draw enhanced control information"""
+        # Enhanced status with YOLO model info
+        yolo_info = "None"
+        if hasattr(self, 'yolo_model') and self.yolo_model:
+            model_name = getattr(self, 'yolo_model_name', 'Unknown')
+            yolo_info = f"{model_name.replace('.pt', '').upper()}"
+        
+        priority_objects = len([obj for obj in self.detected_objects if obj.get('priority', False)])
+        
         controls = [
-            f"🚀 Y.M.I.R v2.0 - Enhanced Mode",
-            f"FPS: {self.fps:.1f} | Faces: {len(self.high_quality_faces)} | Objects: {len(self.detected_objects)}",
+            f"🚀 Y.M.I.R v2.0 - Enhanced Mode | YOLO: {yolo_info}",
+            f"FPS: {self.fps:.1f} | Faces: {len(self.high_quality_faces)} | Objects: {len(self.detected_objects)} (★{priority_objects})",
             "Enhanced Controls:",
             "Q - Quit | F - Face Mesh | B - Body | H - Hands",
-            "Y - YOLO Objects | A - Analytics | P - Privacy Mode",
-            "S - Save Analytics | E - Export Data"
+            "Y - YOLO Objects | A - Analytics | P - Privacy Mode", 
+            "S - Save Analytics | E - Export Data | 1/2/3 - Analysis Speed"
         ]
         
         for i, text in enumerate(controls):
@@ -915,9 +1024,29 @@ class EnhancedEmotionDetector:
         # Enhanced face detection
         self.face_bboxes = self.detect_faces_enhanced(frame)
         
-        # YOLO object detection (every 10 frames for performance)
-        if self.frame_count % 10 == 0:
-            self.detected_objects = self.detect_objects_yolo(frame)
+        # Adaptive YOLO object detection (smart frequency based on scene changes)
+        run_yolo = False
+        
+        # Run YOLO in these cases:
+        if self.frame_count == 1:  # First frame
+            run_yolo = True
+        elif self.frame_count % 15 == 0:  # Every 0.5 seconds at 30fps
+            run_yolo = True
+        elif len(self.detected_objects) == 0:  # No objects detected yet
+            run_yolo = True
+        elif self.frame_count % 5 == 0 and len(self.detected_objects) < 3:  # More frequent if few objects
+            run_yolo = True
+        
+        if run_yolo:
+            new_objects = self.detect_objects_yolo(frame)
+            
+            # Smart object tracking - only update if significant changes
+            if not self.detected_objects or len(new_objects) != len(self.detected_objects):
+                self.detected_objects = new_objects
+                print(f"🎯 YOLO detected {len(new_objects)} objects: {[obj['class'] for obj in new_objects[:5]]}")
+            else:
+                # Update existing objects with new confidence scores
+                self.detected_objects = new_objects
         
         # MediaPipe processing (like original fer1.py)
         mesh_results = self.face_mesh.process(rgb_frame)

@@ -264,18 +264,28 @@ class ProductionEmotionAnalyzer:
             pipeline_model = model_config['pipeline']
             results = pipeline_model(text)
             
-            # Debug: Check result format
-            console.print(f"Debug {model_name}: {type(results)} - {results[:2] if isinstance(results, list) else results}", style="dim blue")
+            # Debug: Check result format (disabled for production)
+            # console.print(f"Debug {model_name}: {type(results)} - {results[:2] if isinstance(results, list) else results}", style="dim blue")
             
             # Handle different result formats from different models
             standardized_emotions = {}
             
-            # Case 1: Results is a list of dictionaries (most common)
+            # Flatten results if they're wrapped in extra lists
+            if isinstance(results, list) and len(results) > 0:
+                # Check if it's wrapped in an extra list: [[{...}]]
+                if isinstance(results[0], list):
+                    results = results[0]  # Unwrap the outer list
+            
+            # Now process the actual results
             if isinstance(results, list) and len(results) > 0:
                 for result in results:
                     if isinstance(result, dict) and 'label' in result and 'score' in result:
                         emotion = result['label'].lower()
                         score = result['score']
+                        
+                        # Skip 'others' category from some models
+                        if emotion == 'others':
+                            continue
                         
                         # Map to standard emotion
                         std_emotion = self.emotion_standardization.get(emotion, emotion)
@@ -289,8 +299,9 @@ class ProductionEmotionAnalyzer:
             elif isinstance(results, dict) and 'label' in results and 'score' in results:
                 emotion = results['label'].lower()
                 score = results['score']
-                std_emotion = self.emotion_standardization.get(emotion, emotion)
-                standardized_emotions[std_emotion] = score
+                if emotion != 'others':  # Skip 'others' category
+                    std_emotion = self.emotion_standardization.get(emotion, emotion)
+                    standardized_emotions[std_emotion] = score
             
             # Case 3: Results is in different format - try to handle gracefully
             else:
@@ -560,6 +571,20 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
             try:
                 with open(profile_path, 'r') as f:
                     data = json.load(f)
+                    
+                    # Handle datetime fields safely
+                    if 'created_at' in data and isinstance(data['created_at'], str):
+                        try:
+                            data['created_at'] = datetime.fromisoformat(data['created_at'])
+                        except:
+                            data['created_at'] = datetime.now()
+                    
+                    if 'last_active' in data and isinstance(data['last_active'], str):
+                        try:
+                            data['last_active'] = datetime.fromisoformat(data['last_active'])
+                        except:
+                            data['last_active'] = datetime.now()
+                    
                     self.user_profile = UserProfile(**data)
                     self.user_profile.last_active = datetime.now()
                 console.print("✅ User profile loaded", style="green")
@@ -582,8 +607,17 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
         """Save user profile"""
         try:
             profile_data = asdict(self.user_profile)
-            profile_data['created_at'] = self.user_profile.created_at.isoformat()
-            profile_data['last_active'] = self.user_profile.last_active.isoformat()
+            
+            # Handle datetime conversion safely
+            if hasattr(self.user_profile.created_at, 'isoformat'):
+                profile_data['created_at'] = self.user_profile.created_at.isoformat()
+            else:
+                profile_data['created_at'] = str(self.user_profile.created_at)
+                
+            if hasattr(self.user_profile.last_active, 'isoformat'):
+                profile_data['last_active'] = self.user_profile.last_active.isoformat()
+            else:
+                profile_data['last_active'] = str(self.user_profile.last_active)
             
             with open("user_profile.json", 'w') as f:
                 json.dump(profile_data, f, indent=2)
@@ -709,21 +743,58 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
     def save_conversation(self):
         """Save conversation to file"""
         try:
+            # Prepare user profile data safely
+            user_profile_data = None
+            if self.user_profile:
+                user_profile_data = asdict(self.user_profile)
+                # Convert datetimes to strings safely
+                if hasattr(self.user_profile.created_at, 'isoformat'):
+                    user_profile_data['created_at'] = self.user_profile.created_at.isoformat()
+                else:
+                    user_profile_data['created_at'] = str(self.user_profile.created_at)
+                    
+                if hasattr(self.user_profile.last_active, 'isoformat'):
+                    user_profile_data['last_active'] = self.user_profile.last_active.isoformat()
+                else:
+                    user_profile_data['last_active'] = str(self.user_profile.last_active)
+            
+            # Get conversation data
+            conversation_list = []
+            emotions_in_session = []
+            
+            for msg in self.conversation_history:
+                try:
+                    msg_dict = msg.to_dict()
+                    conversation_list.append(msg_dict)
+                    
+                    # Track emotions
+                    if msg.emotion and msg.emotion != 'neutral':
+                        emotions_in_session.append(msg.emotion)
+                        
+                except Exception as e:
+                    console.print(f"⚠️ Error processing message: {e}", style="yellow")
+                    continue
+            
             conversation_data = {
                 'timestamp': datetime.now().isoformat(),
-                'user_profile': asdict(self.user_profile) if self.user_profile else None,
-                'conversation': [msg.to_dict() for msg in self.conversation_history],
+                'user_profile': user_profile_data,
+                'conversation': conversation_list,
                 'session_stats': {
-                    'total_messages': len(self.conversation_history),
-                    'emotions_detected': list(set(msg.emotion for msg in self.conversation_history if msg.emotion))
+                    'total_messages': len(conversation_list),
+                    'user_messages': len([msg for msg in conversation_list if msg.get('role') == 'user']),
+                    'assistant_messages': len([msg for msg in conversation_list if msg.get('role') == 'assistant']),
+                    'emotions_detected': list(set(emotions_in_session)),
+                    'session_duration_minutes': 0,  # Could calculate this later
+                    'models_used': list(set(msg.get('metadata', {}).get('emotion_method', '') for msg in conversation_list if msg.get('metadata')))
                 }
             }
             
             filename = f"chat_session_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             with open(filename, 'w') as f:
-                json.dump(conversation_data, f, indent=2, default=str)
+                json.dump(conversation_data, f, indent=2, default=str, ensure_ascii=False)
             
             console.print(f"✅ Conversation saved to {filename}", style="green")
+            console.print(f"   📊 {conversation_data['session_stats']['total_messages']} messages, {len(conversation_data['session_stats']['emotions_detected'])} emotions detected", style="dim green")
             return filename
             
         except Exception as e:
@@ -758,6 +829,8 @@ class ChatInterface:
 **Commands:**
 - `/help` - Show this help
 - `/profile` - View your profile  
+- `/setup` - Setup your profile (name, style, interests)
+- `/stats` - Show session statistics
 - `/clear` - Clear conversation
 - `/save` - Save conversation
 - `/quit` - Exit
@@ -820,6 +893,10 @@ Ready for production-grade emotional AI! 🎯
         
         if command == '/help':
             self.display_welcome()
+        elif command == '/profile':
+            self.display_user_profile()
+        elif command == '/setup':
+            self.setup_user_profile()
         elif command == '/clear':
             self.chatbot.conversation_history.clear()
             self.console.print("✅ Conversation cleared", style="green")
@@ -827,12 +904,86 @@ Ready for production-grade emotional AI! 🎯
             filename = self.chatbot.save_conversation()
             if filename:
                 self.console.print(f"✅ Saved to {filename}", style="green")
+        elif command == '/stats':
+            self.show_session_stats()
         elif command == '/quit':
             return False
         else:
             self.console.print(f"❌ Unknown command: {command}", style="red")
+            self.console.print("Available commands: /help, /profile, /setup, /clear, /save, /stats, /quit", style="dim")
         
         return True
+    
+    def display_user_profile(self):
+        """Display user profile information"""
+        if not self.chatbot.user_profile:
+            self.console.print("❌ No user profile available", style="red")
+            return
+        
+        profile = self.chatbot.user_profile
+        
+        table = Table(title="👤 User Profile", box=box.ROUNDED)
+        table.add_column("Attribute", style="cyan")
+        table.add_column("Value", style="green")
+        
+        table.add_row("User ID", profile.user_id)
+        table.add_row("Name", profile.name or "Not set")
+        table.add_row("Conversation Style", profile.conversation_style)
+        table.add_row("Topics of Interest", ", ".join(profile.topics_of_interest) or "None")
+        table.add_row("Created", profile.created_at.strftime("%Y-%m-%d %H:%M") if hasattr(profile.created_at, 'strftime') else str(profile.created_at))
+        table.add_row("Last Active", profile.last_active.strftime("%Y-%m-%d %H:%M") if hasattr(profile.last_active, 'strftime') else str(profile.last_active))
+        table.add_row("Recent Emotions", ", ".join(profile.emotion_history[-5:]) or "None")
+        
+        self.console.print(table)
+    
+    def setup_user_profile(self):
+        """Setup user profile interactively"""
+        if not self.chatbot.user_profile:
+            self.console.print("❌ No user profile available", style="red")
+            return
+        
+        self.console.print("🔧 User Profile Setup", style="bold blue")
+        
+        # Get user name
+        name = Prompt.ask("What's your name? (optional)", default=self.chatbot.user_profile.name or "", show_default=False)
+        if name.strip():
+            self.chatbot.user_profile.name = name.strip()
+        
+        # Get conversation style
+        style_options = ["casual", "balanced", "formal"]
+        current_style = self.chatbot.user_profile.conversation_style
+        self.console.print(f"Current conversation style: {current_style}")
+        new_style = Prompt.ask("Conversation style", choices=style_options, default=current_style)
+        self.chatbot.user_profile.conversation_style = new_style
+        
+        # Get topics of interest
+        topics_input = Prompt.ask("Topics of interest (comma-separated)", default=", ".join(self.chatbot.user_profile.topics_of_interest), show_default=False)
+        if topics_input.strip():
+            topics = [topic.strip() for topic in topics_input.split(",") if topic.strip()]
+            self.chatbot.user_profile.topics_of_interest = topics
+        
+        # Save profile
+        self.chatbot._save_user_profile()
+        self.console.print("✅ Profile updated successfully!", style="green")
+    
+    def show_session_stats(self):
+        """Show current session statistics"""
+        stats_table = Table(title="📊 Session Statistics", box=box.ROUNDED)
+        stats_table.add_column("Metric", style="cyan")
+        stats_table.add_column("Value", style="green")
+        
+        total_messages = len(self.chatbot.conversation_history)
+        user_messages = len([msg for msg in self.chatbot.conversation_history if msg.role == 'user'])
+        assistant_messages = len([msg for msg in self.chatbot.conversation_history if msg.role == 'assistant'])
+        emotions_detected = list(set(msg.emotion for msg in self.chatbot.conversation_history if msg.emotion and msg.emotion != 'neutral'))
+        
+        stats_table.add_row("Total Messages", str(total_messages))
+        stats_table.add_row("Your Messages", str(user_messages))
+        stats_table.add_row("Y.M.I.R Messages", str(assistant_messages))
+        stats_table.add_row("Emotions Detected", ", ".join(emotions_detected) or "None")
+        stats_table.add_row("Models Available", str(len(self.chatbot.emotion_analyzer.models)))
+        
+        self.console.print(stats_table)
     
     def run(self):
         """Main chat loop"""
