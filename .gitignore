@@ -36,3 +36,6 @@ tests/
 utils/__pycache__
 services/__pycache__
 config/__pycache__
+yolov8n.pt
+emotion_export_1756289347.json
+emotion_data.db
