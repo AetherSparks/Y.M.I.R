@@ -18,7 +18,7 @@ static/music
 /shape_predictor_68_face_landmarks
 /src
 /Render.yaml
-
+.claude/
 /Render.yaml
 /src
 /test.html
@@ -32,3 +32,7 @@ facial_expression_model_weights.h5
 Internship_DTU.pdf
 Labs_Work/
 Labs_Work/*
+tests/
+utils/__pycache__
+services/__pycache__
+config/__pycache__
