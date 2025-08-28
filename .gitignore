@@ -42,7 +42,7 @@ yolo11x.pt
 emotion_export_1756289347.json
 emotion_data.db
 enhancements/src-new/preprocess/__pycache__
-
+.cache
 # Firebase credentials - NEVER commit these!
 firebase_credentials.json
 src/firebase_credentials.json
