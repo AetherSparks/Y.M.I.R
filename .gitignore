@@ -47,3 +47,5 @@ enhancements/src-new/preprocess/__pycache__
 firebase_credentials.json
 src/firebase_credentials.json
 **/firebase_credentials.json
+enhancements/src-new/face/__pycache__
+enhancements/src-new/multimodal_fusion/__pycache__
