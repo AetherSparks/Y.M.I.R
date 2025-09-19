@@ -444,6 +444,7 @@
                 <button class="btn btn-primary" id="start-camera">📹 Start Camera</button>
                 <button class="btn btn-secondary" id="toggle-privacy">🔒 Privacy Mode</button>
                 <button class="btn btn-secondary" id="save-analytics">💾 Save Analytics</button>
+                <button class="btn btn-secondary" id="export-session">💾 Export Session</button>
                 <button class="btn btn-danger" id="stop-camera" style="display: none;">⏹️ Stop Camera</button>
             </div>
         </div>
@@ -516,6 +517,14 @@
                         <div class="metric-value" id="emotion-stability">0%</div>
                         <div class="metric-label">Stability</div>
                     </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="firebase-status">🔴 Local</div>
+                        <div class="metric-label">Storage Status</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="buffer-size">0</div>
+                        <div class="metric-label">Buffered Readings</div>
+                    </div>
                 </div>
             </div>
             
@@ -581,6 +590,7 @@
                 this.stopBtn = document.getElementById('stop-camera');
                 this.privacyBtn = document.getElementById('toggle-privacy');
                 this.saveBtn = document.getElementById('save-analytics');
+                this.exportBtn = document.getElementById('export-session');
                 this.consoleLog = document.getElementById('console-log');
             }
             
@@ -589,6 +599,7 @@
                 this.stopBtn.addEventListener('click', () => this.stopCamera());
                 this.privacyBtn.addEventListener('click', () => this.togglePrivacy());
                 this.saveBtn.addEventListener('click', () => this.saveAnalytics());
+                this.exportBtn.addEventListener('click', () => this.exportSession());
                 
                 // Handle page unload
                 window.addEventListener('beforeunload', () => this.cleanup());
@@ -932,6 +943,32 @@
                 this.log('💾 Analytics saved successfully', 'system');
             }
             
+            async exportSession() {
+                try {
+                    const response = await fetch('/api/export_session', { method: 'POST' });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Create download link for session data
+                        const dataStr = JSON.stringify(result.export_data, null, 2);
+                        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                        const url = URL.createObjectURL(dataBlob);
+                        
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `ymir_session_${result.export_data.session_info.session_id.slice(0,8)}.json`;
+                        link.click();
+                        
+                        URL.revokeObjectURL(url);
+                        this.log('💾 Session data exported successfully', 'system');
+                    } else {
+                        this.log('❌ Export failed: ' + result.message, 'error');
+                    }
+                } catch (error) {
+                    this.log('❌ Export error: ' + error.message, 'error');
+                }
+            }
+            
             log(message, type = 'system') {
                 const logEntry = document.createElement('div');
                 logEntry.className = `log-entry ${type}`;
@@ -962,6 +999,38 @@
                 }, 10000); // Every 10 seconds
             }
             
+            async updateStorageStatus() {
+                try {
+                    const response = await fetch('/api/storage');
+                    const storage = await response.json();
+                    
+                    const statusElement = document.getElementById('firebase-status');
+                    const bufferElement = document.getElementById('buffer-size');
+                    
+                    if (statusElement) {
+                        if (storage.storage_enabled && !storage.offline_mode) {
+                            statusElement.textContent = '🟢 Online';
+                        } else if (storage.offline_mode) {
+                            statusElement.textContent = '🟡 Offline';
+                        } else {
+                            statusElement.textContent = '🔴 Local';
+                        }
+                    }
+                    
+                    if (bufferElement) {
+                        bufferElement.textContent = storage.buffer_size || 0;
+                    }
+                    
+                    // Log storage buffer status
+                    if (storage.buffer_size > 0) {
+                        this.log(`📊 ${storage.buffer_size} readings buffered for sync`, 'system');
+                    }
+                    
+                } catch (error) {
+                    console.error('Storage status update failed:', error);
+                }
+            }
+            
             cleanup() {
                 if (this.isRunning) {
                     this.stopCamera();
@@ -971,7 +1040,13 @@
         
         // Initialize the system when page loads
         document.addEventListener('DOMContentLoaded', () => {
-            new EmotionDetectionSystem();
+            const system = new EmotionDetectionSystem();
+            
+            // Update storage status every 10 seconds
+            setInterval(() => system.updateStorageStatus(), 10000);
+            
+            // Initial storage status update
+            system.updateStorageStatus();
         });
     </script>
 </body>
