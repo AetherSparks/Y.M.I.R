@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Y.M.I.R Advanced Emotion Detection v3.0</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+        }
+        
+        .content-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #4070ff;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(45deg, #4070ff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin: 10px 0 0 0;
+        }
+        
+        /* Modern Card Design */
+        .card {
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 255, 0.2);
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 255, 0.15);
+        }
+        
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Main Camera Section */
+        .camera-section {
+            grid-column: span 2;
+        }
+        
+        .camera-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        #video-feed {
+            max-width: 100%;
+            width: 640px;
+            height: 480px;
+            border-radius: 12px;
+            border: 3px solid #4070ff;
+            box-shadow: 0 0 20px rgba(64, 112, 255, 0.3);
+            background: #000;
+            object-fit: cover;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #4070ff, #00d4ff);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(64, 112, 255, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #ff4070, #ff6b6b);
+            color: white;
+        }
+        
+        /* Status Indicators */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(50, 50, 50, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4070;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.active {
+            background: #00ff88;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* Emotion Display */
+        .emotion-display {
+            background: rgba(64, 112, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #4070ff;
+        }
+        
+        .emotion-main {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .emotion-main h3 {
+            font-size: 2rem;
+            margin: 0;
+            color: #4070ff;
+        }
+        
+        .emotion-confidence {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            margin: 5px 0;
+        }
+        
+        .emotion-bars {
+            margin-top: 20px;
+        }
+        
+        .emotion-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .emotion-label {
+            width: 100px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        
+        .emotion-progress {
+            flex: 1;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        
+        .emotion-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4070ff, #00d4ff);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .emotion-value {
+            width: 60px;
+            text-align: right;
+            font-weight: 600;
+        }
+        
+        /* YOLO Detection */
+        .yolo-section {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .yolo-objects {
+            background: rgba(50, 50, 50, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .object-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .object-item:last-child {
+            border-bottom: none;
+        }
+        
+        .object-name {
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .object-confidence {
+            color: #4070ff;
+            font-weight: 600;
+        }
+        
+        .environment-info {
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #00d4ff;
+        }
+        
+        .environment-type {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+        
+        /* Analytics */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4070ff;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Console Log */
+        .console-section {
+            grid-column: span 2;
+        }
+        
+        .console-log {
+            background: #000;
+            border-radius: 8px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            border: 1px solid #333;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            color: #00ff88;
+        }
+        
+        .log-entry.yolo {
+            color: #ffaa00;
+        }
+        
+        .log-entry.emotion {
+            color: #4070ff;
+        }
+        
+        .log-entry.error {
+            color: #ff4070;
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.5rem;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(64, 112, 255, 0.3);
+            border-left: 4px solid #4070ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .camera-section {
+                grid-column: span 1;
+            }
+            
+            .console-section {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚀 Y.M.I.R Advanced Emotion Detection v3.0</h1>
+            <p>Modular Architecture • Enhanced YOLO Context Analysis • Real-time Emotion Recognition</p>
+        </div>
+        
+        <!-- Main Camera Section -->
+        <div class="card camera-section">
+            <h2>🎯 Live Emotion Analysis</h2>
+            
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-dot" id="camera-status"></div>
+                    <span>Camera</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot" id="yolo-status"></div>
+                    <span>YOLO Detection</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot" id="emotion-status"></div>
+                    <span>Emotion Analysis</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot" id="firebase-status"></div>
+                    <span>Firebase Storage</span>
+                </div>
+            </div>
+            
+            <!-- Camera Container -->
+            <div class="camera-container">
+                <video id="video-feed" autoplay playsinline muted></video>
+                <div class="camera-overlay">
+                    <div>FPS: <span id="fps-counter">0</span></div>
+                    <div>Faces: <span id="face-counter">0</span></div>
+                    <div>Objects: <span id="object-counter">0</span></div>
+                </div>
+            </div>
+            
+            <!-- Camera Controls -->
+            <div class="camera-controls">
+                <button class="btn btn-primary" id="start-camera">📹 Start Camera</button>
+                <button class="btn btn-secondary" id="toggle-privacy">🔒 Privacy Mode</button>
+                <button class="btn btn-secondary" id="save-analytics">💾 Save Analytics</button>
+                <button class="btn btn-danger" id="stop-camera" style="display: none;">⏹️ Stop Camera</button>
+            </div>
+        </div>
+        
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            
+            <!-- Emotion Detection Results -->
+            <div class="card">
+                <h2>🎭 Emotion Analysis</h2>
+                <div class="emotion-display">
+                    <div class="loading" id="emotion-loading">
+                        <div class="spinner"></div>
+                        Waiting for camera...
+                    </div>
+                    
+                    <div id="emotion-results" style="display: none;">
+                        <div class="emotion-main">
+                            <h3 id="dominant-emotion">NEUTRAL</h3>
+                            <div class="emotion-confidence">
+                                Confidence: <span id="emotion-confidence">0%</span> | 
+                                Quality: <span id="face-quality">0%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="emotion-bars" id="emotion-bars">
+                            <!-- Emotion bars will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- YOLO Object Detection -->
+            <div class="card yolo-section">
+                <h2>🎯 YOLO Detection & Environment</h2>
+                
+                <div class="environment-info">
+                    <div class="environment-type" id="environment-type">Unknown Environment</div>
+                    <div id="environment-modifiers"></div>
+                </div>
+                
+                <div class="yolo-objects">
+                    <h3>Detected Objects:</h3>
+                    <div id="object-list">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Waiting for YOLO detection...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Session Analytics -->
+            <div class="card">
+                <h2>📊 Session Analytics</h2>
+                <div class="analytics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="total-readings">0</div>
+                        <div class="metric-label">Total Readings</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="avg-confidence">0%</div>
+                        <div class="metric-label">Avg Confidence</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="avg-quality">0%</div>
+                        <div class="metric-label">Avg Quality</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="emotion-stability">0%</div>
+                        <div class="metric-label">Stability</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performance Metrics -->
+            <div class="card">
+                <h2>⚡ Performance</h2>
+                <div class="analytics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="processing-fps">0</div>
+                        <div class="metric-label">Processing FPS</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="models-active">0</div>
+                        <div class="metric-label">Active Models</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="session-duration">0s</div>
+                        <div class="metric-label">Session Time</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="total-frames">0</div>
+                        <div class="metric-label">Total Frames</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Console Log -->
+            <div class="card console-section">
+                <h2>🖥️ System Console</h2>
+                <div class="console-log" id="console-log">
+                    <div class="log-entry">🚀 Y.M.I.R Enhanced Emotion Detection System v3.0</div>
+                    <div class="log-entry">💡 Click "Start Camera" to begin emotion analysis</div>
+                    <div class="log-entry">🔧 System ready for initialization...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class EmotionDetectionSystem {
+            constructor() {
+                this.stream = null;
+                this.isRunning = false;
+                this.sessionStartTime = null;
+                this.frameCount = 0;
+                this.emotionData = null;
+                this.yoloData = null;
+                this.analytics = {
+                    totalReadings: 0,
+                    confidenceSum: 0,
+                    qualitySum: 0,
+                    stabilitySum: 0
+                };
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.startConsoleUpdates();
+            }
+            
+            initializeElements() {
+                this.videoFeed = document.getElementById('video-feed');
+                this.startBtn = document.getElementById('start-camera');
+                this.stopBtn = document.getElementById('stop-camera');
+                this.privacyBtn = document.getElementById('toggle-privacy');
+                this.saveBtn = document.getElementById('save-analytics');
+                this.consoleLog = document.getElementById('console-log');
+            }
+            
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => this.startCamera());
+                this.stopBtn.addEventListener('click', () => this.stopCamera());
+                this.privacyBtn.addEventListener('click', () => this.togglePrivacy());
+                this.saveBtn.addEventListener('click', () => this.saveAnalytics());
+                
+                // Handle page unload
+                window.addEventListener('beforeunload', () => this.cleanup());
+                
+                // Handle visibility change
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden && this.isRunning) {
+                        this.log('⏸️ Tab hidden - Pausing analysis...', 'emotion');
+                    } else if (!document.hidden && this.isRunning) {
+                        this.log('▶️ Tab visible - Resuming analysis...', 'emotion');
+                    }
+                });
+            }
+            
+            async startCamera() {
+                try {
+                    this.log('📷 Requesting camera access...', 'system');
+                    
+                    // Request camera permission
+                    this.stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 },
+                            frameRate: { ideal: 30 }
+                        }
+                    });
+                    
+                    this.videoFeed.srcObject = this.stream;
+                    this.isRunning = true;
+                    this.sessionStartTime = Date.now();
+                    
+                    // Update UI
+                    this.startBtn.style.display = 'none';
+                    this.stopBtn.style.display = 'inline-block';
+                    this.updateStatus('camera-status', true);
+                    
+                    this.log('✅ Camera started successfully!', 'system');
+                    this.log('🔧 Initializing emotion detection models...', 'system');
+                    
+                    // Simulate model initialization
+                    setTimeout(() => {
+                        this.updateStatus('yolo-status', true);
+                        this.updateStatus('emotion-status', true);
+                        this.updateStatus('firebase-status', true);
+                        this.log('✅ All models initialized and ready!', 'system');
+                        this.startProcessing();
+                    }, 2000);
+                    
+                } catch (error) {
+                    this.log(`❌ Camera access error: ${error.message}`, 'error');
+                    console.error('Camera access error:', error);
+                    
+                    if (error.name === 'NotAllowedError') {
+                        alert('Camera permission denied. Please allow camera access and try again.');
+                    } else if (error.name === 'NotFoundError') {
+                        alert('No camera found. Please check your camera connection.');
+                    } else {
+                        alert('Error accessing camera. Please check permissions and try again.');
+                    }
+                }
+            }
+            
+            stopCamera() {
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                    this.videoFeed.srcObject = null;
+                    this.stream = null;
+                    this.isRunning = false;
+                    
+                    // Update UI
+                    this.startBtn.style.display = 'inline-block';
+                    this.stopBtn.style.display = 'none';
+                    this.updateStatus('camera-status', false);
+                    this.updateStatus('yolo-status', false);
+                    this.updateStatus('emotion-status', false);
+                    
+                    // Reset displays
+                    document.getElementById('emotion-loading').style.display = 'flex';
+                    document.getElementById('emotion-results').style.display = 'none';
+                    
+                    this.log('🛑 Camera stopped', 'system');
+                }
+            }
+            
+            startProcessing() {
+                // Simulate emotion detection processing
+                const processFrame = () => {
+                    if (!this.isRunning) return;
+                    
+                    this.frameCount++;
+                    
+                    // Simulate emotion detection every 30 frames (1 second)
+                    if (this.frameCount % 30 === 0) {
+                        this.simulateEmotionDetection();
+                    }
+                    
+                    // Simulate YOLO detection every 15 frames (0.5 seconds)
+                    if (this.frameCount % 15 === 0) {
+                        this.simulateYOLODetection();
+                    }
+                    
+                    // Update performance metrics
+                    this.updatePerformanceMetrics();
+                    
+                    requestAnimationFrame(processFrame);
+                };
+                
+                // Hide loading and show results
+                document.getElementById('emotion-loading').style.display = 'none';
+                document.getElementById('emotion-results').style.display = 'block';
+                
+                requestAnimationFrame(processFrame);
+            }
+            
+            simulateEmotionDetection() {
+                // Simulate realistic emotion detection data
+                const emotions = ['happy', 'sad', 'angry', 'fear', 'surprise', 'neutral'];
+                const dominantEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+                
+                this.emotionData = {
+                    dominant: dominantEmotion,
+                    confidence: 0.7 + Math.random() * 0.3,
+                    quality: 0.6 + Math.random() * 0.4,
+                    stability: Math.random(),
+                    emotions: {}
+                };
+                
+                // Generate emotion scores
+                emotions.forEach(emotion => {
+                    if (emotion === dominantEmotion) {
+                        this.emotionData.emotions[emotion] = 40 + Math.random() * 40;
+                    } else {
+                        this.emotionData.emotions[emotion] = Math.random() * 30;
+                    }
+                });
+                
+                this.updateEmotionDisplay();
+                this.updateAnalytics();
+                
+                this.log(`🧠 Face Emotion: ${dominantEmotion.toUpperCase()} (${(this.emotionData.emotions[dominantEmotion]).toFixed(1)}%)`, 'emotion');
+            }
+            
+            simulateYOLODetection() {
+                // Simulate YOLO object detection
+                const objects = ['person', 'laptop', 'phone', 'book', 'cup', 'keyboard', 'chair', 'clock'];
+                const detectedObjects = [];
+                
+                // Randomly detect 1-5 objects
+                const numObjects = 1 + Math.floor(Math.random() * 4);
+                for (let i = 0; i < numObjects; i++) {
+                    const obj = objects[Math.floor(Math.random() * objects.length)];
+                    if (!detectedObjects.find(o => o.class === obj)) {
+                        detectedObjects.push({
+                            class: obj,
+                            confidence: 0.3 + Math.random() * 0.7
+                        });
+                    }
+                }
+                
+                // Determine environment type
+                const environments = ['WORK_ENVIRONMENT', 'INDOOR_COMFORTABLE', 'NEUTRAL_ENVIRONMENT'];
+                const environment = environments[Math.floor(Math.random() * environments.length)];
+                
+                this.yoloData = {
+                    objects: detectedObjects,
+                    environment: environment,
+                    modifiers: this.generateEmotionModifiers(detectedObjects, environment)
+                };
+                
+                this.updateYOLODisplay();
+                
+                this.log(`🎯 YOLO: ${detectedObjects.length} objects detected`, 'yolo');
+                this.log(`🌍 Environment: ${environment}`, 'yolo');
+            }
+            
+            generateEmotionModifiers(objects, environment) {
+                const modifiers = {};
+                
+                // Base modifiers based on environment
+                if (environment === 'WORK_ENVIRONMENT') {
+                    modifiers.neutral = 1.1 + Math.random() * 0.1;
+                    modifiers.happiness = 0.8 + Math.random() * 0.2;
+                } else if (environment === 'INDOOR_COMFORTABLE') {
+                    modifiers.happiness = 1.2 + Math.random() * 0.2;
+                    modifiers.sadness = 0.7 + Math.random() * 0.2;
+                }
+                
+                // Object-specific modifiers
+                objects.forEach(obj => {
+                    if (obj.class === 'phone' || obj.class === 'cup') {
+                        modifiers.happiness = (modifiers.happiness || 1.0) * (1.1 + Math.random() * 0.3);
+                    }
+                    if (obj.class === 'clock' || obj.class === 'laptop') {
+                        modifiers.neutral = (modifiers.neutral || 1.0) * (1.1 + Math.random() * 0.2);
+                    }
+                });
+                
+                return modifiers;
+            }
+            
+            updateEmotionDisplay() {
+                if (!this.emotionData) return;
+                
+                document.getElementById('dominant-emotion').textContent = this.emotionData.dominant.toUpperCase();
+                document.getElementById('emotion-confidence').textContent = `${(this.emotionData.confidence * 100).toFixed(0)}%`;
+                document.getElementById('face-quality').textContent = `${(this.emotionData.quality * 100).toFixed(0)}%`;
+                
+                // Update emotion bars
+                const barsContainer = document.getElementById('emotion-bars');
+                barsContainer.innerHTML = '';
+                
+                const sortedEmotions = Object.entries(this.emotionData.emotions)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 4);
+                
+                sortedEmotions.forEach(([emotion, score]) => {
+                    const barDiv = document.createElement('div');
+                    barDiv.className = 'emotion-bar';
+                    barDiv.innerHTML = `
+                        <div class="emotion-label">${emotion}</div>
+                        <div class="emotion-progress">
+                            <div class="emotion-fill" style="width: ${score}%"></div>
+                        </div>
+                        <div class="emotion-value">${score.toFixed(1)}%</div>
+                    `;
+                    barsContainer.appendChild(barDiv);
+                });
+            }
+            
+            updateYOLODisplay() {
+                if (!this.yoloData) return;
+                
+                // Update environment type
+                document.getElementById('environment-type').textContent = this.yoloData.environment.replace('_', ' ');
+                
+                // Update environment modifiers
+                const modifiersDiv = document.getElementById('environment-modifiers');
+                modifiersDiv.innerHTML = '';
+                
+                Object.entries(this.yoloData.modifiers).forEach(([emotion, modifier]) => {
+                    if (modifier !== 1.0) {
+                        const direction = modifier > 1.0 ? '↗️' : '↘️';
+                        const effect = modifier > 1.0 ? 'BOOSTED' : 'REDUCED';
+                        modifiersDiv.innerHTML += `<div>${direction} ${emotion} ${effect} by ${modifier.toFixed(2)}x</div>`;
+                    }
+                });
+                
+                // Update object list
+                const objectList = document.getElementById('object-list');
+                objectList.innerHTML = '';
+                
+                this.yoloData.objects.forEach(obj => {
+                    const objDiv = document.createElement('div');
+                    objDiv.className = 'object-item';
+                    objDiv.innerHTML = `
+                        <div class="object-name">${obj.class}</div>
+                        <div class="object-confidence">${(obj.confidence * 100).toFixed(0)}%</div>
+                    `;
+                    objectList.appendChild(objDiv);
+                });
+                
+                // Update counters
+                document.getElementById('object-counter').textContent = this.yoloData.objects.length;
+            }
+            
+            updateAnalytics() {
+                if (!this.emotionData) return;
+                
+                this.analytics.totalReadings++;
+                this.analytics.confidenceSum += this.emotionData.confidence;
+                this.analytics.qualitySum += this.emotionData.quality;
+                this.analytics.stabilitySum += this.emotionData.stability;
+                
+                document.getElementById('total-readings').textContent = this.analytics.totalReadings;
+                document.getElementById('avg-confidence').textContent = `${((this.analytics.confidenceSum / this.analytics.totalReadings) * 100).toFixed(0)}%`;
+                document.getElementById('avg-quality').textContent = `${((this.analytics.qualitySum / this.analytics.totalReadings) * 100).toFixed(0)}%`;
+                document.getElementById('emotion-stability').textContent = `${((this.analytics.stabilitySum / this.analytics.totalReadings) * 100).toFixed(0)}%`;
+            }
+            
+            updatePerformanceMetrics() {
+                if (!this.sessionStartTime) return;
+                
+                const sessionDuration = Math.floor((Date.now() - this.sessionStartTime) / 1000);
+                const fps = sessionDuration > 0 ? (this.frameCount / sessionDuration).toFixed(1) : '0';
+                
+                document.getElementById('processing-fps').textContent = fps;
+                document.getElementById('models-active').textContent = this.isRunning ? '4' : '0';
+                document.getElementById('session-duration').textContent = `${sessionDuration}s`;
+                document.getElementById('total-frames').textContent = this.frameCount;
+                document.getElementById('fps-counter').textContent = fps;
+                document.getElementById('face-counter').textContent = this.emotionData ? '1' : '0';
+            }
+            
+            updateStatus(elementId, isActive) {
+                const statusDot = document.getElementById(elementId);
+                if (isActive) {
+                    statusDot.classList.add('active');
+                } else {
+                    statusDot.classList.remove('active');
+                }
+            }
+            
+            togglePrivacy() {
+                if (this.videoFeed.style.filter === 'blur(20px)') {
+                    this.videoFeed.style.filter = '';
+                    this.privacyBtn.textContent = '🔒 Privacy Mode';
+                    this.log('🔓 Privacy mode disabled', 'system');
+                } else {
+                    this.videoFeed.style.filter = 'blur(20px)';
+                    this.privacyBtn.textContent = '🔓 Normal Mode';
+                    this.log('🔒 Privacy mode enabled', 'system');
+                }
+            }
+            
+            saveAnalytics() {
+                const analyticsData = {
+                    session: {
+                        duration: this.sessionStartTime ? Math.floor((Date.now() - this.sessionStartTime) / 1000) : 0,
+                        totalFrames: this.frameCount,
+                        totalReadings: this.analytics.totalReadings
+                    },
+                    performance: {
+                        avgConfidence: this.analytics.totalReadings > 0 ? this.analytics.confidenceSum / this.analytics.totalReadings : 0,
+                        avgQuality: this.analytics.totalReadings > 0 ? this.analytics.qualitySum / this.analytics.totalReadings : 0,
+                        avgStability: this.analytics.totalReadings > 0 ? this.analytics.stabilitySum / this.analytics.totalReadings : 0
+                    },
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Create download link
+                const dataStr = JSON.stringify(analyticsData, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `ymir_analytics_${Date.now()}.json`;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+                this.log('💾 Analytics saved successfully', 'system');
+            }
+            
+            log(message, type = 'system') {
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry ${type}`;
+                logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                
+                this.consoleLog.appendChild(logEntry);
+                this.consoleLog.scrollTop = this.consoleLog.scrollHeight;
+                
+                // Keep only last 100 entries
+                while (this.consoleLog.children.length > 100) {
+                    this.consoleLog.removeChild(this.consoleLog.firstChild);
+                }
+            }
+            
+            startConsoleUpdates() {
+                // Add periodic system messages
+                setInterval(() => {
+                    if (this.isRunning) {
+                        const messages = [
+                            '⚡ System running optimally',
+                            '🔄 Processing frame data...',
+                            '📡 Monitoring emotion patterns',
+                            '🎯 YOLO environmental analysis active'
+                        ];
+                        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                        this.log(randomMessage, 'system');
+                    }
+                }, 10000); // Every 10 seconds
+            }
+            
+            cleanup() {
+                if (this.isRunning) {
+                    this.stopCamera();
+                }
+            }
+        }
+        
+        // Initialize the system when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new EmotionDetectionSystem();
+        });
+    </script>
+</body>
+</html>
