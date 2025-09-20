@@ -1,0 +1,11 @@
+{
+    "python.analysis.extraPaths": [
+        "./enhancements/src-new"
+    ],
+    "python.analysis.include": [
+        "./enhancements/src-new"
+    ],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "basic",
+    "pylance.insidersChannel": "off"
+}

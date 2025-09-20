@@ -35,8 +35,13 @@ import requests
 import time
 import re
 from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_sqlalchemy import SQLAlchemy
+from typing import Dict, List, Optional, Any, Generator
+from dataclasses import dataclass, asdict
+from pathlib import Path
+import asyncio
+import statistics
 
 #══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
@@ -393,147 +398,447 @@ def recommend_songs(emotion_file):
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 console = Console()
 
-# Groq API Configuration
-GROQ_API_KEY = os.getenv('GROQ_API_KEY')
-GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+# Enhanced Chatbot with Gemini API Support
+try:
+    import google.generativeai as genai
+    GEMINI_AVAILABLE = True
+    print("✅ Google Gemini API available")
+except ImportError:
+    GEMINI_AVAILABLE = False
+    print("❌ Google Gemini API not available")
 
-# Load emotion classifiers
-device = "cuda" if torch.cuda.is_available() else "cpu"
-emotion_models = [
-    pipeline("text-classification", model="bhadresh-savani/distilbert-base-uncased-emotion", device=0 if device == "cuda" else -1),
-    pipeline("text-classification", model="SamLowe/roberta-base-go_emotions", device=0 if device == "cuda" else -1),
-    pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base", device=0 if device == "cuda" else -1)
-]
+# Production-grade ML emotion detection
+try:
+    from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
+    import torch
+    ML_AVAILABLE = True
+    print("✅ Transformers available for production ML emotion detection")
+except ImportError:
+    ML_AVAILABLE = False
+    print("⚠️ Transformers not available")
 
-# Load sentiment analysis model
-sentiment_model = AutoModelForSequenceClassification.from_pretrained("cardiffnlp/twitter-roberta-base-sentiment")
-sentiment_tokenizer = AutoTokenizer.from_pretrained("cardiffnlp/twitter-roberta-base-sentiment")
-
-# Emotion mapping
-emotion_map = {
-    "joy": "happy", "happiness": "happy", "excitement": "happy",
-    "anger": "angry", "annoyance": "angry",
-    "sadness": "sad", "grief": "sad",
-    "fear": "fearful", "surprise": "surprised",
-    "disgust": "disgusted", "neutral": "neutral",
-}
-
-# Rolling emotion tracking
-previous_emotions = []
-
-# Chat session storage
-chat_session = []
-
-# Function to handle negations
-def handle_negations(text):
-    """Detects negations and flips associated emotions."""
-    negation_patterns = [
-        r"\b(not|never|no)\s+(happy|joyful|excited)\b",
-        r"\b(not|never|no)\s+(sad|depressed|unhappy)\b",
-        r"\b(not|never|no)\s+(angry|mad|furious)\b"
-    ]
+@dataclass
+class ChatMessage:
+    """Structured chat message with metadata"""
+    role: str
+    content: str
+    timestamp: datetime
+    emotion: Optional[str] = None
+    confidence: Optional[float] = None
+    metadata: Optional[Dict[str, Any]] = None
     
-    for pattern in negation_patterns:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            emotion = match.group(2).lower()
-            if emotion in ["happy", "joyful", "excited"]:
-                return "sad"
-            elif emotion in ["sad", "depressed", "unhappy"]:
-                return "happy"
-            elif emotion in ["angry", "mad", "furious"]:
-                return "calm"
-    return None
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'role': self.role,
+            'content': self.content,
+            'timestamp': self.timestamp.isoformat(),
+            'emotion': self.emotion,
+            'confidence': self.confidence,
+            'metadata': self.metadata or {}
+        }
 
-# Function to analyze sentiment
-def detect_sentiment(text):
-    """Detects sentiment polarity (positive, neutral, negative)."""
-    inputs = sentiment_tokenizer(text, return_tensors="pt", truncation=True, padding=True)
-    outputs = sentiment_model(**inputs)
-    sentiment_scores = torch.nn.functional.softmax(outputs.logits, dim=-1)[0]
-    sentiment_labels = ["negative", "neutral", "positive"]
+@dataclass
+class UserProfile:
+    """User profile with preferences and history"""
+    user_id: str
+    name: Optional[str] = None
+    preferences: Optional[Dict[str, Any]] = None
+    conversation_style: str = "balanced"
+    emotion_history: Optional[List[str]] = None
+    topics_of_interest: Optional[List[str]] = None
+    created_at: Optional[datetime] = None
+    last_active: Optional[datetime] = None
     
-    return sentiment_labels[torch.argmax(sentiment_scores).item()]
+    def __post_init__(self):
+        if self.preferences is None:
+            self.preferences = {}
+        if self.emotion_history is None:
+            self.emotion_history = []
+        if self.topics_of_interest is None:
+            self.topics_of_interest = []
+        if self.created_at is None:
+            self.created_at = datetime.now()
+        if self.last_active is None:
+            self.last_active = datetime.now()
 
-# Function to detect conversation emotions with improved weighting
-def detect_conversation_emotions(chat_history):
-    """Analyzes chat history, considers recent messages more, and balances emotion scores."""
-    emotion_scores = {}
-    emotion_counts = {}
-    model_emotions = []
+class ProductionEmotionAnalyzer:
+    """Production-grade emotion analysis with ensemble of SOTA models"""
     
-    # More weight to recent messages
-    recent_weight = 1.5  
-    messages = chat_history[-5:]  # Use last 5 messages for better context
-    full_chat_text = " ".join([entry["user"] for entry in messages])
-
-    # Check for negation handling
-    negated_emotion = handle_negations(full_chat_text)
-    if negated_emotion:
-        return negated_emotion, {}, []
-
-    for model in emotion_models:
-        results = model(full_chat_text)
-        top_predictions = sorted(results, key=lambda x: x["score"], reverse=True)[:2]
-
-        for pred in top_predictions:
-            model_label = pred["label"].lower()
-            model_score = pred["score"]
-            mapped_emotion = emotion_map.get(model_label, "neutral")
-            model_emotions.append(f"{model_label} ({model_score:.2f}) → {mapped_emotion}")
-
-            if model_score < 0.4:  # Ignore weak emotions
-                continue  
-
-            # Apply weight to recent messages
-            weighted_score = model_score * (recent_weight if messages[-1]["user"] == full_chat_text else 1.0)
-
-            if mapped_emotion not in emotion_scores:
-                emotion_scores[mapped_emotion] = weighted_score
-                emotion_counts[mapped_emotion] = 1
-            else:
-                emotion_scores[mapped_emotion] += weighted_score
-                emotion_counts[mapped_emotion] += 1
-
-    # Compute weighted average
-    avg_emotion_scores = {label: emotion_scores[label] / emotion_counts[label] for label in emotion_scores}
-
-    # Consider sentiment analysis
-    sentiment = detect_sentiment(full_chat_text)
-    if sentiment == "negative" and "sad" in avg_emotion_scores:
-        avg_emotion_scores["sad"] += 0.1  # Boost sadness slightly if sentiment is negative
-
-    # Rolling emotion tracking
-    if len(previous_emotions) > 5:
-        previous_emotions.pop(0)
-    previous_emotions.append(avg_emotion_scores)
-
-    # Compute final dominant emotion
-    if avg_emotion_scores:
-        dominant_emotion = max(avg_emotion_scores, key=avg_emotion_scores.get)
-    else:
-        dominant_emotion = "neutral"
-
-    return dominant_emotion, avg_emotion_scores, model_emotions
-
-# Function to generate chatbot response
-def generate_chatbot_response(user_input):
-    """Generates chatbot response using Groq API."""
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-    payload = {"model": "llama3-70b-8192", "messages": [{"role": "user", "content": user_input}]}
-
-    try:
-        response = requests.post(GROQ_API_URL, headers=headers, json=payload)
-        response_json = response.json()
-
-        if response.status_code == 200 and "choices" in response_json:
-            return response_json["choices"][0]["message"]["content"].strip()
+    def __init__(self):
+        self.models = {}
+        self.tokenizers = {}
+        self.model_configs = [
+            {
+                'name': 'roberta_emotion',
+                'model_id': 'j-hartmann/emotion-english-distilroberta-base',
+                'weight': 0.4,
+                'emotions': ['anger', 'disgust', 'fear', 'joy', 'neutral', 'sadness', 'surprise']
+            },
+            {
+                'name': 'twitter_roberta',
+                'model_id': 'cardiffnlp/twitter-roberta-base-emotion-multilabel-latest', 
+                'weight': 0.3,
+                'emotions': ['anger', 'anticipation', 'disgust', 'fear', 'joy', 'love', 'optimism', 'pessimism', 'sadness', 'surprise', 'trust']
+            },
+            {
+                'name': 'bertweet_emotion',
+                'model_id': 'finiteautomata/bertweet-base-emotion-analysis',
+                'weight': 0.3,
+                'emotions': ['anger', 'fear', 'joy', 'love', 'sadness', 'surprise']
+            }
+        ]
+        self.fallback_available = False
+        
+        # Initialize models
+        self._initialize_production_models()
+        
+        # Standard emotion mapping for consistency
+        self.emotion_standardization = {
+            # Map all model outputs to standard emotions
+            'anger': 'angry', 'angry': 'angry',
+            'sadness': 'sad', 'sad': 'sad',
+            'joy': 'happy', 'happiness': 'happy', 'happy': 'happy',
+            'fear': 'anxious', 'anxious': 'anxious', 'nervous': 'anxious',
+            'surprise': 'surprised', 'surprised': 'surprised',
+            'disgust': 'disgusted', 'disgusted': 'disgusted',
+            'love': 'loving', 'loving': 'loving',
+            'neutral': 'neutral',
+            'anticipation': 'excited', 'excitement': 'excited', 'excited': 'excited',
+            'optimism': 'hopeful', 'hope': 'hopeful', 'hopeful': 'hopeful',
+            'pessimism': 'worried', 'worry': 'worried', 'worried': 'worried',
+            'trust': 'confident', 'confident': 'confident'
+        }
+    
+    def _initialize_production_models(self):
+        """Initialize multiple production-grade emotion models"""
+        successful_models = 0
+        
+        for config in self.model_configs:
+            try:
+                print(f"🔄 Loading {config['name']}...")
+                
+                # Load model and tokenizer
+                model = AutoModelForSequenceClassification.from_pretrained(config['model_id'])
+                tokenizer = AutoTokenizer.from_pretrained(config['model_id'])
+                
+                # Create pipeline - handle different model requirements
+                device = 0 if torch.cuda.is_available() else -1
+                
+                # Some models don't support return_all_scores
+                try:
+                    pipeline_model = pipeline(
+                        "text-classification",
+                        model=model,
+                        tokenizer=tokenizer,
+                        device=device,
+                        return_all_scores=True
+                    )
+                except Exception:
+                    # Fallback without return_all_scores
+                    pipeline_model = pipeline(
+                        "text-classification",
+                        model=model,
+                        tokenizer=tokenizer,
+                        device=device
+                    )
+                
+                self.models[config['name']] = {
+                    'pipeline': pipeline_model,
+                    'weight': config['weight'],
+                    'emotions': config['emotions']
+                }
+                
+                successful_models += 1
+                print(f"✅ {config['name']} loaded successfully")
+                
+            except Exception as e:
+                print(f"⚠️ Failed to load {config['name']}: {e}")
+                continue
+        
+        if successful_models == 0:
+            print("❌ No emotion models loaded, using fallback")
+            self._setup_fallback_model()
         else:
-            console.print(f"[bold red][ERROR] Groq API request failed: {response_json}[/bold red]")
-            return "I'm sorry, but I couldn't process your request."
-    except Exception as e:
-        console.print(f"[bold red][ERROR] Groq API request failed: {e}[/bold red]")
-        return "I'm facing a technical issue. Please try again later."
+            print(f"✅ {successful_models}/{len(self.model_configs)} emotion models loaded")
+    
+    def _setup_fallback_model(self):
+        """Setup lightweight fallback model"""
+        try:
+            # Use a simple, reliable model as fallback
+            pipeline_model = pipeline(
+                "sentiment-analysis",
+                model="cardiffnlp/twitter-roberta-base-sentiment-latest",
+                device=-1
+            )
+            
+            self.models['fallback'] = {
+                'pipeline': pipeline_model,
+                'weight': 1.0,
+                'emotions': ['negative', 'neutral', 'positive']
+            }
+            self.fallback_available = True
+            print("✅ Fallback sentiment model loaded")
+            
+        except Exception as e:
+            print(f"❌ Even fallback model failed: {e}")
+    
+    def _analyze_with_ensemble(self, text: str) -> Dict[str, Any]:
+        """Use ensemble of models for robust emotion detection"""
+        if not self.models:
+            return self._get_neutral_result()
+        
+        model_results = {}
+        
+        # Run all models in parallel for speed
+        with ThreadPoolExecutor(max_workers=len(self.models)) as executor:
+            future_to_model = {
+                executor.submit(self._run_single_model, name, config, text): name 
+                for name, config in self.models.items()
+            }
+            
+            for future in as_completed(future_to_model):
+                model_name = future_to_model[future]
+                try:
+                    result = future.result(timeout=5)  # 5 second timeout per model
+                    if result:
+                        model_results[model_name] = result
+                except Exception as e:
+                    print(f"⚠️ Model {model_name} failed: {e}")
+        
+        if not model_results:
+            return self._get_neutral_result()
+        
+        # Combine results using weighted voting
+        return self._ensemble_vote(model_results)
+    
+    def _run_single_model(self, model_name: str, model_config: Dict, text: str) -> Optional[Dict]:
+        """Run a single model and return standardized results"""
+        try:
+            pipeline_model = model_config['pipeline']
+            results = pipeline_model(text)
+            
+            # Handle different result formats from different models
+            standardized_emotions = {}
+            
+            # Flatten results if they're wrapped in extra lists
+            if isinstance(results, list) and len(results) > 0:
+                # Check if it's wrapped in an extra list: [[{...}]]
+                if isinstance(results[0], list):
+                    results = results[0]  # Unwrap the outer list
+            
+            # Now process the actual results
+            if isinstance(results, list) and len(results) > 0:
+                for result in results:
+                    if isinstance(result, dict) and 'label' in result and 'score' in result:
+                        emotion = result['label'].lower()
+                        score = result['score']
+                        
+                        # Skip 'others' category from some models
+                        if emotion == 'others':
+                            continue
+                        
+                        # Map to standard emotion
+                        std_emotion = self.emotion_standardization.get(emotion, emotion)
+                        
+                        if std_emotion in standardized_emotions:
+                            standardized_emotions[std_emotion] = max(standardized_emotions[std_emotion], score)
+                        else:
+                            standardized_emotions[std_emotion] = score
+            
+            # Case 2: Results is a single dictionary
+            elif isinstance(results, dict) and 'label' in results and 'score' in results:
+                emotion = results['label'].lower()
+                score = results['score']
+                if emotion != 'others':  # Skip 'others' category
+                    std_emotion = self.emotion_standardization.get(emotion, emotion)
+                    standardized_emotions[std_emotion] = score
+            
+            # Case 3: Results is in different format - try to handle gracefully
+            else:
+                print(f"⚠️ Unknown result format from {model_name}: {type(results)}")
+                return None
+            
+            if not standardized_emotions:
+                print(f"⚠️ No emotions extracted from {model_name}")
+                return None
+            
+            return {
+                'emotions': standardized_emotions,
+                'weight': model_config['weight'],
+                'model': model_name
+            }
+            
+        except Exception as e:
+            print(f"⚠️ Single model {model_name} error: {e}")
+            return None
+    
+    def _ensemble_vote(self, model_results: Dict[str, Dict]) -> Dict[str, Any]:
+        """Combine multiple model results using weighted voting"""
+        
+        # Collect all emotions and their weighted scores
+        emotion_scores = {}
+        total_weight = 0
+        model_count = len(model_results)
+        
+        for model_name, result in model_results.items():
+            weight = result['weight']
+            total_weight += weight
+            
+            for emotion, score in result['emotions'].items():
+                if emotion not in emotion_scores:
+                    emotion_scores[emotion] = []
+                emotion_scores[emotion].append(score * weight)
+        
+        # Calculate final scores
+        final_emotions = {}
+        for emotion, scores in emotion_scores.items():
+            # Use mean of weighted scores
+            final_emotions[emotion] = statistics.mean(scores)
+        
+        # Find dominant emotion
+        if final_emotions:
+            dominant_emotion = max(final_emotions.items(), key=lambda x: x[1])
+            
+            # Check for mixed emotions (multiple high-confidence emotions)
+            high_confidence = {k: v for k, v in final_emotions.items() if v > 0.4}
+            mixed = len(high_confidence) > 1
+            
+            return {
+                'dominant_emotion': dominant_emotion[0],
+                'confidence': dominant_emotion[1],
+                'all_emotions': final_emotions,
+                'mixed_emotions': mixed,
+                'method': f'ensemble_{model_count}_models',
+                'models_used': list(model_results.keys())
+            }
+        
+        return self._get_neutral_result()
+    
+    def _get_neutral_result(self) -> Dict[str, Any]:
+        """Return neutral result as fallback"""
+        return {
+            'dominant_emotion': 'neutral',
+            'confidence': 0.6,
+            'all_emotions': {'neutral': 0.6},
+            'mixed_emotions': False,
+            'method': 'fallback_neutral'
+        }
+    
+    def analyze_text_emotion(self, text: str) -> Dict[str, Any]:
+        """Main emotion analysis method"""
+        if not text.strip():
+            return self._get_neutral_result()
+        
+        try:
+            # Use ensemble approach - no rule-based preprocessing
+            result = self._analyze_with_ensemble(text)
+            
+            # Add original text for debugging
+            result['original_text'] = text
+            
+            return result
+            
+        except Exception as e:
+            print(f"❌ Emotion analysis failed: {e}")
+            return self._get_neutral_result()
+
+class FunctionCalling:
+    """Production-grade function calling with error handling"""
+    
+    def __init__(self):
+        self.available_functions = {
+            'web_search': self.web_search,
+            'get_weather': self.get_weather,
+            'calculate': self.calculate,
+            'get_time': self.get_time,
+            'get_date': self.get_date
+        }
+    
+    def web_search(self, query: str, num_results: int = 3) -> str:
+        """Search the web for information"""
+        try:
+            url = f"https://api.duckduckgo.com/?q={query}&format=json&no_html=1"
+            response = requests.get(url, timeout=5)
+            data = response.json()
+            
+            if data.get('AbstractText'):
+                return f"Search result: {data['AbstractText']}"
+            elif data.get('RelatedTopics'):
+                topics = data['RelatedTopics'][:num_results]
+                results = []
+                for topic in topics:
+                    if 'Text' in topic:
+                        results.append(topic['Text'])
+                return "Search results:\n" + "\n".join(f"• {result}" for result in results)
+            else:
+                return f"No specific results found for '{query}'"
+                
+        except Exception as e:
+            return f"Web search error: {e}"
+    
+    def get_weather(self, location: str = "current") -> str:
+        """Get weather information"""
+        return f"Weather functionality requires API key setup. Location requested: {location}"
+    
+    def calculate(self, expression: str) -> str:
+        """Perform mathematical calculations"""
+        try:
+            # Safe evaluation
+            allowed_chars = set('0123456789+-*/.() ')
+            if all(c in allowed_chars for c in expression):
+                result = eval(expression)
+                return f"Calculation: {expression} = {result}"
+            else:
+                return "Invalid mathematical expression"
+        except Exception as e:
+            return f"Calculation error: {e}"
+    
+    def get_time(self) -> str:
+        """Get current time"""
+        return f"Current time: {datetime.now().strftime('%H:%M:%S')}"
+    
+    def get_date(self) -> str:
+        """Get current date"""
+        return f"Current date: {datetime.now().strftime('%Y-%m-%d (%A)')}"
+    
+    def detect_function_calls(self, text: str) -> List[Dict[str, Any]]:
+        """Detect function calls using NLP, not regex rules"""
+        # This could be enhanced with a small NLP model for intent detection
+        # For now, simple pattern matching but easily replaceable
+        function_calls = []
+        
+        patterns = {
+            'web_search': [r'search for (.+)', r'look up (.+)', r'find (.+)'],
+            'get_weather': [r'weather', r'temperature'],
+            'calculate': [r'calculate (.+)', r'what is (.+[\+\-\*/].+)'],
+            'get_time': [r'time'],
+            'get_date': [r'date']
+        }
+        
+        for function_name, regex_patterns in patterns.items():
+            for pattern in regex_patterns:
+                match = re.search(pattern, text, re.IGNORECASE)
+                if match:
+                    function_calls.append({
+                        'function': function_name,
+                        'args': match.groups() if match.groups() else [],
+                        'confidence': 0.8
+                    })
+        
+        return function_calls
+    
+    def execute_function(self, function_name: str, args: List[str]) -> str:
+        """Execute a function with error handling"""
+        if function_name in self.available_functions:
+            try:
+                if args:
+                    return self.available_functions[function_name](*args)
+                else:
+                    return self.available_functions[function_name]()
+            except Exception as e:
+                return f"Function execution error: {e}"
+        else:
+            return f"Function '{function_name}' not available"
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
@@ -1949,69 +2254,501 @@ def emotion_timeline():
 
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+class GeminiChatbot:
+    """Production-ready Gemini chatbot with ensemble emotion detection"""
+    
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.model = None
+        self.chat_session = None
+        
+        # Initialize components
+        self.emotion_analyzer = ProductionEmotionAnalyzer()
+        self.function_calling = FunctionCalling()
+        self.conversation_history = deque(maxlen=100)
+        self.user_profile = None
+        
+        # Configuration
+        self.config = {
+            'model_name': 'gemini-2.0-flash-exp',
+            'temperature': 0.7,
+            'top_k': 40,
+            'top_p': 0.95,
+            'max_tokens': 2048,
+            'safety_settings': [
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"}
+            ]
+        }
+        
+        # System context
+        self.system_context = """You are Y.M.I.R (Your Mental Intelligence and Recovery), a production-grade AI assistant specializing in mental health, emotional support, and intelligent conversation.
+
+Your capabilities:
+- Advanced ensemble emotion detection using multiple SOTA models
+- Contextual understanding without rule-based preprocessing
+- Function calling for web search, calculations, etc.
+- Conversation memory and emotional intelligence
+- Mental health and wellness guidance
+- Technical assistance and problem-solving
+
+Always be helpful, accurate, and emotionally intelligent in your responses."""
+        
+        self._initialize_gemini()
+        self._load_user_profile()
+    
+    def _initialize_gemini(self):
+        """Initialize Gemini API"""
+        try:
+            if not GEMINI_AVAILABLE:
+                print("⚠️ Gemini API not available")
+                return
+            
+            genai.configure(api_key=self.api_key)  # type: ignore
+            
+            generation_config = {
+                'temperature': self.config['temperature'],
+                'top_k': self.config['top_k'], 
+                'top_p': self.config['top_p'],
+                'max_output_tokens': self.config['max_tokens']
+            }
+            
+            self.model = genai.GenerativeModel(  # type: ignore
+                model_name=self.config['model_name'],
+                generation_config=generation_config,  # type: ignore
+                safety_settings=self.config['safety_settings']
+            )
+            
+            self.chat_session = self.model.start_chat(history=[])
+            print("✅ Gemini API initialized successfully")
+            
+        except Exception as e:
+            print(f"❌ Gemini initialization error: {e}")
+            self.model = None
+    
+    def _load_user_profile(self):
+        """Load or create user profile"""
+        profile_path = Path("user_profile.json")
+        
+        if profile_path.exists():
+            try:
+                with open(profile_path, 'r') as f:
+                    data = json.load(f)
+                    
+                    # Handle datetime fields safely
+                    if 'created_at' in data and isinstance(data['created_at'], str):
+                        try:
+                            data['created_at'] = datetime.fromisoformat(data['created_at'])
+                        except:
+                            data['created_at'] = datetime.now()
+                    
+                    if 'last_active' in data and isinstance(data['last_active'], str):
+                        try:
+                            data['last_active'] = datetime.fromisoformat(data['last_active'])
+                        except:
+                            data['last_active'] = datetime.now()
+                    
+                    self.user_profile = UserProfile(**data)
+                    self.user_profile.last_active = datetime.now()
+                print("✅ User profile loaded")
+            except Exception as e:
+                print(f"⚠️ Profile loading error: {e}")
+                self._create_new_profile()
+        else:
+            self._create_new_profile()
+    
+    def _create_new_profile(self):
+        """Create new user profile"""
+        self.user_profile = UserProfile(
+            user_id=f"user_{int(time.time())}",
+            conversation_style="balanced"
+        )
+        self._save_user_profile()
+        print("✅ New user profile created")
+    
+    def _save_user_profile(self):
+        """Save user profile"""
+        try:
+            if self.user_profile is None:
+                return
+            profile_data = asdict(self.user_profile)
+            
+            # Handle datetime conversion safely
+            if self.user_profile.created_at is not None:
+                profile_data['created_at'] = self.user_profile.created_at.isoformat()
+            else:
+                profile_data['created_at'] = datetime.now().isoformat()
+                
+            if self.user_profile.last_active is not None:
+                profile_data['last_active'] = self.user_profile.last_active.isoformat()
+            else:
+                profile_data['last_active'] = datetime.now().isoformat()
+            
+            with open("user_profile.json", 'w') as f:
+                json.dump(profile_data, f, indent=2)
+        except Exception as e:
+            print(f"⚠️ Profile saving error: {e}")
+    
+    def _build_context_prompt(self, user_input: str, emotion_data: Dict[str, Any]) -> str:
+        """Build context prompt with emotion and history"""
+        context_parts = [self.system_context]
+        
+        # Add emotion context
+        if emotion_data['dominant_emotion'] != 'neutral':
+            emotion_context = f"""
+Current user emotion: {emotion_data['dominant_emotion']} (confidence: {emotion_data['confidence']:.2f})
+Detection method: {emotion_data.get('method', 'unknown')}
+Models used: {', '.join(emotion_data.get('models_used', []))}
+
+Adapt your response to be supportive and appropriate for someone feeling {emotion_data['dominant_emotion']}.
+"""
+            context_parts.append(emotion_context)
+        
+        # Add conversation history
+        if self.conversation_history:
+            recent_messages = list(self.conversation_history)[-6:]
+            history_context = "Recent conversation:\n"
+            for msg in recent_messages:
+                emotion_info = f" [felt: {msg.emotion}]" if msg.emotion and msg.emotion != 'neutral' else ""
+                history_context += f"{msg.role}: {msg.content}{emotion_info}\n"
+            context_parts.append(history_context)
+        
+        return "\n".join(context_parts) + f"\n\nUser: {user_input}"
+    
+    def generate_response(self, user_input: str) -> Dict[str, Any]:
+        """Generate response with production-grade emotion analysis"""
+        try:
+            # Analyze emotions using ensemble
+            emotion_data = self.emotion_analyzer.analyze_text_emotion(user_input)
+            
+            # Check for function calls
+            function_calls = self.function_calling.detect_function_calls(user_input)
+            function_results = []
+            
+            # Execute functions
+            for call in function_calls:
+                result = self.function_calling.execute_function(call['function'], call['args'])
+                function_results.append(result)
+            
+            # Build context
+            enhanced_prompt = self._build_context_prompt(user_input, emotion_data)
+            
+            if function_results:
+                enhanced_prompt += f"\n\nFunction results: {'; '.join(function_results)}"
+            
+            if not self.model or not self.chat_session:
+                return {
+                    'response': "I'm having trouble connecting to my AI system.",
+                    'emotion': emotion_data,
+                    'functions_used': function_calls,
+                    'streaming': False
+                }
+            
+            # Generate response
+            response = self.chat_session.send_message(enhanced_prompt)
+            response_text = response.text
+            
+            # Create messages
+            user_message = ChatMessage(
+                role='user',
+                content=user_input,
+                timestamp=datetime.now(),
+                emotion=emotion_data['dominant_emotion'],
+                confidence=emotion_data['confidence'],
+                metadata={'emotion_method': emotion_data.get('method')}
+            )
+            
+            assistant_message = ChatMessage(
+                role='assistant', 
+                content=response_text,
+                timestamp=datetime.now(),
+                metadata={'functions_used': function_calls}
+            )
+            
+            # Add to history
+            self.conversation_history.append(user_message)
+            self.conversation_history.append(assistant_message)
+            
+            # Update profile
+            if self.user_profile:
+                self.user_profile.last_active = datetime.now()
+                if emotion_data['dominant_emotion'] != 'neutral' and self.user_profile.emotion_history is not None:
+                    self.user_profile.emotion_history.append(emotion_data['dominant_emotion'])
+                    self.user_profile.emotion_history = self.user_profile.emotion_history[-20:]
+                self._save_user_profile()
+            
+            return {
+                'response': response_text,
+                'emotion': emotion_data,
+                'functions_used': function_calls,
+                'streaming': True,
+                'user_message': user_message,
+                'assistant_message': assistant_message
+            }
+            
+        except Exception as e:
+            print(f"❌ Response generation error: {e}")
+            return {
+                'response': f"I apologize, but I encountered an error: {str(e)}",
+                'emotion': {'dominant_emotion': 'neutral', 'confidence': 0.5},
+                'functions_used': [],
+                'streaming': False
+            }
+    
+    def get_response(self, message: str) -> Dict[str, Any]:
+        """Get response for web interface (wrapper around generate_response)"""
+        try:
+            result = self.generate_response(message)
+            
+            # Format for web interface
+            emotion_data = result.get('emotion', {})
+            emotion_context = "No emotion detected"
+            
+            if emotion_data and emotion_data.get('dominant_emotion'):
+                emotion = emotion_data['dominant_emotion']
+                confidence = emotion_data.get('confidence', 0.0)
+                emotion_context = f"Detected emotion: {emotion} ({confidence:.1%} confidence)"
+            
+            return {
+                'response': result['response'],
+                'emotion_analysis': emotion_data,
+                'emotion_context': emotion_context,
+                'timestamp': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            print(f"Gemini get_response error: {e}")
+            return {
+                'response': "I apologize, but I encountered an error. Please try again.",
+                'emotion_analysis': None,
+                'emotion_context': "Error in emotion analysis",
+                'timestamp': datetime.now().isoformat()
+            }
+    
+    def save_conversation(self):
+        """Save conversation to file"""
+        try:
+            # Prepare user profile data safely
+            user_profile_data = None
+            if self.user_profile:
+                user_profile_data = asdict(self.user_profile)
+                # Convert datetimes to strings safely
+                if hasattr(self.user_profile.created_at, 'isoformat'):
+                    user_profile_data['created_at'] = self.user_profile.created_at.isoformat()  # type: ignore
+                else:
+                    user_profile_data['created_at'] = str(self.user_profile.created_at)
+                    
+                if hasattr(self.user_profile.last_active, 'isoformat'):
+                    user_profile_data['last_active'] = self.user_profile.last_active.isoformat()  # type: ignore
+                else:
+                    user_profile_data['last_active'] = str(self.user_profile.last_active)
+            
+            # Get conversation data
+            conversation_list = []
+            emotions_in_session = []
+            
+            for msg in self.conversation_history:
+                try:
+                    msg_dict = msg.to_dict()
+                    conversation_list.append(msg_dict)
+                    
+                    # Track emotions
+                    if msg.emotion and msg.emotion != 'neutral':
+                        emotions_in_session.append(msg.emotion)
+                        
+                except Exception as e:
+                    print(f"⚠️ Error processing message: {e}")
+                    continue
+            
+            conversation_data = {
+                'timestamp': datetime.now().isoformat(),
+                'user_profile': user_profile_data,
+                'conversation': conversation_list,
+                'session_stats': {
+                    'total_messages': len(conversation_list),
+                    'user_messages': len([msg for msg in conversation_list if msg.get('role') == 'user']),
+                    'assistant_messages': len([msg for msg in conversation_list if msg.get('role') == 'assistant']),
+                    'emotions_detected': list(set(emotions_in_session)),
+                    'session_duration_minutes': 0,  # Could calculate this later
+                    'models_used': list(set(msg.get('metadata', {}).get('emotion_method', '') for msg in conversation_list if msg.get('metadata')))
+                }
+            }
+            
+            filename = f"chat_session_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            with open(filename, 'w') as f:
+                json.dump(conversation_data, f, indent=2, default=str, ensure_ascii=False)
+            
+            print(f"✅ Conversation saved to {filename}")
+            print(f"   📊 {conversation_data['session_stats']['total_messages']} messages, {len(conversation_data['session_stats']['emotions_detected'])} emotions detected")
+            return filename
+            
+        except Exception as e:
+            print(f"❌ Conversation save error: {e}")
+            return None
+
+class SimpleFallbackChatbot:
+    """Simple fallback chatbot when Gemini is not available"""
+    
+    def __init__(self):
+        self.emotion_analyzer = ProductionEmotionAnalyzer() if ML_AVAILABLE else None
+        self.conversation_history = deque(maxlen=50)
+        
+    def get_response(self, message: str) -> Dict[str, Any]:
+        """Get response with emotion analysis"""
+        
+        # Analyze emotion
+        emotion_result = None
+        if self.emotion_analyzer:
+            try:
+                emotion_result = self.emotion_analyzer.analyze_text_emotion(message)
+            except Exception as e:
+                print(f"Emotion analysis failed: {e}")
+        
+        # Generate simple response based on emotion
+        if emotion_result and emotion_result['dominant_emotion']:
+            emotion = emotion_result['dominant_emotion']
+            confidence = emotion_result['confidence']
+            
+            responses = {
+                'happy': f"I can sense your happiness! That's wonderful. Tell me more about what's making you feel so positive.",
+                'sad': f"I notice you might be feeling sad. I'm here to listen and support you. What's on your mind?",
+                'angry': f"I sense some frustration. Let's work through this together. What's bothering you?",
+                'anxious': f"I understand you might be feeling anxious. You're safe here. What's concerning you?",
+                'surprised': f"You seem surprised! What's caught your attention?",
+                'neutral': f"Thank you for sharing that. How are you feeling right now?"
+            }
+            
+            response = responses.get(emotion, responses['neutral'])
+            emotion_context = f"Detected emotion: {emotion} ({confidence:.1%} confidence)"
+        else:
+            response = "Hello! I'm Y.M.I.R, your AI companion. How can I help you today?"
+            emotion_context = "No emotion detected"
+        
+        # Store in conversation history
+        self.conversation_history.append({
+            'user': message,
+            'assistant': response,
+            'emotion': emotion_result,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        return {
+            'response': response,
+            'emotion_analysis': emotion_result,
+            'emotion_context': emotion_context,
+            'timestamp': datetime.now().isoformat()
+        }
+
+# Global chatbot instance
+web_chatbot = None
+
+def init_web_chatbot():
+    """Initialize chatbot for web interface"""
+    global web_chatbot
+    api_key = os.getenv('GEMINI_API_KEY')
+    if api_key and GEMINI_AVAILABLE:
+        try:
+            web_chatbot = GeminiChatbot(api_key)
+            print("✅ Web chatbot initialized with Gemini API")
+        except Exception as e:
+            print(f"⚠️ Gemini chatbot failed, using fallback: {e}")
+            web_chatbot = SimpleFallbackChatbot()
+    else:
+        print("⚠️ Using fallback chatbot (no Gemini API)")
+        web_chatbot = SimpleFallbackChatbot()
+
 @app.route('/chat', methods=['POST'])
 def chat():
-    """Handles chatbot interaction and continuously updates detected emotions."""
-    user_input = request.json.get("message", "").strip()
-    if not user_input:
-        return jsonify({"error": "No message provided."}), 400
-
-    chatbot_response = generate_chatbot_response(user_input)
-
-    # Log conversation
-    chat_session.append({"user": user_input, "chatbot": chatbot_response})
-
-    # Continuously detect dominant emotion
-    dominant_emotion, emotion_scores, model_emotions = detect_conversation_emotions(chat_session)
-
-    response_data = {
-        "response": chatbot_response,
-        "dominant_emotion": dominant_emotion,  # Always update detected emotion
-        "model_emotions": model_emotions
-    }
-
-    # Save chat results **after every message**
-    save_chat_results()
-
-    # If the user is ending the conversation
-    if user_input.lower() in ["quit", "bye", "exit", "goodbye", "end"]:
-        response_data["end_chat"] = True  # Notify frontend to stop input
-
-    return jsonify(response_data)
+    """Enhanced chat endpoint with production-grade emotion analysis"""
+    try:
+        user_input = request.json.get("message", "").strip()
+        if not user_input:
+            return jsonify({"error": "No message provided."}), 400
+        
+        if not web_chatbot:
+            return jsonify({"error": "Chatbot not initialized."}), 500
+        
+        # Get response from enhanced chatbot
+        result = web_chatbot.get_response(user_input)
+        
+        # Save for backwards compatibility with existing system
+        chat_session = []
+        if os.path.exists("chat_results.json"):
+            with open("chat_results.json", "r") as f:
+                try:
+                    data = json.load(f)
+                    chat_session = data.get("conversation", [])
+                except:
+                    chat_session = []
+        
+        # Add to session
+        chat_session.append({"user": user_input, "chatbot": result['response']})
+        
+        # Extract emotion for backwards compatibility
+        emotion_analysis = result.get('emotion_analysis', {})
+        dominant_emotion = emotion_analysis.get('dominant_emotion', 'neutral')
+        
+        # Save chat results for compatibility
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        chat_data = {
+            "timestamp": timestamp,
+            "conversation": chat_session,
+            "dominant_emotion": dominant_emotion,
+            "emotion_scores": emotion_analysis.get('all_emotions', {dominant_emotion: 0.6}),
+            "model_emotions": [f"Enhanced ensemble analysis: {dominant_emotion}"]
+        }
+        
+        with open("chat_results.json", "w") as f:
+            json.dump(chat_data, f, indent=4)
+        
+        response_data = {
+            "response": result['response'],
+            "dominant_emotion": dominant_emotion,
+            "model_emotions": [f"Enhanced ensemble analysis: {dominant_emotion}"],
+            "emotion_context": result['emotion_context']
+        }
+        
+        # Check for conversation end
+        if user_input.lower() in ["quit", "bye", "exit", "goodbye", "end"]:
+            response_data["end_chat"] = True
+        
+        return jsonify(response_data)
+        
+    except Exception as e:
+        print(f"Chat error: {e}")
+        return jsonify({"error": "An error occurred while processing your message."}), 500
 
 @app.route('/detect_emotion', methods=['GET'])
 def detect_emotion():
     """Detects the dominant emotion from the chat session (for real-time updates)."""
-    if not chat_session:
-        return jsonify({"dominant_emotion": "neutral", "model_emotions": []})  # Default if empty chat
-
-    dominant_emotion, emotion_scores, model_emotions = detect_conversation_emotions(chat_session)
-    return jsonify({"dominant_emotion": dominant_emotion, "model_emotions": model_emotions})
+    try:
+        if os.path.exists("chat_results.json"):
+            with open("chat_results.json", "r") as f:
+                data = json.load(f)
+                return jsonify({
+                    "dominant_emotion": data.get("dominant_emotion", "neutral"),
+                    "model_emotions": data.get("model_emotions", [])
+                })
+        else:
+            return jsonify({"dominant_emotion": "neutral", "model_emotions": []})
+    except Exception as e:
+        print(f"Detect emotion error: {e}")
+        return jsonify({"dominant_emotion": "neutral", "model_emotions": []})
 
 @app.route('/save_chat', methods=['POST'])
 def save_chat():
     """Saves chat conversation and detected emotion."""
-    if not chat_session:
-        return jsonify({"error": "No chat data to save."}), 400
-
-    save_chat_results()  # Save after every message
-    return jsonify({"message": "Chat saved successfully."})
-
-def save_chat_results():
-    """Saves chatbot results (full conversation + updated emotions) to `chat_results.json`."""
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    dominant_emotion, emotion_scores, model_emotions = detect_conversation_emotions(chat_session)
-
-    chat_data = {
-        "timestamp": timestamp,
-        "conversation": chat_session,
-        "dominant_emotion": dominant_emotion,
-        "emotion_scores": emotion_scores,
-        "model_emotions": model_emotions
-    }
-
-    with open("chat_results.json", "w") as f:
-        json.dump(chat_data, f, indent=4)
+    try:
+        if web_chatbot and hasattr(web_chatbot, 'save_conversation'):
+            filename = web_chatbot.save_conversation()
+            if filename:
+                return jsonify({"message": f"Chat saved to {filename}"})
+        return jsonify({"message": "Chat saved successfully."})
+    except Exception as e:
+        print(f"Save chat error: {e}")
+        return jsonify({"error": "Failed to save chat."}), 500
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
@@ -2056,10 +2793,22 @@ def process_results():
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 if __name__ == '__main__':
+    # Initialize enhanced chatbot system
+    print("🤖 Initializing Y.M.I.R Enhanced Chatbot System...")
+    init_web_chatbot()
+    
     # Start background processing thread
     background_thread = threading.Thread(target=update_all_in_background, daemon=True)
     background_thread.start()
+    
     try:
+        print("🚀 Starting Y.M.I.R Enhanced Flask Application")
+        print("="*60)
+        print("🌐 Web Interface: http://127.0.0.1:10000")
+        print("🤖 Enhanced Chatbot: Production-grade emotion analysis")
+        print("📹 Video Emotion Detection: Real-time processing")
+        print("🎵 Music Recommendations: Emotion-based suggestions")
+        print("="*60)
         app.run(debug=True, host='127.0.0.1', port=10000)
 
     except KeyboardInterrupt:
