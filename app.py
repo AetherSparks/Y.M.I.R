@@ -8,6 +8,7 @@ Author: Y.M.I.R Development Team
 Version: 1.0.0
 """
 
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 from flask import Flask, render_template, request, jsonify, url_for, Response
 from flask_cors import CORS
 import os
@@ -17,6 +18,43 @@ from datetime import datetime
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
+from email.message import EmailMessage
+import random
+from signal import signal
+import smtplib
+import sys
+from dotenv import load_dotenv
+load_dotenv()
+import os
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import atexit
+import json
+import pickle
+import cv2
+import numpy as np
+import threading
+import time
+import mediapipe as mp
+import dlib
+import warnings
+from deepface import DeepFace
+from concurrent.futures import ThreadPoolExecutor
+from flask import Flask, render_template, Response, jsonify, render_template_string, request, send_from_directory, session, url_for, redirect ,flash
+from flask_mail import Mail , Message
+from flask_session import Session
+from flask_cors import CORS
+from scipy.spatial import distance as dist
+from collections import deque
+from transformers import pipeline
+from rich.console import Console
+import pandas as pd
+import torch
+import requests
+import time
+import re
+from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
 
 # Load environment variables
 load_dotenv()
@@ -43,11 +81,51 @@ except ImportError as e:
     print(f"⚠️ Emotion combiner not available: {e}")
     RealEmotionCombiner = None
     RealCombinedEmotion = None
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # Initialize Flask app
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'ymir-dev-key-2024')
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
+
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Email Config
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME=os.environ.get('EMAIL_USER'),
+    MAIL_PASSWORD=os.environ.get('EMAIL_PASS'),
+    MAIL_DEFAULT_SENDER=os.environ.get('EMAIL_USER')
+)
+
+# Initialize mail with app explicitly
+mail = Mail(app)
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///emotion_ai.db'  # or use PostgreSQL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# print("Mail config:", {
+#     "server": app.config['MAIL_SERVER'],
+#     "port": app.config['MAIL_PORT'],
+#     "username": bool(app.config['MAIL_USERNAME']),  # Just print if it exists
+#     "password": bool(app.config['MAIL_PASSWORD']),  # Jus   t print if it exists
+#     "use_tls": app.config['MAIL_USE_TLS']
+# })
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # Enable CORS for API calls
 CORS(app)
 
@@ -58,6 +136,8 @@ app.template_folder = 'templates'
 # Microservice URLs
 FACE_MICROSERVICE_URL = 'http://localhost:5002'
 TEXT_MICROSERVICE_URL = 'http://localhost:5003'
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
 
 class MicroserviceClient:
     """Client to communicate with microservices"""
@@ -290,9 +370,69 @@ if EMOTION_COMBINER_AVAILABLE:
     monitor_thread.start()
     print("✅ Emotion combiner monitoring started (every 60 seconds)")
 
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+#reya's implementation
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+DATA_FILE = 'goals.json'
+POSTS_FILE = 'data/posts.json'
+app.secret_key = "your_secret_key"
+
+analyzer = SentimentIntensityAnalyzer()
+
+# Mood-based meditation scripts (more human-like and varied)
+SCRIPTS = {
+    "anxious": [
+        "Take a deep breath in... and out. Imagine a calm ocean. Let the waves carry your anxiety away.",
+        "Inhale peace. Exhale worry. Picture a peaceful forest with birds gently chirping.",
+        "You are safe. You are grounded. With every breath, let go of anxious thoughts."
+    ],
+    "stressed": [
+        "Let go of tension with every breath. Relax your shoulders. You are safe.",
+        "You are not your stress. You are strength, you are calm. Let each exhale ground you.",
+        "Breathe deeply. Picture your thoughts floating like clouds, drifting far away."
+    ],
+    "tired": [
+        "Close your eyes. Imagine a soft, glowing light recharging your body and mind.",
+        "Sink into stillness. Every breath is a wave of renewal flowing through you.",
+        "Let your body rest. Let your mind slow down. You deserve peace and rest."
+    ],
+    "happy": [
+        "Let’s deepen your joy. Smile softly and be present with the happiness within.",
+        "Breathe in gratitude. Breathe out love. Stay with this beautiful feeling.",
+        "Feel the warmth inside you. Your happiness is a gift — cherish this moment."
+    ]
+}
+
+# Optional: Motivational quotes to display with the meditation
+QUOTES = [
+    "You are enough. Just as you are.",
+    "Breathe. You’ve got this.",
+    "Peace begins with a single breath.",
+    "Today is a fresh start.",
+    "Inner calm is your superpower."
+]
+
+def suggest_breathing(mood):
+    techniques = {
+        "anxious": "Box Breathing (4-4-4-4) – Inhale, hold, exhale, hold for 4 seconds each.",
+        "stressed": "4-7-8 Breathing – Inhale 4s, hold 7s, exhale 8s. Great for calming nerves.",
+        "tired": "Diaphragmatic Breathing – Deep belly breaths to refresh energy.",
+        "distracted": "Alternate Nostril Breathing – Helps center your focus.",
+        "neutral": "Guided Breath Awareness – Simply observe your breath."
+    }
+    return techniques.get(mood, "Try Box Breathing to get started.")
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Flask Route: Home
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
 @app.route('/')
-def home():
-    """Render the home page"""
+def home1():
     return render_template('home.html')
 
 @app.route('/ai_app')
@@ -308,65 +448,381 @@ def ai_app():
 
 @app.route('/about')
 def about():
-    """About page"""
-    return render_template('about.html')
-
-@app.route('/contact')
-def contact():
-    """Contact page"""
-    return render_template('contact.html')
+    return render_template('about.html')  
 
 @app.route('/features')
 def features():
-    """Features page"""
     return render_template('features.html')
 
 @app.route('/pricing')
 def pricing():
-    """Pricing page"""
     return render_template('pricing.html')
 
 @app.route('/privacy')
 def privacy():
-    """Privacy policy page"""
     return render_template('privacy.html')
 
 @app.route('/services')
 def services():
-    """Services page"""
     return render_template('services.html')
 
 @app.route('/wellness')
 def wellness():
     return render_template('wellness_tools.html')
 
-@app.route('/meditation')
-def meditation():
-    """Meditation page"""
-    return render_template('meditation.html')
+@app.route('/gaming')
+def gaming():
+    return render_template('gaming.html')
 
-@app.route('/breathing')
-def breathing():
-    """Breathing exercises page"""
-    return render_template('breathing.html')
-
-@app.route('/journal')
-def journal():
-    """Journal page"""
-    return render_template('journal.html')
-
-@app.route('/community_support')
-def community_support():
-    """Community support page"""
-    return render_template('community_support.html')
-
-@app.route('/cookiepolicy')
-def cookiepolicy():
-    """Cookie policy page"""
+@app.route('/cookies')
+def cookies():
     return render_template('cookiepolicy.html')
 
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        try:
+            print("======= CONTACT FORM SUBMISSION =======")
+            print("Form data:", request.form)
 
+            # Get form data
+            name = request.form.get('name', '')
+            email = request.form.get('email', '')
+            subject = request.form.get('subject', 'No Subject')
+            message = request.form.get('message', '')
+            phone = request.form.get('phone', 'Not provided')
+
+            # Timestamp for submission
+            submission_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            # Create the email message
+            print("Creating message...")
+            msg = Message(
+                subject=f"New Contact Inquiry: {subject}",
+                sender=("Your Website Contact Form", app.config.get('MAIL_DEFAULT_SENDER') or os.getenv('EMAIL_USER')),
+                recipients=[app.config.get('MAIL_USERNAME') or os.getenv('EMAIL_USER')],
+                reply_to=email
+            )
+
+            # Plain text body (ASCII-safe fallback)
+            msg.body = f"""Hello Admin,
+
+You have received a new contact form submission on your website.
+
+Submitted On: {submission_time}
+
+Name: {name}
+Email: {email}
+Phone: {phone}
+Subject: {subject}
+Message:
+{message}
+
+Please respond promptly.
+"""
+
+            # HTML body (UTF-8 + emoji support)
+            html_body = render_template_string("""
+<html>
+  <body style="font-family: Arial, sans-serif; color: #333;">
+    <h2> New Contact Form Submission</h2>
+    <p><strong> Submitted On:</strong> {{ submission_time }}</p>
+    <p><strong> Name:</strong> {{ name }}</p>
+    <p><strong> Email:</strong> {{ email }}</p>
+    <p><strong> Phone:</strong> {{ phone }}</p>
+    <p><strong> Subject:</strong> {{ subject }}</p>
+    <p><strong> Message:</strong><br>{{ message }}</p>
+    <hr>
+    <p>Regards,<br><strong>Your Website Bot</strong></p>
+  </body>
+</html>
+""", submission_time=submission_time, name=name, email=email, phone=phone, subject=subject, message=message.replace('\n', '<br>'))
+
+            msg.html = html_body  # Attach HTML email
+
+            # Optional: Handle attachments
+            if 'attachment' in request.files:
+                file = request.files['attachment']
+                if file and file.filename != '':
+                    print(f"Attaching file: {file.filename}")
+                    file_content = file.read()
+                    msg.attach(file.filename, file.content_type, file_content)
+                    print("Attachment added.")
+
+            # Send email
+            print("Sending email...")
+            mail.send(msg)
+            print("Email sent!")
+
+            return jsonify({"success": True, "message": "Thank you! Your message has been sent."})
+
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print("======= CONTACT FORM ERROR =======")
+            print(f"Error type: {type(e).__name__}")
+            print(f"Error message: {str(e)}")
+            print(f"Traceback:\n{error_details}")
+
+            return jsonify({
+                "success": False,
+                "message": "Oops! Something went wrong. Please try again later."
+            }), 500
+
+    # GET request → render contact form
+    return render_template('contact.html')
+
+from flask import jsonify
+
+@app.route('/book-appointment', methods=['POST'])
+def book_appointment():
+    user_name = request.form['user_name']
+    user_email = request.form['user_email']
+    appointment_date = request.form['appointment_date']
+    time_slot = request.form['time_slot']
+    duration = request.form['meeting_duration']
+    timezone = request.form['timezone']
+    notes = request.form['appointment_notes']
+
+    subject = 'New appointment Booking!'
+    body = f"""
+    New Appointment Booked!
+
+    Name: {user_name}
+    Email: {user_email}
+    Appointment Date: {appointment_date}
+    Time Slot: {time_slot}
+    Duration: {duration} minutes
+    Timezone: {timezone}
+    Notes: {notes}
+    """
+
+    sender_email = os.environ.get('EMAIL_USER')
+    receiver_email = os.environ.get('EMAIL_USER')
+    password = os.environ.get('EMAIL_PASS')
+
+    try:
+        msg = EmailMessage()
+        msg['Subject'] = subject
+        msg['From'] = sender_email
+        msg['To'] = receiver_email
+        msg.set_content(body)
+
+        # Send Email
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(sender_email, password)
+            smtp.send_message(msg)
+
+        # ✅ Return JSON success message (instead of flash)
+        return jsonify({"success": True, "message": "Appointment booked successfully!"})
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"success": False, "message": "Failed to send email!"}), 500
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+#Emotion based jorunaling and welness tool  [REYA'S IMPLEMENTATION]
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+@app.route("/meditation")
+def meditation():
+    return render_template("meditation.html")
+
+@app.route("/meditation/result", methods=["POST"])
+def meditation_result():
+    feeling = request.form.get("feeling", "").lower()
+
+    # Find matching script list based on mood keyword
+    for mood, scripts in SCRIPTS.items():
+        if mood in feeling:
+            script = random.choice(scripts)
+            break
+    else:
+        # Default script if mood not found
+        script = f"Let’s take a few moments to be still. You mentioned feeling '{feeling}'. Breathe deeply and allow peace to fill your body."
+
+    quote = random.choice(QUOTES)
+
+    return render_template("meditation_result.html", script=script, quote=quote)
+
+@app.route('/breathing', methods=['GET', 'POST'])
+def breathing():
+    suggestion = None
+    if request.method == 'POST':
+        mood = request.form['mood'].lower()
+        suggestion = suggest_breathing(mood)
+    return render_template('breathing.html', suggestion=suggestion)
+
+@app.route('/journal', methods=['GET', 'POST'])
+def journal():
+    if request.method == 'POST':
+        entry = request.form['entry']
+        sentiment, suggestion = analyze_journal(entry)
+        return render_template('journal.html', sentiment=sentiment, suggestion=suggestion, entry=entry)
+    return render_template('journal.html')
+
+def analyze_journal(text):
+    scores = analyzer.polarity_scores(text)
+    compound = scores['compound']
+
+    if compound >= 0.05:
+        sentiment = 'positive'
+    elif compound <= -0.05:
+        sentiment = 'negative'
+    else:
+        sentiment = 'neutral'
+
+    suggestions = {
+        "positive": "Keep up the positive energy! 😊",
+        "negative": "Try writing about what made you feel this way. 💬",
+        "neutral": "Explore your thoughts more deeply next time. ✍️"
+    }
+
+    return sentiment, suggestions.get(sentiment)
+
+def load_goals():
+    if not os.path.exists(DATA_FILE):
+        return []
+    with open(DATA_FILE, 'r') as f:
+        return json.load(f)
+
+def save_goals(goals):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(goals, f, indent=4)
+
+@app.route('/goals', methods=['GET', 'POST'])
+def goals():
+    if request.method == 'POST':
+        new_goal = request.form.get('goal')
+        if new_goal:
+            goals = load_goals()
+            goals.append({
+                "goal": new_goal,
+                "created": datetime.today().strftime('%Y-%m-%d'),
+                "streak": 0,
+                "last_checked": ""
+            })
+            save_goals(goals)
+            return redirect(url_for('goals'))
+    
+    goals = load_goals()
+    return render_template('goals.html', goals=goals)
+
+@app.route('/check_goal/<int:goal_index>')
+def check_goal(goal_index):
+    goals = load_goals()
+    today = datetime.today().strftime('%Y-%m-%d')
+
+    if goals[goal_index]["last_checked"] != today:
+        goals[goal_index]["last_checked"] = today
+        goals[goal_index]["streak"] += 1
+        save_goals(goals)
+
+    return redirect(url_for('goals'))
+
+@app.route('/sound-therapy', methods=['GET', 'POST'])
+def sound_therapy():
+    mood = request.form.get('mood') if request.method == 'POST' else None
+
+    mood_to_sound = {
+        "relaxed": {
+            "title": "Sunset Landscape",
+            "file": "Sunset-Landscape(chosic.com).mp3"
+        },
+        "anxious": {
+            "title": "White Petals",
+            "file": "keys-of-moon-white-petals(chosic.com).mp3"
+        },
+        "sad": {
+            "title": "Rainforest Sounds",
+            "file": "Rain-Sound-and-Rainforest(chosic.com).mp3"
+        },
+        "tired": {
+            "title": "Meditation",
+            "file": "meditation.mp3"
+        },
+        "focus": {
+            "title": "Magical Moments",
+            "file": "Magical-Moments-chosic.com_.mp3"
+        }
+    }
+
+    recommended = mood_to_sound.get(mood, None)
+
+    # All available sounds (for browsing below)
+    all_sounds = list(mood_to_sound.values())
+
+    return render_template('sound_therapy.html', recommended=recommended, all_sounds=all_sounds)
+
+def load_posts():
+    if os.path.exists(POSTS_FILE):
+        with open(POSTS_FILE, 'r') as f:
+            return json.load(f)
+    return []
+
+def save_posts(posts):
+    with open(POSTS_FILE, 'w') as f:
+        json.dump(posts, f, indent=4)
+
+
+@app.route('/community', methods=['GET', 'POST'])
+def community_support():
+    posts = load_posts()
+
+    if request.method == 'POST':
+        username = request.form['username']
+        message = request.form['message']
+        # Very basic AI reply simulation (you can plug in sentiment/local AI later)
+        ai_response = "Thanks for sharing. You're not alone on this journey 🌟"
+
+        posts.insert(0, {
+            'username': username,
+            'message': message,
+            'reply': ai_response
+        })
+
+        save_posts(posts)
+        return redirect(url_for('community_support'))
+
+    return render_template('community_support.html', posts=posts)
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+#Emotion based movie recommendation [SNEHA'S IMPLEMENTATION]
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Sample movie list
+movie_data = [
+    {"title": "Inception", "genres": "Action|Sci-Fi|Thriller"},
+    {"title": "The Dark Knight", "genres": "Action|Crime|Drama"},
+    {"title": "Titanic", "genres": "Drama|Romance"},
+    {"title": "The Shawshank Redemption", "genres": "Drama"},
+    {"title": "Avatar", "genres": "Action|Adventure|Fantasy"}
+]
+
+@app.route('/recommend', methods=['GET', 'POST'])
+def home():
+    mood = None
+    recommendations = None
+    
+    if request.method == 'POST':
+        mood = request.form['mood']
+        recommendations = get_movie_recommendations(mood)
+
+    return render_template('recommendations.html', mood=mood, recommendations=recommendations)
+
+def get_movie_recommendations(mood):
+    # Filter movies based on mood, for simplicity we just return all movies here
+    # You can customize this logic to filter movies based on the mood
+    return movie_data
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # API Routes - Proxy to microservices
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 @app.route('/api/camera/start', methods=['POST'])
 def api_start_camera():
     """Proxy camera start to face microservice"""
@@ -508,8 +964,11 @@ def api_combined_emotions():
     result = microservice_client.get_combined_emotions()
     print(f"🔗 API RESULT: {result}")
     return jsonify(result)
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # 🎵 EMOTION-BASED MUSIC RECOMMENDATION API
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 @app.route('/api/music/recommendations')
 def api_music_recommendations():
     """🎵 Get emotion-based music recommendations for the carousel (100 songs for scrolling)"""
@@ -617,9 +1076,10 @@ def api_music_recommendations():
             'error': f'Music recommendation error: {str(e)}',
             'recommendations': []
         }), 500
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
-
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 @app.route('/api/video_feed')
 def api_video_feed():
     """Proxy video feed from face microservice"""
@@ -632,7 +1092,9 @@ def api_video_feed():
         )
     except Exception as e:
         return jsonify({'error': f'Video feed error: {str(e)}'}), 500
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # Health check endpoint
 @app.route('/health')
 def health_check():
@@ -655,8 +1117,11 @@ def health_check():
             }
         }
     })
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # ===== MUSIC PLAYER API ENDPOINTS =====
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 import re
 import os
 import time
@@ -934,6 +1399,10 @@ def api_get_album_art():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # Add Firebase Authentication routes
 if FIREBASE_AUTH_AVAILABLE:
     add_auth_routes(app)
@@ -956,3 +1425,4 @@ if __name__ == '__main__':
         port=5000,
         threaded=True
     )
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
