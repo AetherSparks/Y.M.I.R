@@ -34,7 +34,7 @@ except ImportError:
 
 @dataclass
 class RealCombinedEmotion:
-    """Real combined emotion from actual storage"""
+    """Real combined emotion from actual storage with multi-emotion support"""
     dominant_emotion: str
     confidence: float
     facial_source: Optional[Dict[str, Any]] = None
@@ -42,9 +42,21 @@ class RealCombinedEmotion:
     combination_method: str = "confidence_based"
     timestamp: datetime = None
     
+    # 🎭 Multi-emotion support attributes
+    top_emotions: List[Tuple[str, float]] = None
+    is_multi_emotion: bool = False
+    fusion_weights: Dict[str, float] = None
+    all_fused_emotions: Dict[str, float] = None
+    
     def __post_init__(self):
         if self.timestamp is None:
             self.timestamp = datetime.now()
+        if self.top_emotions is None:
+            self.top_emotions = [(self.dominant_emotion, self.confidence)]
+        if self.fusion_weights is None:
+            self.fusion_weights = {'facial': 0.5, 'text': 0.5}
+        if self.all_fused_emotions is None:
+            self.all_fused_emotions = {self.dominant_emotion: self.confidence}
 
 class AdvancedEmotionFusionEngine:
     """🧠 ADVANCED Emotion Fusion with Multiple Strategies"""
@@ -155,67 +167,106 @@ class AdvancedEmotionFusionEngine:
         return emotion, confidence, f"temporal_weighted_f{facial_temporal_weight:.2f}_t{text_temporal_weight:.2f}"
     
     def _adaptive_fusion(self, facial_data: Dict[str, Any], text_data: Dict[str, Any]) -> Tuple[str, float, str]:
-        """🎯 SMART Adaptive fusion with MULTI-EMOTION support"""
+        """🎯 CONTEXT-AWARE Adaptive fusion based on user activity"""
         facial_confidence = facial_data.get('confidence', 0.0) if facial_data else 0.0
         text_confidence = text_data.get('confidence', 0.0) if text_data else 0.0
         
-        # Base weights
-        facial_weight = 0.5
-        text_weight = 0.5
+        # 🎯 SMART ACTIVITY DETECTION
+        from datetime import timezone
+        now = datetime.now(timezone.utc)
         
-        # 🧠 Smart confidence-based adjustment
-        confidence_ratio = facial_confidence / (text_confidence + 0.01)
-        if confidence_ratio > 2.0:
-            facial_weight = 0.7
-            text_weight = 0.3
-        elif confidence_ratio < 0.5:
-            facial_weight = 0.3
-            text_weight = 0.7
+        # Analyze user activity patterns
+        text_age = 999999  # Default very old
+        is_actively_chatting = False
+        is_recent_text = False
+        
+        if text_data and text_data.get('timestamp'):
+            text_timestamp = text_data['timestamp']
+            if text_timestamp.tzinfo is None:
+                text_timestamp = text_timestamp.replace(tzinfo=timezone.utc)
+            text_age = (now - text_timestamp).total_seconds()
+            is_recent_text = text_age < 120  # Less than 2 minutes
+            is_actively_chatting = text_data.get('is_recent_activity', False) or text_age < 30
+        
+        facial_age = 999999  # Default very old  
+        is_camera_active = False
+        if facial_data and facial_data.get('timestamp'):
+            facial_timestamp = facial_data['timestamp']
+            if facial_timestamp.tzinfo is None:
+                facial_timestamp = facial_timestamp.replace(tzinfo=timezone.utc)
+            facial_age = (now - facial_timestamp).total_seconds()
+            is_camera_active = facial_age < 60  # Camera active in last minute
+        
+        # 🎮 DYNAMIC WEIGHTING BASED ON USER ACTIVITY
+        print(f"🎯 Activity Analysis:")
+        print(f"   💬 Text age: {text_age:.0f}s, Active chatting: {is_actively_chatting}")
+        print(f"   📹 Face age: {facial_age:.0f}s, Camera active: {is_camera_active}")
+        
+        # SCENARIO 1: User is actively chatting (text should STRONGLY dominate)
+        if is_actively_chatting and text_age < 60:
+            facial_weight = 0.1   # Very low facial weight
+            text_weight = 0.9    # Very high text weight
+            strategy = "active_chatting"
+            print(f"   🎯 Strategy: ACTIVE CHATTING (90/10) - text emotions dominate")
+        
+        # SCENARIO 2: Only camera running, no recent text (facial should STRONGLY dominate)
+        elif is_camera_active and not is_recent_text:
+            facial_weight = 0.9   # Very high facial weight
+            text_weight = 0.1    # Very low text weight
+            strategy = "camera_only"
+            print(f"   🎯 Strategy: CAMERA ONLY (90/10) - facial emotions dominate")
+        
+        # SCENARIO 3: Both active (meaningful but decisive weighting)
+        elif is_camera_active and is_recent_text:
+            if text_age < facial_age:
+                facial_weight = 0.4   # Meaningful facial influence
+                text_weight = 0.6    # Text leads but doesn't dominate
+                strategy = "both_active_text_newer"
+                print(f"   🎯 Strategy: BOTH ACTIVE (60/40) - text leads, face influences")
+            else:
+                facial_weight = 0.6   # Face leads but doesn't dominate  
+                text_weight = 0.4    # Meaningful text influence
+                strategy = "both_active_face_newer"
+                print(f"   🎯 Strategy: BOTH ACTIVE (60/40) - face leads, text influences")
+        
+        # SCENARIO 4: Neither source is recent (use older logic)
+        else:
+            facial_weight = 0.5
+            text_weight = 0.5
+            strategy = "legacy_balanced"
+            print(f"   🎯 Strategy: LEGACY BALANCED - no recent activity")
+        
+        # 🧠 Apply confidence-based fine-tuning
+        if facial_confidence > 0 and text_confidence > 0:
+            confidence_ratio = facial_confidence / (text_confidence + 0.01)
+            if confidence_ratio > 3.0:  # Very high facial confidence
+                facial_weight *= 1.2
+                strategy += "_facial_boost"
+            elif confidence_ratio < 0.33:  # Very high text confidence
+                text_weight *= 1.2
+                strategy += "_text_boost"
         
         # 🔍 Quality-based adjustment (if facial has quality score)
         if facial_data and facial_data.get('quality_score', 0) > 0.8:
-            facial_weight *= 1.2  # Boost high-quality facial detection
+            facial_weight *= 1.1  # Small boost for high-quality facial detection
         
         # 🎭 MULTI-EMOTION BONUS: If facial has diverse emotions, boost its weight
         if facial_data and facial_data.get('top_emotions'):
             top_emotions = facial_data['top_emotions']
             if len(top_emotions) >= 2:
-                # Check if secondary emotion is significant (>10%)
                 secondary_score = top_emotions[1][1] if len(top_emotions) > 1 else 0
                 if secondary_score > 0.1:  # 10% threshold
-                    facial_weight *= 1.15  # Boost for emotional complexity
+                    facial_weight *= 1.1  # Smaller boost for emotional complexity
                     print(f"🎭 Facial multi-emotion bonus: {top_emotions[1][0]} = {secondary_score:.3f}")
         
         # 🎭 MULTI-EMOTION BONUS: If text has diverse emotions, boost its weight
         if text_data and text_data.get('top_emotions'):
             top_text_emotions = text_data['top_emotions']
             if len(top_text_emotions) >= 2:
-                # Check if secondary emotion is significant (>20% for text as it's usually noisier)
                 secondary_score = top_text_emotions[1][1] if len(top_text_emotions) > 1 else 0
                 if secondary_score > 0.2:  # 20% threshold for text
-                    text_weight *= 1.15  # Boost for emotional complexity
+                    text_weight *= 1.1  # Smaller boost for emotional complexity
                     print(f"🎭 Text multi-emotion bonus: {top_text_emotions[1][0]} = {secondary_score:.3f}")
-        
-        # 🕐 Freshness boost - newer data gets slight preference
-        from datetime import timezone
-        now = datetime.now(timezone.utc)  # Use UTC timezone-aware datetime
-        if facial_data and facial_data.get('timestamp'):
-            facial_timestamp = facial_data['timestamp']
-            # Ensure facial timestamp is timezone-aware
-            if facial_timestamp.tzinfo is None:
-                facial_timestamp = facial_timestamp.replace(tzinfo=timezone.utc)
-            facial_age = (now - facial_timestamp).total_seconds()
-            if facial_age < 30:  # Less than 30 seconds old
-                facial_weight *= 1.1
-        
-        if text_data and text_data.get('timestamp'):
-            text_timestamp = text_data['timestamp']
-            # Ensure text timestamp is timezone-aware
-            if text_timestamp.tzinfo is None:
-                text_timestamp = text_timestamp.replace(tzinfo=timezone.utc)
-            text_age = (now - text_timestamp).total_seconds()
-            if text_age < 30:  # Less than 30 seconds old
-                text_weight *= 1.1
         
         # Normalize weights
         total_weight = facial_weight + text_weight
@@ -390,60 +441,99 @@ class RealEmotionCombiner:
             return None
     
     def get_latest_text_emotions(self, minutes_back: int = 10) -> Optional[Dict[str, Any]]:
-        """🔥 Get latest text emotions from Firebase (like ChatGPT)"""
+        """🔥 Get LATEST text emotions from Firebase with recency prioritization"""
         if not self.firebase_client:
             if not self.silent:
                 print("❌ Firebase not available for text emotions")
             return None
         
         try:
-            # Calculate time range using UTC to match Firebase storage
+            # 🎯 SMART TIME RANGE: Prioritize very recent activity
             from datetime import timezone
-            cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=minutes_back)
+            now = datetime.now(timezone.utc)
             
-            # Query Firebase for recent text emotion readings (NO INDEXES!)
+            # Look for recent activity first (last 2 minutes)
+            recent_cutoff = now - timedelta(minutes=2)
+            extended_cutoff = now - timedelta(minutes=minutes_back)
+            
             emotions_ref = self.firebase_client.collection('emotion_readings')
             
-            # Query ordered by timestamp (newest first) to get latest emotions
-            query = emotions_ref.where('timestamp', '>=', cutoff_time).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(20)
+            # 🔍 STEP 1: Check for very recent text emotions (priority)
+            recent_query = emotions_ref.where('timestamp', '>=', recent_cutoff).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(5)
+            recent_docs = list(recent_query.stream())
             
-            docs = query.stream()
-            
-            # Filter in code to avoid indexes - STRICT text emotion filtering
-            text_emotions = []
-            for doc in docs:
+            recent_text_emotions = []
+            for doc in recent_docs:
                 data = doc.to_dict()
-                # TEXT emotions have: 'role': 'user', 'emotion' (singular), 'message_id'
-                # FACIAL emotions have: 'face_id', 'emotions' (plural), no 'role' field
                 if (data.get('role') == 'user' and 
                     'emotion' in data and 
                     'message_id' in data and 
-                    'face_id' not in data):  # Allow ALL emotions including neutral for testing
-                    text_emotions.append({
+                    'face_id' not in data):
+                    recent_text_emotions.append({
                         'doc': doc,
                         'data': data,
-                        'timestamp': data.get('timestamp')
+                        'timestamp': data.get('timestamp'),
+                        'age_seconds': (now - data.get('timestamp')).total_seconds()
                     })
-                    print(f"🔍 DEBUG: Found text emotion - session: {data.get('session_id')}, emotion: {data.get('emotion')}, time: {data.get('timestamp')}")
             
-            # Get latest (already ordered by timestamp descending)
-            if text_emotions:
-                latest = text_emotions[0]  # First item is the most recent
+            # If recent activity found, use it with high priority
+            if recent_text_emotions:
+                latest = recent_text_emotions[0]  # Most recent
                 data = latest['data']
+                age = latest['age_seconds']
                 
-                print(f"💬 Found Firebase text emotion: {data}")
+                print(f"💬 Found RECENT text emotion (⚡{age:.0f}s ago): {data.get('emotion')}")
                 return {
-                    'source': 'firebase_chat',
+                    'source': 'firebase_chat_recent',
                     'timestamp': data.get('timestamp'),
                     'emotion': data.get('emotion'),
                     'confidence': data.get('confidence', 0.5),
                     'content': data.get('content_preview', ''),
                     'session_id': data.get('session_id'),
                     'message_id': data.get('message_id'),
-                    'doc_id': latest['doc'].id
+                    'doc_id': latest['doc'].id,
+                    'age_seconds': age,
+                    'is_recent_activity': True
                 }
             
-            print(f"💬 No Firebase text emotions found in last {minutes_back} minutes")
+            # 🔍 STEP 2: If no recent activity, look in extended range
+            extended_query = emotions_ref.where('timestamp', '>=', extended_cutoff).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(10)
+            extended_docs = list(extended_query.stream())
+            
+            text_emotions = []
+            for doc in extended_docs:
+                data = doc.to_dict()
+                if (data.get('role') == 'user' and 
+                    'emotion' in data and 
+                    'message_id' in data and 
+                    'face_id' not in data):
+                    text_emotions.append({
+                        'doc': doc,
+                        'data': data,
+                        'timestamp': data.get('timestamp'),
+                        'age_seconds': (now - data.get('timestamp')).total_seconds()
+                    })
+            
+            if text_emotions:
+                latest = text_emotions[0]  # Most recent in extended range
+                data = latest['data']
+                age = latest['age_seconds']
+                
+                print(f"💬 Found older text emotion ({age/60:.1f}min ago): {data.get('emotion')}")
+                return {
+                    'source': 'firebase_chat_older',
+                    'timestamp': data.get('timestamp'),
+                    'emotion': data.get('emotion'),
+                    'confidence': data.get('confidence', 0.5),
+                    'content': data.get('content_preview', ''),
+                    'session_id': data.get('session_id'),
+                    'message_id': data.get('message_id'),
+                    'doc_id': latest['doc'].id,
+                    'age_seconds': age,
+                    'is_recent_activity': False
+                }
+            
+            print(f"💬 No text emotions found in last {minutes_back} minutes")
             return None
             
         except Exception as e:
@@ -583,16 +673,80 @@ class RealEmotionCombiner:
             print(f"   🧠 Method: {method}")
             print(f"   📈 Strategy: {strategy}")
         
-        # Create combined result
-        combined = RealCombinedEmotion(
+        # 🎭 ENHANCED: Create multi-emotion result instead of just dominant
+        all_fused_emotions = {}
+        
+        # Determine fusion weights based on method used
+        if method == 'facial_only':
+            facial_weight, text_weight = 1.0, 0.0
+        elif method == 'text_only':
+            facial_weight, text_weight = 0.0, 1.0
+        elif method.startswith('adaptive'):
+            # Use adaptive weights from strategy
+            if 'active_chatting' in method:
+                facial_weight, text_weight = 0.1, 0.9
+            elif 'camera_only' in method:
+                facial_weight, text_weight = 0.9, 0.1
+            else:
+                facial_weight, text_weight = 0.6, 0.4  # Default balanced
+        else:
+            facial_weight, text_weight = 0.5, 0.5  # Default equal weighting
+        
+        # Combine ALL emotions from both sources with proper weighting
+        if facial_fusion_data and facial_fusion_data.get('emotions'):
+            for emotion, score in facial_fusion_data['emotions'].items():
+                all_fused_emotions[emotion] = all_fused_emotions.get(emotion, 0) + (score * facial_weight)
+        
+        if text_fusion_data and text_fusion_data.get('emotions'):
+            for emotion, score in text_fusion_data['emotions'].items():
+                all_fused_emotions[emotion] = all_fused_emotions.get(emotion, 0) + (score * text_weight)
+        
+        # Get top 3 emotions instead of just winner
+        top_emotions = []
+        is_multi_emotion = False
+        
+        if all_fused_emotions:
+            sorted_emotions = sorted(all_fused_emotions.items(), key=lambda x: x[1], reverse=True)
+            top_emotions = sorted_emotions[:3]  # Top 3 emotions
+            
+            # Check if this is truly multi-emotion (secondary emotion has significant score)
+            if len(top_emotions) > 1 and top_emotions[1][1] > 0.15:  # Secondary emotion > 15%
+                is_multi_emotion = True
+                
+                if not self.silent:
+                    print(f"\\n🎭 MULTI-EMOTION DETECTED:")
+                    print(f"   Primary: {top_emotions[0][0].upper()} ({top_emotions[0][1]:.1%})")
+                    if len(top_emotions) > 1:
+                        print(f"   Secondary: {top_emotions[1][0].upper()} ({top_emotions[1][1]:.1%})")
+                    if len(top_emotions) > 2:
+                        print(f"   Tertiary: {top_emotions[2][0].upper()} ({top_emotions[2][1]:.1%})")
+            else:
+                if not self.silent:
+                    print(f"\\n🎯 SINGLE DOMINANT EMOTION: {top_emotions[0][0].upper()} ({top_emotions[0][1]:.1%})")
+        
+        # Create enhanced result with multi-emotion data
+        enhanced_result = RealCombinedEmotion(
             dominant_emotion=winner_emotion,
             confidence=winner_confidence,
-            facial_source=facial_data,
-            text_source=text_data,
-            combination_method=f"{strategy}_{method}"
+            combination_method=method,
+            facial_source=facial_fusion_data,
+            text_source=text_fusion_data
         )
         
-        return combined
+        # Add multi-emotion data to the result
+        enhanced_result.top_emotions = top_emotions
+        enhanced_result.is_multi_emotion = is_multi_emotion
+        enhanced_result.fusion_weights = {'facial': facial_weight, 'text': text_weight}
+        enhanced_result.all_fused_emotions = all_fused_emotions
+        
+        if not self.silent:
+            print(f"\\n🎯 FINAL MULTI-EMOTION RESULT:")
+            print(f"   🏆 Winner: {winner_emotion} (confidence: {winner_confidence:.2f})")
+            print(f"   🎭 Multi-emotion: {'YES' if is_multi_emotion else 'NO'}")
+            print(f"   ⚖️ Weights: Facial={facial_weight:.1f}, Text={text_weight:.1f}")
+            print("=" * 70)
+        
+        return enhanced_result
     
     def get_emotion_history(self, hours_back: int = 24) -> List[Dict[str, Any]]:
         """Get emotion history from both sources"""
@@ -720,7 +874,12 @@ def get_combined_emotion(minutes_back: int = 10, strategy: str = 'adaptive'):
                 'strategy': strategy,
                 'facial_data': combined.facial_source,
                 'text_data': combined.text_source,
-                'timestamp': combined.timestamp
+                'timestamp': combined.timestamp,
+                # 🎭 Multi-emotion data
+                'top_emotions': combined.top_emotions,
+                'is_multi_emotion': combined.is_multi_emotion,
+                'fusion_weights': combined.fusion_weights,
+                'all_emotions': combined.all_fused_emotions
             }
         else:
             print("🔍 DEBUG: combine_real_emotions returned None")

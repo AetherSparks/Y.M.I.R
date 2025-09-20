@@ -200,7 +200,12 @@ class MicroserviceClient:
                         'combination_method': combined.combination_method,
                         'timestamp': combined.timestamp.isoformat(),
                         'facial_source': combined.facial_source,
-                        'text_source': combined.text_source
+                        'text_source': combined.text_source,
+                        # 🎭 Multi-emotion support
+                        'top_emotions': getattr(combined, 'top_emotions', [(combined.dominant_emotion, combined.confidence)]),
+                        'is_multi_emotion': getattr(combined, 'is_multi_emotion', False),
+                        'fusion_weights': getattr(combined, 'fusion_weights', {'facial': 0.5, 'text': 0.5}),
+                        'all_emotions': getattr(combined, 'all_fused_emotions', {combined.dominant_emotion: combined.confidence})
                     },
                     'face_emotions': face_emotions,
                     'text_available': not text_status.get('error')
