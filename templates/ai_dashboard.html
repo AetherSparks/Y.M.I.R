@@ -430,6 +430,68 @@
                 inset 0 -1px 0 rgba(59, 130, 246, 0.05);
             overflow: hidden;
             backdrop-filter: blur(20px);
+            cursor: grab;
+            user-select: none;
+        }
+
+        .music-carousel-container:active {
+            cursor: grabbing;
+        }
+
+        /* Carousel Controls */
+        .carousel-controls {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .carousel-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .carousel-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .carousel-btn.active {
+            background: rgba(79, 209, 199, 0.3);
+            border-color: #4fd1c7;
+            color: #4fd1c7;
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.65em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .music-carousel-container:hover .scroll-indicator {
+            opacity: 1;
         }
 
         /* Animated Holographic Border - Dark Blue Theme */
@@ -688,14 +750,297 @@
             height: 200px;
         }
 
-        /* CSS Version 5.0 - Medium Speed Like Big Companies */
+        /* CSS Version 6.0 - Optimal Speed with Manual Controls */
         .music-track {
             display: flex;
             gap: 20px;
-            animation: scroll-left 80s linear infinite !important;
+            animation: scroll-left 60s linear infinite;
             width: fit-content;
+            transition: transform 0.3s ease;
         }
 
+        .music-track.dragging {
+            animation-play-state: paused !important;
+            cursor: grabbing !important;
+            transition: none !important;
+        }
+
+        .music-track.paused {
+            animation-play-state: paused !important;
+        }
+
+        .music-carousel {
+            cursor: grab;
+        }
+
+        .music-carousel:active {
+            cursor: grabbing;
+        }
+
+        /* 🎨 ENHANCED AI SONG CARDS - STUNNING VISUAL DESIGN */
+        .ai-song-card {
+            min-width: 320px;
+            height: 200px;
+            border-radius: 20px;
+            padding: 0;
+            border: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
+                        0 0 0 1px rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .ai-song-card:hover {
+            transform: translateY(-10px) scale(1.02) rotateX(5deg);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 
+                        0 0 0 1px rgba(255, 255, 255, 0.2),
+                        0 0 40px rgba(255, 255, 255, 0.1);
+            animation-play-state: paused;
+        }
+
+        /* Floating Music Icon */
+        .floating-music-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .music-note {
+            font-size: 18px;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .music-wave {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 2px solid rgba(79, 209, 199, 0.4);
+            border-radius: 50%;
+            animation: pulse-ring 2s ease-in-out infinite;
+        }
+
+        /* Card Content */
+        .card-content {
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Enhanced Song Title */
+        .enhanced-song-title {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .title-text {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            display: block;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 220px;
+        }
+
+        .title-glow {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background: linear-gradient(90deg, #4fd1c7, rgba(79, 209, 199, 0.5));
+            transition: width 0.4s ease;
+        }
+
+        .ai-song-card:hover .title-glow {
+            width: 100%;
+        }
+
+        /* Enhanced Artist */
+        .enhanced-artist {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .artist-icon {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .artist-text {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Popularity Stats */
+        .popularity-stats {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .stat-bubble {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-bubble:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .stat-label {
+            font-size: 0.7em;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        /* Enhanced Play Button */
+        .enhanced-play-btn {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .play-btn-inner {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-icon-enhanced {
+            font-size: 18px;
+            color: white;
+            margin-left: 3px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+        }
+
+        .play-ripple {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .enhanced-play-btn:hover .play-btn-inner {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, rgba(79, 209, 199, 0.4), rgba(79, 209, 199, 0.2));
+            box-shadow: 0 0 20px rgba(79, 209, 199, 0.4);
+        }
+
+        .enhanced-play-btn:active .play-ripple {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+
+        .play-glow {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .enhanced-play-btn:hover .play-glow {
+            opacity: 1;
+        }
+
+        /* Card Shine Effect */
+        .card-shine {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg) translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .ai-song-card:hover .card-shine {
+            transform: rotate(45deg) translateX(100%);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        /* Legacy song-card styles for compatibility */
         .song-card {
             min-width: 280px;
             background: linear-gradient(135deg, #1f2937, #374151);
@@ -706,28 +1051,6 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
-        }
-
-        .song-card:hover {
-            transform: translateY(-5px) scale(1.05);
-            border-color: #4fd1c7;
-            box-shadow: 0 10px 25px rgba(79, 209, 199, 0.3);
-            animation-play-state: paused;
-        }
-
-        .song-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(79, 209, 199, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .song-card:hover::before {
-            left: 100%;
         }
 
         .song-info {
@@ -1074,11 +1397,12 @@
             background: rgba(59, 130, 246, 0.3);
             transition: all 0.2s ease;
             opacity: 0;
-            pointer-events: auto;
+            pointer-events: none; /* Disable by default to prevent accidental triggers */
         }
 
         .music-player-popup:hover .resize-handle {
             opacity: 1; /* Show handles on hover */
+            pointer-events: auto; /* Enable only when popup is hovered */
         }
 
         .resize-handle:hover {
@@ -1798,6 +2122,18 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Carousel Controls -->
+            <div class="carousel-controls">
+                <div class="carousel-btn" id="pauseBtn" onclick="toggleCarouselAnimation()">⏸</div>
+                <div class="carousel-btn" id="scrollLeftBtn" onclick="scrollCarouselLeft()">◀</div>
+                <div class="carousel-btn" id="scrollRightBtn" onclick="scrollCarouselRight()">▶</div>
+            </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator">
+                Drag to scroll • Use controls • Hover to pause
+            </div>
         </div>
     </div>
     
@@ -1906,15 +2242,13 @@
             showLoading(false);
         }
         
-        // Emotion monitoring
+        // Emotion monitoring - DISABLED (music carousel handles emotions)
         function startEmotionUpdates() {
-            emotionLoading.style.display = 'inline-block';
-            emotionStatus.textContent = 'Analyzing emotions...';
+            emotionLoading.style.display = 'none';
+            emotionStatus.textContent = 'Emotions handled by music carousel';
             
-            emotionUpdateInterval = setInterval(async () => {
-                const emotions = await apiCall('/api/emotions');
-                updateEmotionDisplay(emotions);
-            }, 1000);
+            // REMOVED: Duplicate emotion calls - music carousel handles this
+            console.log('💡 Emotion monitoring disabled - music carousel handles emotion detection');
         }
         
         function stopEmotionUpdates() {
@@ -2358,34 +2692,7 @@
         // Replace original startCamera with optimized version
         window.startCamera = startCameraOptimized;
 
-        // 🎵 Music Carousel System
-        const fallbackSongs = [
-            { title: "Stressed Out", artist: "Twenty One Pilots", duration: "3:22", mood: "Anxious", genre: "Alternative" },
-            { title: "Happy", artist: "Pharrell Williams", duration: "3:53", mood: "Joy", genre: "Pop" },
-            { title: "Sad Song", artist: "We The Kings", duration: "3:15", mood: "Sad", genre: "Rock" },
-            { title: "Can't Stop the Feeling", artist: "Justin Timberlake", duration: "3:56", mood: "Happy", genre: "Pop" },
-            { title: "Mad World", artist: "Gary Jules", duration: "3:07", mood: "Melancholy", genre: "Alternative" },
-            { title: "Thunder", artist: "Imagine Dragons", duration: "3:07", mood: "Energetic", genre: "Rock" },
-            { title: "Someone Like You", artist: "Adele", duration: "4:45", mood: "Heartbreak", genre: "Pop" },
-            { title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars", duration: "4:30", mood: "Funky", genre: "Funk" },
-            { title: "Everybody Hurts", artist: "R.E.M.", duration: "5:17", mood: "Comfort", genre: "Rock" },
-            { title: "Good as Hell", artist: "Lizzo", duration: "2:39", mood: "Confident", genre: "Pop" },
-            { title: "Creep", artist: "Radiohead", duration: "3:58", mood: "Alienated", genre: "Alternative" },
-            { title: "Walking on Sunshine", artist: "Katrina and the Waves", duration: "3:58", mood: "Euphoric", genre: "Pop" },
-            { title: "Hurt", artist: "Johnny Cash", duration: "3:38", mood: "Pain", genre: "Country" },
-            { title: "Don't Stop Me Now", artist: "Queen", duration: "3:29", mood: "Unstoppable", genre: "Rock" },
-            { title: "Black", artist: "Pearl Jam", duration: "5:43", mood: "Despair", genre: "Grunge" },
-            { title: "I Will Survive", artist: "Gloria Gaynor", duration: "3:18", mood: "Resilient", genre: "Disco" },
-            { title: "Losing Myself", artist: "Will Smith", duration: "4:02", mood: "Lost", genre: "Hip-hop" },
-            { title: "Here Comes the Sun", artist: "The Beatles", duration: "3:05", mood: "Hopeful", genre: "Rock" },
-            { title: "Angry", artist: "The Rolling Stones", duration: "3:46", mood: "Rage", genre: "Rock" },
-            { title: "Calm Down", artist: "Rema", duration: "3:59", mood: "Chill", genre: "Afrobeats" },
-            { title: "Anxious", artist: "Josh A", duration: "3:12", mood: "Anxiety", genre: "Rap" },
-            { title: "Good 4 U", artist: "Olivia Rodrigo", duration: "2:58", mood: "Vindictive", genre: "Pop" },
-            { title: "Fearless", artist: "Taylor Swift", duration: "4:03", mood: "Brave", genre: "Country" },
-            { title: "Surprised", artist: "Lil Wayne", duration: "3:21", mood: "Shocked", genre: "Rap" },
-            { title: "Disgusted", artist: "Eminem", duration: "4:17", mood: "Disgust", genre: "Rap" }
-        ];
+        // 🎵 AI Music Carousel System - ONLY uses real therapeutic music data from CSV
 
         let currentlyPlaying = null;
 
@@ -2407,43 +2714,455 @@
             `;
         }
 
-        function initializeMusicCarousel() {
+        async function initializeMusicCarousel() {
             const musicTrack = document.getElementById('musicTrack');
             
-            // Create multiple duplicates for seamless, continuous coverage
-            const allSongs = [...fallbackSongs, ...fallbackSongs, ...fallbackSongs, ...fallbackSongs];
+            try {
+                console.log('🎵 Loading AI-powered therapeutic music recommendations...');
+                
+                // 🚀 CALL THE REAL AI MUSIC API
+                const response = await fetch('/api/music/recommendations?session_id=user123&limit=100');
+                const data = await response.json();
+                
+                if (data.success && data.recommendations && data.recommendations.length > 0) {
+                    console.log('✅ AI Music API Success!');
+                    console.log(`🎭 Emotion: ${data.emotion.dominant} (${data.emotion.confidence})`);
+                    console.log(`🎵 Songs: ${data.recommendations.length}`);
+                    console.log(`🤖 Multi-emotion: ${data.emotion.is_multi_emotion}`);
+                    
+                    // Convert API data to display format
+                    const aiSongs = data.recommendations.map(track => ({
+                        title: track.track_name,
+                        artist: track.artist_name,
+                        popularity: track.track_popularity,
+                        artist_popularity: track.artist_popularity
+                    }));
+                    
+                    // Store globally for click handlers
+                    currentAISongs = aiSongs;
+                    
+                    // Create continuous carousel with AI songs
+                    const allSongs = [...aiSongs, ...aiSongs]; // Duplicate for scrolling
+                    musicTrack.innerHTML = allSongs.map((song, index) => createAISongCard(song, index % aiSongs.length)).join('');
+                    
+                    console.log('🎵 AI Music carousel loaded with', allSongs.length, 'therapeutic recommendations');
+                    
+                    // Update emotion display
+                    updateEmotionDisplay(data.emotion);
+                    
+                } else {
+                    console.log('⚠️ AI Music API failed - no recommendations available');
+                    musicTrack.innerHTML = '<div class="song-card" style="opacity: 0.6;"><div class="song-info"><div class="song-title">🎵 No AI recommendations</div><div class="song-artist">Please check your emotion detection system</div></div></div>';
+                }
+                
+            } catch (error) {
+                console.error('❌ AI Music API error:', error);
+                musicTrack.innerHTML = '<div class="song-card" style="opacity: 0.6;"><div class="song-info"><div class="song-title">⚠️ API Connection Error</div><div class="song-artist">Please refresh the page</div></div></div>';
+            }
+        }
+        
+        // Fallback functionality removed - ONLY AI data is used
+        
+        function formatDuration(ms) {
+            const minutes = Math.floor(ms / 60000);
+            const seconds = Math.floor((ms % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function createAISongCard(song, index) {
+            // Original dark/blue theme gradients - keeping consistent with your design
+            const darkGradients = [
+                'linear-gradient(135deg, #1f2937, #374151)',
+                'linear-gradient(135deg, #1e3a8a, #1f2937)', 
+                'linear-gradient(135deg, #1f2937, #1e3a8a)',
+                'linear-gradient(135deg, #374151, #1f2937)',
+                'linear-gradient(135deg, #0f172a, #1e3a8a)',
+                'linear-gradient(135deg, #1e3a8a, #0f172a)',
+                'linear-gradient(135deg, #1f2937, #0f172a)',
+                'linear-gradient(135deg, #374151, #1e3a8a)'
+            ];
             
-            musicTrack.innerHTML = allSongs.map((song, index) => createSongCard(song, index % fallbackSongs.length)).join('');
+            const cardGradient = darkGradients[index % darkGradients.length];
             
-            console.log('🎵 Music carousel initialized with', allSongs.length, 'total cards for continuous display');
+            return `
+                <div class="ai-song-card" onclick="handleAISongClick(${index})" style="background: ${cardGradient};">
+                    <!-- Floating Music Icon -->
+                    <div class="floating-music-icon">
+                        <div class="music-note">♪</div>
+                        <div class="music-wave"></div>
+                    </div>
+                    
+                    <!-- Card Content -->
+                    <div class="card-content">
+                        <!-- Song Title with Glow Effect -->
+                        <div class="enhanced-song-title" title="${song.title}">
+                            <span class="title-text">${song.title}</span>
+                            <div class="title-glow"></div>
+                        </div>
+                        
+                        <!-- Artist Name with Icon -->
+                        <div class="enhanced-artist">
+                            <span class="artist-icon">🎤</span>
+                            <span class="artist-text">${song.artist}</span>
+                        </div>
+                        
+                        <!-- Popularity Stats with Animation -->
+                        <div class="popularity-stats">
+                            <div class="stat-bubble track-stat">
+                                <div class="stat-icon" style="color: #4fd1c7;">🔥</div>
+                                <div class="stat-value">${song.popularity || 0}</div>
+                                <div class="stat-label">Track</div>
+                            </div>
+                            <div class="stat-bubble artist-stat">
+                                <div class="stat-icon" style="color: #06d6a0;">⭐</div>
+                                <div class="stat-value">${song.artist_popularity || 0}</div>
+                                <div class="stat-label">Artist</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Play Button -->
+                    <div class="enhanced-play-btn" onclick="playAISong(${index}, event)">
+                        <div class="play-btn-inner">
+                            <div class="play-icon-enhanced">▶</div>
+                            <div class="play-ripple"></div>
+                        </div>
+                        <div class="play-glow"></div>
+                    </div>
+                    
+                    <!-- Card Shine Effect -->
+                    <div class="card-shine"></div>
+                </div>
+            `;
+        }
+        
+        function updateEmotionDisplay(emotion) {
+            // Update any emotion indicators on the page
+            const emotionDisplay = document.querySelector('.current-emotion');
+            if (emotionDisplay) {
+                emotionDisplay.textContent = `Current Emotion: ${emotion.dominant} (${Math.round(emotion.confidence * 100)}%)`;
+            }
         }
 
-        function playPauseSong(index, event) {
+        // 🎠 CAROUSEL MANUAL CONTROLS
+        function toggleCarouselAnimation() {
+            const musicTrack = document.getElementById('musicTrack');
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            if (isCarouselPaused) {
+                // Resume animation - RESET everything
+                currentTransform = 0;
+                musicTrack.style.transform = 'translateX(0px)';
+                musicTrack.style.animation = 'scroll-left 60s linear infinite';
+                musicTrack.classList.remove('paused');
+                pauseBtn.textContent = '⏸';
+                pauseBtn.classList.remove('active');
+                isCarouselPaused = false;
+                console.log('▶️ Animation resumed, reset to start');
+            } else {
+                // Pause animation
+                musicTrack.style.animationPlayState = 'paused';
+                musicTrack.classList.add('paused');
+                pauseBtn.textContent = '▶';
+                pauseBtn.classList.add('active');
+                isCarouselPaused = true;
+                console.log('⏸ Animation paused');
+            }
+        }
+
+        function scrollCarouselLeft() {
+            const musicTrack = document.getElementById('musicTrack');
+            if (!musicTrack) return;
+            
+            const scrollAmount = 340; // Card width + gap
+            
+            // Only scroll left if we're not already at the start
+            if (currentTransform < 0) {
+                currentTransform += scrollAmount; // Move left (toward 0)
+                
+                // Don't scroll past start
+                if (currentTransform > 0) currentTransform = 0;
+                
+                // DISABLE ANIMATION COMPLETELY for manual control
+                musicTrack.style.animation = 'none';
+                musicTrack.style.transform = `translateX(${currentTransform}px)`;
+                musicTrack.classList.add('paused');
+                
+                // Update button states
+                isCarouselPaused = true;
+                const pauseBtn = document.getElementById('pauseBtn');
+                if (pauseBtn) {
+                    pauseBtn.textContent = '▶';
+                    pauseBtn.classList.add('active');
+                }
+                
+                console.log('⬅️ Scrolled left, transform:', currentTransform);
+            } else {
+                console.log('⬅️ Already at start, cannot scroll left');
+            }
+        }
+
+        function scrollCarouselRight() {
+            const musicTrack = document.getElementById('musicTrack');
+            if (!musicTrack) {
+                console.log('❌ musicTrack not found');
+                return;
+            }
+            
+            const scrollAmount = 340; // Card width + gap
+            
+            // Calculate max scroll based on content width vs viewport width
+            const totalWidth = currentAISongs.length * 340;
+            const viewportWidth = window.innerWidth;
+            const maxScroll = -(totalWidth - viewportWidth + 200); // Add some padding
+            
+            // Only scroll right if we haven't reached the end
+            if (currentTransform > maxScroll) {
+                currentTransform -= scrollAmount; // Move right (negative direction)
+                
+                // Don't scroll past end
+                if (currentTransform < maxScroll) currentTransform = maxScroll;
+                
+                // DISABLE ANIMATION COMPLETELY for manual control
+                musicTrack.style.animation = 'none';
+                musicTrack.style.transform = `translateX(${currentTransform}px)`;
+                musicTrack.classList.add('paused');
+                
+                // Update button states
+                isCarouselPaused = true;
+                const pauseBtn = document.getElementById('pauseBtn');
+                if (pauseBtn) {
+                    pauseBtn.textContent = '▶';
+                    pauseBtn.classList.add('active');
+                }
+                
+                console.log('➡️ Scrolled right, transform:', currentTransform);
+            } else {
+                console.log('➡️ Already at end, cannot scroll right');
+            }
+        }
+
+        // 🖱️ DRAG AND SWIPE FUNCTIONALITY  
+        let dragListenersAttached = false;
+        function initializeCarouselDragControls() {
+            const container = document.querySelector('.music-carousel');
+            const musicTrack = document.getElementById('musicTrack');
+            
+            if (!container || !musicTrack) {
+                console.log('❌ Drag controls: Container or musicTrack not found');
+                return;
+            }
+
+            // Remove existing listeners if any to prevent duplicates
+            if (dragListenersAttached) {
+                console.log('🔧 Removing old drag listeners');
+                container.removeEventListener('mousedown', window.carouselMouseDown);
+                document.removeEventListener('mousemove', window.carouselMouseMove);  
+                document.removeEventListener('mouseup', window.carouselMouseUp);
+            }
+
+            console.log('✅ Initializing drag controls');
+            dragListenersAttached = true;
+            
+            // Move variables to global scope for reinitialization
+            window.carouselStartDragX = 0;
+            window.carouselIsDragging = false;
+            window.carouselStartTransform = 0;
+
+            // Mouse events - Add debugging to see if events are attached
+            console.log('🔧 Adding mouse event listeners to:', container);
+            
+            // Create global function references for removal
+            window.carouselMouseDown = function(e) {
+                console.log('🔧 MOUSEDOWN DETECTED on container!', e.target);
+                startDrag(e);
+            };
+            window.carouselMouseMove = drag;
+            window.carouselMouseUp = endDrag;
+            
+            container.addEventListener('mousedown', window.carouselMouseDown, { passive: false });
+            document.addEventListener('mousemove', window.carouselMouseMove, { passive: false });
+            document.addEventListener('mouseup', window.carouselMouseUp);
+
+            // Touch events for mobile  
+            container.addEventListener('touchstart', startDrag, { passive: false });
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('touchend', endDrag);
+            
+            // Debug: Check if container is properly setup
+            console.log('🔧 Drag container setup:', {
+                container: container.className,
+                musicTrack: musicTrack.id,
+                containerRect: container.getBoundingClientRect(),
+                trackRect: musicTrack.getBoundingClientRect(),
+                currentAISongsLength: currentAISongs.length
+            });
+            
+            // Test immediate functionality
+            setTimeout(() => {
+                console.log('🔧 Delayed check - currentAISongs length:', currentAISongs.length);
+            }, 1000);
+
+            function startDrag(e) {
+                console.log('🔧 Start drag event fired, target:', e.target.className, 'tagName:', e.target.tagName);
+                
+                // Only prevent drag on actual button elements - allow drag everywhere else
+                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                    console.log('❌ Drag blocked: clicked on button element');
+                    return;
+                }
+                
+                // Allow drag on all other elements including cards
+                console.log('✅ Drag allowed on target:', e.target.className);
+                
+                // Get current transform from the element itself for accuracy
+                const musicTrack = document.getElementById('musicTrack');
+                const currentMatrix = window.getComputedStyle(musicTrack).transform;
+                if (currentMatrix !== 'none') {
+                    const values = currentMatrix.split('(')[1].split(')')[0].split(',');
+                    currentTransform = parseFloat(values[4]) || 0;
+                }
+                
+                window.carouselIsDragging = true;
+                window.carouselStartDragX = e.clientX || e.touches[0].clientX;
+                window.carouselStartTransform = currentTransform;
+                
+                container.style.cursor = 'grabbing';
+                // DISABLE ANIMATION COMPLETELY during drag
+                musicTrack.style.animation = 'none';
+                musicTrack.classList.add('dragging');
+                musicTrack.classList.add('paused');
+                
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🖱️ Drag started, startTransform:', window.carouselStartTransform, 'startDragX:', window.carouselStartDragX);
+            }"}
+
+            function drag(e) {
+                if (!window.carouselIsDragging) {
+                    // Don't log this constantly as it's normal during mouse movement
+                    return;
+                }
+                e.preventDefault();
+                
+                const currentX = e.clientX || e.touches[0].clientX;
+                const deltaX = currentX - window.carouselStartDragX;
+                const newTransform = window.carouselStartTransform + deltaX;
+                
+                // Apply constraints (same logic as arrow buttons)
+                const totalWidth = currentAISongs.length * 340;
+                const viewportWidth = window.innerWidth;
+                const maxScroll = -(totalWidth - viewportWidth + 200); // Add padding
+                const constrainedTransform = Math.max(maxScroll, Math.min(0, newTransform));
+                
+                // DISABLE ANIMATION COMPLETELY during drag
+                const musicTrack = document.getElementById('musicTrack');
+                musicTrack.style.animation = 'none';
+                musicTrack.style.transform = `translateX(${constrainedTransform}px)`;
+                currentTransform = constrainedTransform;
+                
+                console.log('🖱️ Dragging, deltaX:', deltaX, 'currentX:', currentX, 'startDragX:', window.carouselStartDragX, 'newTransform:', constrainedTransform);
+            }"}
+
+            function endDrag(e) {
+                if (!window.carouselIsDragging) return;
+                
+                window.carouselIsDragging = false;
+                const container = document.querySelector('.music-carousel');
+                const musicTrack = document.getElementById('musicTrack');
+                
+                container.style.cursor = 'grab';
+                musicTrack.classList.remove('dragging');
+                musicTrack.classList.add('paused'); // Keep animation disabled
+                
+                // Update pause button state
+                isCarouselPaused = true;
+                const pauseBtn = document.getElementById('pauseBtn');
+                if (pauseBtn) {
+                    pauseBtn.textContent = '▶';
+                    pauseBtn.classList.add('active');
+                }
+                
+                console.log('🖱️ Drag ended, transform:', currentTransform);
+            }
+        }
+        
+        // Global variable to store current AI songs
+        let currentAISongs = [];
+        
+        // 🎠 Carousel Control Variables
+        let isCarouselPaused = false;
+        let isDragging = false;
+        let startX = 0;
+        let scrollOffset = 0;
+        let currentTransform = 0;
+        
+        // 🔧 Function to sync currentTransform with actual DOM transform
+        function syncCurrentTransform() {
+            const musicTrack = document.getElementById('musicTrack');
+            if (musicTrack) {
+                const currentMatrix = window.getComputedStyle(musicTrack).transform;
+                if (currentMatrix !== 'none') {
+                    const values = currentMatrix.split('(')[1].split(')')[0].split(',');
+                    currentTransform = parseFloat(values[4]) || 0;
+                    console.log('🔄 Synced currentTransform:', currentTransform);
+                }
+            }
+        }
+
+        // 🔧 Debug function to test controls
+        function testCarouselControls() {
+            console.log('🔧 Testing carousel controls...');
+            console.log('Elements found:');
+            console.log('- musicTrack:', document.getElementById('musicTrack'));
+            console.log('- music-carousel:', document.querySelector('.music-carousel'));
+            console.log('- pauseBtn:', document.getElementById('pauseBtn'));
+            console.log('- scrollLeftBtn:', document.getElementById('scrollLeftBtn'));
+            console.log('- scrollRightBtn:', document.getElementById('scrollRightBtn'));
+            console.log('- currentAISongs length:', currentAISongs.length);
+            console.log('- currentTransform:', currentTransform);
+        }
+
+        // Expose to window for testing
+        window.testCarouselControls = testCarouselControls;
+        window.scrollCarouselLeft = scrollCarouselLeft;
+        window.scrollCarouselRight = scrollCarouselRight;
+        window.toggleCarouselAnimation = toggleCarouselAnimation;
+        
+        function handleAISongClick(index) {
+            const song = currentAISongs[index % currentAISongs.length];
+            console.log('🎵 AI Song clicked:', song.title, 'by', song.artist);
+            console.log('🎯 GUARANTEE: This exact song will be played:', song.title);
+            
+            // Open the professional music player with THIS SPECIFIC AI song
+            openMusicPlayer(song, index);
+        }
+        
+        function playAISong(index, event) {
             event.stopPropagation();
             
-            const song = fallbackSongs[index];
+            const song = currentAISongs[index % currentAISongs.length];
+            console.log('▶️ Playing AI song:', song.title, 'by', song.artist);
             
-            // Open the professional music player
+            // Open the full music player instead of just showing notification
             openMusicPlayer(song, index);
         }
 
-        function handleSongClick(index) {
-            const song = fallbackSongs[index];
-            console.log('🎵 Song clicked:', song.title, 'by', song.artist);
-            
-            // Open the professional music player
-            openMusicPlayer(song, index);
-        }
+        // Old fallback music player functions removed - only AI songs are supported
 
         // ===== PROFESSIONAL MUSIC PLAYER FUNCTIONALITY =====
         let currentSongIndex = 0;
-        let currentPlaylist = fallbackSongs;
+        let currentPlaylist = [];
         let audioPlayer = null;
         let isPlayerPlaying = false;
 
         function openMusicPlayer(song, index) {
             currentSongIndex = index;
-            currentPlaylist = fallbackSongs;
+            currentPlaylist = currentAISongs || [];
+            
+            console.log('🎵 Opening music player for:', song.title, 'by', song.artist);
+            console.log('🎯 CONFIRMED: Playing this specific song:', song.title, 'by', song.artist);
+            console.log('🎵 Current playlist length:', currentPlaylist.length);
             
             // Start wind animation and setup player simultaneously
             startWindAnimation();
@@ -2452,7 +3171,7 @@
             const popup = document.getElementById('musicPlayerPopup');
             popup.classList.add('visible');
             
-            // Start setup immediately (don't wait for animation)
+            // Start setup immediately (don't wait for animation) - EXACTLY THIS SONG
             setupPlayer(song);
         }
 
@@ -3028,10 +3747,54 @@
             const musicTrack = document.getElementById('musicTrack');
             if (musicTrack) {
                 initializeMusicCarousel();
+                initializeCarouselDragControls();
+                initializeWheelScroll();
+                
+                // 🔄 AUTO-REFRESH MUSIC EVERY 30 SECONDS
+                setInterval(() => {
+                    console.log('🔄 Auto-refreshing AI music recommendations...');
+                    initializeMusicCarousel();
+                }, 30000); // 30 seconds
             } else {
                 // Retry in 100ms if element not ready
                 setTimeout(initCarouselEarly, 100);
             }
+        }
+
+        // 🎡 WHEEL SCROLL SUPPORT
+        function initializeWheelScroll() {
+            const container = document.querySelector('.music-carousel');
+            if (!container) return;
+
+            container.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                const musicTrack = document.getElementById('musicTrack');
+                if (!musicTrack) return;
+                
+                const scrollSpeed = e.deltaY > 0 ? -80 : 80; // Faster scroll, deltaY > 0 = scroll down = move right
+                currentTransform += scrollSpeed;
+                
+                // Apply constraints
+                const totalWidth = currentAISongs.length * 340;
+                const viewportWidth = window.innerWidth;
+                const maxScroll = -(totalWidth - viewportWidth);
+                currentTransform = Math.max(maxScroll, Math.min(0, currentTransform));
+                
+                // DISABLE ANIMATION COMPLETELY for wheel scroll
+                musicTrack.style.animation = 'none';
+                musicTrack.style.transform = `translateX(${currentTransform}px)`;
+                musicTrack.classList.add('paused');
+                
+                // Update pause button
+                isCarouselPaused = true;
+                const pauseBtn = document.getElementById('pauseBtn');
+                if (pauseBtn) {
+                    pauseBtn.textContent = '▶';
+                    pauseBtn.classList.add('active');
+                }
+                
+                console.log('🎡 Wheel scroll, transform:', currentTransform);
+            });
         }
 
         // Header initialization function
@@ -3226,6 +3989,11 @@
             });
 
             function startResize(e) {
+                // Only start resize if user actually clicked on a resize handle
+                if (!e.target.classList.contains('resize-handle')) {
+                    return;
+                }
+                
                 e.preventDefault();
                 e.stopPropagation(); // Prevent drag from triggering
                 

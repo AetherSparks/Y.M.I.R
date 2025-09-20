@@ -41,6 +41,24 @@ from pathlib import Path
 from collections import defaultdict, deque
 import logging
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    print("✅ Environment variables loaded from .env file")
+except ImportError:
+    print("⚠️ python-dotenv not installed - .env file won't be loaded automatically")
+    print("   Install with: pip install python-dotenv")
+
+# 🤖 AI-POWERED THERAPEUTIC RECOMMENDATIONS
+try:
+    import google.generativeai as genai
+    GEMINI_AVAILABLE = True
+    print("✅ Gemini AI available for therapeutic recommendations")
+except ImportError:
+    GEMINI_AVAILABLE = False
+    print("❌ Gemini AI not available - falling back to rule-based recommendations")
+
 # Firebase imports (optional)
 try:
     import firebase_admin
@@ -282,6 +300,27 @@ class MusicRecommendation:
     session_id: str
     recommendation_strategy: str = "adaptive"
     
+    # 🎵 ENHANCED DATASET FIELDS
+    album: str = "Unknown Album"
+    track_popularity: int = 0
+    artist_popularity: int = 0
+    musical_features: str = "Unknown"
+    artist_genres: str = "Unknown"
+    mental_health_benefit: str = "General Wellness"
+    duration_ms: int = 0
+    danceability: float = 0.0
+    energy: float = 0.0
+    valence: float = 0.0
+    tempo: float = 0.0
+    # Additional audio features from dataset
+    key: int = 0
+    loudness: float = 0.0
+    mode: int = 0
+    speechiness: float = 0.0
+    acousticness: float = 0.0
+    instrumentalness: float = 0.0
+    liveness: float = 0.0
+    
     def to_dict(self) -> Dict[str, Any]:
         result = asdict(self)
         result['timestamp'] = self.timestamp.isoformat()
@@ -305,11 +344,199 @@ class RecommendationSet:
         result['recommendations'] = [r.to_dict() for r in self.recommendations]
         return result
 
+class AITherapeuticAdvisor:
+    """🧠 AI-powered therapeutic music recommendation advisor using Gemini"""
+    
+    def __init__(self):
+        self.gemini_available = GEMINI_AVAILABLE
+        self.model = None
+        
+        if self.gemini_available:
+            self._initialize_gemini()
+    
+    def _initialize_gemini(self):
+        """Initialize Gemini AI model"""
+        try:
+            # Check for API key in environment
+            api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY') or os.getenv('GOOGLE_AI_API_KEY')
+            
+            print(f"🔑 DEBUG: Looking for API keys...")
+            print(f"   GEMINI_API_KEY: {'✅ Found' if os.getenv('GEMINI_API_KEY') else '❌ Not found'}")
+            print(f"   GOOGLE_API_KEY: {'✅ Found' if os.getenv('GOOGLE_API_KEY') else '❌ Not found'}")
+            print(f"   GOOGLE_AI_API_KEY: {'✅ Found' if os.getenv('GOOGLE_AI_API_KEY') else '❌ Not found'}")
+            
+            if not api_key:
+                print("⚠️ No Gemini API key found in environment variables")
+                print("   Please set one of: GEMINI_API_KEY, GOOGLE_API_KEY, or GOOGLE_AI_API_KEY")
+                self.gemini_available = False
+                return
+            
+            genai.configure(api_key=api_key)
+            self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
+            print("✅ Gemini AI model initialized successfully")
+            
+        except Exception as e:
+            print(f"❌ Failed to initialize Gemini: {e}")
+            self.gemini_available = False
+            self.model = None
+    
+    def get_therapeutic_strategy(self, emotion: str, confidence: float, 
+                               available_moods: List[str], track_samples: List[Dict]) -> Dict[str, Any]:
+        """Use AI to determine the best therapeutic music strategy"""
+        
+        if not self.gemini_available or not self.model:
+            return self._fallback_therapeutic_strategy(emotion, available_moods)
+        
+        try:
+            # Create context for AI
+            prompt = f"""
+You are a music therapy expert cross-checking our therapeutic music recommendations.
+
+USER EMOTION: "{emotion}" (confidence: {confidence:.1%})
+
+OUR DATASET MOODS ONLY: {', '.join(available_moods)}
+
+SAMPLE TRACKS FROM OUR DATASET:
+{self._format_track_samples(track_samples[:5])}
+
+TASK: Cross-check and select the BEST mood from OUR DATASET ONLY for therapeutic relief.
+
+STRICT REQUIREMENTS:
+1. ONLY choose from our available moods: {', '.join(available_moods)}
+2. NO external suggestions - work with what we have
+3. For negative emotions (angry, sad, fear): recommend calming/uplifting moods from our dataset
+4. For positive emotions: maintain/enhance using our available moods
+5. Provide therapeutic reasoning using our dataset context
+
+Respond in this EXACT JSON format:
+{{
+  "target_mood": "MUST be exactly one from: {', '.join(available_moods)}",
+  "reasoning": "why this mood from our dataset will help therapeutically",
+  "strategy": "immediate_relief" or "gradual_transition" or "mood_enhancement", 
+  "therapeutic_benefit": "specific benefit using our dataset's mood",
+  "confidence": 0.0-1.0
+}}
+"""
+
+            response = self.model.generate_content(prompt)
+            result = self._parse_ai_response(response.text)
+            
+            if result and self._validate_ai_result(result, available_moods):
+                print(f"🤖 AI cross-check approved: {result['target_mood']} - {result['reasoning']}")
+                return result
+            else:
+                print("⚠️ AI response invalid or not from our dataset, using fallback")
+                return self._fallback_therapeutic_strategy(emotion, available_moods)
+                
+        except Exception as e:
+            print(f"❌ AI therapeutic strategy failed: {e}")
+            return self._fallback_therapeutic_strategy(emotion, available_moods)
+    
+    def _format_track_samples(self, tracks: List[Dict]) -> str:
+        """Format track samples for AI context"""
+        formatted = []
+        for track in tracks:
+            track_info = f"'{track.get('Track Name', 'Unknown')}' by {track.get('Artist Name', 'Unknown')} (Mood: {track.get('Mood_Label', 'Unknown')})"
+            formatted.append(track_info)
+        return '\n'.join(formatted)
+    
+    def _parse_ai_response(self, response_text: str) -> Optional[Dict[str, Any]]:
+        """Parse AI response and extract JSON"""
+        try:
+            # Extract JSON from response
+            import re
+            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if json_match:
+                json_str = json_match.group()
+                result = json.loads(json_str)
+                return result
+            return None
+        except Exception as e:
+            print(f"Failed to parse AI response: {e}")
+            return None
+    
+    def _validate_ai_result(self, result: Dict[str, Any], available_moods: List[str]) -> bool:
+        """Validate that AI only selected from our dataset moods"""
+        if 'target_mood' not in result:
+            print("❌ AI response missing target_mood")
+            return False
+        
+        target_mood = result['target_mood']
+        if target_mood not in available_moods:
+            print(f"❌ AI suggested '{target_mood}' which is not in our dataset: {available_moods}")
+            return False
+        
+        required_fields = ['reasoning', 'strategy', 'therapeutic_benefit', 'confidence']
+        for field in required_fields:
+            if field not in result:
+                print(f"❌ AI response missing required field: {field}")
+                return False
+        
+        print(f"✅ AI response validated - using mood '{target_mood}' from our dataset")
+        return True
+    
+    def _fallback_therapeutic_strategy(self, emotion: str, available_moods: List[str]) -> Dict[str, Any]:
+        """Fallback therapeutic strategy using ONLY our dataset moods"""
+        emotion_lower = emotion.lower()
+        
+        # Find best therapeutic mood from OUR DATASET ONLY
+        def find_best_mood(preferred_moods):
+            for mood in preferred_moods:
+                if mood in available_moods:
+                    return mood
+            return available_moods[0] if available_moods else 'Neutral'
+        
+        if emotion_lower in ['anger', 'angry', 'rage', 'frustrated']:
+            target = find_best_mood(['Calm', 'Neutral', 'Joy'])
+            return {
+                'target_mood': target,
+                'reasoning': f'Using {target} from our dataset to reduce anger and promote peace',
+                'strategy': 'immediate_relief',
+                'therapeutic_benefit': f'{target} music for anger relief and emotional regulation',
+                'confidence': 0.8
+            }
+        elif emotion_lower in ['sadness', 'sad', 'depressed', 'melancholy']:
+            target = find_best_mood(['Joy', 'Excitement', 'Calm', 'Neutral'])
+            return {
+                'target_mood': target,
+                'reasoning': f'Using {target} from our dataset to help overcome sadness',
+                'strategy': 'gradual_transition',
+                'therapeutic_benefit': f'{target} music for mood uplift and emotional support',
+                'confidence': 0.8
+            }
+        elif emotion_lower in ['fear', 'anxious', 'worried', 'stressed']:
+            target = find_best_mood(['Calm', 'Neutral', 'Joy'])
+            return {
+                'target_mood': target,
+                'reasoning': f'Using {target} from our dataset to reduce anxiety and stress',
+                'strategy': 'immediate_relief',
+                'therapeutic_benefit': f'{target} music for anxiety relief and relaxation',
+                'confidence': 0.8
+            }
+        else:
+            # Positive or neutral emotions
+            target = find_best_mood(['Joy', 'Excitement', 'Calm', 'Neutral'])
+            return {
+                'target_mood': target,
+                'reasoning': f'Using {target} from our dataset to maintain positive emotional state',
+                'strategy': 'mood_enhancement',
+                'therapeutic_benefit': f'{target} music for emotional balance and well-being',
+                'confidence': 0.7
+            }
+
 class AdvancedMusicRecommendationEngine:
     """🎵 ADVANCED Music recommendation engine with 4 strategies + ML models"""
     
-    def __init__(self, dataset_path: str = "datasets/therapeutic_music_enriched.csv", model_dir: str = "models"):
+    def __init__(self, dataset_path: str = None, model_dir: str = "models"):
+        # Use absolute path to your real CSV dataset
+        if dataset_path is None:
+            current_file = Path(__file__).resolve()
+            project_root = current_file.parent.parent.parent.parent  # Go up to project root
+            dataset_path = project_root / "datasets" / "therapeutic_music_enriched.csv"
+        
         self.dataset_path = Path(dataset_path)
+        print(f"🎵 Looking for dataset at: {self.dataset_path}")
+        print(f"🔍 Dataset exists: {self.dataset_path.exists()}")
         self.model_dir = Path(model_dir)
         self.music_df = None
         
@@ -321,6 +548,10 @@ class AdvancedMusicRecommendationEngine:
         # Session tracking and analytics
         self.recommendation_history = deque(maxlen=1000)
         self.session_recommendations = defaultdict(list)
+        
+        # 🤖 AI-POWERED THERAPEUTIC ADVISOR
+        self.ai_advisor = AITherapeuticAdvisor()
+        print(f"🧠 AI Therapeutic Advisor: {'✅ Active' if self.ai_advisor.gemini_available else '❌ Fallback mode'}")
         
         # 🎯 4 ADVANCED MUSIC STRATEGIES
         self.emotion_music_strategies = {
@@ -362,27 +593,36 @@ class AdvancedMusicRecommendationEngine:
             # Load music dataset
             if self.dataset_path.exists():
                 self.music_df = pd.read_csv(self.dataset_path)
-                logging.info(f"Loaded music dataset: {len(self.music_df)} tracks")
+                print(f"✅ Loaded music dataset: {len(self.music_df)} tracks")
                 
                 # Ensure required columns exist
                 required_columns = ['Track Name', 'Artist Name', 'Mood_Label']
                 missing_columns = [col for col in required_columns if col not in self.music_df.columns]
                 if missing_columns:
-                    logging.warning(f"Missing columns in dataset: {missing_columns}")
+                    print(f"⚠️ Missing columns in dataset: {missing_columns}")
+                else:
+                    # Show available moods for debugging
+                    available_moods = self.music_df['Mood_Label'].unique()
+                    print(f"📊 Available moods in dataset: {list(available_moods)}")
+                    
+                    # Show mood distribution
+                    mood_counts = self.music_df['Mood_Label'].value_counts()
+                    print(f"📈 Mood distribution:")
+                    for mood, count in mood_counts.head(10).items():
+                        print(f"   {mood}: {count} songs")
             else:
-                logging.warning(f"Music dataset not found: {self.dataset_path}")
-                # Create fallback data
-                self.music_df = pd.DataFrame({
-                    'Track Name': ['On Top Of The World', 'Counting Stars', 'Let Her Go', 'Photograph', 'Paradise'],
-                    'Artist Name': ['Imagine Dragons', 'OneRepublic', 'Passenger', 'Ed Sheeran', 'Coldplay'],
-                    'Mood_Label': ['joy', 'joy', 'sadness', 'neutral', 'neutral']
-                })
+                print(f"❌ Music dataset not found: {self.dataset_path}")
+                print(f"❌ CANNOT PROCEED WITHOUT REAL DATASET")
+                self.music_df = None
+                return
             
             # Load trained ML models if available
             self._load_trained_model()
             
         except Exception as e:
-            logging.error(f"Error initializing recommendation system: {e}")
+            print(f"❌ Error initializing recommendation system: {e}")
+            import traceback
+            traceback.print_exc()
     
     def _load_trained_model(self):
         """Load trained ML recommendation models"""
@@ -442,7 +682,8 @@ class AdvancedMusicRecommendationEngine:
         """🏥 Therapeutic approach - music for emotional healing"""
         
         if self.music_df is None or self.music_df.empty:
-            return self._create_fallback_recommendations(emotion, confidence, session_id, num_recommendations, "therapeutic")
+            print(f"❌ No music dataset available - cannot generate recommendations")
+            return []
         
         # Get therapeutic benefits for this emotion
         benefits = self.therapeutic_benefits.get(emotion, ['General Wellness'])
@@ -478,7 +719,27 @@ class AdvancedMusicRecommendationEngine:
                 recommendation_reason=f"Therapeutic support for {emotion}",
                 timestamp=datetime.now(),
                 session_id=session_id,
-                recommendation_strategy="therapeutic"
+                recommendation_strategy="therapeutic",
+                # 🎵 POPULATE DATASET FIELDS
+                album=track.get('Album', 'Unknown Album'),
+                track_popularity=int(track.get('Track Popularity', 0)),
+                artist_popularity=int(track.get('Artist Popularity', 0)),
+                musical_features=track.get('Musical_Features', 'Unknown'),
+                artist_genres=track.get('Artist Genres', 'Unknown'),
+                mental_health_benefit=track.get('Mental_Health_Benefit', 'General Wellness'),
+                duration_ms=int(track.get('Duration (ms)', 0)),
+                danceability=float(track.get('Danceability', 0.0)),
+                energy=float(track.get('Energy', 0.0)),
+                valence=float(track.get('Valence', 0.0)),
+                tempo=float(track.get('Tempo', 0.0)),
+                # Additional audio features
+                key=int(track.get('Key', 0)),
+                loudness=float(track.get('Loudness', 0.0)),
+                mode=int(track.get('Mode', 0)),
+                speechiness=float(track.get('Speechiness', 0.0)),
+                acousticness=float(track.get('Acousticness', 0.0)),
+                instrumentalness=float(track.get('Instrumentalness', 0.0)),
+                liveness=float(track.get('Liveness', 0.0))
             )
             recommendations.append(rec)
         
@@ -489,20 +750,57 @@ class AdvancedMusicRecommendationEngine:
         """🎭 Mood matching - music that matches current emotional state"""
         
         if self.music_df is None or self.music_df.empty:
-            return self._create_fallback_recommendations(emotion, confidence, session_id, num_recommendations, "mood_matching")
+            print(f"❌ No music dataset available - cannot generate recommendations")
+            return []
         
-        # Filter by exact emotion match
+        print(f"🎭 Mood matching for emotion: {emotion}")
+        print(f"📊 Dataset has {len(self.music_df)} total tracks")
+        
+        # Filter by emotion match (case-insensitive and flexible)
         matching_tracks = pd.DataFrame()
         if 'Mood_Label' in self.music_df.columns:
-            matching_tracks = self.music_df[self.music_df['Mood_Label'] == emotion].copy()
+            # Try exact match first
+            exact_match = self.music_df[self.music_df['Mood_Label'].str.lower() == emotion.lower()].copy()
+            
+            if not exact_match.empty:
+                matching_tracks = exact_match
+                print(f"✅ Found {len(matching_tracks)} exact matches for '{emotion}'")
+            else:
+                # Try partial matching for similar emotions
+                emotion_mapping = {
+                    'angry': ['anger', 'rage', 'mad', 'irritated'],
+                    'anger': ['angry', 'rage', 'mad', 'irritated'],
+                    'sad': ['sadness', 'melancholy', 'sorrow', 'grief'],
+                    'sadness': ['sad', 'melancholy', 'sorrow', 'grief'],
+                    'happy': ['joy', 'happiness', 'cheerful', 'upbeat'],
+                    'joy': ['happy', 'happiness', 'cheerful', 'upbeat'],
+                    'excited': ['excitement', 'energetic', 'thrilled'],
+                    'excitement': ['excited', 'energetic', 'thrilled'],
+                    'calm': ['peaceful', 'relaxed', 'serene', 'neutral'],
+                    'neutral': ['calm', 'peaceful', 'balanced']
+                }
+                
+                related_emotions = emotion_mapping.get(emotion.lower(), [emotion.lower()])
+                for related in related_emotions:
+                    partial_match = self.music_df[self.music_df['Mood_Label'].str.lower().str.contains(related, na=False)].copy()
+                    if not partial_match.empty:
+                        matching_tracks = partial_match
+                        print(f"✅ Found {len(matching_tracks)} partial matches for '{related}'")
+                        break
         
         if matching_tracks.empty:
+            print(f"⚠️ No mood matches found, using audio feature matching...")
             # Fallback to audio feature matching
             matching_tracks = self._find_tracks_by_audio_features(emotion, num_recommendations * 2)
+            if matching_tracks.empty:
+                print(f"❌ No matches found for emotion '{emotion}' in real dataset")
+                return []
         
         # Score and rank by popularity if available
         matching_tracks = self._score_tracks_by_popularity(matching_tracks)
         top_tracks = matching_tracks.head(num_recommendations)
+        
+        print(f"🎵 Generating {len(top_tracks)} recommendations from matching tracks")
         
         recommendations = []
         for _, track in top_tracks.iterrows():
@@ -516,87 +814,166 @@ class AdvancedMusicRecommendationEngine:
                 recommendation_reason=f"Matches current {emotion} mood",
                 timestamp=datetime.now(),
                 session_id=session_id,
-                recommendation_strategy="mood_matching"
+                recommendation_strategy="mood_matching",
+                # 🎵 POPULATE DATASET FIELDS
+                album=track.get('Album', 'Unknown Album'),
+                track_popularity=int(track.get('Track Popularity', 0)),
+                artist_popularity=int(track.get('Artist Popularity', 0)),
+                musical_features=track.get('Musical_Features', 'Unknown'),
+                artist_genres=track.get('Artist Genres', 'Unknown'),
+                mental_health_benefit=track.get('Mental_Health_Benefit', 'General Wellness'),
+                duration_ms=int(track.get('Duration (ms)', 0)),
+                danceability=float(track.get('Danceability', 0.0)),
+                energy=float(track.get('Energy', 0.0)),
+                valence=float(track.get('Valence', 0.0)),
+                tempo=float(track.get('Tempo', 0.0)),
+                # Additional audio features
+                key=int(track.get('Key', 0)),
+                loudness=float(track.get('Loudness', 0.0)),
+                mode=int(track.get('Mode', 0)),
+                speechiness=float(track.get('Speechiness', 0.0)),
+                acousticness=float(track.get('Acousticness', 0.0)),
+                instrumentalness=float(track.get('Instrumentalness', 0.0)),
+                liveness=float(track.get('Liveness', 0.0))
             )
             recommendations.append(rec)
         
+        print(f"✅ Created {len(recommendations)} music recommendations")
         return recommendations
     
     def _mood_regulation_strategy(self, emotion: str, confidence: float,
                                 session_id: str, num_recommendations: int) -> List[MusicRecommendation]:
-        """⚖️ Mood regulation - guide toward desired emotional state"""
+        """🤖 AI-powered mood regulation - guide toward desired emotional state for therapeutic relief"""
         
-        # Define target emotions for regulation
-        regulation_map = {
-            'sadness': 'neutral',
-            'anger': 'calm', 
-            'fear': 'calm',
-            'neutral': 'joy',
-            'joy': 'joy',  # Maintain positive state
-            'excitement': 'calm',  # Calm down high energy
-            'calm': 'calm'  # Maintain calm state
-        }
-        
-        target_emotion = regulation_map.get(emotion, 'neutral')
+        print(f"🧘 AI MOOD REGULATION: Providing therapeutic relief for '{emotion}'")
         
         if self.music_df is None or self.music_df.empty:
-            return self._create_fallback_recommendations(target_emotion, confidence, session_id, num_recommendations, "mood_regulation")
+            print(f"❌ No music dataset available - cannot generate recommendations")
+            return []
         
-        # Get tracks for target emotion
+        # 🤖 GET AI THERAPEUTIC STRATEGY
+        available_moods = self.music_df['Mood_Label'].unique().tolist() if 'Mood_Label' in self.music_df.columns else []
+        track_samples = self.music_df.head(10).to_dict('records') if not self.music_df.empty else []
+        
+        ai_strategy = self.ai_advisor.get_therapeutic_strategy(
+            emotion=emotion,
+            confidence=confidence,
+            available_moods=available_moods,
+            track_samples=track_samples
+        )
+        
+        target_emotion = ai_strategy['target_mood']
+        reasoning = ai_strategy['reasoning']
+        therapeutic_benefit = ai_strategy['therapeutic_benefit']
+        
+        print(f"🎯 AI recommends '{target_emotion}' music")
+        print(f"💡 Reasoning: {reasoning}")
+        
+        # 🎵 ENHANCED THERAPEUTIC MUSIC SELECTION
         regulating_tracks = pd.DataFrame()
+        
+        # First priority: Find tracks with exact mood match for therapeutic target
         if 'Mood_Label' in self.music_df.columns:
             regulating_tracks = self.music_df[self.music_df['Mood_Label'] == target_emotion].copy()
+            print(f"Found {len(regulating_tracks)} tracks with mood label '{target_emotion}'")
         
-        if regulating_tracks.empty:
-            regulating_tracks = self._find_tracks_by_audio_features(target_emotion, num_recommendations * 2)
+        # Second priority: Use audio features to find therapeutic tracks
+        if regulating_tracks.empty or len(regulating_tracks) < num_recommendations:
+            print(f"Expanding search using audio features for '{target_emotion}'")
+            audio_feature_tracks = self._find_tracks_by_audio_features(target_emotion, num_recommendations * 3)
+            
+            if regulating_tracks.empty:
+                regulating_tracks = audio_feature_tracks
+            else:
+                # Combine and remove duplicates
+                regulating_tracks = pd.concat([regulating_tracks, audio_feature_tracks]).drop_duplicates()
+        
+        # 🏥 THERAPEUTIC FILTERING - Remove tracks that might worsen the condition
+        if target_emotion == 'calm' and not regulating_tracks.empty:
+            # For calming: avoid high-energy, aggressive music
+            if 'Energy' in regulating_tracks.columns:
+                regulating_tracks = regulating_tracks[regulating_tracks['Energy'] <= 0.7]
+            if 'Valence' in regulating_tracks.columns:
+                regulating_tracks = regulating_tracks[regulating_tracks['Valence'] >= 0.3]
+                
+        elif target_emotion == 'joy' and not regulating_tracks.empty:
+            # For joy/uplift: favor positive, energetic music
+            if 'Valence' in regulating_tracks.columns:
+                regulating_tracks = regulating_tracks[regulating_tracks['Valence'] >= 0.5]
+            if 'Energy' in regulating_tracks.columns:
+                regulating_tracks = regulating_tracks[regulating_tracks['Energy'] >= 0.4]
+        
+        print(f"After therapeutic filtering: {len(regulating_tracks)} suitable tracks")
         
         # Score and select
         regulating_tracks = self._score_tracks_by_audio_features(regulating_tracks, target_emotion)
         top_tracks = regulating_tracks.head(num_recommendations)
         
+        # 🎯 CREATE AI-GUIDED THERAPEUTIC RECOMMENDATIONS
         recommendations = []
         for _, track in top_tracks.iterrows():
             rec = MusicRecommendation(
                 track_name=track.get('Track Name', 'Unknown Track'),
                 artist_name=track.get('Artist Name', 'Unknown Artist'),
                 emotion_target=target_emotion,
-                confidence_score=confidence * 0.8,  # Confidence reduction for regulation
-                therapeutic_benefit=f"Emotional regulation: {emotion} → {target_emotion}",
+                confidence_score=confidence * ai_strategy['confidence'],  # Use AI confidence
+                therapeutic_benefit=therapeutic_benefit,  # From AI
                 audio_features=self._extract_audio_features(track),
-                recommendation_reason=f"Guide from {emotion} toward {target_emotion}",
+                recommendation_reason=reasoning,  # From AI
                 timestamp=datetime.now(),
                 session_id=session_id,
-                recommendation_strategy="mood_regulation"
+                recommendation_strategy=f"ai_therapeutic_{ai_strategy['strategy']}",
+                # 🎵 POPULATE DATASET FIELDS
+                album=track.get('Album', 'Unknown Album'),
+                track_popularity=int(track.get('Track Popularity', 0)),
+                artist_popularity=int(track.get('Artist Popularity', 0)),
+                musical_features=track.get('Musical_Features', 'Unknown'),
+                artist_genres=track.get('Artist Genres', 'Unknown'),
+                mental_health_benefit=track.get('Mental_Health_Benefit', 'General Wellness'),
+                duration_ms=int(track.get('Duration (ms)', 0)),
+                danceability=float(track.get('Danceability', 0.0)),
+                energy=float(track.get('Energy', 0.0)),
+                valence=float(track.get('Valence', 0.0)),
+                tempo=float(track.get('Tempo', 0.0)),
+                # Additional audio features
+                key=int(track.get('Key', 0)),
+                loudness=float(track.get('Loudness', 0.0)),
+                mode=int(track.get('Mode', 0)),
+                speechiness=float(track.get('Speechiness', 0.0)),
+                acousticness=float(track.get('Acousticness', 0.0)),
+                instrumentalness=float(track.get('Instrumentalness', 0.0)),
+                liveness=float(track.get('Liveness', 0.0))
             )
             recommendations.append(rec)
+        
+        print(f"✅ Generated {len(recommendations)} AI-guided therapeutic recommendations")
         
         return recommendations
     
     def _adaptive_strategy(self, emotion: str, confidence: float,
                          session_id: str, num_recommendations: int) -> List[MusicRecommendation]:
-        """🧠 Adaptive strategy - combines approaches based on context"""
+        """🧠 Adaptive strategy - ALWAYS provides therapeutic relief, never mood matching"""
         
-        # Get session history for context
-        session_history = self.session_recommendations.get(session_id, [])
+        print(f"🎯 ADAPTIVE STRATEGY: Providing therapeutic relief for emotion '{emotion}'")
         
-        # Determine strategy based on confidence and history
-        if confidence > 0.8:
-            # High confidence - trust the emotion and match it
-            return self._mood_matching_strategy(emotion, confidence, session_id, num_recommendations)
-        elif len(session_history) > 0:
-            # Has history - check if we need mood regulation
-            recent_emotions = [rec.target_emotion for rec in session_history[-3:]]
-            if recent_emotions.count(emotion) > 1 and emotion in ['sadness', 'anger', 'fear']:
-                # Persistent negative emotion - try regulation
-                return self._mood_regulation_strategy(emotion, confidence, session_id, num_recommendations)
-            else:
-                # Mix of matching and therapeutic
-                matching_recs = self._mood_matching_strategy(emotion, confidence, session_id, num_recommendations // 2)
-                therapeutic_recs = self._therapeutic_strategy(emotion, confidence, session_id, num_recommendations - len(matching_recs))
-                return matching_recs + therapeutic_recs
-        else:
-            # No history, moderate confidence - use therapeutic approach
+        # 🎭 ALWAYS use mood regulation for therapeutic relief
+        # If someone is angry, sad, fearful, etc. - give them relief!
+        negative_emotions = ['anger', 'angry', 'sadness', 'sad', 'fear', 'afraid', 'disgust', 'worried', 'anxious', 'stressed']
+        
+        if emotion.lower() in negative_emotions:
+            print(f"🏥 Detected negative emotion '{emotion}' - providing therapeutic relief")
+            # Always use mood regulation to help the user feel better
+            return self._mood_regulation_strategy(emotion, confidence, session_id, num_recommendations)
+        elif emotion.lower() in ['neutral', 'calm']:
+            print(f"😌 Neutral/calm emotion '{emotion}' - maintaining peaceful state")
+            # For neutral/calm, provide peaceful/relaxing music to maintain the state
             return self._therapeutic_strategy(emotion, confidence, session_id, num_recommendations)
+        else:
+            print(f"😊 Positive emotion '{emotion}' - enhancing positive mood")
+            # For positive emotions (joy, excitement), enhance but also balance
+            positive_recs = self._therapeutic_strategy(emotion, confidence, session_id, num_recommendations // 2)
+            calming_recs = self._mood_regulation_strategy(emotion, confidence, session_id, num_recommendations - len(positive_recs))
+            return positive_recs + calming_recs
     
     def _find_tracks_by_audio_features(self, emotion: str, limit: int) -> pd.DataFrame:
         """Find tracks matching audio feature preferences for emotion"""
@@ -665,6 +1042,44 @@ class AdvancedMusicRecommendationEngine:
             # Random shuffle if no popularity data
             return tracks_df.sample(frac=1.0) if len(tracks_df) > 1 else tracks_df
     
+    def _get_therapeutic_benefit_description(self, from_emotion: str, to_emotion: str) -> str:
+        """Generate specific therapeutic benefit description"""
+        benefit_map = {
+            ('anger', 'calm'): 'Anger relief through calming harmonies and peaceful rhythms',
+            ('angry', 'calm'): 'Anger relief through calming harmonies and peaceful rhythms',
+            ('sadness', 'joy'): 'Mood uplift from sadness to joy through positive energy music',
+            ('sad', 'joy'): 'Mood uplift from sadness to joy through positive energy music',
+            ('fear', 'calm'): 'Anxiety relief and confidence building through soothing melodies',
+            ('afraid', 'calm'): 'Anxiety relief and confidence building through soothing melodies',
+            ('anxious', 'calm'): 'Anxiety relief and stress reduction through calming music',
+            ('worried', 'calm'): 'Worry relief and mental peace through therapeutic sounds',
+            ('stressed', 'calm'): 'Stress relief and relaxation through peaceful music',
+            ('disgust', 'neutral'): 'Emotional cleansing and neutralizing through balanced music',
+            ('neutral', 'joy'): 'Mood enhancement from neutral to positive state',
+        }
+        
+        key = (from_emotion.lower(), to_emotion.lower())
+        return benefit_map.get(key, f'Therapeutic transition from {from_emotion} to {to_emotion}')
+    
+    def _get_therapeutic_reason(self, from_emotion: str, to_emotion: str) -> str:
+        """Generate specific therapeutic reasoning"""
+        reason_map = {
+            ('anger', 'calm'): 'Providing calming music to reduce anger and promote inner peace',
+            ('angry', 'calm'): 'Providing calming music to reduce anger and promote inner peace',
+            ('sadness', 'joy'): 'Uplifting music to help overcome sadness and restore happiness',
+            ('sad', 'joy'): 'Uplifting music to help overcome sadness and restore happiness',
+            ('fear', 'calm'): 'Comforting music to alleviate fear and build confidence',
+            ('afraid', 'calm'): 'Comforting music to alleviate fear and build confidence',
+            ('anxious', 'calm'): 'Soothing music to reduce anxiety and promote relaxation',
+            ('worried', 'calm'): 'Peaceful music to ease worries and calm the mind',
+            ('stressed', 'calm'): 'Relaxing music to relieve stress and restore balance',
+            ('disgust', 'neutral'): 'Neutral music to cleanse negative feelings',
+            ('neutral', 'joy'): 'Positive music to enhance mood and bring joy',
+        }
+        
+        key = (from_emotion.lower(), to_emotion.lower())
+        return reason_map.get(key, f'Therapeutic music to guide from {from_emotion} toward {to_emotion}')
+    
     def _extract_audio_features(self, track_row) -> Dict[str, float]:
         """Extract audio features from track data"""
         feature_columns = [
@@ -682,51 +1097,7 @@ class AdvancedMusicRecommendationEngine:
         
         return features
     
-    def _create_fallback_recommendations(self, emotion: str, confidence: float, session_id: str, 
-                                       num_tracks: int, strategy: str) -> List[MusicRecommendation]:
-        """Create fallback recommendations when no dataset available"""
-        fallback_tracks = {
-            'joy': [
-                {'track': 'Happy', 'artist': 'Pharrell Williams'},
-                {'track': 'Can\'t Stop the Feeling', 'artist': 'Justin Timberlake'},
-                {'track': 'Good as Hell', 'artist': 'Lizzo'}
-            ],
-            'sadness': [
-                {'track': 'Someone Like You', 'artist': 'Adele'},
-                {'track': 'Hurt', 'artist': 'Johnny Cash'},
-                {'track': 'Mad World', 'artist': 'Gary Jules'}
-            ],
-            'neutral': [
-                {'track': 'Weightless', 'artist': 'Marconi Union'},
-                {'track': 'Clair de Lune', 'artist': 'Claude Debussy'},
-                {'track': 'River', 'artist': 'Joni Mitchell'}
-            ],
-            'anger': [
-                {'track': 'Breathe Me', 'artist': 'Sia'},
-                {'track': 'Calm Down', 'artist': 'Rema'},
-                {'track': 'Peace of Mind', 'artist': 'Boston'}
-            ]
-        }
-        
-        tracks = fallback_tracks.get(emotion, fallback_tracks['neutral'])[:num_tracks]
-        
-        recommendations = []
-        for track_data in tracks:
-            rec = MusicRecommendation(
-                track_name=track_data['track'],
-                artist_name=track_data['artist'],
-                emotion_target=emotion,
-                confidence_score=confidence * 0.7,  # Lower confidence for fallback
-                therapeutic_benefit=self.therapeutic_benefits.get(emotion, ['General Wellness'])[0],
-                audio_features={'valence': 0.5, 'energy': 0.5, 'tempo': 120},  # Default values
-                recommendation_reason=f"Fallback {strategy} selection for {emotion}",
-                timestamp=datetime.now(),
-                session_id=session_id,
-                recommendation_strategy=f"{strategy}_fallback"
-            )
-            recommendations.append(rec)
-        
-        return recommendations
+    # REMOVED: No fallback recommendations - use REAL data only
     
     def get_session_recommendation_history(self, session_id: str) -> List[Dict[str, Any]]:
         """Get recommendation history for a session"""
@@ -794,6 +1165,19 @@ class UnifiedEmotionMusicSystem:
         self.firebase_client = None
         self.project_root = self._find_project_root()
         
+        # 🎭 NEW: Import real emotion combiner
+        try:
+            from real_emotion_combiner import get_combined_emotion
+            self.real_emotion_combiner = get_combined_emotion
+            self.combiner_available = True
+            if not silent:
+                print("✅ Real emotion combiner integrated")
+        except ImportError as e:
+            self.real_emotion_combiner = None
+            self.combiner_available = False
+            if not silent:
+                print(f"⚠️ Real emotion combiner not available: {e}")
+        
         # Initialize components
         self.fusion_engine = AdvancedEmotionFusionEngine()
         self.music_engine = AdvancedMusicRecommendationEngine()
@@ -809,6 +1193,7 @@ class UnifiedEmotionMusicSystem:
             print("🎯 Y.M.I.R Unified Emotion-Music System initialized")
             print(f"🔥 Firebase: {'✅ Connected' if self.firebase_client else '❌ Unavailable'}")
             print(f"🧠 Fusion strategies: {list(self.fusion_engine.strategies.keys())}")
+            print(f"🎭 Multi-emotion support: {'✅ Available' if self.combiner_available else '❌ Unavailable'}")
     
     def _find_project_root(self) -> Path:
         """Find project root"""
@@ -839,6 +1224,107 @@ class UnifiedEmotionMusicSystem:
                     return
         except Exception:
             pass
+    
+    def _get_multi_emotion_music_recommendations(self, session_id: str, dominant_emotion: str, 
+                                               confidence: float, top_emotions: List[Tuple[str, float]], 
+                                               is_multi_emotion: bool, num_tracks: int) -> List[Dict[str, Any]]:
+        """🎵 Generate music recommendations using multi-emotion data"""
+        try:
+            if is_multi_emotion and len(top_emotions) > 1:
+                # Multi-emotion blending: 60% primary, 30% secondary, 10% tertiary
+                primary_emotion, primary_confidence = top_emotions[0]
+                secondary_emotion, secondary_confidence = top_emotions[1] if len(top_emotions) > 1 else (primary_emotion, 0)
+                tertiary_emotion, tertiary_confidence = top_emotions[2] if len(top_emotions) > 2 else (primary_emotion, 0)
+                
+                if not self.silent:
+                    print(f"🎵 Multi-emotion music blending:")
+                    print(f"   Primary (60%): {primary_emotion} ({primary_confidence:.2f})")
+                    print(f"   Secondary (30%): {secondary_emotion} ({secondary_confidence:.2f})")
+                    print(f"   Tertiary (10%): {tertiary_emotion} ({tertiary_confidence:.2f})")
+                
+                # Get recommendations for each emotion with proportional tracks
+                primary_tracks = int(num_tracks * 0.6)
+                secondary_tracks = int(num_tracks * 0.3)
+                tertiary_tracks = num_tracks - primary_tracks - secondary_tracks
+                
+                all_recommendations = []
+                
+                # Primary emotion recommendations
+                if primary_tracks > 0:
+                    primary_rec_set = self.music_engine.get_recommendations_for_emotion(
+                        session_id, primary_emotion, primary_confidence, "mood_matching", primary_tracks
+                    )
+                    if primary_rec_set and primary_rec_set.recommendations:
+                        for rec in primary_rec_set.recommendations:
+                            rec_dict = rec.to_dict()
+                            rec_dict['emotion_source'] = 'primary'
+                            rec_dict['emotion_weight'] = 0.6
+                            rec_dict['source_emotion'] = primary_emotion
+                            all_recommendations.append(rec_dict)
+                
+                # Secondary emotion recommendations
+                if secondary_tracks > 0 and secondary_emotion != primary_emotion:
+                    secondary_rec_set = self.music_engine.get_recommendations_for_emotion(
+                        session_id, secondary_emotion, secondary_confidence, "mood_matching", secondary_tracks
+                    )
+                    if secondary_rec_set and secondary_rec_set.recommendations:
+                        for rec in secondary_rec_set.recommendations:
+                            rec_dict = rec.to_dict()
+                            rec_dict['emotion_source'] = 'secondary'
+                            rec_dict['emotion_weight'] = 0.3
+                            rec_dict['source_emotion'] = secondary_emotion
+                            all_recommendations.append(rec_dict)
+                
+                # Tertiary emotion recommendations
+                if tertiary_tracks > 0 and tertiary_emotion != primary_emotion and tertiary_emotion != secondary_emotion:
+                    tertiary_rec_set = self.music_engine.get_recommendations_for_emotion(
+                        session_id, tertiary_emotion, tertiary_confidence, "therapeutic", tertiary_tracks
+                    )
+                    if tertiary_rec_set and tertiary_rec_set.recommendations:
+                        for rec in tertiary_rec_set.recommendations:
+                            rec_dict = rec.to_dict()
+                            rec_dict['emotion_source'] = 'tertiary'
+                            rec_dict['emotion_weight'] = 0.1
+                            rec_dict['source_emotion'] = tertiary_emotion
+                            all_recommendations.append(rec_dict)
+                
+                # Shuffle to mix emotions throughout the playlist
+                import random
+                random.shuffle(all_recommendations)
+                
+                if not self.silent:
+                    print(f"🎵 Generated {len(all_recommendations)} multi-emotion recommendations")
+                
+                return all_recommendations[:num_tracks]
+            
+            else:
+                # Single emotion - use existing logic
+                if not self.silent:
+                    print(f"🎵 Single emotion recommendations for: {dominant_emotion}")
+                
+                rec_set = self.music_engine.get_recommendations_for_emotion(
+                    session_id, dominant_emotion, confidence, "adaptive", num_tracks
+                )
+                
+                if rec_set and rec_set.recommendations:
+                    recommendations = []
+                    for rec in rec_set.recommendations:
+                        rec_dict = rec.to_dict()
+                        rec_dict['emotion_source'] = 'single'
+                        rec_dict['emotion_weight'] = 1.0
+                        rec_dict['source_emotion'] = dominant_emotion
+                        recommendations.append(rec_dict)
+                    return recommendations
+                
+                return []
+                
+        except Exception as e:
+            if not self.silent:
+                print(f"❌ Error generating multi-emotion music recommendations: {e}")
+            
+            # Return empty if no dataset available
+            print(f"❌ Cannot generate recommendations without real dataset")
+            return []
     
     def get_latest_facial_emotions(self, minutes_back: int = 10) -> Optional[Dict[str, Any]]:
         """Get latest facial emotions from Firebase"""
@@ -926,47 +1412,97 @@ class UnifiedEmotionMusicSystem:
     
     def get_emotion_and_music(self, session_id: str = "default", minutes_back: int = 10, 
                             strategy: str = 'adaptive', num_tracks: int = 10) -> Optional[UnifiedEmotionResult]:
-        """🎯 MAIN FUNCTION: Get current emotion and music recommendations"""
+        """🎯 MAIN FUNCTION: Get current emotion and music recommendations with MULTI-EMOTION support"""
         start_time = datetime.now()
         
         try:
-            # Get emotion data from both sources
-            facial_data = self.get_latest_facial_emotions(minutes_back)
-            text_data = self.get_latest_text_emotions(minutes_back)
-            
-            # Fuse emotions
-            if not facial_data and not text_data:
-                return None
-            
-            emotion, confidence, method = self.fusion_engine.fuse_emotions(
-                facial_data, text_data, strategy
-            )
-            
-            # Get music recommendations using advanced engine
-            rec_set = self.music_engine.get_recommendations_for_emotion(
-                session_id, emotion, confidence, "adaptive", num_tracks
-            )
-            
-            # Extract just the recommendations for simple return format
-            music_recommendations = [rec.to_dict() for rec in rec_set.recommendations] if rec_set else []
-            
-            # Calculate processing time
-            processing_time = (datetime.now() - start_time).total_seconds() * 1000
-            
-            # Create result
-            result = UnifiedEmotionResult(
-                emotion=emotion,
-                confidence=confidence,
-                source=method,
-                strategy=strategy,
-                facial_data=facial_data,
-                text_data=text_data,
-                music_recommendations=music_recommendations,
-                recommendation_strategy="adaptive",
-                session_id=session_id,
-                timestamp=start_time,
-                processing_time_ms=processing_time
-            )
+            # 🎭 NEW: Use real emotion combiner for multi-emotion support
+            if self.combiner_available:
+                if not self.silent:
+                    print(f"🎭 Using REAL emotion combiner for multi-emotion analysis...")
+                
+                emotion_result = self.real_emotion_combiner(minutes_back=minutes_back, strategy=strategy)
+                
+                if not emotion_result:
+                    if not self.silent:
+                        print("❌ No emotion detected by real combiner")
+                    return None
+                
+                # Extract emotion data
+                emotion = emotion_result['emotion']
+                confidence = emotion_result['confidence']
+                method = emotion_result['source']
+                
+                # 🎭 NEW: Multi-emotion data
+                is_multi_emotion = emotion_result.get('is_multi_emotion', False)
+                top_emotions = emotion_result.get('top_emotions', [(emotion, confidence)])
+                fusion_weights = emotion_result.get('fusion_weights', {'facial': 0.5, 'text': 0.5})
+                
+                if not self.silent:
+                    print(f"🎭 Detected: {emotion} (confidence: {confidence:.2f})")
+                    print(f"🎭 Multi-emotion: {is_multi_emotion}")
+                    if is_multi_emotion and len(top_emotions) > 1:
+                        print(f"🎪 Top emotions: {top_emotions[:3]}")
+                
+                # 🎵 NEW: Enhanced music recommendations using multi-emotion data
+                music_recommendations = self._get_multi_emotion_music_recommendations(
+                    session_id, emotion, confidence, top_emotions, is_multi_emotion, num_tracks
+                )
+                
+                # Create enhanced result with multi-emotion support
+                result = UnifiedEmotionResult(
+                    emotion=emotion,
+                    confidence=confidence,
+                    source=method,
+                    strategy=strategy,
+                    facial_data=emotion_result.get('facial_data'),
+                    text_data=emotion_result.get('text_data'),
+                    music_recommendations=music_recommendations,
+                    recommendation_strategy="multi_emotion_adaptive",
+                    session_id=session_id,
+                    timestamp=start_time,
+                    processing_time_ms=(datetime.now() - start_time).total_seconds() * 1000
+                )
+                
+                # Add multi-emotion metadata to result
+                result.is_multi_emotion = is_multi_emotion
+                result.top_emotions = top_emotions
+                result.fusion_weights = fusion_weights
+                
+            else:
+                # Fallback to old method if real combiner not available
+                if not self.silent:
+                    print("⚠️ Using fallback emotion detection...")
+                
+                facial_data = self.get_latest_facial_emotions(minutes_back)
+                text_data = self.get_latest_text_emotions(minutes_back)
+                
+                if not facial_data and not text_data:
+                    return None
+                
+                emotion, confidence, method = self.fusion_engine.fuse_emotions(
+                    facial_data, text_data, strategy
+                )
+                
+                rec_set = self.music_engine.get_recommendations_for_emotion(
+                    session_id, emotion, confidence, "adaptive", num_tracks
+                )
+                
+                music_recommendations = [rec.to_dict() for rec in rec_set.recommendations] if rec_set else []
+                
+                result = UnifiedEmotionResult(
+                    emotion=emotion,
+                    confidence=confidence,
+                    source=method,
+                    strategy=strategy,
+                    facial_data=facial_data,
+                    text_data=text_data,
+                    music_recommendations=music_recommendations,
+                    recommendation_strategy="adaptive",
+                    session_id=session_id,
+                    timestamp=start_time,
+                    processing_time_ms=(datetime.now() - start_time).total_seconds() * 1000
+                )
             
             # Store in session
             self.session_data[session_id] = result
@@ -976,6 +1512,8 @@ class UnifiedEmotionMusicSystem:
         except Exception as e:
             if not self.silent:
                 print(f"Error in get_emotion_and_music: {e}")
+                import traceback
+                traceback.print_exc()
             return None
     
     def get_session_history(self, session_id: str) -> Optional[UnifiedEmotionResult]:
@@ -986,9 +1524,9 @@ class UnifiedEmotionMusicSystem:
 _unified_system = None
 
 def get_emotion_and_music(session_id: str = "default", minutes_back: int = 10, 
-                         strategy: str = 'adaptive', num_tracks: int = 10) -> Optional[Dict[str, Any]]:
+                         strategy: str = 'adaptive', num_tracks: int = 100) -> Optional[Dict[str, Any]]:
     """
-    🎯 MAIN FUNCTION FOR APP.PY
+    🎯 MAIN FUNCTION FOR APP.PY - Enhanced with Multi-Emotion Support
     
     Get current user emotion and music recommendations in one call!
     
@@ -996,23 +1534,34 @@ def get_emotion_and_music(session_id: str = "default", minutes_back: int = 10,
         session_id: User session identifier
         minutes_back: How many minutes back to look for emotions
         strategy: Fusion strategy ('simple', 'adaptive', 'confidence_based', 'temporal_weighted', 'weighted_average')
-        num_tracks: Number of music tracks to recommend
+        num_tracks: Number of music tracks to recommend (default 100 for carousel)
     
     Returns:
         Dict with emotion and music data or None if no emotions found
         {
-            'emotion': str,                    # Current emotion
+            'emotion': str,                    # Current dominant emotion
             'confidence': float,               # 0-1 confidence score
             'source': str,                     # How emotion was determined
             'strategy': str,                   # Fusion strategy used
+            'is_multi_emotion': bool,          # 🎭 NEW: Whether multiple emotions detected
+            'top_emotions': List[Tuple],       # 🎭 NEW: Top 3 emotions with scores
+            'fusion_weights': Dict,            # 🎭 NEW: Facial vs text weights used
             'music_recommendations': [         # List of recommended tracks
                 {
-                    'track': str,              # Track name
-                    'artist': str,             # Artist name
-                    'mood': str,               # Mood category
+                    'track_name': str,         # Track name
+                    'artist_name': str,        # Artist name  
+                    'album': str,              # Album name
+                    'emotion_target': str,     # Target emotion for this track
                     'therapeutic_benefit': str, # Therapeutic benefit
-                    'confidence_match': float, # How well it matches emotion
-                    'recommendation_reason': str
+                    'confidence_score': float, # How well it matches emotion
+                    'recommendation_reason': str,
+                    'emotion_source': str,     # 🎭 NEW: 'primary', 'secondary', 'tertiary', or 'single'
+                    'emotion_weight': float,   # 🎭 NEW: Weight in multi-emotion blend
+                    'source_emotion': str,     # 🎭 NEW: Which emotion this track addresses
+                    'audio_features': Dict,    # Audio features for UI display
+                    'musical_features': str,   # Musical description
+                    'track_popularity': int,   # Popularity score
+                    'artist_popularity': int   # Artist popularity
                 }
             ],
             'processing_time_ms': float,       # Processing time
@@ -1025,7 +1574,21 @@ def get_emotion_and_music(session_id: str = "default", minutes_back: int = 10,
         _unified_system = UnifiedEmotionMusicSystem(silent=True)
     
     result = _unified_system.get_emotion_and_music(session_id, minutes_back, strategy, num_tracks)
-    return result.to_dict() if result else None
+    
+    if result:
+        result_dict = result.to_dict()
+        
+        # 🎭 Add multi-emotion data to the response
+        if hasattr(result, 'is_multi_emotion'):
+            result_dict['is_multi_emotion'] = result.is_multi_emotion
+        if hasattr(result, 'top_emotions'):
+            result_dict['top_emotions'] = result.top_emotions
+        if hasattr(result, 'fusion_weights'):
+            result_dict['fusion_weights'] = result.fusion_weights
+        
+        return result_dict
+    
+    return None
 
 def get_emotion_simple(session_id: str = "default", strategy: str = 'adaptive') -> Optional[str]:
     """
@@ -1103,30 +1666,54 @@ def test_unified_system():
     print("=" * 60)
     
     # Test main function
-    result = get_emotion_and_music("test_session", strategy='adaptive')
+    result = get_emotion_and_music("test_session", strategy='adaptive', num_tracks=10)
     
     if result:
         print(f"✅ EMOTION DETECTED: {result['emotion']}")
         print(f"   Confidence: {result['confidence']:.2f}")
         print(f"   Source: {result['source']}")
         print(f"   Strategy: {result['strategy']}")
+        print(f"   Multi-emotion: {result.get('is_multi_emotion', False)}")
         print(f"   Music tracks: {len(result['music_recommendations'])}")
         print(f"   Processing time: {result['processing_time_ms']:.1f}ms")
         
-        # Show first track
+        # Show first 5 tracks with full details
         if result['music_recommendations']:
-            track = result['music_recommendations'][0]
-            print(f"   First recommendation: {track['track']} by {track['artist']}")
+            print(f"\n🎵 TOP 5 RECOMMENDED SONGS:")
+            print("-" * 80)
+            for i, track in enumerate(result['music_recommendations'][:30], 1):
+                print(f"{i}. 🎵 {track.get('track_name', 'Unknown Track')}")
+                print(f"   🎤 Artist: {track.get('artist_name', 'Unknown Artist')}")
+                print(f"   💿 Album: {track.get('album', 'Unknown Album')}")
+                print(f"   🎭 Mood: {track.get('emotion_target', 'Unknown')}")
+                print(f"   💚 Benefit: {track.get('therapeutic_benefit', 'General Wellness')}")
+                print(f"   📊 Popularity: Track={track.get('track_popularity', 0)}, Artist={track.get('artist_popularity', 0)}")
+                print(f"   🎼 Features: {track.get('musical_features', 'Unknown')}")
+                if track.get('emotion_source'):
+                    print(f"   🎯 Emotion Source: {track.get('emotion_source')} ({track.get('emotion_weight', 1.0):.1f})")
+                print()
     else:
         print("❌ No emotions detected")
     
     # Test simple function
     emotion = get_emotion_simple("test_session")
-    print(f"\nSimple emotion: {emotion}")
+    print(f"Simple emotion: {emotion}")
     
-    # Test music-only function
-    music = get_music_for_emotion("joy", 0.9, 3)
+    # Test music-only function with detailed output
+    print(f"\n🎵 TESTING DIRECT MUSIC RECOMMENDATION:")
+    print("-" * 50)
+    music = get_music_for_emotion("joy", 0.9, 5)
     print(f"Music for joy: {len(music)} tracks")
+    
+    if music:
+        print(f"\n🎵 JOY MUSIC RECOMMENDATIONS:")
+        print("-" * 50)
+        for i, track in enumerate(music[:3], 1):
+            print(f"{i}. 🎵 {track.get('track_name', 'Unknown Track')}")
+            print(f"   🎤 Artist: {track.get('artist_name', 'Unknown Artist')}")
+            print(f"   💚 Benefit: {track.get('therapeutic_benefit', 'General Wellness')}")
+            print(f"   📊 Confidence: {track.get('confidence_score', 0):.2f}")
+            print()
     
     print("\n✅ Testing complete!")
 

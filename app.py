@@ -161,12 +161,11 @@ class MicroserviceClient:
             return {'error': 'Emotion combiner not available'}
         
         try:
-            # 🔍 SAFE CHECK: Only get face emotions if camera is actually running
+            # Only get face emotions if camera is actually running
             face_status = self.get_face_service_status()
             face_emotions = {}
             
             if face_status.get('running') and not face_status.get('error'):
-                # Camera is actively running, safe to get emotions
                 face_emotions = self.get_emotions()
             else:
                 # Camera not running, don't trigger it with API calls
@@ -201,7 +200,7 @@ class MicroserviceClient:
                         'timestamp': combined.timestamp.isoformat(),
                         'facial_source': combined.facial_source,
                         'text_source': combined.text_source,
-                        # 🎭 Multi-emotion support
+                        # Multi-emotion support
                         'top_emotions': getattr(combined, 'top_emotions', [(combined.dominant_emotion, combined.confidence)]),
                         'is_multi_emotion': getattr(combined, 'is_multi_emotion', False),
                         'fusion_weights': getattr(combined, 'fusion_weights', {'facial': 0.5, 'text': 0.5}),
@@ -491,53 +490,100 @@ def api_combined_emotions():
     print(f"🔗 API RESULT: {result}")
     return jsonify(result)
 
-@app.route('/api/test_combiner')
-def api_test_combiner():
-    """Test emotion combiner with detailed logging"""
-    print(f"\n🧪 TESTING EMOTION COMBINER")
-    print("=" * 60)
-    
-    if not EMOTION_COMBINER_AVAILABLE:
-        return jsonify({'error': 'Emotion combiner not available'})
-    
+# 🎵 EMOTION-BASED MUSIC RECOMMENDATION API
+@app.route('/api/music/recommendations')
+def api_music_recommendations():
+    """🎵 Get emotion-based music recommendations for the carousel (100 songs for scrolling)"""
     try:
-        # Import and test the combiner directly
-        from real_emotion_combiner import test_emotion_fusion, get_combined_emotion
+        session_id = request.args.get('session_id', 'default')
+        limit = int(request.args.get('limit', 100))  # Default 100 for carousel
+        minutes_back = int(request.args.get('minutes_back', 10))
+        strategy = request.args.get('strategy', 'adaptive')
         
-        print("🧪 Testing direct combiner function...")
-        result = get_combined_emotion(minutes_back=10, strategy='adaptive')
-        
-        if result:
-            print(f"✅ DIRECT COMBINER RESULT:")
-            print(f"   Emotion: {result['emotion']}")
-            print(f"   Confidence: {result['confidence']}")
-            print(f"   Source: {result['source']}")
-            print(f"   Strategy: {result['strategy']}")
+        # Import and use the unified emotion music system
+        try:
+            import sys
+            sys.path.append('enhancements/src-new/multimodal_fusion')
+            from unified_emotion_music_system import get_emotion_and_music
+            result = get_emotion_and_music(session_id, minutes_back, strategy, limit)
             
-            if result['facial_data']:
-                print(f"   📹 Facial data: {result['facial_data']}")
-            if result['text_data']:
-                print(f"   💬 Text data: {result['text_data']}")
-        else:
-            print(f"❌ No combined emotion data available")
-        
-        print("=" * 60)
-        
-        # Also test via microservice client
-        client_result = microservice_client.get_combined_emotions()
-        print(f"🔗 MICROSERVICE CLIENT RESULT: {client_result}")
-        
-        return jsonify({
-            'success': True,
-            'direct_result': result,
-            'client_result': client_result
-        })
-        
+            if result:
+                recommendations = result.get('music_recommendations', [])
+                
+                # Format for API response - ensure we have all the fields the frontend needs
+                formatted_recommendations = []
+                for track in recommendations:
+                    formatted_track = {
+                        # Essential display info
+                        'track_name': track.get('track_name', 'Unknown Track'),
+                        'artist_name': track.get('artist_name', 'Unknown Artist'),
+                        'album': track.get('album', 'Unknown Album'),
+                        
+                        # Metadata for UI
+                        'track_popularity': track.get('track_popularity', 50),
+                        'artist_popularity': track.get('artist_popularity', 50),
+                        'emotion_target': track.get('emotion_target', 'neutral'),
+                        'therapeutic_benefit': track.get('therapeutic_benefit', 'General Wellness'),
+                        'musical_features': track.get('musical_features', 'Balanced'),
+                        
+                        # Audio features for advanced UI (if needed)
+                        'audio_features': track.get('audio_features', {}),
+                        
+                        # Multi-emotion metadata
+                        'emotion_source': track.get('emotion_source', 'single'),
+                        'emotion_weight': track.get('emotion_weight', 1.0),
+                        'source_emotion': track.get('source_emotion', result.get('emotion')),
+                        'confidence_score': track.get('confidence_score', 0.5),
+                        'recommendation_reason': track.get('recommendation_reason', 'Emotion-based match')
+                    }
+                    formatted_recommendations.append(formatted_track)
+                
+                api_result = {
+                    'success': True,
+                    'emotion': {
+                        'dominant': result.get('emotion'),
+                        'confidence': result.get('confidence'),
+                        'is_multi_emotion': result.get('is_multi_emotion', False),
+                        'top_emotions': result.get('top_emotions', []),
+                        'fusion_weights': result.get('fusion_weights', {})
+                    },
+                    'recommendations': formatted_recommendations,
+                    'metadata': {
+                        'total_songs': len(formatted_recommendations),
+                        'dataset_size': '3212',  # Your real dataset size
+                        'session_id': session_id,
+                        'processing_time_ms': result.get('processing_time_ms', 0),
+                        'timestamp': result.get('timestamp'),
+                        'update_interval': 30  # Tell frontend to update every 30 seconds
+                    }
+                }
+                return jsonify(api_result)
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': 'No emotion detected - please ensure face/text microservices are running',
+                    'recommendations': [],
+                    'metadata': {
+                        'session_id': session_id,
+                        'timestamp': datetime.now().isoformat()
+                    }
+                })
+            
+        except ImportError:
+            return jsonify({
+                'success': False,
+                'error': 'Music recommendation system not available',
+                'recommendations': []
+            }), 500
+            
     except Exception as e:
-        print(f"❌ Combiner test error: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': f'Test failed: {str(e)}'})
+        return jsonify({
+            'success': False,
+            'error': f'Music recommendation error: {str(e)}',
+            'recommendations': []
+        }), 500
+
+
 
 @app.route('/api/video_feed')
 def api_video_feed():
@@ -576,15 +622,13 @@ def health_check():
     })
 
 # ===== MUSIC PLAYER API ENDPOINTS =====
-import requests
 import re
 import os
-from urllib.parse import quote
 import time
 
 @app.route('/api/get_audio')
 def api_get_audio():
-    """Get audio URL for a song using multiple sources"""
+    """Get audio URL for a song using YouTube to MP3 conversion"""
     song = request.args.get('song')
     artist = request.args.get('artist')
     
@@ -594,7 +638,7 @@ def api_get_audio():
         }), 400
     
     try:
-        # Method 1: Try YouTube to MP3 API first (fastest, best quality)
+        # Method 1: Try YouTube to MP3 API first
         audio_url = get_audio_from_youtube_api(song, artist)
         if audio_url:
             return jsonify({
@@ -616,7 +660,6 @@ def api_get_audio():
                 'artist': artist
             })
         
-        # No fallbacks - return error if YouTube methods fail
         return jsonify({
             'success': False,
             'error': 'Unable to find audio on YouTube',
@@ -631,9 +674,9 @@ def api_get_audio():
         }), 500
 
 def get_audio_from_youtube_api(song, artist):
-    """Try to get audio using your YouTube to MP3 API with real YouTube search"""
+    """Get audio using YouTube to MP3 API with real YouTube search"""
     try:
-        # Search for the song on YouTube using yt-dlp
+        # Search for the song on YouTube
         search_query = f"{artist} {song} official audio"
         youtube_url = search_youtube_url_real(search_query)
         
@@ -676,16 +719,13 @@ def get_audio_from_youtube_api(song, artist):
         
     return None
 
-
 def search_youtube_url_real(query):
     """Search YouTube and return the best video URL using yt-dlp"""
     try:
-        # Try to import yt_dlp, fallback if not available
         try:
             import yt_dlp
         except ImportError:
             print("⚠️ yt-dlp not available, using fallback URLs")
-            return search_youtube_url_fallback(query)
         
         ydl_opts = {
             'quiet': True,
@@ -710,7 +750,6 @@ def search_youtube_url_real(query):
             if results and results.get('entries'):
                 for entry in results['entries']:
                     if entry and entry.get('id'):
-                        # Prefer official videos
                         title = entry.get('title', '').lower()
                         if 'official' in title or 'audio' in title:
                             return f"https://www.youtube.com/watch?v={entry['id']}"
@@ -723,39 +762,22 @@ def search_youtube_url_real(query):
     except Exception as e:
         print(f"⚠️ YouTube search error: {e}")
         
-    return search_youtube_url_fallback(query)
 
-def search_youtube_url_fallback(query):
-    """Fallback YouTube URLs for demo"""
-    # Popular song URLs for demo
-    fallback_urls = [
-        "https://youtu.be/e1uCqIPCP1k",  # Your test URL
-        "https://youtu.be/dQw4w9WgXcQ",  # Rick Roll
-        "https://youtu.be/kJQP7kiw5Fk",  # Despacito
-        "https://youtu.be/JGwWNGJdvx8",  # Shape of You
-        "https://youtu.be/2Vv-BfVoq4g"   # Perfect
-    ]
-    
-    import random
-    return random.choice(fallback_urls)
+
 
 def get_audio_from_youtube_search(song, artist):
     """Alternative method using yt-dlp direct download"""
     try:
-        # Try to import yt_dlp
         try:
             import yt_dlp
         except ImportError:
-            print("⚠️ yt-dlp not available for direct download")
             return None
         
         filename = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
         output_path = os.path.join('static', 'music', filename)
         
-        # Ensure directory exists
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
-        # Generate search queries
         queries = [
             f"{artist} - {song} official audio",
             f"{artist} {song} official",
@@ -765,12 +787,12 @@ def get_audio_from_youtube_search(song, artist):
         for query in queries:
             try:
                 ydl_opts = {
-                    'format': 'bestaudio[ext=m4a]/bestaudio/best[height<=720]/best',  # Optimal format from debug
+                    'format': 'bestaudio[ext=m4a]/bestaudio/best[height<=720]/best',
                     'outtmpl': os.path.splitext(output_path)[0],
                     'postprocessors': [{
                         'key': 'FFmpegExtractAudio',
                         'preferredcodec': 'mp3',
-                        'preferredquality': '128',  # Good quality audio
+                        'preferredquality': '128',
                     }],
                     'quiet': True,
                     'ignoreerrors': True,
@@ -779,13 +801,12 @@ def get_audio_from_youtube_search(song, artist):
                     'socket_timeout': 30,
                     'extractor_args': {
                         'youtube': {
-                            'skip': ['dash']  # Skip problematic DASH formats
+                            'skip': ['dash']
                         }
                     }
                 }
                 
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    # Search and download first result
                     ydl.download([f"ytsearch1:{query}"])
                 
                 if os.path.exists(output_path):
@@ -803,9 +824,7 @@ def get_audio_from_youtube_search(song, artist):
 
 def clean_filename(filename):
     """Clean filename for filesystem compatibility"""
-    import re
     return re.sub(r'[<>:"/\\|?*]', '_', filename)
-
 
 @app.route('/api/check_local_music')
 def api_check_local_music():
@@ -839,7 +858,7 @@ def api_check_local_music():
 
 @app.route('/api/get_album_art')
 def api_get_album_art():
-    """Get album art for a song using multiple sources"""
+    """Get album art for a song using iTunes API"""
     song = request.args.get('song')
     artist = request.args.get('artist')
     
@@ -847,70 +866,7 @@ def api_get_album_art():
         return jsonify({'error': 'Missing parameters'}), 400
     
     try:
-        # Try multiple sources for album art
-        
-        # Method 1: Try Last.fm API (free, no key needed for basic search)
-        album_art_url = get_album_art_lastfm(artist, song)
-        if album_art_url:
-            return jsonify({
-                'success': True,
-                'image_url': album_art_url,
-                'source': 'lastfm',
-                'song': song,
-                'artist': artist
-            })
-        
-        # Method 2: Try iTunes API (free)
-        album_art_url = get_album_art_itunes(artist, song)
-        if album_art_url:
-            return jsonify({
-                'success': True,
-                'image_url': album_art_url,
-                'source': 'itunes',
-                'song': song,
-                'artist': artist
-            })
-        
-        # Method 3: Fallback to mood-based placeholder
-        album_art_url = get_mood_based_placeholder(song, artist)
-        return jsonify({
-            'success': True,
-            'image_url': album_art_url,
-            'source': 'placeholder',
-            'song': song,
-            'artist': artist
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-def get_album_art_lastfm(artist, song):
-    """Try to get album art from Last.fm API"""
-    try:
-        import urllib.parse
-        
-        # Last.fm API doesn't require key for basic search
-        base_url = "http://ws.audioscrobbler.com/2.0/"
-        params = {
-            'method': 'track.getInfo',
-            'api_key': 'your_lastfm_key',  # You'd need to get this
-            'artist': artist,
-            'track': song,
-            'format': 'json'
-        }
-        
-        # For demo, return None to use iTunes
-        return None
-        
-    except Exception as e:
-        print(f"⚠️ Last.fm error: {e}")
-        return None
-
-def get_album_art_itunes(artist, song):
-    """Try to get album art from iTunes API (free)"""
-    try:
-        import urllib.parse
-        
+        # Try iTunes API (free)
         search_term = f"{artist} {song}".replace(' ', '+')
         itunes_url = f"https://itunes.apple.com/search?term={search_term}&media=music&limit=1"
         
@@ -923,28 +879,25 @@ def get_album_art_itunes(artist, song):
                 if artwork_url:
                     # Upgrade to higher resolution
                     artwork_url = artwork_url.replace('100x100', '500x500')
-                    return artwork_url
+                    return jsonify({
+                        'success': True,
+                        'image_url': artwork_url,
+                        'source': 'itunes',
+                        'song': song,
+                        'artist': artist
+                    })
+        
+        # Fallback to placeholder
+        return jsonify({
+            'success': True,
+            'image_url': 'https://via.placeholder.com/400x400/6A5ACD/FFFFFF/png?text=🎵',
+            'source': 'placeholder',
+            'song': song,
+            'artist': artist
+        })
         
     except Exception as e:
-        print(f"⚠️ iTunes API error: {e}")
-        
-    return None
-
-def get_mood_based_placeholder(song, artist):
-    """Generate mood-based placeholder album art"""
-    # Create beautiful gradient placeholders based on song mood
-    mood_gradients = {
-        'happy': 'https://via.placeholder.com/400x400/FFD700/FFFFFF/png?text=♪',
-        'sad': 'https://via.placeholder.com/400x400/4682B4/FFFFFF/png?text=♫', 
-        'energetic': 'https://via.placeholder.com/400x400/FF6347/FFFFFF/png?text=♪',
-        'calm': 'https://via.placeholder.com/400x400/87CEEB/FFFFFF/png?text=♫',
-        'romantic': 'https://via.placeholder.com/400x400/FFB6C1/FFFFFF/png?text=♥',
-        'default': 'https://via.placeholder.com/400x400/6A5ACD/FFFFFF/png?text=🎵'
-    }
-    
-    # You could analyze song name/artist for mood keywords
-    # For now, return default
-    return mood_gradients['default']
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     print("🚀 Starting Y.M.I.R AI Emotion Detection System...")
