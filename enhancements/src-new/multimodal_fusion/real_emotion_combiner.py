@@ -155,7 +155,7 @@ class AdvancedEmotionFusionEngine:
         return emotion, confidence, f"temporal_weighted_f{facial_temporal_weight:.2f}_t{text_temporal_weight:.2f}"
     
     def _adaptive_fusion(self, facial_data: Dict[str, Any], text_data: Dict[str, Any]) -> Tuple[str, float, str]:
-        """🎯 SMART Adaptive fusion based on context and modality reliability"""
+        """🎯 SMART Adaptive fusion with MULTI-EMOTION support"""
         facial_confidence = facial_data.get('confidence', 0.0) if facial_data else 0.0
         text_confidence = text_data.get('confidence', 0.0) if text_data else 0.0
         
@@ -176,15 +176,44 @@ class AdvancedEmotionFusionEngine:
         if facial_data and facial_data.get('quality_score', 0) > 0.8:
             facial_weight *= 1.2  # Boost high-quality facial detection
         
+        # 🎭 MULTI-EMOTION BONUS: If facial has diverse emotions, boost its weight
+        if facial_data and facial_data.get('top_emotions'):
+            top_emotions = facial_data['top_emotions']
+            if len(top_emotions) >= 2:
+                # Check if secondary emotion is significant (>10%)
+                secondary_score = top_emotions[1][1] if len(top_emotions) > 1 else 0
+                if secondary_score > 0.1:  # 10% threshold
+                    facial_weight *= 1.15  # Boost for emotional complexity
+                    print(f"🎭 Facial multi-emotion bonus: {top_emotions[1][0]} = {secondary_score:.3f}")
+        
+        # 🎭 MULTI-EMOTION BONUS: If text has diverse emotions, boost its weight
+        if text_data and text_data.get('top_emotions'):
+            top_text_emotions = text_data['top_emotions']
+            if len(top_text_emotions) >= 2:
+                # Check if secondary emotion is significant (>20% for text as it's usually noisier)
+                secondary_score = top_text_emotions[1][1] if len(top_text_emotions) > 1 else 0
+                if secondary_score > 0.2:  # 20% threshold for text
+                    text_weight *= 1.15  # Boost for emotional complexity
+                    print(f"🎭 Text multi-emotion bonus: {top_text_emotions[1][0]} = {secondary_score:.3f}")
+        
         # 🕐 Freshness boost - newer data gets slight preference
-        now = datetime.now()
+        from datetime import timezone
+        now = datetime.now(timezone.utc)  # Use UTC timezone-aware datetime
         if facial_data and facial_data.get('timestamp'):
-            facial_age = (now - facial_data['timestamp']).total_seconds()
+            facial_timestamp = facial_data['timestamp']
+            # Ensure facial timestamp is timezone-aware
+            if facial_timestamp.tzinfo is None:
+                facial_timestamp = facial_timestamp.replace(tzinfo=timezone.utc)
+            facial_age = (now - facial_timestamp).total_seconds()
             if facial_age < 30:  # Less than 30 seconds old
                 facial_weight *= 1.1
         
         if text_data and text_data.get('timestamp'):
-            text_age = (now - text_data['timestamp']).total_seconds()
+            text_timestamp = text_data['timestamp']
+            # Ensure text timestamp is timezone-aware
+            if text_timestamp.tzinfo is None:
+                text_timestamp = text_timestamp.replace(tzinfo=timezone.utc)
+            text_age = (now - text_timestamp).total_seconds()
             if text_age < 30:  # Less than 30 seconds old
                 text_weight *= 1.1
         
@@ -193,14 +222,14 @@ class AdvancedEmotionFusionEngine:
         facial_weight /= total_weight
         text_weight /= total_weight
         
-        # Apply fusion
+        # 🎭 ENHANCED: Use full emotion spectrum for fusion
         facial_emotions = facial_data.get('emotions', {}) if facial_data else {}
         text_emotions = {text_data.get('emotion', 'neutral'): text_confidence} if text_data else {}
         
         emotion, confidence = self._weighted_average_fusion(facial_emotions, text_emotions, 
                                        facial_weight, text_weight)
         
-        return emotion, confidence, f"adaptive_f{facial_weight:.2f}_t{text_weight:.2f}"
+        return emotion, confidence, f"adaptive_multiemo_f{facial_weight:.2f}_t{text_weight:.2f}"
     
     def fuse_emotions(self, facial_data: Dict[str, Any], text_data: Dict[str, Any], 
                      strategy: str = 'adaptive') -> Tuple[str, float, str]:
@@ -305,28 +334,53 @@ class RealEmotionCombiner:
             return None
         
         try:
-            # Calculate time range
-            cutoff_time = datetime.now() - timedelta(minutes=minutes_back)
+            # Calculate time range using UTC to match Firebase storage
+            from datetime import timezone
+            cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=minutes_back)
+            current_time = datetime.now(timezone.utc)
             
-            # Query Firebase for recent emotion readings
+            # 🔍 DEBUG: Show what we're looking for
+            print(f"🔍 DEBUG: Looking for facial emotions after {cutoff_time} (UTC)")
+            print(f"🔍 DEBUG: Current time: {current_time} (UTC)")
+            
+            # Query Firebase for recent emotion readings (FACIAL ONLY - NO role field)
             emotions_ref = self.firebase_client.collection('emotion_readings')
             
-            # Get recent readings
-            query = emotions_ref.where('timestamp', '>=', cutoff_time).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(1)
+            # Get recent readings and filter for facial emotions (no role field = facial)
+            query = emotions_ref.where('timestamp', '>=', cutoff_time).limit(20)  # Get more to filter
             
             docs = query.stream()
             
-            for doc in docs:
+            # 🔍 DEBUG: Check all documents we get
+            docs_list = list(docs)
+            print(f"🔍 DEBUG: Found {len(docs_list)} total documents in range")
+            
+            for i, doc in enumerate(docs_list):
                 data = doc.to_dict()
-                print(f"📹 Found facial emotion: {data}")
-                return {
-                    'source': 'firebase',
-                    'timestamp': data.get('timestamp'),
-                    'emotions': data.get('emotions', {}),
-                    'confidence': data.get('confidence', 0.5),
-                    'face_id': data.get('face_id'),
-                    'doc_id': doc.id
-                }
+                print(f"🔍 DEBUG Doc {i}: timestamp={data.get('timestamp')}, has_role={'role' in data}, has_emotions={'emotions' in data}, has_face_id={'face_id' in data}")
+                if 'role' not in data:
+                    print(f"    📹 Potential facial: {list(data.keys())}")
+                else:
+                    print(f"    💬 Text emotion: role={data.get('role')}")
+            
+            # Filter for facial emotions only (strict filtering)
+            for doc in docs_list:
+                data = doc.to_dict()
+                # FACIAL emotions have: 'face_id', 'emotions' (plural), no 'role' field
+                # TEXT emotions have: 'role': 'user', 'emotion' (singular), 'message_id'
+                if ('role' not in data and 
+                    'emotions' in data and 
+                    'face_id' in data and 
+                    'message_id' not in data):  # This is definitely a facial emotion
+                    print(f"📹 Found facial emotion: {data}")
+                    return {
+                        'source': 'firebase',
+                        'timestamp': data.get('timestamp'),
+                        'emotions': data.get('emotions', {}),
+                        'confidence': data.get('confidence', 0.5),
+                        'face_id': data.get('face_id'),
+                        'doc_id': doc.id
+                    }
             
             print(f"📹 No facial emotions found in last {minutes_back} minutes")
             return None
@@ -336,76 +390,64 @@ class RealEmotionCombiner:
             return None
     
     def get_latest_text_emotions(self, minutes_back: int = 10) -> Optional[Dict[str, Any]]:
-        """Get latest text emotions from JSON chat files"""
+        """🔥 Get latest text emotions from Firebase (like ChatGPT)"""
+        if not self.firebase_client:
+            if not self.silent:
+                print("❌ Firebase not available for text emotions")
+            return None
+        
         try:
-            # Look for chat session files
-            chat_patterns = [
-                self.project_root / "chat_session_*.json",
-                Path("chat_session_*.json"),
-                Path("*.json")  # Broader search
-            ]
+            # Calculate time range using UTC to match Firebase storage
+            from datetime import timezone
+            cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=minutes_back)
             
-            latest_file = None
-            latest_time = None
+            # Query Firebase for recent text emotion readings (NO INDEXES!)
+            emotions_ref = self.firebase_client.collection('emotion_readings')
             
-            for pattern in chat_patterns:
-                files = glob.glob(str(pattern))
-                for file_path in files:
-                    if 'chat_session_' in file_path:
-                        # Extract timestamp from filename
-                        try:
-                            filename = Path(file_path).name
-                            # Format: chat_session_YYYYMMDD_HHMMSS.json
-                            time_part = filename.replace('chat_session_', '').replace('.json', '')
-                            file_time = datetime.strptime(time_part, '%Y%m%d_%H%M%S')
-                            
-                            if latest_time is None or file_time > latest_time:
-                                latest_time = file_time
-                                latest_file = file_path
-                        except ValueError:
-                            continue
+            # Query ordered by timestamp (newest first) to get latest emotions
+            query = emotions_ref.where('timestamp', '>=', cutoff_time).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(20)
             
-            if not latest_file:
-                if not self.silent:
-                    print("💬 No chat session files found")
-                return None
+            docs = query.stream()
             
-            # Check if file is recent enough
-            if latest_time and (datetime.now() - latest_time).total_seconds() > (minutes_back * 60):
-                if not self.silent:
-                    print(f"💬 Latest chat file is too old: {latest_time}")
-                return None
+            # Filter in code to avoid indexes - STRICT text emotion filtering
+            text_emotions = []
+            for doc in docs:
+                data = doc.to_dict()
+                # TEXT emotions have: 'role': 'user', 'emotion' (singular), 'message_id'
+                # FACIAL emotions have: 'face_id', 'emotions' (plural), no 'role' field
+                if (data.get('role') == 'user' and 
+                    'emotion' in data and 
+                    'message_id' in data and 
+                    'face_id' not in data):  # Allow ALL emotions including neutral for testing
+                    text_emotions.append({
+                        'doc': doc,
+                        'data': data,
+                        'timestamp': data.get('timestamp')
+                    })
+                    print(f"🔍 DEBUG: Found text emotion - session: {data.get('session_id')}, emotion: {data.get('emotion')}, time: {data.get('timestamp')}")
             
-            # Read the chat file
-            with open(latest_file, 'r', encoding='utf-8') as f:
-                chat_data = json.load(f)
+            # Get latest (already ordered by timestamp descending)
+            if text_emotions:
+                latest = text_emotions[0]  # First item is the most recent
+                data = latest['data']
+                
+                print(f"💬 Found Firebase text emotion: {data}")
+                return {
+                    'source': 'firebase_chat',
+                    'timestamp': data.get('timestamp'),
+                    'emotion': data.get('emotion'),
+                    'confidence': data.get('confidence', 0.5),
+                    'content': data.get('content_preview', ''),
+                    'session_id': data.get('session_id'),
+                    'message_id': data.get('message_id'),
+                    'doc_id': latest['doc'].id
+                }
             
-            print(f"💬 Reading chat file: {latest_file}")
-            
-            # Find the latest user message with emotion
-            conversation = chat_data.get('conversation', [])
-            
-            for message in reversed(conversation):  # Start from most recent
-                if (message.get('role') == 'user' and 
-                    message.get('emotion') and 
-                    message.get('emotion') != 'neutral'):
-                    
-                    print(f"💬 Found text emotion: {message}")
-                    return {
-                        'source': 'json_chat',
-                        'file': latest_file,
-                        'timestamp': message.get('timestamp'),
-                        'emotion': message.get('emotion'),
-                        'confidence': message.get('confidence', 0.5),
-                        'content': message.get('content', '')[:100] + '...',  # First 100 chars
-                        'metadata': message.get('metadata', {})
-                    }
-            
-            print("💬 No emotions found in recent chat messages")
+            print(f"💬 No Firebase text emotions found in last {minutes_back} minutes")
             return None
             
         except Exception as e:
-            print(f"❌ Error reading text emotions from JSON: {e}")
+            print(f"❌ Error reading text emotions from Firebase: {e}")
             return None
     
     def combine_real_emotions(self, minutes_back: int = 10, strategy: str = 'adaptive') -> Optional[RealCombinedEmotion]:
@@ -420,32 +462,73 @@ class RealEmotionCombiner:
         # Get text emotions from JSON files
         text_data = self.get_latest_text_emotions(minutes_back)
         
-        # Prepare data for advanced fusion
+        # Prepare data for advanced fusion with NORMALIZED SCALES
         facial_fusion_data = None
         if facial_data and facial_data.get('emotions'):
             emotions_dict = facial_data['emotions']
             if emotions_dict:
                 dominant = max(emotions_dict.items(), key=lambda x: float(x[1]))
                 facial_emotion = dominant[0]
-                # Convert percentage to 0-1 if needed
+                
+                # 🔧 FIXED: Properly normalize facial confidence (percentage -> decimal)
                 score = float(dominant[1])
                 facial_confidence = score / 100.0 if score > 1.0 else score
                 
+                # 🔧 FIXED: Normalize ALL facial emotion scores to 0-1 scale
+                normalized_emotions = {}
+                for emotion, score in emotions_dict.items():
+                    score_float = float(score)
+                    normalized_score = score_float / 100.0 if score_float > 1.0 else score_float
+                    normalized_emotions[emotion] = normalized_score
+                
+                # 🎭 MULTI-EMOTION: Get top 3 emotions for richer fusion
+                sorted_emotions = sorted(normalized_emotions.items(), key=lambda x: x[1], reverse=True)
+                top_emotions = sorted_emotions[:3]  # Top 3 emotions
+                
                 facial_fusion_data = {
-                    'emotion': facial_emotion,
-                    'confidence': facial_confidence,
-                    'emotions': {k: (float(v) / 100.0 if float(v) > 1.0 else float(v)) for k, v in emotions_dict.items()},
+                    'emotion': facial_emotion,  # Dominant emotion
+                    'confidence': facial_confidence,  # Dominant emotion score
+                    'emotions': normalized_emotions,  # All emotions normalized to 0-1
+                    'top_emotions': top_emotions,  # Top 3 for multi-emotion fusion
                     'timestamp': facial_data.get('timestamp'),
-                    'quality_score': facial_data.get('confidence', 0.5)
+                    'quality_score': facial_data.get('confidence', 0.5)  # Keep original confidence for quality
                 }
+                
+                print(f"🔧 DEBUG: Facial emotions (top 3):")
+                for emotion, score in top_emotions:
+                    print(f"   {emotion}: {score:.3f}")
         
         text_fusion_data = None
         if text_data:
-            text_fusion_data = {
-                'emotion': text_data.get('emotion'),
-                'confidence': text_data.get('confidence', 0.5),
-                'timestamp': text_data.get('timestamp')
-            }
+            # 🎭 MULTI-EMOTION: Check if text has multiple emotions too
+            text_all_emotions = text_data.get('emotions', {})
+            text_emotion_score = text_data.get('confidence', 0.5)
+            
+            if text_all_emotions:
+                # Text has multiple emotions! Use them for richer fusion
+                sorted_text_emotions = sorted(text_all_emotions.items(), key=lambda x: x[1], reverse=True)
+                top_text_emotions = sorted_text_emotions[:3]  # Top 3 text emotions
+                
+                text_fusion_data = {
+                    'emotion': text_data.get('emotion'),  # Dominant emotion
+                    'confidence': text_emotion_score,  # Dominant emotion score
+                    'emotions': text_all_emotions,  # ALL text emotions
+                    'top_emotions': top_text_emotions,  # Top 3 for multi-emotion fusion
+                    'timestamp': text_data.get('timestamp')
+                }
+                
+                print(f"🔧 DEBUG: Text emotions (top 3):")
+                for emotion, score in top_text_emotions:
+                    print(f"   {emotion}: {score:.3f}")
+            else:
+                # Single emotion text (fallback)
+                text_fusion_data = {
+                    'emotion': text_data.get('emotion'),
+                    'confidence': text_emotion_score,
+                    'timestamp': text_data.get('timestamp')
+                }
+                
+                print(f"🔧 DEBUG: Text emotion (single): {text_data.get('emotion')} = {text_emotion_score:.3f}")
         
         # Show analysis
         if not self.silent:
@@ -461,11 +544,34 @@ class RealEmotionCombiner:
             else:
                 print(f"   💬 TEXT: No recent data")
         
-        # Apply ADVANCED fusion
+        # Apply ADVANCED fusion - allow single-source emotions too
         if not facial_fusion_data and not text_fusion_data:
             if not self.silent:
                 print("❌ No recent emotions found in either source")
             return None
+        
+        # 🎯 SINGLE SOURCE: If only one source available, use it directly
+        if facial_fusion_data and not text_fusion_data:
+            if not self.silent:
+                print("🎯 FACIAL-ONLY combination (no recent text)")
+            return RealCombinedEmotion(
+                dominant_emotion=facial_fusion_data['emotion'],
+                confidence=facial_fusion_data['confidence'],
+                combination_method='facial_only',
+                facial_source=facial_fusion_data,
+                text_source=None
+            )
+            
+        if text_fusion_data and not facial_fusion_data:
+            if not self.silent:
+                print("🎯 TEXT-ONLY combination (no recent facial)")
+            return RealCombinedEmotion(
+                dominant_emotion=text_fusion_data['emotion'],
+                confidence=text_fusion_data['confidence'],
+                combination_method='text_only',
+                facial_source=None,
+                text_source=text_fusion_data
+            )
         
         # Use advanced fusion engine
         winner_emotion, winner_confidence, method = self.fusion_engine.fuse_emotions(
@@ -495,65 +601,55 @@ class RealEmotionCombiner:
         # Get facial emotion history from Firebase
         if self.firebase_client:
             try:
-                cutoff_time = datetime.now() - timedelta(hours=hours_back)
+                from datetime import timezone
+                cutoff_time = datetime.now(timezone.utc) - timedelta(hours=hours_back)
                 emotions_ref = self.firebase_client.collection('emotion_readings')
                 query = emotions_ref.where('timestamp', '>=', cutoff_time).order_by('timestamp')
                 
                 for doc in query.stream():
                     data = doc.to_dict()
-                    emotions_dict = data.get('emotions', {})
-                    if emotions_dict:
-                        dominant = max(emotions_dict.items(), key=lambda x: float(x[1]))
-                        history.append({
-                            'timestamp': data.get('timestamp'),
-                            'emotion': dominant[0],
-                            'confidence': float(dominant[1]) / 100.0 if float(dominant[1]) > 1.0 else float(dominant[1]),
-                            'source': 'facial'
-                        })
+                    # STRICT filter: only facial emotions (not text)
+                    if ('role' not in data and 
+                        'emotions' in data and 
+                        'face_id' in data and 
+                        'message_id' not in data):
+                        emotions_dict = data.get('emotions', {})
+                        if emotions_dict:
+                            dominant = max(emotions_dict.items(), key=lambda x: float(x[1]))
+                            history.append({
+                                'timestamp': data.get('timestamp'),
+                                'emotion': dominant[0],
+                                'confidence': float(dominant[1]) / 100.0 if float(dominant[1]) > 1.0 else float(dominant[1]),
+                                'source': 'facial'
+                            })
             except Exception as e:
                 print(f"❌ Error getting facial history: {e}")
         
-        # Get text emotion history from JSON files
-        try:
-            chat_patterns = [
-                self.project_root / "chat_session_*.json",
-                Path("chat_session_*.json")
-            ]
-            
-            for pattern in chat_patterns:
-                files = glob.glob(str(pattern))
-                for file_path in files:
-                    try:
-                        with open(file_path, 'r', encoding='utf-8') as f:
-                            chat_data = json.load(f)
-                        
-                        conversation = chat_data.get('conversation', [])
-                        for message in conversation:
-                            if (message.get('role') == 'user' and 
-                                message.get('emotion') and 
-                                message.get('emotion') != 'neutral' and
-                                message.get('timestamp')):
-                                
-                                # Parse timestamp
-                                try:
-                                    if isinstance(message['timestamp'], str):
-                                        msg_time = datetime.fromisoformat(message['timestamp'].replace('Z', '+00:00'))
-                                    else:
-                                        msg_time = datetime.now()  # Fallback
-                                    
-                                    if msg_time >= datetime.now() - timedelta(hours=hours_back):
-                                        history.append({
-                                            'timestamp': msg_time,
-                                            'emotion': message.get('emotion'),
-                                            'confidence': message.get('confidence', 0.5),
-                                            'source': 'text'
-                                        })
-                                except:
-                                    continue
-                    except:
-                        continue
-        except Exception as e:
-            print(f"❌ Error getting text history: {e}")
+        # Get text emotion history from Firebase (NO INDEXES!)
+        if self.firebase_client:
+            try:
+                from datetime import timezone
+                cutoff_time = datetime.now(timezone.utc) - timedelta(hours=hours_back)
+                emotions_ref = self.firebase_client.collection('emotion_readings')
+                # Simple query - filter in code to avoid indexes
+                query = emotions_ref.where('timestamp', '>=', cutoff_time).limit(200)
+                
+                for doc in query.stream():
+                    data = doc.to_dict()
+                    # STRICT filter: only user text emotions (not facial)
+                    if (data.get('role') == 'user' and 
+                        'emotion' in data and 
+                        'message_id' in data and 
+                        'face_id' not in data and 
+                        data.get('emotion') != 'neutral'):
+                        history.append({
+                            'timestamp': data.get('timestamp'),
+                            'emotion': data.get('emotion'),
+                            'confidence': data.get('confidence', 0.5),
+                            'source': 'text'
+                        })
+            except Exception as e:
+                print(f"❌ Error getting Firebase text history: {e}")
         
         # Sort by timestamp
         history.sort(key=lambda x: x['timestamp'])
@@ -611,7 +707,7 @@ def get_combined_emotion(minutes_back: int = 10, strategy: str = 'adaptive'):
     global _combiner_instance
     
     if _combiner_instance is None:
-        _combiner_instance = RealEmotionCombiner(silent=True)  # Silent for production use
+        _combiner_instance = RealEmotionCombiner(silent=False)  # DEBUG: Show detailed output
     
     try:
         combined = _combiner_instance.combine_real_emotions(minutes_back=minutes_back, strategy=strategy)
@@ -627,9 +723,13 @@ def get_combined_emotion(minutes_back: int = 10, strategy: str = 'adaptive'):
                 'timestamp': combined.timestamp
             }
         else:
+            print("🔍 DEBUG: combine_real_emotions returned None")
             return None
             
-    except Exception:
+    except Exception as e:
+        print(f"🔍 DEBUG: Exception in get_combined_emotion: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def get_emotion_simple(minutes_back: int = 10):

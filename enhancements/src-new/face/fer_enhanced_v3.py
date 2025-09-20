@@ -528,8 +528,8 @@ class EnhancedEmotionDetector:
                 # Show all emotions detected
                 print(f"   🎪 All Emotions Detected:")
                 sorted_emotions = sorted(reading.emotions.items(), key=lambda x: x[1], reverse=True)
-                for emotion, score in sorted_emotions[:4]:  # Top 4 emotions
-                    bar = "█" * int(score / 10)  # Visual bar
+                for emotion, score in sorted_emotions:  # Show ALL emotions (not just top 4)
+                    bar = "█" * max(1, int(score / 10))  # Visual bar
                     print(f"      {emotion.capitalize():12} {score:5.1f}% {bar}")
                 
                 # Show environmental context influence
