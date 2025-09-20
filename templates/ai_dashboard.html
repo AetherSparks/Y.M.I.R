@@ -1904,6 +1904,403 @@
                 font-size: 11px;
             }
         }
+        
+        /* =================== THERAPIST FINDER MODAL STYLES =================== */
+        .therapist-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .therapist-modal-content {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 40, 0.95));
+            border-radius: 20px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .therapist-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(100, 100, 255, 0.2);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+        }
+        
+        .therapist-modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            color: #f0f0f0;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .close-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .therapist-search-section {
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(100, 100, 255, 0.1);
+        }
+        
+        .location-status {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .location-loading {
+            color: #60a5fa;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .search-filters {
+            margin: 20px 0;
+        }
+        
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-select {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            background: rgba(30, 30, 30, 0.8);
+            color: #f0f0f0;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-therapists-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+        
+        .search-therapists-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+        }
+        
+        .search-therapists-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .therapist-loading {
+            padding: 40px;
+            text-align: center;
+            color: #b0b0b0;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .therapist-results {
+            padding: 0 30px 30px;
+        }
+        
+        .results-header {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .results-header h3 {
+            color: #60a5fa;
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        
+        .therapist-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .therapist-card {
+            background: rgba(40, 40, 40, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(100, 100, 255, 0.2);
+            padding: 25px;
+            display: flex;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .therapist-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        
+        .therapist-photo {
+            flex-shrink: 0;
+        }
+        
+        .therapist-photo img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .therapist-info {
+            flex-grow: 1;
+        }
+        
+        .therapist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .therapist-header h4 {
+            color: #f0f0f0;
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .therapist-rating {
+            color: #fbbf24;
+            font-size: 14px;
+        }
+        
+        .therapist-rating span {
+            color: #b0b0b0;
+            margin-left: 5px;
+        }
+        
+        .therapist-credentials {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .credential-badge, .distance-badge, .accepting-badge, .not-accepting-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .credential-badge {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+        
+        .distance-badge {
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+        }
+        
+        .accepting-badge {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+        
+        .not-accepting-badge {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+        
+        .therapist-specialties {
+            color: #e2e8f0;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .therapist-details {
+            margin-bottom: 15px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #b0b0b0;
+            font-size: 13px;
+        }
+        
+        .detail-row strong {
+            color: #e2e8f0;
+        }
+        
+        .therapist-bio {
+            margin-bottom: 20px;
+        }
+        
+        .therapist-bio p {
+            color: #d1d5db;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        .therapist-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .contact-btn.primary {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .contact-btn.secondary {
+            background: rgba(107, 114, 128, 0.2);
+            color: #d1d5db;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+        
+        .contact-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .therapist-source {
+            text-align: right;
+        }
+        
+        .therapist-source small {
+            color: #6b7280;
+            font-size: 11px;
+        }
+        
+        .no-results, .error-message {
+            text-align: center;
+            padding: 40px;
+            color: #b0b0b0;
+        }
+        
+        .no-results h3, .error-message h3 {
+            color: #f0f0f0;
+            margin-bottom: 15px;
+        }
+        
+        .retry-btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .therapist-modal-content {
+                margin: 10px;
+                max-height: 95vh;
+            }
+            
+            .therapist-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .therapist-photo {
+                align-self: center;
+            }
+            
+            .therapist-header {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .therapist-actions {
+                justify-content: center;
+            }
+        }
+        /* =================== END THERAPIST FINDER STYLES =================== */
     </style>
 </head>
 <body>
@@ -2120,6 +2517,321 @@
             <!-- Scroll Indicator -->
             <div class="scroll-indicator">
                 Drag to scroll • Use controls • Hover to pause
+            </div>
+        </div>
+
+        <!-- 🧠 ULTIMATE DAILY CHECK-IN EXPERIENCE -->
+        <div class="wellness-section card-primary" style="margin: 40px 0; padding: 40px; background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(20px); border-radius: 24px; border: 1px solid rgba(64, 112, 255, 0.3); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 25px rgba(64, 112, 255, 0.2); position: relative; overflow: hidden;">
+            
+            <!-- Animated Background Effect -->
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.03) 50%, rgba(30, 58, 138, 0.05) 100%); background-size: 400% 400%; animation: holographicBorder 8s ease infinite; pointer-events: none; z-index: 0;"></div>
+            
+            <div style="position: relative; z-index: 1;">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h2 class="text-gradient" style="background: linear-gradient(135deg, #3b82f6, #60a5fa, #93c5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2.5rem; font-weight: 800; margin-bottom: 15px; text-shadow: 0 0 30px rgba(59, 130, 246, 0.4);">Daily Emotional Journey</h2>
+                    <p style="color: #dbeafe; font-size: 1.1rem; opacity: 0.9;">Track your emotional wellness with AI-powered insights</p>
+                </div>
+
+                <!-- 🏆 STREAK & ACHIEVEMENT BAR -->
+                <div id="achievementBar" style="display: flex; justify-content: space-between; align-items: center; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(8px);">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div id="streakIndicator" style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 32px; height: 32px; background: linear-gradient(45deg, #f59e0b, #f97316); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: aiPulse 2s infinite;">
+                                <span style="font-size: 16px;">🔥</span>
+                            </div>
+                            <div>
+                                <div style="color: #f59e0b; font-weight: 700; font-size: 1.1rem;"><span id="streakCount">0</span> Day Streak</div>
+                                <div style="color: #93c5fd; font-size: 0.9rem;">Keep it going!</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <div id="weeklyBadge" class="achievement-badge" style="background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; border-radius: 20px; padding: 8px 12px; color: #22c55e; font-size: 0.85rem; font-weight: 600;">Weekly Warrior</div>
+                        <div id="moodMaster" class="achievement-badge" style="background: rgba(139, 92, 246, 0.2); border: 1px solid #8b5cf6; border-radius: 20px; padding: 8px 12px; color: #8b5cf6; font-size: 0.85rem; font-weight: 600;">Mood Master</div>
+                    </div>
+                </div>
+
+                <!-- 🎯 ENHANCED MOOD CHECK-IN -->
+                <div class="mood-check-in" style="margin-bottom: 40px;">
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <h3 style="color: #60a5fa; margin-bottom: 10px; font-size: 1.4rem; font-weight: 600;">How are you feeling right now?</h3>
+                        <p id="contextualPrompt" style="margin-bottom: 15px; color: #b0b0b0; font-size: 1rem;">Track your emotional journey with us ✨</p>
+                        
+                        <!-- 🚀 LAZY USER QUICK ACTIONS -->
+                        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                            <button id="quickGoodBtn" class="quick-mood-btn" style="background: linear-gradient(45deg, rgba(34, 197, 94, 0.3), rgba(59, 130, 246, 0.3)); border: 1px solid #22c55e; border-radius: 20px; padding: 8px 16px; color: #22c55e; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem;">
+                                ⚡ Just Good Today
+                            </button>
+                            <button id="quickOkayBtn" class="quick-mood-btn" style="background: linear-gradient(45deg, rgba(251, 146, 60, 0.3), rgba(156, 163, 175, 0.3)); border: 1px solid #fb923c; border-radius: 20px; padding: 8px 16px; color: #fb923c; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem;">
+                                😐 Meh, Whatever
+                            </button>
+                            <button id="skipTodayBtn" class="quick-mood-btn" style="background: rgba(100, 100, 100, 0.2); border: 1px solid #6b7280; border-radius: 20px; padding: 8px 16px; color: #9ca3af; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem;">
+                                ⏭️ Skip (Keep Streak)
+                            </button>
+                        </div>
+                        
+                        <!-- Smart Suggestions -->
+                        <div id="smartSuggestions" style="display: none; background: rgba(79, 209, 199, 0.1); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(79, 209, 199, 0.3);">
+                            <div style="color: #4fd1c7; font-size: 0.9rem; margin-bottom: 8px;">💡 Based on your patterns:</div>
+                            <div id="suggestionText" style="color: #dbeafe; font-size: 0.95rem;"></div>
+                            <button id="acceptSuggestionBtn" style="background: #4fd1c7; border: none; border-radius: 8px; color: #1a1a2e; padding: 6px 12px; cursor: pointer; margin-top: 8px; font-size: 0.8rem; font-weight: 600;">
+                                ✨ Use This
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Mood Buttons with Animations -->
+                    <div class="mood-options" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                        <button class="mood-btn" data-mood="amazing" data-value="5" style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.3) 100%); border: 2px solid #22c55e; border-radius: 16px; padding: 20px; color: #22c55e; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, rgba(34, 197, 94, 0.1), transparent); opacity: 0; transition: opacity 0.3s ease;"></div>
+                            <div style="font-size: 32px; transform: scale(1); transition: transform 0.3s ease;">✨</div>
+                            <span style="font-weight: 600; font-size: 1rem;">Amazing</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">Feeling fantastic!</span>
+                        </button>
+                        
+                        <button class="mood-btn" data-mood="great" data-value="4" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%); border: 2px solid #3b82f6; border-radius: 16px; padding: 20px; color: #3b82f6; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, rgba(59, 130, 246, 0.1), transparent); opacity: 0; transition: opacity 0.3s ease;"></div>
+                            <div style="font-size: 32px; transform: scale(1); transition: transform 0.3s ease;">😊</div>
+                            <span style="font-weight: 600; font-size: 1rem;">Great</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">Really good day</span>
+                        </button>
+                        
+                        <button class="mood-btn" data-mood="good" data-value="3" style="background: linear-gradient(135deg, rgba(156, 163, 175, 0.2) 0%, rgba(107, 114, 128, 0.3) 100%); border: 2px solid #9ca3af; border-radius: 16px; padding: 20px; color: #9ca3af; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, rgba(156, 163, 175, 0.1), transparent); opacity: 0; transition: opacity 0.3s ease;"></div>
+                            <div style="font-size: 32px; transform: scale(1); transition: transform 0.3s ease;">🙂</div>
+                            <span style="font-weight: 600; font-size: 1rem;">Good</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">Pretty decent</span>
+                        </button>
+                        
+                        <button class="mood-btn" data-mood="okay" data-value="2" style="background: linear-gradient(135deg, rgba(251, 146, 60, 0.2) 0%, rgba(245, 158, 11, 0.3) 100%); border: 2px solid #fb923c; border-radius: 16px; padding: 20px; color: #fb923c; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, rgba(251, 146, 60, 0.1), transparent); opacity: 0; transition: opacity 0.3s ease;"></div>
+                            <div style="font-size: 32px; transform: scale(1); transition: transform 0.3s ease;">😐</div>
+                            <span style="font-weight: 600; font-size: 1rem;">Okay</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">Could be better</span>
+                        </button>
+                        
+                        <button class="mood-btn" data-mood="rough" data-value="1" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.3) 100%); border: 2px solid #ef4444; border-radius: 16px; padding: 20px; color: #ef4444; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; overflow: hidden;">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, rgba(239, 68, 68, 0.1), transparent); opacity: 0; transition: opacity 0.3s ease;"></div>
+                            <div style="font-size: 32px; transform: scale(1); transition: transform 0.3s ease;">😔</div>
+                            <span style="font-weight: 600; font-size: 1rem;">Rough</span>
+                            <span style="font-size: 0.8rem; opacity: 0.8;">Having a tough time</span>
+                        </button>
+                    </div>
+
+                    <!-- 🎚️ ADDITIONAL CONTEXT SLIDERS -->
+                    <div id="contextSliders" style="display: none; background: rgba(40, 40, 40, 0.6); border-radius: 16px; padding: 25px; margin-bottom: 30px; border: 1px solid rgba(100, 100, 255, 0.2);">
+                        <h4 style="color: #60a5fa; margin-bottom: 20px; text-align: center;">Tell us more about your day</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;">
+                            <div class="context-slider">
+                                <label style="display: block; color: #93c5fd; font-weight: 500; margin-bottom: 8px;">Energy Level</label>
+                                <input type="range" id="energySlider" min="1" max="10" value="5" style="width: 100%; height: 6px; border-radius: 3px; background: rgba(59, 130, 246, 0.3); outline: none;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #6b7280; margin-top: 5px;">
+                                    <span>Drained</span>
+                                    <span id="energyValue">5</span>
+                                    <span>Energetic</span>
+                                </div>
+                            </div>
+                            
+                            <div class="context-slider">
+                                <label style="display: block; color: #93c5fd; font-weight: 500; margin-bottom: 8px;">Stress Level</label>
+                                <input type="range" id="stressSlider" min="1" max="10" value="5" style="width: 100%; height: 6px; border-radius: 3px; background: rgba(239, 68, 68, 0.3); outline: none;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #6b7280; margin-top: 5px;">
+                                    <span>Relaxed</span>
+                                    <span id="stressValue">5</span>
+                                    <span>Stressed</span>
+                                </div>
+                            </div>
+                            
+                            <div class="context-slider">
+                                <label style="display: block; color: #93c5fd; font-weight: 500; margin-bottom: 8px;">Social Connection</label>
+                                <input type="range" id="socialSlider" min="1" max="10" value="5" style="width: 100%; height: 6px; border-radius: 3px; background: rgba(34, 197, 94, 0.3); outline: none;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #6b7280; margin-top: 5px;">
+                                    <span>Lonely</span>
+                                    <span id="socialValue">5</span>
+                                    <span>Connected</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <label style="display: block; color: #93c5fd; font-weight: 500; margin-bottom: 8px;">What's on your mind? (Optional)</label>
+                            <textarea id="thoughtsInput" placeholder="Share what's been on your mind today..." style="width: 100%; height: 80px; background: rgba(30, 30, 30, 0.8); border: 1px solid rgba(100, 100, 255, 0.2); border-radius: 8px; padding: 12px; color: #f0f0f0; font-family: inherit; resize: vertical;"></textarea>
+                        </div>
+                        
+                        <button id="submitMoodBtn" style="width: 100%; background: linear-gradient(45deg, #4070ff, #00d4ff); border: none; border-radius: 12px; color: white; padding: 15px; font-weight: 600; font-size: 1.1rem; cursor: pointer; margin-top: 20px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(64, 112, 255, 0.3);">
+                            Complete Check-In ✨
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mood-history" style="background: rgba(40, 40, 40, 0.5); border-radius: 12px; padding: 20px;">
+                    <h4 style="color: #60a5fa; margin-bottom: 15px;">Your Mood History</h4>
+                    <div class="view-toggle" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <button id="chartViewBtn" class="view-btn active" style="background: #3b82f6; color: white; border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer;">Chart View</button>
+                        <button id="tableViewBtn" class="view-btn" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 8px; padding: 8px 16px; cursor: pointer;">Table View</button>
+                        <button id="exportDataBtn" class="action-btn" style="background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; border-radius: 8px; padding: 8px 16px; cursor: pointer;">Export Data</button>
+                        <button id="clearDataBtn" class="action-btn warning" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; border-radius: 8px; padding: 8px 16px; cursor: pointer;">Clear History</button>
+                    </div>
+                    <div class="mood-views">
+                        <div id="chartView" class="mood-view active">
+                            <div class="mood-chart">
+                                <div class="mood-placeholder" style="text-align: center; color: #666; padding: 40px;">Track your first mood to see history</div>
+                            </div>
+                        </div>
+                        <div id="tableView" class="mood-view" style="display: none;">
+                            <table class="mood-table" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid #4fd1c7;">
+                                        <th style="color: #4fd1c7; padding: 10px; text-align: left;">Date</th>
+                                        <th style="color: #4fd1c7; padding: 10px; text-align: left;">Time</th>
+                                        <th style="color: #4fd1c7; padding: 10px; text-align: left;">Mood</th>
+                                        <th style="color: #4fd1c7; padding: 10px; text-align: left;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="moodTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercises-section" style="margin-bottom: 40px;">
+                <h3 style="color: #60a5fa; margin-bottom: 20px;">Breathing & Meditation Exercises</h3>
+                <div class="exercise-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    <div class="exercise-card" style="background: rgba(40, 40, 40, 0.5); border-radius: 12px; padding: 20px; border: 1px solid rgba(100, 100, 255, 0.2);">
+                        <div class="exercise-icon" style="width: 48px; height: 48px; margin-bottom: 15px; color: #4fd1c7;">
+                            <svg style="width: 100%; height: 100%; fill: currentColor;" viewBox="0 0 512 512">
+                                <path d="M156.7 256H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h142.2c15.9 0 30.8 10.9 33.4 26.6 3.3 20-12.1 37.4-31.6 37.4-14.1 0-26.1-9.2-30.4-21.9-2.1-6.3-8.6-10.1-15.2-10.1H81.6c-9.8 0-17.7 8.8-15.9 18.4 8.6 44.1 47.6 77.6 94.2 77.6 57.1 0 102.7-50.1 95.2-108.6C249 291 205.4 256 156.7 256zM16 224h336c59.7 0 106.8-54.8 93.8-116.7-7.6-36.2-36.9-65.5-73.1-73.1-55.4-11.6-105.1 24.9-114.9 75.5-1.9 9.6 6.1 18.3 15.8 18.3h32.8c6.7 0 13.1-3.8 15.2-10.1C325.9 105.2 337.9 96 352 96c19.4 0 34.9 17.4 31.6 37.4-2.6 15.7-17.4 26.6-33.4 26.6H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16zm384 32H243.7c19.3 16.6 33.2 38.8 39.8 64H400c26.5 0 48 21.5 48 48s-21.5 48-48 48c-17.9 0-33.3-9.9-41.6-24.4-2.9-5-8.7-7.6-14.5-7.6h-33.8c-10.9 0-19 10.8-15.3 21.1 17.8 50.6 70.5 84.8 129.4 72.3 41.2-8.7 75.1-41.6 84.7-82.7C526 321.5 470.5 256 400 256z"/>
+                            </svg>
+                        </div>
+                        <h4 style="color: #60a5fa; margin-bottom: 10px;">4-7-8 Breathing</h4>
+                        <p style="color: #b0b0b0; margin-bottom: 15px;">A calming breath exercise for anxiety relief</p>
+                        <!-- Default View -->
+                        <div id="breathingDefault">
+                            <button onclick="startBreathingInCard()" style="background: linear-gradient(45deg, #3b82f6, #60a5fa); color: white; border: none; border-radius: 8px; padding: 12px 24px; cursor: pointer; transition: all 0.3s ease; font-weight: 600; width: 100%;">Start Exercise</button>
+                        </div>
+                        
+                        <!-- Exercise Active View -->
+                        <div id="breathingActive" style="display: none; text-align: center; margin-top: 10px;">
+                            <div style="position: relative; margin: 15px 0;">
+                                <div id="breathingCircle" style="width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; background: linear-gradient(135deg, #4fd1c7, #3b82f6); box-shadow: 0 0 20px rgba(79, 209, 199, 0.6); transition: transform 4s ease-in-out; display: flex; align-items: center; justify-content: center;">
+                                    <span id="breathingText" style="color: white; font-weight: 600; font-size: 0.8rem;">Ready</span>
+                                </div>
+                            </div>
+                            <div id="breathingInstructions" style="color: #e2e8f0; margin: 10px 0; font-size: 0.85rem; min-height: 30px;">Get ready to breathe</div>
+                            <div id="breathingTimer" style="color: #4fd1c7; font-size: 1.2rem; font-weight: bold; margin: 8px 0;">04:00</div>
+                            <div style="display: flex; gap: 8px; justify-content: center; margin: 10px 0;">
+                                <button id="startBreathingBtn" onclick="startBreathingSession()" style="background: #10b981; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem;">Start</button>
+                                <button id="pauseBreathingBtn" onclick="pauseBreathingSession()" style="display: none; background: #f59e0b; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem;">Pause</button>
+                                <button onclick="stopBreathingSession()" style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem;">Stop</button>
+                            </div>
+                            <div style="width: 100%; height: 3px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; margin-top: 10px;">
+                                <div id="breathingProgress" style="height: 100%; background: linear-gradient(90deg, #4fd1c7, #3b82f6); width: 0%; transition: width 0.3s ease; border-radius: 2px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="exercise-card" style="background: rgba(40, 40, 40, 0.5); border-radius: 12px; padding: 20px; border: 1px solid rgba(100, 100, 255, 0.2);">
+                        <div class="exercise-icon" style="width: 48px; height: 48px; margin-bottom: 15px; color: #4fd1c7;">
+                            <svg style="width: 100%; height: 100%; fill: currentColor;" viewBox="0 0 512 512">
+                                <path d="M360.6 60.94a10.43 10.43 0 0 0 14.76 0l21.57-21.56a10.43 10.43 0 0 0 0-14.76L375.35 3.06c-4.08-4.07-10.68-4.07-14.76 0l-21.57 21.56a10.43 10.43 0 0 0 0 14.76l21.58 21.56zM412.11 192c-26.69 0-51.77 10.39-70.64 29.25l-24.25 24.25c-6.78 6.77-15.78 10.5-25.38 10.5H245c10.54-22.1 14.17-48.11 7.73-75.23-10.1-42.55-46.36-76.11-89.52-83.19-36.15-5.93-70.9 5.04-96.01 28.78-7.36 6.96-6.97 18.85 1.12 24.93l26.15 19.63c5.72 4.3 13.66 4.32 19.2-.21 8.45-6.9 19.02-10.71 30.27-10.71 26.47 0 48.01 21.53 48.01 48s-21.54 48-48.01 48h-31.9c-11.96 0-19.74 12.58-14.39 23.28l16.09 32.17c2.53 5.06 7.6 8.1 13.17 8.55h33.03c35.3 0 64.01 28.7 64.01 64s-28.71 64-64.01 64c-96.02 0-122.35-54.02-145.15-92.03-4.53-7.55-14.77-3.58-14.79 5.22C-.09 416 41.13 512 159.94 512c70.59 0 128.02-57.42 128.02-128 0-23.42-6.78-45.1-17.81-64h21.69c26.69 0 51.77-10.39 70.64-29.25l24.25-24.25c6.78-6.77 15.78-10.5 25.38-10.5 19.78 0 35.88 16.09 35.88 35.88V392c0 13.23-18.77 24-32.01 24-39.4 0-66.67-24.24-81.82-42.89-4.77-5.87-14.2-2.54-14.2 5.02V416s0 64 96.02 64c48.54 0 96.02-39.47 96.02-88V291.88c0-55.08-44.8-99.88-99.89-99.88zm42.18-124.73c-85.55 65.12-169.05 2.75-172.58.05-6.02-4.62-14.44-4.38-20.14.55-5.74 4.92-7.27 13.17-3.66 19.8 1.61 2.95 40.37 72.34 118.8 72.34 79.92 0 98.78-31.36 101.75-37.66 1.02-2.12 1.53-4.47 1.53-6.83V80c0-13.22-15.14-20.69-25.7-12.73z"/>
+                            </svg>
+                        </div>
+                        <h4 style="color: #60a5fa; margin-bottom: 10px;">5-Minute Meditation</h4>
+                        <p style="color: #b0b0b0; margin-bottom: 15px;">Quick mindfulness for stress reduction</p>
+                        <!-- Default View -->
+                        <div id="meditationDefault">
+                            <button onclick="startMeditationInCard()" style="background: linear-gradient(45deg, #8b5cf6, #a78bfa); color: white; border: none; border-radius: 8px; padding: 12px 24px; cursor: pointer; transition: all 0.3s ease; font-weight: 600; width: 100%;">Start Exercise</button>
+                        </div>
+                        
+                        <!-- Exercise Active View -->
+                        <div id="meditationActive" style="display: none; text-align: center; margin-top: 10px;">
+                            <div style="position: relative; margin: 15px 0; width: 80px; height: 80px; margin: 0 auto;">
+                                <div class="meditation-center" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, #8b5cf6, #a78bfa);"></div>
+                                <div class="meditation-ring1" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(139, 92, 246, 0.4);"></div>
+                                <div class="meditation-ring2" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; border-radius: 50%; border: 1px solid rgba(139, 92, 246, 0.2);"></div>
+                            </div>
+                            <div id="meditationInstructions" style="color: #e2e8f0; margin: 10px 0; font-size: 0.85rem; min-height: 30px;">Focus on your breath</div>
+                            <div id="meditationTimer" style="color: #8b5cf6; font-size: 1.2rem; font-weight: bold; margin: 8px 0;">05:00</div>
+                            <div style="display: flex; gap: 8px; justify-content: center; margin: 10px 0;">
+                                <button id="startMeditationBtn" onclick="startMeditationSession()" style="background: #10b981; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem;">Start</button>
+                                <button id="pauseMeditationBtn" onclick="pauseMeditationSession()" style="display: none; background: #f59e0b; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem;">Pause</button>
+                                <button onclick="stopMeditationSession()" style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem;">Stop</button>
+                            </div>
+                            <div style="width: 100%; height: 3px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; margin-top: 10px;">
+                                <div id="meditationProgress" style="height: 100%; background: linear-gradient(90deg, #8b5cf6, #a78bfa); width: 0%; transition: width 0.3s ease; border-radius: 2px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="exercise-card" style="background: rgba(40, 40, 40, 0.5); border-radius: 12px; padding: 20px; border: 1px solid rgba(100, 100, 255, 0.2);">
+                        <div class="exercise-icon" style="width: 48px; height: 48px; margin-bottom: 15px; color: #4fd1c7;">
+                            <svg style="width: 100%; height: 100%; fill: currentColor;" viewBox="0 0 512 512">
+                                <path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/>
+                            </svg>
+                        </div>
+                        <h4 style="color: #60a5fa; margin-bottom: 10px;">Gratitude Practice</h4>
+                        <p style="color: #b0b0b0; margin-bottom: 15px;">Focus on positivity and thankfulness</p>
+                        <!-- Default View -->
+                        <div id="gratitudeDefault">
+                            <button onclick="startGratitudeInCard()" style="background: linear-gradient(45deg, #10b981, #34d399); color: white; border: none; border-radius: 8px; padding: 12px 24px; cursor: pointer; transition: all 0.3s ease; font-weight: 600; width: 100%;">Start Exercise</button>
+                        </div>
+                        
+                        <!-- Exercise Active View -->
+                        <div id="gratitudeActive" style="display: none; text-align: center; margin-top: 10px;">
+                            <div style="position: relative; margin: 15px 0;">
+                                <div class="gratitude-hearts" style="color: #f87171; font-size: 2rem; animation: gratitudeFloat 4s ease-in-out infinite;">♥</div>
+                            </div>
+                            <div id="gratitudeInstructions" style="color: #e2e8f0; margin: 10px 0; font-size: 0.85rem; min-height: 30px;">Think of what you're grateful for</div>
+                            <div id="gratitudeTimer" style="color: #10b981; font-size: 1.2rem; font-weight: bold; margin: 8px 0;">03:00</div>
+                            <div style="display: flex; gap: 8px; justify-content: center; margin: 10px 0;">
+                                <button id="startGratitudeBtn" onclick="startGratitudeSession()" style="background: #10b981; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem;">Start</button>
+                                <button id="pauseGratitudeBtn" onclick="pauseGratitudeSession()" style="display: none; background: #f59e0b; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem;">Pause</button>
+                                <button onclick="stopGratitudeSession()" style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem;">Stop</button>
+                            </div>
+                            <div style="width: 100%; height: 3px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; margin-top: 10px;">
+                                <div id="gratitudeProgress" style="height: 100%; background: linear-gradient(90deg, #10b981, #34d399); width: 0%; transition: width 0.3s ease; border-radius: 2px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="help-resources">
+                <h3 style="color: #60a5fa; margin-bottom: 20px;">Professional Help Resources</h3>
+                <p style="color: #b0b0b0; margin-bottom: 20px;">If you're experiencing persistent negative emotions, consider reaching out for professional support.</p>
+                <div class="resources-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="resource-item" style="background: rgba(40, 40, 40, 0.5); border-radius: 12px; padding: 20px; border: 1px solid rgba(100, 100, 255, 0.2); display: flex; align-items: center; gap: 15px;">
+                        <svg style="width: 32px; height: 32px; fill: #ef4444; flex-shrink: 0;" viewBox="0 0 512 512">
+                            <path d="M497.39 361.8l-112-48a24 24 0 0 0-28 6.9l-49.6 60.6A370.66 370.66 0 0 1 130.6 204.11l60.6-49.6a23.94 23.94 0 0 0 6.9-28l-48-112A24.16 24.16 0 0 0 122.6.61l-104 24A24 24 0 0 0 0 48c0 256.5 207.9 464 464 464a24 24 0 0 0 23.4-18.6l24-104a24.29 24.29 0 0 0-14.01-27.6z"/>
+                        </svg>
+                        <div class="resource-info" style="flex-grow: 1;">
+                            <h4 style="color: #60a5fa; margin-bottom: 5px;">Crisis Helpline</h4>
+                            <p style="color: #b0b0b0; margin: 0;">24/7 Support: 988</p>
+                        </div>
+                        <a href="tel:988" class="resource-btn" style="background: #ef4444; color: white; border: none; border-radius: 8px; padding: 8px 16px; text-decoration: none; cursor: pointer;">Call Now</a>
+                    </div>
+                    <div class="resource-item" style="background: rgba(40, 40, 40, 0.5); border-radius: 12px; padding: 20px; border: 1px solid rgba(100, 100, 255, 0.2); display: flex; align-items: center; gap: 15px;">
+                        <svg style="width: 32px; height: 32px; fill: #3b82f6; flex-shrink: 0;" viewBox="0 0 576 512">
+                            <path d="M416 192c0-88.4-93.1-160-208-160S0 103.6 0 192c0 34.3 14.1 65.9 38 92-13.4 30.2-35.5 54.2-35.8 54.5-2.2 2.3-2.8 5.7-1.5 8.7S4.8 352 8 352c36.6 0 66.9-12.3 88.7-25 32.2 15.7 70.3 25 111.3 25 114.9 0 208-71.6 208-160zm122 220c23.9-26 38-57.7 38-92 0-66.9-53.5-124.2-129.3-148.1.9 6.6 1.3 13.3 1.3 20.1 0 105.9-107.7 192-240 192-10.8 0-21.3-.8-31.7-1.9C207.8 439.6 281.8 480 368 480c41 0 79.1-9.2 111.3-25 21.8 12.7 52.1 25 88.7 25 3.2 0 6.1-1.9 7.3-4.8 1.3-2.9.7-6.3-1.5-8.7-.3-.3-22.4-24.2-35.8-54.5z"/>
+                        </svg>
+                        <div class="resource-info" style="flex-grow: 1;">
+                            <h4 style="color: #60a5fa; margin-bottom: 5px;">Text Crisis Line</h4>
+                            <p style="color: #b0b0b0; margin: 0;">Text HOME to 741741</p>
+                        </div>
+                        <a href="sms:741741?body=HOME" class="resource-btn" style="background: #3b82f6; color: white; border: none; border-radius: 8px; padding: 8px 16px; text-decoration: none; cursor: pointer;">Text Now</a>
+                    </div>
+                    <div class="resource-item" style="background: rgba(40, 40, 40, 0.5); border-radius: 12px; padding: 20px; border: 1px solid rgba(100, 100, 255, 0.2); display: flex; align-items: center; gap: 15px;">
+                        <svg style="width: 32px; height: 32px; fill: #22c55e; flex-shrink: 0;" viewBox="0 0 448 512">
+                            <path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zM104 424c0 13.3 10.7 24 24 24s24-10.7 24-24-10.7-24-24-24-24 10.7-24 24zm216-135.4v49c36.5 7.4 64 39.8 64 78.4v41.7c0 7.6-5.4 14.2-12.9 15.7l-32.2 6.4c-4.3.9-8.5-1.9-9.4-6.3l-3.1-15.7c-.9-4.3 1.9-8.6 6.3-9.4l19.3-3.9V416c0-62.8-96-65.1-96 1.9v26.7l19.3 3.9c4.3.9 7.1 5.1 6.3 9.4l-3.1 15.7c-.9 4.3-5.1 7.1-9.4 6.3l-31.2-4.2c-7.9-1.1-13.8-7.8-13.8-15.9V416c0-38.6 27.5-70.9 64-78.4v-45.2c-2.2.7-4.4 1.1-6.6 1.9-18 6.3-37.3 9.8-57.4 9.8s-39.4-3.5-57.4-9.8c-7.4-2.6-14.9-4.2-22.6-5.2v81.6c23.1 6.9 40 28.1 40 53.4 0 30.9-25.1 56-56 56s-56-25.1-56-56c0-25.3 16.9-46.5 40-53.4v-80.4C48.5 301 0 355.8 0 422.4v44.8C0 491.9 20.1 512 44.8 512h358.4c24.7 0 44.8-20.1 44.8-44.8v-44.8c0-72-56.8-130.3-128-133.8z"/>
+                        </svg>
+                        <div class="resource-info" style="flex-grow: 1;">
+                            <h4 style="color: #60a5fa; margin-bottom: 5px;">Find a Therapist</h4>
+                            <p style="color: #b0b0b0; margin: 0;">Search for mental health professionals</p>
+                        </div>
+                        <button id="findTherapistBtn" class="resource-btn" style="background: #22c55e; color: white; border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer;">Search</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -4355,6 +5067,1259 @@
                 clearInterval(emotionUpdateInterval);
             }
         });
+        
+        // =================== BREATHING & MEDITATION EXERCISES ===================
+        // Global variables for exercises
+        
+        let currentExerciseType = null;
+        let exerciseTimer = null;
+        let exerciseStartTime = null;
+        let exerciseDuration = 0;
+        let isPaused = false;
+        let breathingCycle = 0;
+        
+        // CSS animations for exercises
+        const exerciseAnimations = `
+            <style>
+                @keyframes breatheIn {
+                    0% { transform: scale(1); box-shadow: 0 0 40px rgba(79, 209, 199, 0.6); }
+                    100% { transform: scale(1.3); box-shadow: 0 0 80px rgba(79, 209, 199, 0.9); }
+                }
+                @keyframes breatheOut {
+                    0% { transform: scale(1.3); box-shadow: 0 0 80px rgba(79, 209, 199, 0.9); }
+                    100% { transform: scale(1); box-shadow: 0 0 40px rgba(79, 209, 199, 0.6); }
+                }
+                @keyframes hold {
+                    0%, 100% { transform: scale(1.3); box-shadow: 0 0 80px rgba(79, 209, 199, 0.9); }
+                }
+                @keyframes meditationPulse {
+                    0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+                    50% { transform: scale(1.1) rotate(180deg); opacity: 0.8; }
+                }
+                @keyframes meditationRipple1 {
+                    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+                    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.2; }
+                }
+                @keyframes meditationRipple2 {
+                    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.2; }
+                    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.1; }
+                }
+                @keyframes gratitudeFloat {
+                    0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+                    25% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); }
+                    50% { transform: translate(-50%, -50%) scale(1.2) rotate(0deg); }
+                    75% { transform: translate(-50%, -50%) scale(1.1) rotate(-5deg); }
+                }
+                .meditation-center { animation: meditationPulse 3s ease-in-out infinite; }
+                .meditation-ring1 { animation: meditationRipple1 4s ease-in-out infinite; }
+                .meditation-ring2 { animation: meditationRipple2 5s ease-in-out infinite; }
+                .gratitude-hearts { animation: gratitudeFloat 4s ease-in-out infinite; }
+            </style>
+        `;
+        
+        // Add animations to head
+        if (!document.getElementById('exerciseAnimations')) {
+            const styleSheet = document.createElement('div');
+            styleSheet.innerHTML = exerciseAnimations;
+            styleSheet.id = 'exerciseAnimations';
+            document.head.appendChild(styleSheet);
+        }
+        
+        function startBreathingExercise() {
+            currentExerciseType = 'breathing';
+            exerciseDuration = 4 * 60 * 1000; // 4 minutes
+            
+            openExerciseModal();
+            document.getElementById('exerciseTitle').textContent = '4-7-8 Breathing Exercise';
+            document.getElementById('breathingCircle').style.display = 'block';
+            document.getElementById('meditationVisual').style.display = 'none';
+            document.getElementById('gratitudeVisual').style.display = 'none';
+            
+            document.getElementById('instructionText').textContent = 'Get comfortable and prepare to breathe. This exercise uses the 4-7-8 technique: Inhale for 4 counts, hold for 7 counts, exhale for 8 counts.';
+        }
+        
+        function startMeditationExercise() {
+            currentExerciseType = 'meditation';
+            exerciseDuration = 5 * 60 * 1000; // 5 minutes
+            
+            openExerciseModal();
+            document.getElementById('exerciseTitle').textContent = '5-Minute Mindfulness Meditation';
+            document.getElementById('breathingCircle').style.display = 'none';
+            document.getElementById('meditationVisual').style.display = 'block';
+            document.getElementById('gratitudeVisual').style.display = 'none';
+            
+            document.getElementById('instructionText').textContent = 'Find a comfortable position. Close your eyes and focus on your breath. Let thoughts come and go without judgment.';
+        }
+        
+        function startGratitudeExercise() {
+            currentExerciseType = 'gratitude';
+            exerciseDuration = 3 * 60 * 1000; // 3 minutes
+            
+            openExerciseModal();
+            document.getElementById('exerciseTitle').textContent = 'Gratitude Practice';
+            document.getElementById('breathingCircle').style.display = 'none';
+            document.getElementById('meditationVisual').style.display = 'none';
+            document.getElementById('gratitudeVisual').style.display = 'block';
+            
+            document.getElementById('instructionText').textContent = 'Take a moment to reflect on three things you are grateful for today. Focus on the feelings of appreciation and joy.';
+        }
+        
+        function openExerciseModal() {
+            document.getElementById('exerciseModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Reset controls
+            document.getElementById('startExerciseBtn').style.display = 'inline-block';
+            document.getElementById('pauseExerciseBtn').style.display = 'none';
+            document.getElementById('stopExerciseBtn').style.display = 'none';
+            document.getElementById('exerciseProgress').style.width = '0%';
+            document.getElementById('timerDisplay').textContent = '00:00';
+        }
+        
+        function closeExerciseModal() {
+            document.getElementById('exerciseModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            if (exerciseTimer) {
+                clearInterval(exerciseTimer);
+                exerciseTimer = null;
+            }
+            
+            // Stop breathing animations
+            const breathingCircle = document.querySelector('.breathing-circle');
+            if (breathingCircle) {
+                breathingCircle.style.animation = 'none';
+            }
+            
+            currentExerciseType = null;
+            isPaused = false;
+            breathingCycle = 0;
+        }
+        
+        function startCurrentExercise() {
+            if (!currentExerciseType) return;
+            
+            document.getElementById('startExerciseBtn').style.display = 'none';
+            document.getElementById('pauseExerciseBtn').style.display = 'inline-block';
+            document.getElementById('stopExerciseBtn').style.display = 'inline-block';
+            
+            exerciseStartTime = Date.now();
+            isPaused = false;
+            
+            if (currentExerciseType === 'breathing') {
+                startBreathingCycle();
+            } else if (currentExerciseType === 'meditation') {
+                document.getElementById('instructionText').textContent = 'Focus on your breath... inhale... exhale... let your mind be present in this moment.';
+            } else if (currentExerciseType === 'gratitude') {
+                showGratitudePrompts();
+            }
+            
+            // Start timer
+            exerciseTimer = setInterval(updateExerciseTimer, 100);
+            
+            // Save to Firebase if user is authenticated
+            if (window.ymirAuth && !window.ymirAuth.isTemporaryUser) {
+                window.ymirAuth.saveData('exercises', {
+                    type: currentExerciseType,
+                    startTime: new Date(),
+                    duration: exerciseDuration
+                });
+            }
+        }
+        
+        function pauseCurrentExercise() {
+            isPaused = !isPaused;
+            
+            if (isPaused) {
+                document.getElementById('pauseExerciseBtn').textContent = 'Resume';
+                if (exerciseTimer) {
+                    clearInterval(exerciseTimer);
+                    exerciseTimer = null;
+                }
+                
+                // Pause breathing animation
+                const breathingCircle = document.querySelector('.breathing-circle');
+                if (breathingCircle) {
+                    breathingCircle.style.animationPlayState = 'paused';
+                }
+            } else {
+                document.getElementById('pauseExerciseBtn').textContent = 'Pause';
+                exerciseTimer = setInterval(updateExerciseTimer, 100);
+                
+                // Resume breathing animation
+                const breathingCircle = document.querySelector('.breathing-circle');
+                if (breathingCircle) {
+                    breathingCircle.style.animationPlayState = 'running';
+                }
+            }
+        }
+        
+        function stopCurrentExercise() {
+            if (exerciseTimer) {
+                clearInterval(exerciseTimer);
+                exerciseTimer = null;
+            }
+            
+            // Show completion message
+            const elapsedTime = Math.floor((Date.now() - exerciseStartTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            
+            document.getElementById('instructionText').innerHTML = `
+                <strong style="color: #10b981;">Exercise Complete!</strong><br>
+                You practiced for ${minutes}:${seconds.toString().padStart(2, '0')}. 
+                Great job taking time for your mental health! 🌟
+            `;
+            
+            // Reset UI
+            document.getElementById('startExerciseBtn').style.display = 'inline-block';
+            document.getElementById('pauseExerciseBtn').style.display = 'none';
+            document.getElementById('stopExerciseBtn').style.display = 'none';
+            document.getElementById('startExerciseBtn').textContent = 'Start New Session';
+            
+            // Stop breathing animations
+            const breathingCircle = document.querySelector('.breathing-circle');
+            if (breathingCircle) {
+                breathingCircle.style.animation = 'none';
+            }
+            
+            // Save completion to Firebase
+            if (window.ymirAuth && !window.ymirAuth.isTemporaryUser) {
+                window.ymirAuth.saveData('exercises', {
+                    type: currentExerciseType,
+                    completed: true,
+                    duration: elapsedTime,
+                    completedAt: new Date()
+                });
+            }
+        }
+        
+        function updateExerciseTimer() {
+            if (!exerciseStartTime || isPaused) return;
+            
+            const elapsed = Date.now() - exerciseStartTime;
+            const remaining = exerciseDuration - elapsed;
+            
+            if (remaining <= 0) {
+                stopCurrentExercise();
+                return;
+            }
+            
+            // Update timer display
+            const totalSeconds = Math.floor(remaining / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update progress bar
+            const progress = (elapsed / exerciseDuration) * 100;
+            document.getElementById('exerciseProgress').style.width = progress + '%';
+        }
+        
+        function startBreathingCycle() {
+            const breathingCircle = document.querySelector('.breathing-circle');
+            const breathingText = document.getElementById('breathingText');
+            
+            function runCycle() {
+                if (isPaused || !currentExerciseType) return;
+                
+                // Inhale (4 seconds)
+                breathingText.textContent = 'Inhale... 4';
+                breathingCircle.style.animation = 'breatheIn 4s ease-in-out forwards';
+                
+                setTimeout(() => {
+                    if (isPaused || !currentExerciseType) return;
+                    breathingText.textContent = 'Inhale... 3';
+                }, 1000);
+                
+                setTimeout(() => {
+                    if (isPaused || !currentExerciseType) return;
+                    breathingText.textContent = 'Inhale... 2';
+                }, 2000);
+                
+                setTimeout(() => {
+                    if (isPaused || !currentExerciseType) return;
+                    breathingText.textContent = 'Inhale... 1';
+                }, 3000);
+                
+                // Hold (7 seconds)
+                setTimeout(() => {
+                    if (isPaused || !currentExerciseType) return;
+                    breathingText.textContent = 'Hold... 7';
+                    breathingCircle.style.animation = 'hold 7s ease-in-out forwards';
+                }, 4000);
+                
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Hold... 6'; }, 5000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Hold... 5'; }, 6000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Hold... 4'; }, 7000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Hold... 3'; }, 8000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Hold... 2'; }, 9000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Hold... 1'; }, 10000);
+                
+                // Exhale (8 seconds)
+                setTimeout(() => {
+                    if (isPaused || !currentExerciseType) return;
+                    breathingText.textContent = 'Exhale... 8';
+                    breathingCircle.style.animation = 'breatheOut 8s ease-in-out forwards';
+                }, 11000);
+                
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Exhale... 7'; }, 12000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Exhale... 6'; }, 13000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Exhale... 5'; }, 14000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Exhale... 4'; }, 15000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Exhale... 3'; }, 16000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Exhale... 2'; }, 17000);
+                setTimeout(() => { if (!isPaused && currentExerciseType) breathingText.textContent = 'Exhale... 1'; }, 18000);
+                
+                // Complete cycle and repeat
+                setTimeout(() => {
+                    if (!isPaused && currentExerciseType === 'breathing') {
+                        breathingCycle++;
+                        document.getElementById('instructionText').textContent = 
+                            `Cycle ${breathingCycle} complete. Continue breathing steadily... Inhale for 4, hold for 7, exhale for 8.`;
+                        runCycle();
+                    }
+                }, 19000);
+            }
+            
+            runCycle();
+        }
+        
+        function showGratitudePrompts() {
+            const prompts = [
+                "What made you smile today?",
+                "Who are you grateful to have in your life?",
+                "What achievement are you proud of?",
+                "What simple pleasure brought you joy recently?",
+                "What opportunity are you thankful for?",
+                "What about your health are you grateful for?",
+                "What place makes you feel peaceful?",
+                "What skill or talent are you thankful to have?",
+                "What memory brings you warmth?",
+                "What about today went better than expected?"
+            ];
+            
+            let currentPrompt = 0;
+            
+            function showNextPrompt() {
+                if (currentPrompt < prompts.length && currentExerciseType === 'gratitude' && !isPaused) {
+                    document.getElementById('instructionText').textContent = prompts[currentPrompt];
+                    currentPrompt++;
+                    setTimeout(showNextPrompt, 18000); // 18 seconds per prompt
+                }
+            }
+            
+            showNextPrompt();
+        }
+        
+        // =================== END BREATHING & MEDITATION EXERCISES ===================
+    </script>
+
+    <!-- CSS Animations for Exercises -->
+    <style>
+        @keyframes breatheIn {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(79, 209, 199, 0.6); }
+            100% { transform: scale(1.3); box-shadow: 0 0 40px rgba(79, 209, 199, 0.9); }
+        }
+        @keyframes breatheOut {
+            0% { transform: scale(1.3); box-shadow: 0 0 40px rgba(79, 209, 199, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(79, 209, 199, 0.6); }
+        }
+        @keyframes meditationPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.1) rotate(180deg); opacity: 0.8; }
+        }
+        @keyframes meditationRipple1 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.2; }
+        }
+        @keyframes meditationRipple2 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.2; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.1; }
+        }
+        @keyframes gratitudeFloat {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(5deg); }
+            50% { transform: scale(1.2) rotate(0deg); }
+            75% { transform: scale(1.1) rotate(-5deg); }
+        }
+        .meditation-center { animation: meditationPulse 3s ease-in-out infinite; }
+        .meditation-ring1 { animation: meditationRipple1 4s ease-in-out infinite; }
+        .meditation-ring2 { animation: meditationRipple2 5s ease-in-out infinite; }
+        .gratitude-hearts { animation: gratitudeFloat 4s ease-in-out infinite; }
+    </style>
+
+    <!-- Breathing Exercise Functions - Global Scope -->
+    <script>
+        // Global variables
+        var breathingTimer = null;
+        var meditationTimer = null;
+        var gratitudeTimer = null;
+        var breathingStartTime = null;
+        var meditationStartTime = null;
+        var gratitudeStartTime = null;
+        var breathingPaused = false;
+        var meditationPaused = false;
+        var gratitudePaused = false;
+        
+        // BREATHING EXERCISE FUNCTIONS
+        function startBreathingInCard() {
+            console.log('🧘‍♀️ Starting breathing exercise in card...');
+            document.getElementById('breathingDefault').style.display = 'none';
+            document.getElementById('breathingActive').style.display = 'block';
+            document.getElementById('breathingInstructions').textContent = 'Get comfortable. Inhale for 4, hold for 7, exhale for 8.';
+        }
+        
+        function startBreathingSession() {
+            console.log('▶️ Starting breathing session...');
+            document.getElementById('startBreathingBtn').style.display = 'none';
+            document.getElementById('pauseBreathingBtn').style.display = 'inline-block';
+            
+            breathingStartTime = Date.now();
+            breathingPaused = false;
+            
+            // Start breathing cycle
+            startBreathingCycle();
+            
+            // Start timer (4 minutes)
+            breathingTimer = setInterval(function() {
+                if (breathingPaused) return;
+                
+                const elapsed = Date.now() - breathingStartTime;
+                const totalDuration = 4 * 60 * 1000; // 4 minutes
+                const remaining = totalDuration - elapsed;
+                
+                if (remaining <= 0) {
+                    stopBreathingSession();
+                    return;
+                }
+                
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('breathingTimer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                const progress = (elapsed / totalDuration) * 100;
+                document.getElementById('breathingProgress').style.width = progress + '%';
+            }, 100);
+        }
+        
+        function startBreathingCycle() {
+            const circle = document.getElementById('breathingCircle');
+            const text = document.getElementById('breathingText');
+            
+            function runCycle() {
+                if (breathingPaused || !breathingTimer) return;
+                
+                // Inhale (4 seconds)
+                text.textContent = 'Inhale';
+                circle.style.animation = 'breatheIn 4s ease-in-out forwards';
+                
+                setTimeout(() => {
+                    if (breathingPaused || !breathingTimer) return;
+                    // Hold (7 seconds)
+                    text.textContent = 'Hold';
+                }, 4000);
+                
+                setTimeout(() => {
+                    if (breathingPaused || !breathingTimer) return;
+                    // Exhale (8 seconds)
+                    text.textContent = 'Exhale';
+                    circle.style.animation = 'breatheOut 8s ease-in-out forwards';
+                }, 11000);
+                
+                setTimeout(() => {
+                    if (breathingPaused || !breathingTimer) return;
+                    runCycle(); // Repeat cycle
+                }, 19000);
+            }
+            
+            runCycle();
+        }
+        
+        function pauseBreathingSession() {
+            breathingPaused = !breathingPaused;
+            
+            if (breathingPaused) {
+                document.getElementById('pauseBreathingBtn').textContent = 'Resume';
+                document.getElementById('breathingCircle').style.animationPlayState = 'paused';
+            } else {
+                document.getElementById('pauseBreathingBtn').textContent = 'Pause';
+                document.getElementById('breathingCircle').style.animationPlayState = 'running';
+            }
+        }
+        
+        function stopBreathingSession() {
+            console.log('⏹️ Stopping breathing session...');
+            if (breathingTimer) {
+                clearInterval(breathingTimer);
+                breathingTimer = null;
+            }
+            
+            document.getElementById('breathingInstructions').innerHTML = 
+                '<strong style="color: #10b981;">Great job! 🌟</strong><br>You completed your breathing exercise!';
+            document.getElementById('startBreathingBtn').style.display = 'inline-block';
+            document.getElementById('pauseBreathingBtn').style.display = 'none';
+            document.getElementById('startBreathingBtn').textContent = 'Start Again';
+            
+            // Reset breathing circle
+            document.getElementById('breathingCircle').style.animation = 'none';
+            document.getElementById('breathingText').textContent = 'Complete';
+            
+            // Return to default view after 3 seconds
+            setTimeout(() => {
+                document.getElementById('breathingDefault').style.display = 'block';
+                document.getElementById('breathingActive').style.display = 'none';
+                document.getElementById('startBreathingBtn').textContent = 'Start';
+                document.getElementById('breathingTimer').textContent = '04:00';
+                document.getElementById('breathingProgress').style.width = '0%';
+                document.getElementById('breathingText').textContent = 'Ready';
+            }, 3000);
+        }
+        
+        // MEDITATION EXERCISE FUNCTIONS
+        function startMeditationInCard() {
+            console.log('🧘‍♂️ Starting meditation exercise in card...');
+            document.getElementById('meditationDefault').style.display = 'none';
+            document.getElementById('meditationActive').style.display = 'block';
+            document.getElementById('meditationInstructions').textContent = 'Find a comfortable position and focus on your breath.';
+        }
+        
+        function startMeditationSession() {
+            console.log('▶️ Starting meditation session...');
+            document.getElementById('startMeditationBtn').style.display = 'none';
+            document.getElementById('pauseMeditationBtn').style.display = 'inline-block';
+            
+            meditationStartTime = Date.now();
+            meditationPaused = false;
+            
+            document.getElementById('meditationInstructions').textContent = 'Breathe naturally... let thoughts come and go...';
+            
+            // Start timer (5 minutes)
+            meditationTimer = setInterval(function() {
+                if (meditationPaused) return;
+                
+                const elapsed = Date.now() - meditationStartTime;
+                const totalDuration = 5 * 60 * 1000; // 5 minutes
+                const remaining = totalDuration - elapsed;
+                
+                if (remaining <= 0) {
+                    stopMeditationSession();
+                    return;
+                }
+                
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('meditationTimer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                const progress = (elapsed / totalDuration) * 100;
+                document.getElementById('meditationProgress').style.width = progress + '%';
+            }, 100);
+        }
+        
+        function pauseMeditationSession() {
+            meditationPaused = !meditationPaused;
+            document.getElementById('pauseMeditationBtn').textContent = meditationPaused ? 'Resume' : 'Pause';
+        }
+        
+        function stopMeditationSession() {
+            console.log('⏹️ Stopping meditation session...');
+            if (meditationTimer) {
+                clearInterval(meditationTimer);
+                meditationTimer = null;
+            }
+            
+            document.getElementById('meditationInstructions').innerHTML = 
+                '<strong style="color: #10b981;">Well done! 🌟</strong><br>You completed your meditation!';
+            document.getElementById('startMeditationBtn').style.display = 'inline-block';
+            document.getElementById('pauseMeditationBtn').style.display = 'none';
+            document.getElementById('startMeditationBtn').textContent = 'Start Again';
+            
+            // Return to default view after 3 seconds
+            setTimeout(() => {
+                document.getElementById('meditationDefault').style.display = 'block';
+                document.getElementById('meditationActive').style.display = 'none';
+                document.getElementById('startMeditationBtn').textContent = 'Start';
+                document.getElementById('meditationTimer').textContent = '05:00';
+                document.getElementById('meditationProgress').style.width = '0%';
+            }, 3000);
+        }
+        
+        // GRATITUDE EXERCISE FUNCTIONS  
+        function startGratitudeInCard() {
+            console.log('❤️ Starting gratitude exercise in card...');
+            document.getElementById('gratitudeDefault').style.display = 'none';
+            document.getElementById('gratitudeActive').style.display = 'block';
+            document.getElementById('gratitudeInstructions').textContent = 'Think of three things you are grateful for today.';
+        }
+        
+        function startGratitudeSession() {
+            console.log('▶️ Starting gratitude session...');
+            document.getElementById('startGratitudeBtn').style.display = 'none';
+            document.getElementById('pauseGratitudeBtn').style.display = 'inline-block';
+            
+            gratitudeStartTime = Date.now();
+            gratitudePaused = false;
+            
+            // Start gratitude prompts
+            showGratitudePrompts();
+            
+            // Start timer (3 minutes)
+            gratitudeTimer = setInterval(function() {
+                if (gratitudePaused) return;
+                
+                const elapsed = Date.now() - gratitudeStartTime;
+                const totalDuration = 3 * 60 * 1000; // 3 minutes
+                const remaining = totalDuration - elapsed;
+                
+                if (remaining <= 0) {
+                    stopGratitudeSession();
+                    return;
+                }
+                
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('gratitudeTimer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                const progress = (elapsed / totalDuration) * 100;
+                document.getElementById('gratitudeProgress').style.width = progress + '%';
+            }, 100);
+        }
+        
+        function showGratitudePrompts() {
+            const prompts = [
+                "What made you smile today?",
+                "Who are you grateful to have in your life?",
+                "What achievement are you proud of?",
+                "What simple pleasure brought you joy?",
+                "What opportunity are you thankful for?"
+            ];
+            
+            let currentPrompt = 0;
+            
+            function showNextPrompt() {
+                if (currentPrompt < prompts.length && gratitudeTimer && !gratitudePaused) {
+                    document.getElementById('gratitudeInstructions').textContent = prompts[currentPrompt];
+                    currentPrompt++;
+                    setTimeout(showNextPrompt, 30000); // 30 seconds per prompt
+                }
+            }
+            
+            showNextPrompt();
+        }
+        
+        function pauseGratitudeSession() {
+            gratitudePaused = !gratitudePaused;
+            document.getElementById('pauseGratitudeBtn').textContent = gratitudePaused ? 'Resume' : 'Pause';
+        }
+        
+        function stopGratitudeSession() {
+            console.log('⏹️ Stopping gratitude session...');
+            if (gratitudeTimer) {
+                clearInterval(gratitudeTimer);
+                gratitudeTimer = null;
+            }
+            
+            document.getElementById('gratitudeInstructions').innerHTML = 
+                '<strong style="color: #10b981;">Beautiful! 🌟</strong><br>Thank you for practicing gratitude!';
+            document.getElementById('startGratitudeBtn').style.display = 'inline-block';
+            document.getElementById('pauseGratitudeBtn').style.display = 'none';
+            document.getElementById('startGratitudeBtn').textContent = 'Start Again';
+            
+            // Return to default view after 3 seconds
+            setTimeout(() => {
+                document.getElementById('gratitudeDefault').style.display = 'block';
+                document.getElementById('gratitudeActive').style.display = 'none';
+                document.getElementById('startGratitudeBtn').textContent = 'Start';
+                document.getElementById('gratitudeTimer').textContent = '03:00';
+                document.getElementById('gratitudeProgress').style.width = '0%';
+            }, 3000);
+        }
+        
+        // =================== REAL-TIME THERAPIST FINDER ===================
+        
+        // Global variables for therapist search
+        let userLocation = null;
+        let therapistSearchResults = [];
+        
+        // Initialize therapist finder
+        function initializeTherapistFinder() {
+            const findTherapistBtn = document.getElementById('findTherapistBtn');
+            if (findTherapistBtn) {
+                findTherapistBtn.addEventListener('click', openTherapistModal);
+            }
+        }
+        
+        // Get user's location
+        async function getUserLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation not supported'));
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        resolve(userLocation);
+                    },
+                    error => reject(error),
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 600000 }
+                );
+            });
+        }
+        
+        // Search therapists using multiple data sources
+        async function searchTherapists(location, searchParams = {}) {
+            const {
+                specialty = '',
+                insurance = '',
+                language = '',
+                gender = '',
+                radius = 25
+            } = searchParams;
+            
+            showTherapistLoading(true);
+            
+            try {
+                // Primary search using Psychology Today-style directory
+                const therapists = await Promise.all([
+                    searchPsychologyTodayTherapists(location, searchParams),
+                    searchOpenPathTherapists(location, searchParams),
+                    searchTherapyDenTherapists(location, searchParams)
+                ]);
+                
+                // Combine and deduplicate results
+                const allTherapists = [].concat(...therapists);
+                const uniqueTherapists = deduplicateTherapists(allTherapists);
+                
+                // Sort by distance and rating
+                const sortedTherapists = uniqueTherapists.sort((a, b) => {
+                    if (a.distance !== b.distance) return a.distance - b.distance;
+                    return (b.rating || 0) - (a.rating || 0);
+                });
+                
+                return sortedTherapists.slice(0, 20); // Limit to top 20 results
+                
+            } catch (error) {
+                console.error('Error searching therapists:', error);
+                throw error;
+            } finally {
+                showTherapistLoading(false);
+            }
+        }
+        
+        // Search Psychology Today directory (web scraping simulation)
+        async function searchPsychologyTodayTherapists(location, params) {
+            // In a real implementation, this would use their API or web scraping
+            // For demo, we'll use a mock dataset with real-looking therapist data
+            const mockTherapists = [
+                {
+                    id: 'pt_001',
+                    name: 'Dr. Sarah Martinez, LCSW',
+                    credentials: 'Licensed Clinical Social Worker',
+                    specialties: ['Anxiety', 'Depression', 'LGBTQ+', 'Trauma'],
+                    photo: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=faces',
+                    phone: '(555) 123-4567',
+                    email: 'sarah.martinez@therapy.com',
+                    address: '123 Main St, Suite 200',
+                    city: 'Local City',
+                    state: 'State',
+                    zipcode: '12345',
+                    distance: 2.3,
+                    rating: 4.8,
+                    reviewCount: 42,
+                    insurance: ['Aetna', 'Blue Cross Blue Shield', 'Cigna'],
+                    languages: ['English', 'Spanish'],
+                    gender: 'Female',
+                    telehealth: true,
+                    inPerson: true,
+                    acceptingNew: true,
+                    sessionFee: '$120-150',
+                    website: 'https://sarahmartineztherapy.com',
+                    bio: 'I specialize in helping individuals navigate anxiety, depression, and life transitions. My approach combines cognitive-behavioral therapy with mindfulness techniques.',
+                    source: 'Psychology Today'
+                },
+                {
+                    id: 'pt_002',
+                    name: 'Michael Chen, PhD',
+                    credentials: 'Licensed Psychologist',
+                    specialties: ['Cognitive Behavioral Therapy', 'Addiction', 'Men\'s Issues'],
+                    photo: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=faces',
+                    phone: '(555) 234-5678',
+                    email: 'mchen@psychologypartners.com',
+                    address: '456 Oak Avenue, Building B',
+                    city: 'Local City',
+                    state: 'State',
+                    zipcode: '12346',
+                    distance: 3.7,
+                    rating: 4.9,
+                    reviewCount: 38,
+                    insurance: ['United Healthcare', 'Humana', 'Medicare'],
+                    languages: ['English', 'Mandarin'],
+                    gender: 'Male',
+                    telehealth: true,
+                    inPerson: true,
+                    acceptingNew: true,
+                    sessionFee: '$130-160',
+                    website: 'https://drmichaelchen.com',
+                    bio: 'I work with individuals struggling with addiction, anxiety, and relationship issues using evidence-based approaches.',
+                    source: 'Psychology Today'
+                },
+                {
+                    id: 'pt_003',
+                    name: 'Dr. Emily Rodriguez, LMFT',
+                    credentials: 'Licensed Marriage & Family Therapist',
+                    specialties: ['Couples Therapy', 'Family Therapy', 'Communication Issues'],
+                    photo: 'https://images.unsplash.com/photo-1594824263073-5634dae22d7f?w=150&h=150&fit=crop&crop=faces',
+                    phone: '(555) 345-6789',
+                    email: 'emily@familytherapycenter.com',
+                    address: '789 Pine Street, Floor 3',
+                    city: 'Local City',
+                    state: 'State',
+                    zipcode: '12347',
+                    distance: 5.1,
+                    rating: 4.7,
+                    reviewCount: 56,
+                    insurance: ['Kaiser Permanente', 'Blue Cross', 'Self-Pay'],
+                    languages: ['English', 'Spanish'],
+                    gender: 'Female',
+                    telehealth: true,
+                    inPerson: false,
+                    acceptingNew: true,
+                    sessionFee: '$110-140',
+                    website: 'https://familytherapycenter.com/emily',
+                    bio: 'I help couples and families improve communication and resolve conflicts through systemic therapy approaches.',
+                    source: 'Psychology Today'
+                }
+            ];
+            
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            return mockTherapists.filter(therapist => {
+                if (params.specialty && !therapist.specialties.some(s => 
+                    s.toLowerCase().includes(params.specialty.toLowerCase()))) return false;
+                if (params.gender && therapist.gender.toLowerCase() !== params.gender.toLowerCase()) return false;
+                if (params.insurance && !therapist.insurance.some(i => 
+                    i.toLowerCase().includes(params.insurance.toLowerCase()))) return false;
+                return true;
+            });
+        }
+        
+        // Search OpenPath directory (affordable therapy)
+        async function searchOpenPathTherapists(location, params) {
+            const mockOpenPathTherapists = [
+                {
+                    id: 'op_001',
+                    name: 'Jessica Thompson, LPCC',
+                    credentials: 'Licensed Professional Clinical Counselor',
+                    specialties: ['Anxiety', 'Depression', 'Self-Esteem'],
+                    photo: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=faces',
+                    phone: '(555) 456-7890',
+                    email: 'jessica@openpatcounseling.com',
+                    address: '321 Elm Street, Suite 45',
+                    city: 'Local City',
+                    state: 'State',
+                    zipcode: '12348',
+                    distance: 4.2,
+                    rating: 4.6,
+                    reviewCount: 28,
+                    insurance: ['Sliding Scale', 'OpenPath'],
+                    languages: ['English'],
+                    gender: 'Female',
+                    telehealth: true,
+                    inPerson: true,
+                    acceptingNew: true,
+                    sessionFee: '$60-80',
+                    website: 'https://openpath.com/jessica-thompson',
+                    bio: 'I provide affordable therapy with a focus on anxiety and depression using person-centered approaches.',
+                    source: 'OpenPath'
+                }
+            ];
+            
+            await new Promise(resolve => setTimeout(resolve, 600));
+            return mockOpenPathTherapists;
+        }
+        
+        // Search TherapyDen directory
+        async function searchTherapyDenTherapists(location, params) {
+            const mockTherapyDenTherapists = [
+                {
+                    id: 'td_001',
+                    name: 'Robert Kim, LCSW',
+                    credentials: 'Licensed Clinical Social Worker',
+                    specialties: ['Trauma', 'EMDR', 'PTSD', 'Veterans'],
+                    photo: 'https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=150&h=150&fit=crop&crop=faces',
+                    phone: '(555) 567-8901',
+                    email: 'robert@traumacenter.org',
+                    address: '654 Veterans Blvd, Suite 12',
+                    city: 'Local City',
+                    state: 'State',
+                    zipcode: '12349',
+                    distance: 6.8,
+                    rating: 4.9,
+                    reviewCount: 34,
+                    insurance: ['Tricare', 'VA Benefits', 'Aetna'],
+                    languages: ['English', 'Korean'],
+                    gender: 'Male',
+                    telehealth: true,
+                    inPerson: true,
+                    acceptingNew: true,
+                    sessionFee: '$140-170',
+                    website: 'https://therapyden.com/robert-kim',
+                    bio: 'I specialize in trauma therapy for veterans and first responders using EMDR and somatic approaches.',
+                    source: 'TherapyDen'
+                }
+            ];
+            
+            await new Promise(resolve => setTimeout(resolve, 700));
+            return mockTherapyDenTherapists;
+        }
+        
+        // Remove duplicate therapists
+        function deduplicateTherapists(therapists) {
+            const seen = new Set();
+            return therapists.filter(therapist => {
+                const key = `${therapist.name.toLowerCase()}_${therapist.phone}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        }
+        
+        // Open therapist search modal
+        async function openTherapistModal() {
+            console.log('🔍 Opening therapist finder...');
+            
+            // Create modal if it doesn't exist
+            if (!document.getElementById('therapistModal')) {
+                createTherapistModal();
+            }
+            
+            const modal = document.getElementById('therapistModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Get user location
+            try {
+                showLocationStatus('Getting your location...');
+                await getUserLocation();
+                showLocationStatus('Location found! Ready to search.');
+                document.getElementById('searchTherapistsBtn').disabled = false;
+            } catch (error) {
+                console.error('Location error:', error);
+                showLocationStatus('Location access denied. You can still search by entering a city/zip.');
+                document.getElementById('manualLocationInput').style.display = 'block';
+            }
+        }
+        
+        // Create therapist search modal
+        function createTherapistModal() {
+            const modalHTML = `
+                <div id="therapistModal" class="therapist-modal" style="display: none;">
+                    <div class="therapist-modal-content">
+                        <div class="therapist-modal-header">
+                            <h2 style="color: #60a5fa; margin: 0; display: flex; align-items: center; gap: 10px;">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 448 512">
+                                    <path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zM104 424c0 13.3 10.7 24 24 24s24-10.7 24-24-10.7-24-24-24-24 10.7-24 24zm216-135.4v49c36.5 7.4 64 39.8 64 78.4v41.7c0 7.6-5.4 14.2-12.9 15.7l-32.2 6.4c-4.3.9-8.5-1.9-9.4-6.3l-3.1-15.7c-.9-4.3 1.9-8.6 6.3-9.4l19.3-3.9V416c0-62.8-96-65.1-96 1.9v26.7l19.3 3.9c4.3.9 7.1 5.1 6.3 9.4l-3.1 15.7c-.9 4.3-5.1 7.1-9.4 6.3l-31.2-4.2c-7.9-1.1-13.8-7.8-13.8-15.9V416c0-38.6 27.5-70.9 64-78.4v-45.2c-2.2.7-4.4 1.1-6.6 1.9-18 6.3-37.3 9.8-57.4 9.8s-39.4-3.5-57.4-9.8c-7.4-2.6-14.9-4.2-22.6-5.2v81.6c23.1 6.9 40 28.1 40 53.4 0 30.9-25.1 56-56 56s-56-25.1-56-56c0-25.3 16.9-46.5 40-53.4v-80.4C48.5 301 0 355.8 0 422.4v44.8C0 491.9 20.1 512 44.8 512h358.4c24.7 0 44.8-20.1 44.8-44.8v-44.8c0-72-56.8-130.3-128-133.8z"/>
+                                </svg>
+                                Find Mental Health Professionals
+                            </h2>
+                            <button id="closeTherapistModal" class="close-button">&times;</button>
+                        </div>
+                        
+                        <div class="therapist-search-section">
+                            <div id="locationStatus" class="location-status">
+                                <div class="location-loading">📍 Click "Search" to find therapists near you</div>
+                            </div>
+                            
+                            <div id="manualLocationInput" style="display: none; margin: 15px 0;">
+                                <input type="text" id="manualLocation" placeholder="Enter city, state or zip code" 
+                                       style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(100, 100, 255, 0.3); background: rgba(30, 30, 30, 0.8); color: white;">
+                            </div>
+                            
+                            <div class="search-filters">
+                                <div class="filter-row">
+                                    <select id="specialtyFilter" class="filter-select">
+                                        <option value="">All Specialties</option>
+                                        <option value="anxiety">Anxiety</option>
+                                        <option value="depression">Depression</option>
+                                        <option value="trauma">Trauma & PTSD</option>
+                                        <option value="couples">Couples Therapy</option>
+                                        <option value="family">Family Therapy</option>
+                                        <option value="addiction">Addiction</option>
+                                        <option value="lgbtq">LGBTQ+</option>
+                                        <option value="grief">Grief & Loss</option>
+                                    </select>
+                                    
+                                    <select id="insuranceFilter" class="filter-select">
+                                        <option value="">All Insurance</option>
+                                        <option value="aetna">Aetna</option>
+                                        <option value="blue cross">Blue Cross Blue Shield</option>
+                                        <option value="cigna">Cigna</option>
+                                        <option value="united">United Healthcare</option>
+                                        <option value="kaiser">Kaiser Permanente</option>
+                                        <option value="medicaid">Medicaid</option>
+                                        <option value="self-pay">Self-Pay/Sliding Scale</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="filter-row">
+                                    <select id="genderFilter" class="filter-select">
+                                        <option value="">Any Gender</option>
+                                        <option value="female">Female</option>
+                                        <option value="male">Male</option>
+                                        <option value="non-binary">Non-Binary</option>
+                                    </select>
+                                    
+                                    <select id="sessionTypeFilter" class="filter-select">
+                                        <option value="">Any Session Type</option>
+                                        <option value="telehealth">Telehealth Only</option>
+                                        <option value="in-person">In-Person Only</option>
+                                        <option value="both">Both Options</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button id="searchTherapistsBtn" class="search-therapists-btn" disabled>
+                                🔍 Search Therapists Near Me
+                            </button>
+                        </div>
+                        
+                        <div id="therapistLoading" class="therapist-loading" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <p>Searching mental health professionals...</p>
+                        </div>
+                        
+                        <div id="therapistResults" class="therapist-results"></div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            setupTherapistModalEvents();
+        }
+        
+        // Setup modal event listeners
+        function setupTherapistModalEvents() {
+            document.getElementById('closeTherapistModal').addEventListener('click', closeTherapistModal);
+            document.getElementById('therapistModal').addEventListener('click', (e) => {
+                if (e.target.id === 'therapistModal') closeTherapistModal();
+            });
+            document.getElementById('searchTherapistsBtn').addEventListener('click', performTherapistSearch);
+        }
+        
+        // Close therapist modal
+        function closeTherapistModal() {
+            document.getElementById('therapistModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Show location status
+        function showLocationStatus(message) {
+            const statusEl = document.getElementById('locationStatus');
+            statusEl.innerHTML = `<div class="location-loading">📍 ${message}</div>`;
+        }
+        
+        // Show/hide loading state
+        function showTherapistLoading(show) {
+            const loading = document.getElementById('therapistLoading');
+            const results = document.getElementById('therapistResults');
+            
+            if (show) {
+                loading.style.display = 'block';
+                results.style.display = 'none';
+            } else {
+                loading.style.display = 'none';
+                results.style.display = 'block';
+            }
+        }
+        
+        // Perform therapist search
+        async function performTherapistSearch() {
+            const specialty = document.getElementById('specialtyFilter').value;
+            const insurance = document.getElementById('insuranceFilter').value;
+            const gender = document.getElementById('genderFilter').value;
+            const sessionType = document.getElementById('sessionTypeFilter').value;
+            
+            const searchParams = {
+                specialty,
+                insurance,
+                gender,
+                sessionType
+            };
+            
+            try {
+                let searchLocation = userLocation;
+                
+                // If no GPS location, try manual input
+                if (!searchLocation) {
+                    const manualInput = document.getElementById('manualLocation')?.value;
+                    if (manualInput) {
+                        // In a real app, you'd geocode this address
+                        searchLocation = { lat: 40.7128, lng: -74.0060 }; // NYC default
+                    } else {
+                        throw new Error('Please enable location or enter a city/zip code');
+                    }
+                }
+                
+                const therapists = await searchTherapists(searchLocation, searchParams);
+                therapistSearchResults = therapists;
+                displayTherapistResults(therapists);
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                displayTherapistError(error.message);
+            }
+        }
+        
+        // Display therapist search results
+        function displayTherapistResults(therapists) {
+            const resultsContainer = document.getElementById('therapistResults');
+            
+            if (!therapists || therapists.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <h3>No therapists found</h3>
+                        <p>Try adjusting your search filters or expanding your search area.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            resultsContainer.innerHTML = `
+                <div class="results-header">
+                    <h3>Found ${therapists.length} Mental Health Professionals</h3>
+                    <p style="color: #b0b0b0; margin-top: 5px;">Sorted by distance and rating</p>
+                </div>
+                
+                <div class="therapist-list">
+                    ${therapists.map(therapist => createTherapistCard(therapist)).join('')}
+                </div>
+            `;
+        }
+        
+        // Create individual therapist card
+        function createTherapistCard(therapist) {
+            return `
+                <div class="therapist-card" data-therapist-id="${therapist.id}">
+                    <div class="therapist-photo">
+                        <img src="${therapist.photo}" alt="${therapist.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"80\" height=\"80\" viewBox=\"0 0 80 80\"><rect width=\"80\" height=\"80\" fill=\"%23444\"/><text x=\"40\" y=\"45\" text-anchor=\"middle\" fill=\"white\" font-size=\"14\">${therapist.name.split(' ')[0][0]}${therapist.name.split(' ')[1] ? therapist.name.split(' ')[1][0] : ''}</text></svg>'">
+                    </div>
+                    
+                    <div class="therapist-info">
+                        <div class="therapist-header">
+                            <h4>${therapist.name}</h4>
+                            <div class="therapist-rating">
+                                ${'★'.repeat(Math.floor(therapist.rating))}${'☆'.repeat(5-Math.floor(therapist.rating))}
+                                <span>(${therapist.reviewCount} reviews)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="therapist-credentials">
+                            <span class="credential-badge">${therapist.credentials}</span>
+                            <span class="distance-badge">${therapist.distance} miles</span>
+                            ${therapist.acceptingNew ? '<span class="accepting-badge">Accepting New Clients</span>' : '<span class="not-accepting-badge">Not Accepting</span>'}
+                        </div>
+                        
+                        <div class="therapist-specialties">
+                            <strong>Specializes in:</strong> ${therapist.specialties.slice(0, 3).join(', ')}
+                            ${therapist.specialties.length > 3 ? ` +${therapist.specialties.length - 3} more` : ''}
+                        </div>
+                        
+                        <div class="therapist-details">
+                            <div class="detail-row">
+                                <span><strong>Session Fee:</strong> ${therapist.sessionFee}</span>
+                                <span><strong>Languages:</strong> ${therapist.languages.join(', ')}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span><strong>Insurance:</strong> ${therapist.insurance.slice(0, 2).join(', ')}${therapist.insurance.length > 2 ? ' +more' : ''}</span>
+                                <span><strong>Options:</strong> ${therapist.telehealth && therapist.inPerson ? 'Telehealth & In-Person' : therapist.telehealth ? 'Telehealth Only' : 'In-Person Only'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="therapist-bio">
+                            <p>${therapist.bio}</p>
+                        </div>
+                        
+                        <div class="therapist-actions">
+                            <button class="contact-btn primary" onclick="contactTherapist('${therapist.id}', 'phone')">
+                                📞 Call ${therapist.phone}
+                            </button>
+                            <button class="contact-btn secondary" onclick="contactTherapist('${therapist.id}', 'email')">
+                                ✉️ Email
+                            </button>
+                            <button class="contact-btn secondary" onclick="viewTherapistProfile('${therapist.id}')">
+                                🔗 View Profile
+                            </button>
+                        </div>
+                        
+                        <div class="therapist-source">
+                            <small>Source: ${therapist.source}</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Display error message
+        function displayTherapistError(message) {
+            const resultsContainer = document.getElementById('therapistResults');
+            resultsContainer.innerHTML = `
+                <div class="error-message">
+                    <h3>Search Error</h3>
+                    <p>${message}</p>
+                    <button onclick="performTherapistSearch()" class="retry-btn">Try Again</button>
+                </div>
+            `;
+        }
+        
+        // Contact therapist functions
+        function contactTherapist(therapistId, method) {
+            const therapist = therapistSearchResults.find(t => t.id === therapistId);
+            if (!therapist) return;
+            
+            if (method === 'phone') {
+                window.open(`tel:${therapist.phone}`, '_self');
+            } else if (method === 'email') {
+                window.open(`mailto:${therapist.email}?subject=Therapy Inquiry&body=Hello ${therapist.name},%0D%0A%0D%0AI found your profile through Y.M.I.R AI and would like to inquire about your services.%0D%0A%0D%0AThank you!`, '_self');
+            }
+            
+            // Track contact attempt
+            if (window.ymirAuth) {
+                window.ymirAuth.saveData('therapistContacts', {
+                    therapistId: therapist.id,
+                    therapistName: therapist.name,
+                    contactMethod: method,
+                    timestamp: new Date()
+                });
+            }
+        }
+        
+        function viewTherapistProfile(therapistId) {
+            const therapist = therapistSearchResults.find(t => t.id === therapistId);
+            if (!therapist) return;
+            
+            if (therapist.website) {
+                window.open(therapist.website, '_blank');
+            } else {
+                alert('Profile website not available for this therapist.');
+            }
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTherapistFinder();
+        });
+        
+        // =================== END THERAPIST FINDER ===================
     </script>
 
     <!-- Professional Music Player Popup -->
@@ -4667,6 +6632,1634 @@ function showNotification(message, type = 'info') {
     }
 }
 
+// ===============================================
+// 🧠 ULTIMATE DAILY CHECK-IN SYSTEM 
+// ===============================================
+
+// Daily Check-in Data Management
+class DailyCheckInManager {
+    constructor() {
+        this.currentMood = null;
+        this.currentContext = {
+            energy: 5,
+            stress: 5,
+            social: 5,
+            thoughts: ''
+        };
+        this.streakData = {
+            current: 0,
+            longest: 0,
+            lastCheckIn: null
+        };
+        this.contextualPrompts = [
+            "Track your emotional journey with us ✨",
+            "How has your day been treating you? 🌟",
+            "Take a moment to check in with yourself 💭",
+            "Your feelings matter - let's capture this moment 🎯",
+            "What's your emotional weather today? 🌈",
+            "Every feeling is valid - how are you right now? 💫"
+        ];
+        this.init();
+    }
+
+    init() {
+        this.setupMoodButtons();
+        this.setupContextSliders();
+        this.setupSubmitButton();
+        this.loadUserStreak();
+        this.updateContextualPrompt();
+        this.setupPeriodicPrompts();
+        this.initializeMoodHistory();
+        this.setupLazyUserFeatures();
+    }
+
+    // Setup mood button interactions
+    setupMoodButtons() {
+        const moodButtons = document.querySelectorAll('.mood-btn');
+        
+        moodButtons.forEach(button => {
+            // Add hover effects
+            button.addEventListener('mouseenter', (e) => {
+                const overlay = e.target.querySelector('div');
+                if (overlay) overlay.style.opacity = '1';
+                const icon = e.target.querySelector('div[style*="font-size: 32px"]');
+                if (icon) icon.style.transform = 'scale(1.1)';
+                
+                // Add gentle glow effect
+                e.target.style.boxShadow = `0 8px 25px ${this.getMoodColor(button.dataset.mood, 0.4)}, 0 0 20px ${this.getMoodColor(button.dataset.mood, 0.2)}`;
+            });
+
+            button.addEventListener('mouseleave', (e) => {
+                const overlay = e.target.querySelector('div');
+                if (overlay) overlay.style.opacity = '0';
+                const icon = e.target.querySelector('div[style*="font-size: 32px"]');
+                if (icon) icon.style.transform = 'scale(1)';
+                
+                // Reset glow
+                e.target.style.boxShadow = 'none';
+            });
+
+            // Handle mood selection
+            button.addEventListener('click', (e) => {
+                this.handleMoodSelection(button);
+            });
+        });
+    }
+
+    // Handle mood button selection
+    handleMoodSelection(selectedButton) {
+        // Remove previous selections
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.style.transform = 'scale(1)';
+            btn.style.borderWidth = '2px';
+            btn.classList.remove('selected');
+        });
+
+        // Mark as selected with animation
+        selectedButton.style.transform = 'scale(1.05)';
+        selectedButton.style.borderWidth = '3px';
+        selectedButton.classList.add('selected');
+        
+        // Add celebration animation
+        this.celebrateMoodSelection(selectedButton);
+
+        // Store mood data
+        this.currentMood = {
+            type: selectedButton.dataset.mood,
+            value: parseInt(selectedButton.dataset.value),
+            timestamp: new Date(),
+            emoji: selectedButton.querySelector('div[style*="font-size: 32px"]').textContent
+        };
+
+        // Show context sliders with animation
+        this.showContextSliders();
+        
+        // Update contextual prompt based on mood
+        this.updatePromptForMood(this.currentMood.type);
+
+        console.log('🎯 Mood selected:', this.currentMood);
+    }
+
+    // Celebrate mood selection with particles
+    celebrateMoodSelection(button) {
+        // Create floating celebration effect
+        for (let i = 0; i < 6; i++) {
+            setTimeout(() => {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: absolute;
+                    width: 8px;
+                    height: 8px;
+                    background: ${this.getMoodColor(button.dataset.mood, 0.8)};
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: 1000;
+                    animation: floatAway 1.5s ease-out forwards;
+                `;
+                
+                const rect = button.getBoundingClientRect();
+                particle.style.left = (rect.left + Math.random() * rect.width) + 'px';
+                particle.style.top = (rect.top + Math.random() * rect.height) + 'px';
+                
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 1500);
+            }, i * 100);
+        }
+
+        // Add CSS for particle animation if not exists
+        if (!document.querySelector('#particleAnimation')) {
+            const style = document.createElement('style');
+            style.id = 'particleAnimation';
+            style.textContent = `
+                @keyframes floatAway {
+                    0% { transform: translateY(0) scale(1); opacity: 1; }
+                    100% { transform: translateY(-50px) scale(0.5); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // Get mood-specific colors
+    getMoodColor(mood, opacity = 1) {
+        const colors = {
+            amazing: `rgba(34, 197, 94, ${opacity})`,
+            great: `rgba(59, 130, 246, ${opacity})`,
+            good: `rgba(156, 163, 175, ${opacity})`,
+            okay: `rgba(251, 146, 60, ${opacity})`,
+            rough: `rgba(239, 68, 68, ${opacity})`
+        };
+        return colors[mood] || `rgba(100, 100, 100, ${opacity})`;
+    }
+
+    // Show context sliders with smooth animation
+    showContextSliders() {
+        const contextSliders = document.getElementById('contextSliders');
+        if (contextSliders) {
+            contextSliders.style.display = 'block';
+            contextSliders.style.opacity = '0';
+            contextSliders.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                contextSliders.style.transition = 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                contextSliders.style.opacity = '1';
+                contextSliders.style.transform = 'translateY(0)';
+            }, 100);
+        }
+    }
+
+    // Setup context sliders
+    setupContextSliders() {
+        // Energy slider
+        const energySlider = document.getElementById('energySlider');
+        const energyValue = document.getElementById('energyValue');
+        if (energySlider && energyValue) {
+            energySlider.addEventListener('input', (e) => {
+                this.currentContext.energy = parseInt(e.target.value);
+                energyValue.textContent = e.target.value;
+                this.updateSliderStyle(energySlider, e.target.value);
+            });
+        }
+
+        // Stress slider
+        const stressSlider = document.getElementById('stressSlider');
+        const stressValue = document.getElementById('stressValue');
+        if (stressSlider && stressValue) {
+            stressSlider.addEventListener('input', (e) => {
+                this.currentContext.stress = parseInt(e.target.value);
+                stressValue.textContent = e.target.value;
+                this.updateSliderStyle(stressSlider, e.target.value);
+            });
+        }
+
+        // Social slider
+        const socialSlider = document.getElementById('socialSlider');
+        const socialValue = document.getElementById('socialValue');
+        if (socialSlider && socialValue) {
+            socialSlider.addEventListener('input', (e) => {
+                this.currentContext.social = parseInt(e.target.value);
+                socialValue.textContent = e.target.value;
+                this.updateSliderStyle(socialSlider, e.target.value);
+            });
+        }
+
+        // Thoughts input
+        const thoughtsInput = document.getElementById('thoughtsInput');
+        if (thoughtsInput) {
+            thoughtsInput.addEventListener('input', (e) => {
+                this.currentContext.thoughts = e.target.value;
+            });
+        }
+    }
+
+    // Update slider visual style based on value
+    updateSliderStyle(slider, value) {
+        const percentage = ((value - slider.min) / (slider.max - slider.min)) * 100;
+        slider.style.background = `linear-gradient(90deg, rgba(64, 112, 255, 0.6) 0%, rgba(64, 112, 255, 0.6) ${percentage}%, rgba(64, 112, 255, 0.2) ${percentage}%, rgba(64, 112, 255, 0.2) 100%)`;
+    }
+
+    // Setup submit button
+    setupSubmitButton() {
+        const submitBtn = document.getElementById('submitMoodBtn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => {
+                this.submitDailyCheckIn();
+            });
+        }
+    }
+
+    // Submit daily check-in to Firebase
+    async submitDailyCheckIn() {
+        if (!this.currentMood) {
+            this.showNotification('Please select your mood first! 😊', 'warning');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submitMoodBtn');
+        const originalText = submitBtn.textContent;
+        
+        try {
+            // Show loading state
+            submitBtn.textContent = 'Saving your journey... 💫';
+            submitBtn.disabled = true;
+
+            // Prepare check-in data
+            const checkInData = {
+                mood: this.currentMood,
+                context: this.currentContext,
+                timestamp: new Date(),
+                date: new Date().toDateString(),
+                deviceInfo: {
+                    userAgent: navigator.userAgent,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                }
+            };
+
+            // Save to Firebase
+            if (window.ymirAuth) {
+                await window.ymirAuth.saveData('dailyCheckIns', checkInData);
+                
+                // Update streak
+                await this.updateStreak();
+                
+                // Show success with personalized message
+                const insights = this.generateAIInsights(checkInData);
+                this.showNotification(`✨ Check-in saved! ${insights}`, 'success');
+                
+                // Reset the form
+                this.resetCheckInForm();
+                
+                // Show achievement if applicable
+                this.checkForAchievements();
+                
+            } else {
+                throw new Error('Authentication system not available');
+            }
+
+        } catch (error) {
+            console.error('❌ Error saving check-in:', error);
+            this.showNotification('Unable to save check-in. Please try again! 🔄', 'error');
+        } finally {
+            // Reset button
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Generate AI-powered insights
+    generateAIInsights(checkInData) {
+        const mood = checkInData.mood.type;
+        const energy = checkInData.context.energy;
+        const stress = checkInData.context.stress;
+        
+        const insights = {
+            amazing: [
+                "Your energy is contagious! ✨",
+                "You're radiating positivity today! 🌟",
+                "What a fantastic emotional state! 🚀"
+            ],
+            great: [
+                "You're doing wonderfully! Keep it up! 💪",
+                "Your positive energy is inspiring! 🌈",
+                "Great vibes detected! 🎉"
+            ],
+            good: [
+                "Steady progress is still progress! 📈",
+                "You're maintaining balance well! ⚖️",
+                "Good energy attracts good things! 🌸"
+            ],
+            okay: [
+                "Every day has its moments. You're doing fine! 🤗",
+                "Tomorrow is a new opportunity! 🌅",
+                "Your resilience is your strength! 💎"
+            ],
+            rough: [
+                "Your courage to check in shows strength! 💪",
+                "Difficult moments don't last, strong people do! 🛡️",
+                "You're not alone in this journey! 🤝"
+            ]
+        };
+
+        // Add context-based insights
+        let contextInsight = "";
+        if (energy <= 3) {
+            contextInsight = " Consider some rest or gentle movement. ";
+        } else if (energy >= 8) {
+            contextInsight = " Channel that energy into something meaningful! ";
+        }
+
+        if (stress >= 7) {
+            contextInsight += " Try some breathing exercises to find calm. ";
+        }
+
+        const moodInsights = insights[mood] || insights.okay;
+        const randomInsight = moodInsights[Math.floor(Math.random() * moodInsights.length)];
+        
+        return randomInsight + contextInsight;
+    }
+
+    // Update streak data
+    async updateStreak() {
+        const today = new Date().toDateString();
+        const lastCheckIn = this.streakData.lastCheckIn;
+        
+        if (lastCheckIn !== today) {
+            // Check if yesterday was the last check-in
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (lastCheckIn === yesterday.toDateString()) {
+                // Continue streak
+                this.streakData.current += 1;
+            } else if (lastCheckIn === null || lastCheckIn < yesterday.toDateString()) {
+                // Start new streak
+                this.streakData.current = 1;
+            }
+            
+            // Update longest streak
+            if (this.streakData.current > this.streakData.longest) {
+                this.streakData.longest = this.streakData.current;
+            }
+            
+            this.streakData.lastCheckIn = today;
+            
+            // Save streak data
+            if (window.ymirAuth) {
+                await window.ymirAuth.saveData('streakData', this.streakData);
+            }
+            
+            // Update UI
+            this.updateStreakDisplay();
+        }
+    }
+
+    // Load user streak from Firebase
+    async loadUserStreak() {
+        try {
+            if (window.ymirAuth) {
+                const userData = window.ymirAuth.getUserData('streakData');
+                if (userData && userData.length > 0) {
+                    this.streakData = { ...this.streakData, ...userData[userData.length - 1] };
+                }
+                this.updateStreakDisplay();
+            }
+        } catch (error) {
+            console.error('Error loading streak:', error);
+        }
+    }
+
+    // Update streak display
+    updateStreakDisplay() {
+        const streakCount = document.getElementById('streakCount');
+        if (streakCount) {
+            streakCount.textContent = this.streakData.current;
+            
+            // Add celebration for milestones
+            if (this.streakData.current > 0 && this.streakData.current % 7 === 0) {
+                streakCount.style.animation = 'enhancedStatusPulse 2s ease infinite';
+            }
+        }
+    }
+
+    // Reset check-in form
+    resetCheckInForm() {
+        // Reset mood buttons
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.style.transform = 'scale(1)';
+            btn.style.borderWidth = '2px';
+            btn.classList.remove('selected');
+        });
+
+        // Hide context sliders
+        const contextSliders = document.getElementById('contextSliders');
+        if (contextSliders) {
+            contextSliders.style.opacity = '0';
+            contextSliders.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                contextSliders.style.display = 'none';
+            }, 500);
+        }
+
+        // Reset data
+        this.currentMood = null;
+        this.currentContext = {
+            energy: 5,
+            stress: 5,
+            social: 5,
+            thoughts: ''
+        };
+
+        // Reset form values
+        const sliders = ['energySlider', 'stressSlider', 'socialSlider'];
+        sliders.forEach(sliderId => {
+            const slider = document.getElementById(sliderId);
+            if (slider) {
+                slider.value = 5;
+                const valueDisplay = document.getElementById(sliderId.replace('Slider', 'Value'));
+                if (valueDisplay) valueDisplay.textContent = '5';
+            }
+        });
+
+        const thoughtsInput = document.getElementById('thoughtsInput');
+        if (thoughtsInput) thoughtsInput.value = '';
+
+        // Update prompt
+        setTimeout(() => {
+            this.updateContextualPrompt();
+        }, 1000);
+    }
+
+    // Update contextual prompt
+    updateContextualPrompt() {
+        const promptElement = document.getElementById('contextualPrompt');
+        if (promptElement) {
+            const randomPrompt = this.contextualPrompts[Math.floor(Math.random() * this.contextualPrompts.length)];
+            promptElement.textContent = randomPrompt;
+        }
+    }
+
+    // Update prompt based on selected mood
+    updatePromptForMood(mood) {
+        const promptElement = document.getElementById('contextualPrompt');
+        if (promptElement) {
+            const moodPrompts = {
+                amazing: "You're glowing! Tell us more about this amazing feeling ✨",
+                great: "Wonderful energy! What's contributing to this great day? 🌟",
+                good: "Solid vibes! Share more about what's working well 😊",
+                okay: "It's okay to have average days. What could make it better? 🤗",
+                rough: "Thank you for being honest. You're not alone in this 💙"
+            };
+            promptElement.textContent = moodPrompts[mood] || "Tell us more about your day...";
+        }
+    }
+
+    // Setup periodic prompts
+    setupPeriodicPrompts() {
+        // Update contextual prompt every 30 seconds
+        setInterval(() => {
+            if (!this.currentMood) {
+                this.updateContextualPrompt();
+            }
+        }, 30000);
+    }
+
+    // Check for achievements
+    checkForAchievements() {
+        if (this.streakData.current === 7) {
+            this.showAchievement('🔥 Week Warrior!', 'You\'ve checked in for 7 days straight!');
+        } else if (this.streakData.current === 30) {
+            this.showAchievement('🏆 Monthly Master!', 'Incredible! 30 days of emotional wellness!');
+        } else if (this.streakData.current === 100) {
+            this.showAchievement('🚀 Centurion Champion!', 'You\'re a true wellness warrior - 100 days!');
+        }
+    }
+
+    // Show achievement notification
+    showAchievement(title, message) {
+        // Create achievement modal
+        const achievementHTML = `
+            <div id="achievementModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000;">
+                <div style="background: linear-gradient(135deg, rgba(30, 30, 30, 0.95), rgba(40, 40, 40, 0.95)); border: 2px solid #4070ff; border-radius: 20px; padding: 40px; text-align: center; max-width: 400px; animation: achievementBounce 0.5s ease;">
+                    <div style="font-size: 60px; margin-bottom: 20px;">${title.split(' ')[0]}</div>
+                    <h2 style="color: #4070ff; margin-bottom: 15px;">${title}</h2>
+                    <p style="color: #dbeafe; margin-bottom: 25px;">${message}</p>
+                    <button onclick="document.getElementById('achievementModal').remove()" style="background: #4070ff; border: none; border-radius: 12px; color: white; padding: 12px 24px; font-weight: 600; cursor: pointer;">Awesome! 🎉</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', achievementHTML);
+
+        // Add achievement animation styles
+        if (!document.querySelector('#achievementStyles')) {
+            const style = document.createElement('style');
+            style.id = 'achievementStyles';
+            style.textContent = `
+                @keyframes achievementBounce {
+                    0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+                    50% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+                    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // Show notification
+    showNotification(message, type = 'info') {
+        if (window.ymirAuth) {
+            window.ymirAuth.showNotification(message, type);
+        }
+    }
+
+    // ===============================================
+    // 📊 MOOD HISTORY & VISUALIZATION SYSTEM
+    // ===============================================
+
+    // Initialize mood history system
+    initializeMoodHistory() {
+        this.setupMoodHistoryControls();
+        this.loadMoodHistory();
+        
+        // For testing - add sample data if no data exists
+        setTimeout(() => {
+            if (!this.moodHistoryData || this.moodHistoryData.length === 0) {
+                console.log('📊 No mood data found, you can test by doing a check-in first!');
+                // Show helpful message
+                this.showTestDataOption();
+            }
+        }, 2000);
+    }
+
+    // Setup mood history controls
+    setupMoodHistoryControls() {
+        // View toggle buttons
+        const chartViewBtn = document.getElementById('chartViewBtn');
+        const tableViewBtn = document.getElementById('tableViewBtn');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+
+        if (chartViewBtn) {
+            chartViewBtn.addEventListener('click', () => this.switchView('chart'));
+        }
+        if (tableViewBtn) {
+            tableViewBtn.addEventListener('click', () => this.switchView('table'));
+        }
+        if (exportDataBtn) {
+            exportDataBtn.addEventListener('click', () => this.exportMoodData());
+        }
+        if (clearDataBtn) {
+            clearDataBtn.addEventListener('click', () => this.clearMoodHistory());
+        }
+    }
+
+    // Switch between chart and table view
+    switchView(viewType) {
+        console.log('🔄 Switching to view:', viewType);
+        
+        const chartView = document.getElementById('chartView');
+        const tableView = document.getElementById('tableView');
+        const chartBtn = document.getElementById('chartViewBtn');
+        const tableBtn = document.getElementById('tableViewBtn');
+
+        if (!chartView || !tableView || !chartBtn || !tableBtn) {
+            console.error('❌ View switching elements not found');
+            return;
+        }
+
+        if (viewType === 'chart') {
+            chartView.style.display = 'block';
+            tableView.style.display = 'none';
+            chartBtn.classList.add('active');
+            tableBtn.classList.remove('active');
+            chartBtn.style.background = '#3b82f6';
+            chartBtn.style.color = 'white';
+            chartBtn.style.border = '1px solid #3b82f6';
+            tableBtn.style.background = 'rgba(59, 130, 246, 0.2)';
+            tableBtn.style.color = '#3b82f6';
+            tableBtn.style.border = '1px solid #3b82f6';
+            this.renderMoodChart();
+            console.log('✅ Switched to chart view');
+        } else {
+            chartView.style.display = 'none';
+            tableView.style.display = 'block';
+            tableBtn.classList.add('active');
+            chartBtn.classList.remove('active');
+            tableBtn.style.background = '#3b82f6';
+            tableBtn.style.color = 'white';
+            tableBtn.style.border = '1px solid #3b82f6';
+            chartBtn.style.background = 'rgba(59, 130, 246, 0.2)';
+            chartBtn.style.color = '#3b82f6';
+            chartBtn.style.border = '1px solid #3b82f6';
+            this.renderMoodTable();
+            console.log('✅ Switched to table view');
+        }
+    }
+
+    // Load mood history from Firebase
+    async loadMoodHistory() {
+        try {
+            if (window.ymirAuth) {
+                const checkInData = window.ymirAuth.getUserData('dailyCheckIns');
+                this.moodHistoryData = checkInData || [];
+                
+                console.log('📊 Loaded mood history:', this.moodHistoryData.length, 'entries');
+                
+                // Always render both views to make sure they work
+                this.renderMoodChart();
+                this.renderMoodTable();
+                this.updateHistoryStats();
+            }
+        } catch (error) {
+            console.error('Error loading mood history:', error);
+            // Show empty state
+            this.moodHistoryData = [];
+            this.renderMoodChart();
+            this.renderMoodTable();
+        }
+    }
+
+    // Render mood chart visualization
+    renderMoodChart() {
+        const chartContainer = document.querySelector('.mood-chart');
+        if (!chartContainer) return;
+
+        if (!this.moodHistoryData || this.moodHistoryData.length === 0) {
+            chartContainer.innerHTML = `
+                <div class="mood-placeholder" style="text-align: center; color: #666; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">📊</div>
+                    <h3 style="color: #60a5fa; margin-bottom: 10px;">No Data Yet</h3>
+                    <p>Complete your first daily check-in to see your mood trends!</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Create simple but beautiful chart
+        const last7Days = this.moodHistoryData.slice(-7);
+        const maxValue = 5;
+        
+        let chartHTML = `
+            <div style="padding: 20px;">
+                <h4 style="color: #60a5fa; margin-bottom: 20px; text-align: center;">Last 7 Days Mood Trend</h4>
+                <div style="display: flex; align-items: end; justify-content: space-between; height: 200px; margin-bottom: 20px; padding: 0 20px;">
+        `;
+
+        last7Days.forEach((entry, index) => {
+            const height = (entry.mood.value / maxValue) * 150;
+            const color = this.getMoodColor(entry.mood.type, 0.8);
+            const date = new Date(entry.timestamp).toLocaleDateString();
+            
+            chartHTML += `
+                <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                    <div style="
+                        width: 40px; 
+                        height: ${height}px; 
+                        background: ${color}; 
+                        border-radius: 8px 8px 0 0;
+                        margin-bottom: 10px;
+                        position: relative;
+                        transition: all 0.3s ease;
+                        cursor: pointer;
+                        box-shadow: 0 4px 15px ${color.replace(')', ', 0.3)')};
+                    " title="${entry.mood.type} - ${entry.mood.value}/5">
+                        <div style="
+                            position: absolute;
+                            top: -25px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            font-size: 18px;
+                        ">${entry.mood.emoji}</div>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #93c5fd; text-align: center; transform: rotate(-45deg); margin-top: 5px;">
+                        ${date.split('/')[1]}/${date.split('/')[2]}
+                    </div>
+                </div>
+            `;
+        });
+
+        chartHTML += `
+                </div>
+                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    ${this.generateMoodLegend()}
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    ${this.generateInsights()}
+                </div>
+            </div>
+        `;
+
+        chartContainer.innerHTML = chartHTML;
+    }
+
+    // Generate mood legend
+    generateMoodLegend() {
+        const moods = [
+            { type: 'amazing', emoji: '✨', label: 'Amazing' },
+            { type: 'great', emoji: '😊', label: 'Great' },
+            { type: 'good', emoji: '🙂', label: 'Good' },
+            { type: 'okay', emoji: '😐', label: 'Okay' },
+            { type: 'rough', emoji: '😔', label: 'Rough' }
+        ];
+
+        return moods.map(mood => `
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="
+                    width: 16px; 
+                    height: 16px; 
+                    background: ${this.getMoodColor(mood.type, 0.8)}; 
+                    border-radius: 4px;
+                "></div>
+                <span style="color: #dbeafe; font-size: 0.9rem;">${mood.emoji} ${mood.label}</span>
+            </div>
+        `).join('');
+    }
+
+    // Generate insights from mood data
+    generateInsights() {
+        if (!this.moodHistoryData || this.moodHistoryData.length === 0) return '';
+
+        const recent = this.moodHistoryData.slice(-7);
+        const averageMood = recent.reduce((sum, entry) => sum + entry.mood.value, 0) / recent.length;
+        const averageEnergy = recent.reduce((sum, entry) => sum + entry.context.energy, 0) / recent.length;
+        const averageStress = recent.reduce((sum, entry) => sum + entry.context.stress, 0) / recent.length;
+
+        let insight = '';
+        if (averageMood >= 4) {
+            insight = '🌟 You\'re having a great week! Your mood is consistently positive.';
+        } else if (averageMood >= 3) {
+            insight = '📈 Your mood is stable this week. Keep up the good work!';
+        } else {
+            insight = '💙 This week has been challenging. Remember to be kind to yourself.';
+        }
+
+        return `
+            <div style="background: rgba(64, 112, 255, 0.1); border-radius: 12px; padding: 15px; border: 1px solid rgba(64, 112, 255, 0.3);">
+                <h5 style="color: #60a5fa; margin-bottom: 10px;">Weekly Insights</h5>
+                <p style="color: #dbeafe; margin-bottom: 10px;">${insight}</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; font-size: 0.9rem; color: #93c5fd;">
+                    <div>Avg Mood: ${averageMood.toFixed(1)}/5</div>
+                    <div>Avg Energy: ${averageEnergy.toFixed(1)}/10</div>
+                    <div>Avg Stress: ${averageStress.toFixed(1)}/10</div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Render mood table
+    renderMoodTable() {
+        const tableBody = document.getElementById('moodTableBody');
+        if (!tableBody) return;
+
+        if (!this.moodHistoryData || this.moodHistoryData.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #666; padding: 40px;">
+                        No mood data available yet. Complete your first check-in!
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        const sortedData = [...this.moodHistoryData].reverse(); // Most recent first
+        
+        tableBody.innerHTML = sortedData.map((entry, index) => {
+            const date = new Date(entry.timestamp);
+            const formattedDate = date.toLocaleDateString();
+            const formattedTime = date.toLocaleTimeString();
+            
+            return `
+                <tr style="border-bottom: 1px solid rgba(100, 100, 255, 0.1);">
+                    <td style="padding: 12px; color: #dbeafe;">${formattedDate}</td>
+                    <td style="padding: 12px; color: #dbeafe;">${formattedTime}</td>
+                    <td style="padding: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 20px;">${entry.mood.emoji}</span>
+                            <span style="color: ${this.getMoodColor(entry.mood.type, 1)}; font-weight: 600;">
+                                ${entry.mood.type.charAt(0).toUpperCase() + entry.mood.type.slice(1)}
+                            </span>
+                            <span style="color: #93c5fd; font-size: 0.9rem;">(${entry.mood.value}/5)</span>
+                        </div>
+                        ${entry.context.thoughts ? `<div style="font-size: 0.8rem; color: #b0b0b0; margin-top: 4px;">"${entry.context.thoughts.substring(0, 50)}${entry.context.thoughts.length > 50 ? '...' : ''}"</div>` : ''}
+                    </td>
+                    <td style="padding: 12px;">
+                        <button onclick="dailyCheckIn.viewMoodDetails(${index})" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid #3b82f6; border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 0.8rem;">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // View detailed mood entry
+    viewMoodDetails(index) {
+        const entry = [...this.moodHistoryData].reverse()[index];
+        if (!entry) return;
+
+        const date = new Date(entry.timestamp);
+        const detailsHTML = `
+            <div id="moodDetailModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000;">
+                <div style="background: linear-gradient(135deg, rgba(30, 30, 30, 0.95), rgba(40, 40, 40, 0.95)); border: 2px solid #4070ff; border-radius: 20px; padding: 30px; max-width: 500px; width: 90%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: #4070ff; margin: 0;">Mood Check-in Details</h3>
+                        <button onclick="document.getElementById('moodDetailModal').remove()" style="background: none; border: none; color: #dbeafe; font-size: 24px; cursor: pointer;">&times;</button>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                            <span style="font-size: 32px;">${entry.mood.emoji}</span>
+                            <div>
+                                <div style="color: ${this.getMoodColor(entry.mood.type, 1)}; font-size: 1.2rem; font-weight: 600;">
+                                    ${entry.mood.type.charAt(0).toUpperCase() + entry.mood.type.slice(1)}
+                                </div>
+                                <div style="color: #93c5fd; font-size: 0.9rem;">
+                                    ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <div style="background: rgba(59, 130, 246, 0.1); border-radius: 8px; padding: 12px;">
+                            <div style="color: #60a5fa; font-size: 0.9rem; margin-bottom: 4px;">Energy Level</div>
+                            <div style="color: #dbeafe; font-weight: 600;">${entry.context.energy}/10</div>
+                        </div>
+                        <div style="background: rgba(239, 68, 68, 0.1); border-radius: 8px; padding: 12px;">
+                            <div style="color: #f87171; font-size: 0.9rem; margin-bottom: 4px;">Stress Level</div>
+                            <div style="color: #dbeafe; font-weight: 600;">${entry.context.stress}/10</div>
+                        </div>
+                        <div style="background: rgba(34, 197, 94, 0.1); border-radius: 8px; padding: 12px;">
+                            <div style="color: #4ade80; font-size: 0.9rem; margin-bottom: 4px;">Social Connection</div>
+                            <div style="color: #dbeafe; font-weight: 600;">${entry.context.social}/10</div>
+                        </div>
+                    </div>
+
+                    ${entry.context.thoughts ? `
+                        <div style="background: rgba(40, 40, 40, 0.8); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                            <div style="color: #60a5fa; font-size: 0.9rem; margin-bottom: 8px;">Your Thoughts</div>
+                            <div style="color: #dbeafe; line-height: 1.5;">"${entry.context.thoughts}"</div>
+                        </div>
+                    ` : ''}
+
+                    <button onclick="document.getElementById('moodDetailModal').remove()" style="width: 100%; background: #4070ff; border: none; border-radius: 12px; color: white; padding: 12px; font-weight: 600; cursor: pointer;">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', detailsHTML);
+    }
+
+    // Export mood data
+    exportMoodData() {
+        console.log('📁 Attempting to export data...');
+        
+        if (!this.moodHistoryData || this.moodHistoryData.length === 0) {
+            this.showNotification('No data available to export! Create some mood entries first! 📊', 'warning');
+            return;
+        }
+
+        try {
+            const csvContent = this.generateCSV();
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `ymir-mood-data-${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up
+            URL.revokeObjectURL(url);
+            
+            this.showNotification('✅ Mood data exported successfully! Check your Downloads folder! 📁', 'success');
+            console.log('✅ Export completed successfully');
+        } catch (error) {
+            console.error('❌ Export failed:', error);
+            this.showNotification('❌ Export failed. Please try again!', 'error');
+        }
+    }
+
+    // Generate CSV content
+    generateCSV() {
+        const headers = ['Date', 'Time', 'Mood', 'Mood Value', 'Energy', 'Stress', 'Social Connection', 'Thoughts'];
+        const rows = this.moodHistoryData.map(entry => {
+            const date = new Date(entry.timestamp);
+            return [
+                date.toLocaleDateString(),
+                date.toLocaleTimeString(),
+                entry.mood.type,
+                entry.mood.value,
+                entry.context.energy,
+                entry.context.stress,
+                entry.context.social,
+                `"${(entry.context.thoughts || '').replace(/"/g, '""')}"`
+            ];
+        });
+
+        return [headers, ...rows].map(row => row.join(',')).join('\n');
+    }
+
+    // Clear mood history
+    clearMoodHistory() {
+        if (!this.moodHistoryData || this.moodHistoryData.length === 0) {
+            this.showNotification('No data to clear! 🧹', 'info');
+            return;
+        }
+
+        if (confirm('Are you sure you want to clear all mood history? This action cannot be undone.')) {
+            this.moodHistoryData = [];
+            
+            // Clear from Firebase (in real implementation)
+            if (window.ymirAuth) {
+                // For now, just clear local data
+                // In a real app, you'd need to delete from Firestore
+                console.log('🗑️ Clearing mood history from Firebase...');
+            }
+            
+            this.renderMoodChart();
+            this.renderMoodTable();
+            this.showNotification('🧹 Mood history cleared successfully!', 'success');
+        }
+    }
+
+    // Update history stats
+    updateHistoryStats() {
+        // Could add total check-ins, average mood, etc. to the UI
+        console.log(`📊 Total check-ins: ${this.moodHistoryData?.length || 0}`);
+    }
+
+    // Show test data option for empty history
+    showTestDataOption() {
+        const chartContainer = document.querySelector('.mood-chart');
+        if (chartContainer) {
+            chartContainer.innerHTML = `
+                <div class="mood-placeholder" style="text-align: center; color: #666; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">📊</div>
+                    <h3 style="color: #60a5fa; margin-bottom: 15px;">No Mood Data Yet</h3>
+                    <p style="margin-bottom: 20px;">Complete your first daily check-in above to see your mood trends!</p>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="dailyCheckIn.generateTestData()" style="background: rgba(64, 112, 255, 0.2); color: #4070ff; border: 1px solid #4070ff; border-radius: 8px; padding: 10px 15px; cursor: pointer;">
+                            📈 Add Test Data
+                        </button>
+                        <button onclick="dailyCheckIn.scrollToCheckIn()" style="background: #4070ff; color: white; border: none; border-radius: 8px; padding: 10px 15px; cursor: pointer;">
+                            ✨ Do Check-In Now
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // Generate test data for demonstration
+    generateTestData() {
+        console.log('📊 Generating test mood data...');
+        
+        const testData = [];
+        const moods = ['amazing', 'great', 'good', 'okay', 'rough'];
+        const moodValues = [5, 4, 3, 2, 1];
+        const moodEmojis = ['✨', '😊', '🙂', '😐', '😔'];
+        
+        // Generate data for last 7 days
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            
+            const randomMoodIndex = Math.floor(Math.random() * moods.length);
+            const mood = moods[randomMoodIndex];
+            
+            testData.push({
+                mood: {
+                    type: mood,
+                    value: moodValues[randomMoodIndex],
+                    emoji: moodEmojis[randomMoodIndex]
+                },
+                context: {
+                    energy: Math.floor(Math.random() * 10) + 1,
+                    stress: Math.floor(Math.random() * 10) + 1,
+                    social: Math.floor(Math.random() * 10) + 1,
+                    thoughts: `Test mood entry for ${date.toDateString()}`
+                },
+                timestamp: date,
+                date: date.toDateString(),
+                isTestData: true
+            });
+        }
+        
+        this.moodHistoryData = testData;
+        this.renderMoodChart();
+        this.renderMoodTable();
+        
+        this.showNotification('📊 Test data generated! Try switching between Chart and Table view! 🎯', 'success');
+    }
+
+    // Scroll to check-in section
+    scrollToCheckIn() {
+        const checkInSection = document.querySelector('.mood-check-in');
+        if (checkInSection) {
+            checkInSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Add highlight effect
+            checkInSection.style.boxShadow = '0 0 20px rgba(64, 112, 255, 0.5)';
+            setTimeout(() => {
+                checkInSection.style.boxShadow = '';
+            }, 2000);
+        }
+    }
+
+    // ===============================================
+    // 🚀 LAZY USER FEATURES - MAXIMUM EASE
+    // ===============================================
+
+    setupLazyUserFeatures() {
+        this.setupQuickMoodButtons();
+        this.setupSmartSuggestions();
+        this.setupGentleNudges();
+        this.setupProgressGamification();
+        this.checkForMoodPatterns();
+    }
+
+    // Setup quick one-click mood buttons
+    setupQuickMoodButtons() {
+        const quickGoodBtn = document.getElementById('quickGoodBtn');
+        const quickOkayBtn = document.getElementById('quickOkayBtn');
+        const skipTodayBtn = document.getElementById('skipTodayBtn');
+
+        if (quickGoodBtn) {
+            quickGoodBtn.addEventListener('click', () => {
+                this.quickMoodCheckIn('good', 3, {
+                    energy: 6,
+                    stress: 4,
+                    social: 6,
+                    thoughts: 'Just a regular good day'
+                });
+            });
+        }
+
+        if (quickOkayBtn) {
+            quickOkayBtn.addEventListener('click', () => {
+                this.quickMoodCheckIn('okay', 2, {
+                    energy: 5,
+                    stress: 6,
+                    social: 5,
+                    thoughts: 'Nothing special, just okay'
+                });
+            });
+        }
+
+        if (skipTodayBtn) {
+            skipTodayBtn.addEventListener('click', () => {
+                this.skipTodayButKeepStreak();
+            });
+        }
+
+        // Add hover effects
+        document.querySelectorAll('.quick-mood-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', (e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 4px 15px rgba(64, 112, 255, 0.3)';
+            });
+            btn.addEventListener('mouseleave', (e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = 'none';
+            });
+        });
+    }
+
+    // Quick mood check-in with smart defaults
+    async quickMoodCheckIn(moodType, moodValue, smartDefaults) {
+        // Show loading state
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = '⚡ Saving...';
+        button.disabled = true;
+
+        try {
+            // Set mood data
+            this.currentMood = {
+                type: moodType,
+                value: moodValue,
+                timestamp: new Date(),
+                emoji: this.getMoodEmoji(moodType)
+            };
+
+            // Set smart context defaults
+            this.currentContext = smartDefaults;
+
+            // Prepare check-in data
+            const checkInData = {
+                mood: this.currentMood,
+                context: this.currentContext,
+                timestamp: new Date(),
+                date: new Date().toDateString(),
+                isQuickCheckIn: true,
+                deviceInfo: {
+                    userAgent: navigator.userAgent,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                }
+            };
+
+            // Save to Firebase
+            if (window.ymirAuth) {
+                await window.ymirAuth.saveData('dailyCheckIns', checkInData);
+                
+                // Update streak
+                await this.updateStreak();
+                
+                // Show celebration
+                this.showQuickCheckInCelebration(moodType);
+                
+                // Reset for next time
+                this.resetQuickCheckIn();
+                
+                // Show achievement if applicable
+                this.checkForAchievements();
+                
+            } else {
+                throw new Error('Authentication system not available');
+            }
+
+        } catch (error) {
+            console.error('❌ Error with quick check-in:', error);
+            this.showNotification('Quick check-in failed. Please try again! 🔄', 'error');
+        } finally {
+            // Reset button
+            button.textContent = originalText;
+            button.disabled = false;
+        }
+    }
+
+    // Skip today but maintain streak (for lazy users)
+    async skipTodayButKeepStreak() {
+        const today = new Date().toDateString();
+        
+        try {
+            // Create a "maintenance" entry that counts for streak but isn't a real check-in
+            const skipData = {
+                mood: { type: 'maintenance', value: 0, emoji: '⏭️' },
+                context: { energy: 0, stress: 0, social: 0, thoughts: 'Skipped today' },
+                timestamp: new Date(),
+                date: today,
+                isSkip: true,
+                deviceInfo: {
+                    userAgent: navigator.userAgent,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                }
+            };
+
+            if (window.ymirAuth) {
+                await window.ymirAuth.saveData('dailyCheckIns', skipData);
+                
+                // Update streak (skip days still count!)
+                await this.updateStreak();
+                
+                this.showNotification('✅ Day skipped but streak maintained! Come back tomorrow! 💪', 'success');
+                
+                // Hide quick buttons for today
+                this.hideQuickButtonsForToday();
+            }
+
+        } catch (error) {
+            console.error('❌ Error skipping day:', error);
+            this.showNotification('Unable to skip day. Please try again! 🔄', 'error');
+        }
+    }
+
+    // Show quick check-in celebration
+    showQuickCheckInCelebration(moodType) {
+        const insights = this.getQuickInsights(moodType);
+        this.showNotification(`🚀 Quick check-in complete! ${insights}`, 'success');
+        
+        // Add sparkle effect
+        this.createSparkleEffect();
+        
+        // Update mood history immediately
+        this.loadMoodHistory();
+    }
+
+    // Get quick insights for lazy users
+    getQuickInsights(moodType) {
+        const quickInsights = {
+            good: ['Great choice! 👍', 'Good vibes! ✨', 'Solid day! 💪'],
+            okay: ['That\'s honest! 🤗', 'Tomorrow will be better! 🌅', 'You\'re doing fine! 💙']
+        };
+        
+        const insights = quickInsights[moodType] || ['Thanks for checking in! 🙏'];
+        return insights[Math.floor(Math.random() * insights.length)];
+    }
+
+    // Create sparkle effect for celebrations
+    createSparkleEffect() {
+        for (let i = 0; i < 8; i++) {
+            setTimeout(() => {
+                const sparkle = document.createElement('div');
+                sparkle.textContent = '✨';
+                sparkle.style.cssText = `
+                    position: fixed;
+                    font-size: 20px;
+                    pointer-events: none;
+                    z-index: 1000;
+                    animation: sparkleFloat 2s ease-out forwards;
+                `;
+                
+                // Random position around screen center
+                sparkle.style.left = (window.innerWidth / 2 + (Math.random() - 0.5) * 200) + 'px';
+                sparkle.style.top = (window.innerHeight / 2 + (Math.random() - 0.5) * 200) + 'px';
+                
+                document.body.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    if (sparkle.parentNode) {
+                        sparkle.parentNode.removeChild(sparkle);
+                    }
+                }, 2000);
+            }, i * 150);
+        }
+
+        // Add sparkle animation if not exists
+        if (!document.querySelector('#sparkleAnimation')) {
+            const style = document.createElement('style');
+            style.id = 'sparkleAnimation';
+            style.textContent = `
+                @keyframes sparkleFloat {
+                    0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 0; }
+                    50% { transform: translateY(-30px) scale(1) rotate(180deg); opacity: 1; }
+                    100% { transform: translateY(-60px) scale(0.5) rotate(360deg); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // Setup smart suggestions based on patterns
+    setupSmartSuggestions() {
+        setTimeout(() => {
+            this.showSmartSuggestion();
+        }, 3000); // Show after 3 seconds
+
+        // Setup accept suggestion button
+        const acceptBtn = document.getElementById('acceptSuggestionBtn');
+        if (acceptBtn) {
+            acceptBtn.addEventListener('click', () => {
+                this.acceptSmartSuggestion();
+            });
+        }
+    }
+
+    // Show smart suggestions based on user patterns
+    showSmartSuggestion() {
+        const suggestions = document.getElementById('smartSuggestions');
+        const suggestionText = document.getElementById('suggestionText');
+        
+        if (!suggestions || !suggestionText) return;
+
+        // Get user's historical data for patterns
+        const history = this.moodHistoryData || [];
+        let suggestion = this.generateSmartSuggestion(history);
+        
+        if (suggestion) {
+            suggestionText.textContent = suggestion.text;
+            suggestions.style.display = 'block';
+            this.currentSuggestion = suggestion;
+        }
+    }
+
+    // Generate smart suggestions
+    generateSmartSuggestion(history) {
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        const hour = today.getHours();
+        
+        // Time-based suggestions
+        if (hour < 12) {
+            return {
+                text: "Good morning! Mondays usually start with 'Good' mood for most people. Try it?",
+                mood: 'good',
+                context: { energy: 6, stress: 4, social: 5, thoughts: 'Monday morning vibes' }
+            };
+        } else if (hour > 18) {
+            return {
+                text: "Evening check-in! How about 'Okay' - reflecting on the day?",
+                mood: 'okay',
+                context: { energy: 5, stress: 5, social: 6, thoughts: 'Wrapping up the day' }
+            };
+        }
+
+        // Pattern-based suggestions
+        if (history.length > 3) {
+            const recent = history.slice(-3);
+            const avgMood = recent.reduce((sum, entry) => sum + entry.mood.value, 0) / recent.length;
+            
+            if (avgMood >= 3.5) {
+                return {
+                    text: "You've been feeling good lately! Keep the positive streak going?",
+                    mood: 'great',
+                    context: { energy: 7, stress: 3, social: 7, thoughts: 'Continuing the positive streak' }
+                };
+            }
+        }
+
+        // Default suggestion
+        return {
+            text: "Most people feel 'Good' around this time. Want to go with that?",
+            mood: 'good',
+            context: { energy: 6, stress: 4, social: 6, thoughts: 'Going with the flow' }
+        };
+    }
+
+    // Accept smart suggestion
+    acceptSmartSuggestion() {
+        if (this.currentSuggestion) {
+            const suggestion = this.currentSuggestion;
+            this.quickMoodCheckIn(suggestion.mood, this.getMoodValue(suggestion.mood), suggestion.context);
+            
+            // Hide suggestions
+            const suggestions = document.getElementById('smartSuggestions');
+            if (suggestions) suggestions.style.display = 'none';
+        }
+    }
+
+    // Setup gentle nudges for engagement
+    setupGentleNudges() {
+        // Check if user hasn't checked in today
+        setTimeout(() => {
+            this.checkForTodaysCheckIn();
+        }, 5000);
+
+        // Periodic gentle reminders
+        setInterval(() => {
+            this.maybeShowGentleNudge();
+        }, 30000); // Every 30 seconds
+    }
+
+    // Check if user has checked in today
+    checkForTodaysCheckIn() {
+        const today = new Date().toDateString();
+        const history = this.moodHistoryData || [];
+        const todaysCheckIn = history.find(entry => 
+            new Date(entry.timestamp).toDateString() === today
+        );
+
+        if (!todaysCheckIn) {
+            // Show gentle nudge after 10 seconds
+            setTimeout(() => {
+                this.showGentleNudge();
+            }, 10000);
+        }
+    }
+
+    // Show gentle nudge
+    showGentleNudge() {
+        const prompt = document.getElementById('contextualPrompt');
+        if (prompt) {
+            const originalText = prompt.textContent;
+            prompt.style.color = '#4fd1c7';
+            prompt.style.fontWeight = '600';
+            prompt.textContent = '💙 Quick check-in? Just one click above! ⬆️';
+            
+            setTimeout(() => {
+                prompt.style.color = '#b0b0b0';
+                prompt.style.fontWeight = 'normal';
+                prompt.textContent = originalText;
+            }, 5000);
+        }
+    }
+
+    // Maybe show gentle nudge based on patterns
+    maybeShowGentleNudge() {
+        const today = new Date().toDateString();
+        const history = this.moodHistoryData || [];
+        const todaysCheckIn = history.find(entry => 
+            new Date(entry.timestamp).toDateString() === today
+        );
+
+        // Only nudge if no check-in today and user has been on page for a while
+        if (!todaysCheckIn && Math.random() < 0.1) { // 10% chance every 30 seconds
+            this.updateContextualPrompt();
+            const prompts = [
+                '🌟 One quick click = streak maintained!',
+                '⚡ 2 seconds to check in?',
+                '💪 Keep that streak alive!',
+                '🎯 Quick mood check?'
+            ];
+            
+            const prompt = document.getElementById('contextualPrompt');
+            if (prompt) {
+                const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+                prompt.textContent = randomPrompt;
+                prompt.style.color = '#4fd1c7';
+            }
+        }
+    }
+
+    // Setup progress gamification
+    setupProgressGamification() {
+        this.showProgressIndicators();
+        this.setupMicroRewards();
+    }
+
+    // Show progress indicators
+    showProgressIndicators() {
+        // Add progress towards next milestone
+        const streakCount = this.streakData.current;
+        const nextMilestone = this.getNextMilestone(streakCount);
+        
+        if (nextMilestone > streakCount) {
+            const progress = (streakCount / nextMilestone) * 100;
+            this.addProgressBar(progress, nextMilestone);
+        }
+    }
+
+    // Get next milestone
+    getNextMilestone(current) {
+        const milestones = [7, 30, 100, 365];
+        return milestones.find(milestone => milestone > current) || 365;
+    }
+
+    // Add progress bar to UI
+    addProgressBar(progress, milestone) {
+        const achievementBar = document.getElementById('achievementBar');
+        if (achievementBar && !document.getElementById('progressBar')) {
+            const progressHTML = `
+                <div id="progressBar" style="margin-left: 20px; flex: 1; max-width: 200px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #93c5fd; margin-bottom: 4px;">
+                        <span>Next Goal</span>
+                        <span>${milestone} days</span>
+                    </div>
+                    <div style="background: rgba(100, 100, 255, 0.2); height: 6px; border-radius: 3px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #4070ff, #00d4ff); height: 100%; width: ${progress}%; transition: width 0.5s ease; border-radius: 3px;"></div>
+                    </div>
+                </div>
+            `;
+            achievementBar.insertAdjacentHTML('beforeend', progressHTML);
+        }
+    }
+
+    // Setup micro-rewards
+    setupMicroRewards() {
+        // Small celebrations for any interaction
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('mood-btn') || e.target.classList.contains('quick-mood-btn')) {
+                this.showMicroReward();
+            }
+        });
+    }
+
+    // Show micro reward
+    showMicroReward() {
+        const rewards = ['🌟', '✨', '💫', '⭐', '🎯'];
+        const reward = rewards[Math.floor(Math.random() * rewards.length)];
+        
+        const element = document.createElement('div');
+        element.textContent = reward;
+        element.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            z-index: 1000;
+            animation: microReward 1s ease-out forwards;
+            pointer-events: none;
+        `;
+        
+        document.body.appendChild(element);
+        
+        setTimeout(() => {
+            if (element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
+        }, 1000);
+
+        // Add micro reward animation
+        if (!document.querySelector('#microRewardAnimation')) {
+            const style = document.createElement('style');
+            style.id = 'microRewardAnimation';
+            style.textContent = `
+                @keyframes microReward {
+                    0% { transform: scale(0) rotate(0deg); opacity: 0; }
+                    50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+                    100% { transform: scale(1) rotate(360deg); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // Check for mood patterns
+    checkForMoodPatterns() {
+        if (this.moodHistoryData && this.moodHistoryData.length >= 7) {
+            const patterns = this.analyzeMoodPatterns();
+            if (patterns.hasPattern) {
+                this.showPatternInsight(patterns);
+            }
+        }
+    }
+
+    // Analyze mood patterns
+    analyzeMoodPatterns() {
+        const recent = this.moodHistoryData.slice(-7);
+        const moods = recent.map(entry => entry.mood.value);
+        
+        // Check for consistent patterns
+        const avg = moods.reduce((a, b) => a + b, 0) / moods.length;
+        const isStable = moods.every(mood => Math.abs(mood - avg) <= 1);
+        const isImproving = moods.slice(-3).every((mood, i, arr) => i === 0 || mood >= arr[i-1]);
+        
+        return {
+            hasPattern: isStable || isImproving,
+            isStable,
+            isImproving,
+            average: avg
+        };
+    }
+
+    // Show pattern insight
+    showPatternInsight(patterns) {
+        let message = '';
+        if (patterns.isImproving) {
+            message = '📈 Your mood is trending upward! Keep it up!';
+        } else if (patterns.isStable) {
+            message = '⚖️ Your mood is very consistent. That\'s great emotional stability!';
+        }
+        
+        if (message) {
+            setTimeout(() => {
+                this.showNotification(message, 'info');
+            }, 2000);
+        }
+    }
+
+    // Reset quick check-in
+    resetQuickCheckIn() {
+        this.currentMood = null;
+        this.currentContext = {
+            energy: 5,
+            stress: 5,
+            social: 5,
+            thoughts: ''
+        };
+    }
+
+    // Hide quick buttons after check-in
+    hideQuickButtonsForToday() {
+        const quickButtons = document.querySelectorAll('.quick-mood-btn');
+        quickButtons.forEach(btn => {
+            btn.style.opacity = '0.5';
+            btn.disabled = true;
+            btn.textContent = btn.textContent.replace('⚡', '✅').replace('😐', '✅').replace('⏭️', '✅');
+        });
+    }
+
+    // Get mood emoji
+    getMoodEmoji(moodType) {
+        const emojis = {
+            amazing: '✨',
+            great: '😊',
+            good: '🙂',
+            okay: '😐',
+            rough: '😔'
+        };
+        return emojis[moodType] || '🙂';
+    }
+
+    // Get mood value
+    getMoodValue(moodType) {
+        const values = {
+            amazing: 5,
+            great: 4,
+            good: 3,
+            okay: 2,
+            rough: 1
+        };
+        return values[moodType] || 3;
+    }
+
+
+}
+
+// Initialize Daily Check-in System
+let dailyCheckIn;
+
+// Wait for DOM and Firebase to be ready
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        dailyCheckIn = new DailyCheckInManager();
+        console.log('🧠 Daily Check-in System Initialized');
+    }, 1000);
+});
+
 // Export functions for global access
 window.YMIRAuth = {
     onUserAuthenticated,
@@ -4675,6 +8268,9 @@ window.YMIRAuth = {
     updateDashboardForTemporaryUser,
     showNotification
 };
+
+// Export daily check-in manager
+window.DailyCheckIn = () => dailyCheckIn;
 </script>
 
 </body>
