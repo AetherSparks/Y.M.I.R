@@ -36,16 +36,17 @@ import hashlib
 from dotenv import load_dotenv
 load_dotenv()
 
-# Firebase imports for real-time chat storage
+# Firebase imports for real-time chat storage and authentication
 try:
     import firebase_admin
-    from firebase_admin import credentials, firestore
+    from firebase_admin import credentials, firestore, auth
     FIREBASE_AVAILABLE = True
-    print("✅ Firebase available for real-time chat storage")
+    print("✅ Firebase available for real-time chat storage and authentication")
 except ImportError:
     firebase_admin = None
     credentials = None
     firestore = None
+    auth = None
     FIREBASE_AVAILABLE = False
     print("❌ Firebase not available - install: pip install firebase-admin")
 
@@ -60,11 +61,12 @@ except ImportError:
     ENCRYPTION_AVAILABLE = False
     print("⚠️ Encryption not available - install: pip install cryptography")
 
-# Google Gemini API
+# Google Gemini API with rotation system
 try:
     import google.generativeai as genai
+    from gemini_api_manager import get_gemini_model, get_api_status, gemini_manager
     GEMINI_AVAILABLE = True
-    print("✅ Google Gemini API available")
+    print("✅ Google Gemini API with rotation system available")
 except ImportError:
     GEMINI_AVAILABLE = False
     print("❌ Google Gemini API not available")
@@ -90,6 +92,22 @@ except ImportError:
 
 app = Flask(__name__)
 CORS(app)  # 🎯 ENABLE CORS FOR MICROSERVICE COMMUNICATION
+
+def verify_firebase_token(token):
+    """Verify Firebase auth token and return user info"""
+    if not FIREBASE_AVAILABLE or not token:
+        return None
+    
+    try:
+        decoded_token = auth.verify_id_token(token)
+        return {
+            'uid': decoded_token.get('uid'),
+            'email': decoded_token.get('email'),
+            'name': decoded_token.get('name', decoded_token.get('email', 'User'))
+        }
+    except Exception as e:
+        print(f"❌ Firebase token verification failed: {e}")
+        return None
 
 @dataclass
 class ChatMessage:
@@ -1199,10 +1217,11 @@ class FunctionCalling:
 class GeminiChatbot:
     """Production-ready Gemini chatbot with ensemble emotion detection"""
     
-    def __init__(self, api_key: str = None):
-        self.api_key = api_key or os.getenv('GEMINI_API_KEY')
+    def __init__(self, api_key: str = None, user_info: dict = None):
+        # Use API rotation manager instead of single key
         self.model = None
         self.chat_session = None
+        self.current_user = user_info  # Firebase user info
         
         # Initialize components
         self.emotion_analyzer = ProductionEmotionAnalyzer()
@@ -1246,13 +1265,13 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
         self._load_user_profile()
     
     def _initialize_gemini(self):
-        """Initialize Gemini API"""
+        """Initialize Gemini API with rotation system"""
         try:
-            if not GEMINI_AVAILABLE or not self.api_key:
-                print("❌ Gemini API not available or API key missing")
+            if not GEMINI_AVAILABLE:
+                print("❌ Gemini API not available")
                 return
             
-            genai.configure(api_key=self.api_key)
+            print("🔧 Initializing Gemini with rotation system...")
             
             generation_config = {
                 'temperature': self.config['temperature'],
@@ -1261,77 +1280,115 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
                 'max_output_tokens': self.config['max_tokens']
             }
             
-            self.model = genai.GenerativeModel(
+            # Use rotation manager to get model
+            self.model = get_gemini_model(
                 model_name=self.config['model_name'],
                 generation_config=generation_config,
                 safety_settings=self.config['safety_settings']
             )
             
-            self.chat_session = self.model.start_chat(history=[])
-            print("✅ Gemini API initialized successfully")
+            if self.model:
+                self.chat_session = self.model.start_chat(history=[])
+                print("✅ Gemini API initialized with rotation system")
+            else:
+                print("❌ Failed to get model from rotation manager")
+                self.model = None
+                self.chat_session = None
             
         except Exception as e:
             print(f"❌ Gemini initialization error: {e}")
             self.model = None
+            self.chat_session = None
     
     def _load_user_profile(self):
-        """Load or create user profile"""
-        profile_path = Path("user_profile.json")
-        
-        if profile_path.exists():
+        """Load or create user profile from Firebase or create temporary profile"""
+        if self.current_user and FIREBASE_AVAILABLE:
+            # Load from Firebase for authenticated users
             try:
-                with open(profile_path, 'r') as f:
-                    data = json.load(f)
+                db = firestore.client()
+                user_doc = db.collection('user_profiles').document(self.current_user['uid']).get()
+                
+                if user_doc.exists:
+                    data = user_doc.to_dict()
+                    # Handle datetime fields
+                    if 'created_at' in data:
+                        data['created_at'] = data['created_at'].replace(tzinfo=None) if hasattr(data['created_at'], 'replace') else datetime.now()
+                    if 'last_active' in data:
+                        data['last_active'] = data['last_active'].replace(tzinfo=None) if hasattr(data['last_active'], 'replace') else datetime.now()
                     
-                    # Handle datetime fields safely
-                    if 'created_at' in data and isinstance(data['created_at'], str):
-                        try:
-                            data['created_at'] = datetime.fromisoformat(data['created_at'])
-                        except:
-                            data['created_at'] = datetime.now()
-                    
-                    if 'last_active' in data and isinstance(data['last_active'], str):
-                        try:
-                            data['last_active'] = datetime.fromisoformat(data['last_active'])
-                        except:
-                            data['last_active'] = datetime.now()
+                    # Use Firebase user info
+                    data['user_id'] = self.current_user['uid']
+                    data['name'] = self.current_user['name']
+                    data['email'] = self.current_user['email']
                     
                     self.user_profile = UserProfile(**data)
-                    self.user_profile.last_active = datetime.now()
-                print("✅ User profile loaded")
+                    print(f"✅ User profile loaded from Firebase for {self.current_user['email']}")
+                else:
+                    # Create new Firebase profile
+                    self._create_firebase_profile()
+                    
+                # Update last active
+                self.user_profile.last_active = datetime.now()
+                self._save_user_profile()
+                
             except Exception as e:
-                print(f"⚠️ Profile loading error: {e}")
-                self._create_new_profile()
+                print(f"⚠️ Firebase profile loading error: {e}")
+                self._create_temporary_profile()
         else:
-            self._create_new_profile()
+            # Create temporary profile for unauthenticated users
+            self._create_temporary_profile()
     
-    def _create_new_profile(self):
-        """Create new user profile"""
+    def _create_firebase_profile(self):
+        """Create new Firebase user profile"""
         self.user_profile = UserProfile(
-            user_id=f"user_{int(time.time())}",
+            user_id=self.current_user['uid'],
+            name=self.current_user['name'],
+            email=self.current_user['email'],
+            conversations_count=0,
+            total_emotions_detected=0,
+            dominant_emotion_history=[],
+            preferred_response_style="supportive",
+            privacy_settings={'store_conversations': True, 'analyze_patterns': True},
+            created_at=datetime.now(),
+            last_active=datetime.now(),
             conversation_style="balanced"
         )
         self._save_user_profile()
-        print("✅ New user profile created")
+        print(f"✅ New Firebase profile created for {self.current_user['email']}")
+    
+    def _create_temporary_profile(self):
+        """Create temporary user profile for unauthenticated users"""
+        self.user_profile = UserProfile(
+            user_id=f"temp_user_{int(time.time())}",
+            conversation_style="balanced"
+        )
+        print("✅ Temporary profile created for guest user")
+    
+    def _create_new_profile(self):
+        """Legacy method - use Firebase or temporary profile instead"""
+        self._create_temporary_profile()
     
     def _save_user_profile(self):
-        """Save user profile"""
+        """Save user profile to Firebase for authenticated users or skip for temporary users"""
+        if not self.user_profile:
+            return
+            
         try:
-            profile_data = asdict(self.user_profile)
-            
-            # Handle datetime conversion safely
-            if hasattr(self.user_profile.created_at, 'isoformat'):
-                profile_data['created_at'] = self.user_profile.created_at.isoformat()
-            else:
-                profile_data['created_at'] = str(self.user_profile.created_at)
+            if self.current_user and FIREBASE_AVAILABLE:
+                # Save to Firebase for authenticated users
+                db = firestore.client()
+                profile_data = asdict(self.user_profile)
                 
-            if hasattr(self.user_profile.last_active, 'isoformat'):
-                profile_data['last_active'] = self.user_profile.last_active.isoformat()
+                # Convert datetime objects for Firestore
+                profile_data['created_at'] = self.user_profile.created_at
+                profile_data['last_active'] = self.user_profile.last_active
+                
+                db.collection('user_profiles').document(self.current_user['uid']).set(profile_data)
+                print(f"✅ Profile saved to Firebase for {self.current_user['email']}")
             else:
-                profile_data['last_active'] = str(self.user_profile.last_active)
-            
-            with open("user_profile.json", 'w') as f:
-                json.dump(profile_data, f, indent=2)
+                # Don't save temporary profiles to disk
+                print("⏭️ Temporary profile - not saving to disk")
+                
         except Exception as e:
             print(f"⚠️ Profile saving error: {e}")
     
@@ -1472,8 +1529,31 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
                     response = self.chat_session.send_message(enhanced_prompt)
                     response_text = response.text
                 except Exception as e:
-                    print(f"Gemini API error: {e}")
-                    response_text = self._generate_fallback_response(user_input, basic_emotion)
+                    error_msg = str(e).lower()
+                    if ('quota' in error_msg or 'limit' in error_msg or 'exhausted' in error_msg or 
+                        '429' in error_msg or 'exceeded' in error_msg):
+                        print(f"🔄 Quota exhausted, rotating API key: {e}")
+                        # Mark current key as exhausted and rotate
+                        if GEMINI_AVAILABLE:
+                            gemini_manager.mark_key_exhausted(str(e))
+                        # Try to reinitialize with new key
+                        print("🔄 Attempting to reinitialize with new API key...")
+                        self._initialize_gemini()
+                        if self.model and self.chat_session:
+                            print("✅ Successfully reinitialized! Retrying request...")
+                            try:
+                                response = self.chat_session.send_message(enhanced_prompt)
+                                response_text = response.text
+                                print("✅ Request successful with new API key!")
+                            except Exception as retry_error:
+                                print(f"❌ Retry failed even with new key: {retry_error}")
+                                response_text = self._generate_fallback_response(user_input, basic_emotion)
+                        else:
+                            print("❌ Failed to reinitialize model - no keys available")
+                            response_text = self._generate_fallback_response(user_input, basic_emotion)
+                    else:
+                        print(f"Gemini API error: {e}")
+                        response_text = self._generate_fallback_response(user_input, basic_emotion)
             else:
                 response_text = self._generate_fallback_response(user_input, basic_emotion)
             
@@ -1519,36 +1599,64 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
         """Generate fallback response when Gemini is not available"""
         emotion = emotion_data['dominant_emotion']
         
+        # More natural, therapist-like responses
         responses = {
             'happy': [
-                f"I'm glad to hear you're feeling {emotion}! That's wonderful. Tell me more about what's making you feel this way.",
-                f"Your {emotion} mood is contagious! What's been going well for you?",
-                f"It's great that you're feeling {emotion}. How can I help you maintain this positive energy?"
+                "I'm really glad to hear you're feeling good! What's been going well for you lately?",
+                "It sounds like you're in a positive space right now. I'd love to hear more about what's bringing you joy.",
+                "That's wonderful! Happiness is such a beautiful emotion. What's been making you feel this way?",
+                "I can sense the positivity in your message. Tell me more about what's lighting you up today."
+            ],
+            'joy': [
+                "What a beautiful feeling! I'd love to hear what's bringing you so much joy.",
+                "It's wonderful when we feel truly joyful. What's been the source of this happiness?",
+                "I can feel your joy through your words! What's been going so well for you?"
             ],
             'sad': [
-                f"I understand you're feeling {emotion}. That can be really difficult. Would you like to talk about what's on your mind?",
-                f"I'm sorry to hear you're feeling {emotion}. I'm here to listen and support you through this.",
-                f"Feeling {emotion} is completely valid. Sometimes talking about it can help. What's been troubling you?"
+                "I hear the sadness in your words, and I want you to know that's completely okay. What's been weighing on your heart?",
+                "Sometimes life feels heavy, doesn't it? I'm here to listen if you'd like to share what's been difficult.",
+                "Sadness is such a valid emotion. Would you like to talk about what's been troubling you?",
+                "I can sense you're going through something tough. I'm here to support you through this."
             ],
             'angry': [
-                f"I can sense your {emotion} feelings. That must be frustrating. Would you like to share what's bothering you?",
-                f"Your {emotion} emotion is understandable. Let's work through what's causing these feelings.",
-                f"I hear that you're feeling {emotion}. Sometimes expressing these feelings can be helpful."
+                "I can hear the frustration in your message. Anger often tells us something important - what's been bothering you?",
+                "It sounds like something has really upset you. Would you like to talk through what happened?",
+                "Anger can be such a powerful emotion. What's been making you feel this way?",
+                "I can sense your frustration. Sometimes it helps to express these feelings - what's going on?"
             ],
             'anxious': [
-                f"I notice you might be feeling {emotion}. Anxiety can be overwhelming. What's been on your mind?",
-                f"Feeling {emotion} is more common than you might think. Let's talk about what's causing these feelings.",
-                f"I'm here to help you work through these {emotion} feelings. Take a deep breath and tell me what's worrying you."
+                "Anxiety can feel so overwhelming sometimes. What's been on your mind lately?",
+                "I can sense some worry in your message. Take a deep breath - what's been causing you stress?",
+                "Feeling anxious is so common, and you're not alone in this. What's been making you feel uneasy?",
+                "I hear the concern in your words. Would you like to talk about what's been worrying you?"
+            ],
+            'fear': [
+                "Fear can be really overwhelming. You're safe here to share what's been frightening you.",
+                "I can sense some fear in your message. What's been making you feel scared or worried?",
+                "Sometimes fear tries to protect us, but it can also hold us back. What are you afraid of right now?"
+            ],
+            'neutral': [
+                "Hi there! I'm Y.M.I.R, your mental health companion. How are you feeling today?",
+                "Hello! I'm here to listen and support you. What's on your mind?",
+                "I'm glad you reached out. What would you like to talk about today?",
+                "How can I help you today? I'm here to listen and provide support."
+            ],
+            'confused': [
+                "It sounds like you might be feeling a bit uncertain about something. What's been on your mind?",
+                "Sometimes life can feel confusing. Would you like to talk through what's been puzzling you?",
+                "I can sense some confusion in your message. What's been difficult to understand lately?"
             ]
         }
         
         emotion_responses = responses.get(emotion, [
-            f"I detect that you're feeling {emotion}. Tell me more about that.",
-            f"Thanks for sharing. I sense {emotion} in your message. How can I help?",
-            f"I understand you're experiencing {emotion} feelings. Would you like to explore this further?"
+            "I'm here to listen and support you. What's on your mind today?",
+            "Thank you for reaching out. I'm Y.M.I.R, and I'm here to help. How are you feeling?",
+            "I can sense there's something you'd like to talk about. I'm here for you - what's going on?",
+            "Sometimes it helps just to have someone listen. What would you like to share with me?"
         ])
         
-        return responses.get(emotion, emotion_responses)[hash(user_input) % len(responses.get(emotion, emotion_responses))]
+        emotion_responses = responses.get(emotion, emotion_responses)
+        return emotion_responses[hash(user_input) % len(emotion_responses)]
     
     def save_conversation(self):
         """Save conversation to file"""
@@ -1629,7 +1737,8 @@ def health_check():
         'models_loaded': list(emotion_analyzer.models.keys()) if emotion_analyzer.models else [],
         'gemini_available': chatbot.model is not None,
         'function_calling_available': len(function_calling.available_functions),
-        'user_profile_loaded': chatbot.user_profile is not None
+        'user_profile_loaded': chatbot.user_profile is not None,
+        'gemini_api_status': get_api_status() if GEMINI_AVAILABLE else None
     })
 
 @app.route('/')
@@ -1713,8 +1822,26 @@ def api_chat():
         
         user_message = data['message']
         
-        # Generate complete response using production chatbot
-        response_data = chatbot.generate_response(user_message)
+        # Check for Firebase auth token
+        auth_token = request.headers.get('Authorization')
+        if auth_token and auth_token.startswith('Bearer '):
+            auth_token = auth_token[7:]  # Remove 'Bearer ' prefix
+        
+        # Verify Firebase token and get user info
+        user_info = verify_firebase_token(auth_token) if auth_token else None
+        
+        # Create or get chatbot instance for this user
+        if user_info:
+            # Authenticated user - create chatbot with Firebase user info
+            user_chatbot = GeminiChatbot(user_info=user_info)
+            print(f"🔐 Authenticated user: {user_info['email']}")
+        else:
+            # Temporary user - use existing chatbot or create temporary one
+            user_chatbot = chatbot
+            print("👤 Temporary user session")
+        
+        # Generate complete response using the appropriate chatbot
+        response_data = user_chatbot.generate_response(user_message)
         
         # Add emotion_analysis to user_message for frontend compatibility
         user_message_dict = response_data['user_message'].to_dict()
@@ -1730,8 +1857,9 @@ def api_chat():
                 'functions_used': response_data['functions_used'],
                 'timestamp': datetime.now().isoformat()
             },
-            'session_id': chatbot.firebase_storage.session_id,
-            'conversation_length': len(chatbot.conversation_history)
+            'session_id': user_chatbot.firebase_storage.session_id,
+            'conversation_length': len(user_chatbot.conversation_history),
+            'user_authenticated': user_info is not None
         })
         
     except Exception as e:
@@ -2004,6 +2132,18 @@ def api_learning_analytics():
             'success': False,
             'error': str(e)
         }), 500
+
+@app.route('/api/gemini-status')
+def gemini_api_status():
+    """Get Gemini API rotation status"""
+    if not GEMINI_AVAILABLE:
+        return jsonify({'error': 'Gemini API not available'}), 503
+    
+    try:
+        status = get_api_status()
+        return jsonify(status)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/emotion_suggestions')
 def api_emotion_suggestions():

@@ -1,0 +1,78 @@
+{
+  "current_key_index": 0,
+  "last_updated": "2025-09-21T02:09:58.098900",
+  "api_keys": [
+    {
+      "key_id": "GEMINI_API_KEY1",
+      "is_active": true,
+      "quota_exhausted": false,
+      "error_count": 0,
+      "last_error": null,
+      "last_used": "2025-09-21T02:09:58.098900",
+      "reset_time": null
+    },
+    {
+      "key_id": "GEMINI_API_KEY2",
+      "is_active": true,
+      "quota_exhausted": false,
+      "error_count": 0,
+      "last_error": null,
+      "last_used": null,
+      "reset_time": null
+    },
+    {
+      "key_id": "GEMINI_API_KEY3",
+      "is_active": true,
+      "quota_exhausted": false,
+      "error_count": 0,
+      "last_error": null,
+      "last_used": null,
+      "reset_time": null
+    },
+    {
+      "key_id": "GEMINI_API_KEY4",
+      "is_active": true,
+      "quota_exhausted": false,
+      "error_count": 0,
+      "last_error": null,
+      "last_used": null,
+      "reset_time": null
+    },
+    {
+      "key_id": "GEMINI_API_KEY5",
+      "is_active": true,
+      "quota_exhausted": false,
+      "error_count": 0,
+      "last_error": null,
+      "last_used": null,
+      "reset_time": null
+    },
+    {
+      "key_id": "GEMINI_API_KEY6",
+      "is_active": true,
+      "quota_exhausted": false,
+      "error_count": 0,
+      "last_error": null,
+      "last_used": null,
+      "reset_time": null
+    },
+    {
+      "key_id": "GEMINI_API_KEY7",
+      "is_active": true,
+      "quota_exhausted": false,
+      "error_count": 0,
+      "last_error": null,
+      "last_used": null,
+      "reset_time": null
+    },
+    {
+      "key_id": "GEMINI_API_KEY",
+      "is_active": true,
+      "quota_exhausted": false,
+      "error_count": 0,
+      "last_error": null,
+      "last_used": null,
+      "reset_time": null
+    }
+  ]
+}

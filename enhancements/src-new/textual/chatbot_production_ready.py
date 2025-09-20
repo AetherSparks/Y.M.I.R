@@ -31,11 +31,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 load_dotenv()
 
-# Google Gemini API
+# Google Gemini API with rotation system
 try:
     import google.generativeai as genai
+    import sys
+    import os
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
+    from gemini_api_manager import get_gemini_model, get_api_status, gemini_manager
     GEMINI_AVAILABLE = True
-    print("✅ Google Gemini API available")
+    print("✅ Google Gemini API with rotation system available")
 except ImportError:
     GEMINI_AVAILABLE = False
     print("❌ Google Gemini API not available")
@@ -493,8 +497,8 @@ class FunctionCalling:
 class GeminiChatbot:
     """Production-ready Gemini chatbot with ensemble emotion detection"""
     
-    def __init__(self, api_key: str):
-        self.api_key = api_key
+    def __init__(self, api_key: str = None):
+        # Use API rotation manager instead of single key
         self.model = None
         self.chat_session = None
         
@@ -536,12 +540,10 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
         self._load_user_profile()
     
     def _initialize_gemini(self):
-        """Initialize Gemini API"""
+        """Initialize Gemini API with rotation system"""
         try:
             if not GEMINI_AVAILABLE:
                 raise Exception("Gemini API not available")
-            
-            genai.configure(api_key=self.api_key)
             
             generation_config = {
                 'temperature': self.config['temperature'],
@@ -550,14 +552,15 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
                 'max_output_tokens': self.config['max_tokens']
             }
             
-            self.model = genai.GenerativeModel(
+            # Use rotation manager to get model
+            self.model = get_gemini_model(
                 model_name=self.config['model_name'],
                 generation_config=generation_config,
                 safety_settings=self.config['safety_settings']
             )
             
             self.chat_session = self.model.start_chat(history=[])
-            console.print("✅ Gemini API initialized successfully", style="green")
+            console.print("✅ Gemini API initialized with rotation system", style="green")
             
         except Exception as e:
             console.print(f"❌ Gemini initialization error: {e}", style="red")
@@ -1021,16 +1024,9 @@ def main():
     console.print("=" * 75)
     
     # Get API key from environment
-    api_key = os.getenv('GEMINI_API_KEY')
-    
-    if not api_key:
-        console.print("❌ GEMINI_API_KEY not found in environment!", style="red")
-        console.print("Set it in your .env file: GEMINI_API_KEY=your_key_here")
-        return
-    
     try:
-        with console.status("[bold green]Initializing production AI systems...", spinner="dots"):
-            chatbot = GeminiChatbot(api_key)
+        with console.status("[bold green]Initializing production AI systems with API rotation...", spinner="dots"):
+            chatbot = GeminiChatbot()
         
         console.print("🎯 Production-ready emotion detection active!", style="green")
         

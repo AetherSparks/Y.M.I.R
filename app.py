@@ -16,6 +16,20 @@ import json
 from datetime import datetime
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Import Firebase Authentication
+try:
+    from firebase_auth_backend import firebase_auth, add_auth_routes, require_auth, optional_auth
+    FIREBASE_AUTH_AVAILABLE = True
+    print("✅ Firebase Authentication available")
+except ImportError as e:
+    FIREBASE_AUTH_AVAILABLE = False
+    print(f"⚠️ Firebase Authentication not available: {e}")
+    firebase_auth = None
 
 # Import multimodal emotion combiner
 try:
@@ -222,12 +236,16 @@ microservice_client = MicroserviceClient()
 
 # Add emotion combiner monitoring
 import threading
+
+# Simple cache for music recommendations to prevent excessive API calls
+music_recommendation_cache = {}
+MUSIC_CACHE_DURATION = 300  # 5 minutes
 def monitor_combined_emotions():
-    """Monitor and log combined emotions every 10 seconds"""
+    """Monitor and log combined emotions every 60 seconds"""
     import time
     while True:
         try:
-            time.sleep(10)  # Check every 10 seconds
+            time.sleep(60)  # Check every 60 seconds (reduced from 10 to save API calls)
             if EMOTION_COMBINER_AVAILABLE and microservice_client.emotion_combiner:
                 # 🔍 CHECK: Only monitor if face service is actually running to avoid triggering camera
                 face_status = microservice_client.get_face_service_status()
@@ -270,7 +288,7 @@ def monitor_combined_emotions():
 if EMOTION_COMBINER_AVAILABLE:
     monitor_thread = threading.Thread(target=monitor_combined_emotions, daemon=True)
     monitor_thread.start()
-    print("✅ Emotion combiner monitoring started (every 10 seconds)")
+    print("✅ Emotion combiner monitoring started (every 60 seconds)")
 
 @app.route('/')
 def home():
@@ -346,6 +364,7 @@ def community_support():
 def cookiepolicy():
     """Cookie policy page"""
     return render_template('cookiepolicy.html')
+
 
 # API Routes - Proxy to microservices
 @app.route('/api/camera/start', methods=['POST'])
@@ -500,11 +519,22 @@ def api_music_recommendations():
         minutes_back = int(request.args.get('minutes_back', 10))
         strategy = request.args.get('strategy', 'adaptive')
         
+        # 🚀 Check cache first to prevent excessive API calls
+        cache_key = f"{session_id}_{minutes_back}_{strategy}_{limit}"
+        current_time = datetime.now()
+        
+        if cache_key in music_recommendation_cache:
+            cached_data, cached_time = music_recommendation_cache[cache_key]
+            if (current_time - cached_time).total_seconds() < MUSIC_CACHE_DURATION:
+                print(f"💾 Using cached music recommendations (cached {(current_time - cached_time).total_seconds():.0f}s ago)")
+                return jsonify(cached_data)
+        
         # Import and use the unified emotion music system
         try:
             import sys
             sys.path.append('enhancements/src-new/multimodal_fusion')
             from unified_emotion_music_system import get_emotion_and_music
+            print(f"🎵 Generating new music recommendations for {session_id}")
             result = get_emotion_and_music(session_id, minutes_back, strategy, limit)
             
             if result:
@@ -557,6 +587,11 @@ def api_music_recommendations():
                         'update_interval': 30  # Tell frontend to update every 30 seconds
                     }
                 }
+                
+                # 🚀 Cache the successful result
+                music_recommendation_cache[cache_key] = (api_result, current_time)
+                print(f"💾 Music recommendations cached for {MUSIC_CACHE_DURATION}s")
+                
                 return jsonify(api_result)
             else:
                 return jsonify({
@@ -899,15 +934,25 @@ def api_get_album_art():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Add Firebase Authentication routes
+if FIREBASE_AUTH_AVAILABLE:
+    add_auth_routes(app)
+    print("✅ Firebase Authentication routes added")
+
 if __name__ == '__main__':
     print("🚀 Starting Y.M.I.R AI Emotion Detection System...")
     print("📍 Home page: http://localhost:5000")
     print("🔧 AI App: http://localhost:5000/ai_app")
     
+    if FIREBASE_AUTH_AVAILABLE:
+        print("🔐 Authentication: Firebase Auth enabled")
+    else:
+        print("⚠️ Authentication: Running without Firebase Auth")
+    
     # 🚀 PRODUCTION MODE: Disable debug to prevent auto-restart crashes
     app.run(
         debug=False,
-        host='0.0.0.0',
+        host='localhost',
         port=5000,
         threaded=True
     )

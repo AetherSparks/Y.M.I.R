@@ -345,35 +345,46 @@ class RecommendationSet:
         return result
 
 class AITherapeuticAdvisor:
-    """🧠 AI-powered therapeutic music recommendation advisor using Gemini"""
+    """🧠 AI-powered therapeutic music recommendation advisor using Gemini with smart caching"""
     
     def __init__(self):
         self.gemini_available = GEMINI_AVAILABLE
         self.model = None
         
+        # 🚀 Smart caching to prevent API exhaustion
+        self.response_cache = {}
+        self.cache_duration = 300  # 5 minutes cache
+        self.last_emotion = None
+        self.last_response_time = None
+        self.min_request_interval = 30  # Minimum 30 seconds between requests
+        
         if self.gemini_available:
             self._initialize_gemini()
     
     def _initialize_gemini(self):
-        """Initialize Gemini AI model"""
+        """Initialize Gemini AI model with rotation system"""
         try:
-            # Check for API key in environment
-            api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY') or os.getenv('GOOGLE_AI_API_KEY')
+            # Try to use the rotation system if available
+            try:
+                sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
+                from gemini_api_manager import get_gemini_model
+                self.model = get_gemini_model('gemini-2.0-flash-exp')
+                print("✅ Gemini AI model initialized with rotation system")
+                return
+            except ImportError:
+                print("⚠️ Rotation system not available, using single API key")
             
-            print(f"🔑 DEBUG: Looking for API keys...")
-            print(f"   GEMINI_API_KEY: {'✅ Found' if os.getenv('GEMINI_API_KEY') else '❌ Not found'}")
-            print(f"   GOOGLE_API_KEY: {'✅ Found' if os.getenv('GOOGLE_API_KEY') else '❌ Not found'}")
-            print(f"   GOOGLE_AI_API_KEY: {'✅ Found' if os.getenv('GOOGLE_AI_API_KEY') else '❌ Not found'}")
+            # Fallback to single API key
+            api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY') or os.getenv('GOOGLE_AI_API_KEY')
             
             if not api_key:
                 print("⚠️ No Gemini API key found in environment variables")
-                print("   Please set one of: GEMINI_API_KEY, GOOGLE_API_KEY, or GOOGLE_AI_API_KEY")
                 self.gemini_available = False
                 return
             
             genai.configure(api_key=api_key)
             self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
-            print("✅ Gemini AI model initialized successfully")
+            print("✅ Gemini AI model initialized with single API key")
             
         except Exception as e:
             print(f"❌ Failed to initialize Gemini: {e}")
@@ -382,10 +393,33 @@ class AITherapeuticAdvisor:
     
     def get_therapeutic_strategy(self, emotion: str, confidence: float, 
                                available_moods: List[str], track_samples: List[Dict]) -> Dict[str, Any]:
-        """Use AI to determine the best therapeutic music strategy"""
+        """Use AI to determine the best therapeutic music strategy with smart caching"""
         
-        if not self.gemini_available or not self.model:
+        # 🚀 SMART CACHING: Check if we can reuse recent responses
+        current_time = datetime.now()
+        cache_key = f"{emotion}_{confidence:.1f}"
+        
+        # 1. Check if same emotion within time limit
+        if (self.last_emotion == emotion and 
+            self.last_response_time and 
+            (current_time - self.last_response_time).total_seconds() < self.min_request_interval):
+            print(f"⚡ Reusing recent response for {emotion} (too soon to call API again)")
             return self._fallback_therapeutic_strategy(emotion, available_moods)
+        
+        # 2. Check cache for similar requests
+        if cache_key in self.response_cache:
+            cached_response, cached_time = self.response_cache[cache_key]
+            if (current_time - cached_time).total_seconds() < self.cache_duration:
+                print(f"💾 Using cached response for {emotion} (cached {(current_time - cached_time).total_seconds():.0f}s ago)")
+                return cached_response
+        
+        # 3. If no Gemini available, use fallback
+        if not self.gemini_available or not self.model:
+            print("🔄 No Gemini available, using fallback strategy")
+            return self._fallback_therapeutic_strategy(emotion, available_moods)
+        
+        # 4. Make API call only if necessary
+        print(f"🤖 Making Gemini API call for {emotion} (last call: {(current_time - self.last_response_time).total_seconds():.0f}s ago)" if self.last_response_time else f"🤖 Making first Gemini API call for {emotion}")
         
         try:
             # Create context for AI
@@ -421,15 +455,27 @@ Respond in this EXACT JSON format:
             response = self.model.generate_content(prompt)
             result = self._parse_ai_response(response.text)
             
+            # 🚀 Update cache and tracking
+            self.last_emotion = emotion
+            self.last_response_time = current_time
+            
             if result and self._validate_ai_result(result, available_moods):
+                # Cache successful response
+                self.response_cache[cache_key] = (result, current_time)
                 print(f"🤖 AI cross-check approved: {result['target_mood']} - {result['reasoning']}")
+                print(f"💾 Response cached for {self.cache_duration}s")
                 return result
             else:
                 print("⚠️ AI response invalid or not from our dataset, using fallback")
-                return self._fallback_therapeutic_strategy(emotion, available_moods)
+                fallback_result = self._fallback_therapeutic_strategy(emotion, available_moods)
+                # Cache fallback too to prevent repeated failures
+                self.response_cache[cache_key] = (fallback_result, current_time)
+                return fallback_result
                 
         except Exception as e:
             print(f"❌ AI therapeutic strategy failed: {e}")
+            # Update tracking even for failures to prevent rapid retries
+            self.last_response_time = current_time
             return self._fallback_therapeutic_strategy(emotion, available_moods)
     
     def _format_track_samples(self, tracks: List[Dict]) -> str:

@@ -3,9 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Y.M.I.R AI Dashboard - Microservices Architecture</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+    <title>Y.M.I.R AI Dashboard - Advanced Emotion Detection & Analysis Platform</title>
+    <meta name="description" content="Professional AI-powered emotion detection platform with real-time facial analysis, text sentiment analysis, and personalized music recommendations. Advanced microservices architecture for enterprise applications.">
+    <meta name="keywords" content="AI emotion detection, facial analysis, sentiment analysis, emotion AI, machine learning, microservices, enterprise AI, emotional intelligence, mood analysis">
+    <meta name="author" content="Y.M.I.R Development Team">
+    <meta property="og:title" content="Y.M.I.R AI Dashboard - Advanced Emotion Detection Platform">
+    <meta property="og:description" content="Professional AI-powered emotion detection with real-time analysis and personalized recommendations">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%234F46E5'/><text x='50' y='60' font-family='Arial,sans-serif' font-size='35' font-weight='bold' fill='white' text-anchor='middle'>Y</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase Authentication Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth-styles.css') }}">
     <style>
         body {
             margin: 0;
@@ -756,7 +765,7 @@
             gap: 20px;
             animation: scroll-left 60s linear infinite;
             width: fit-content;
-            transition: transform 0.3s ease;
+            transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
         .music-track.dragging {
@@ -1189,14 +1198,37 @@
         }
         
         @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(10deg); }
-            75% { transform: rotate(-10deg); }
-            100% { transform: rotate(0deg); }
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(5deg) scale(1.05); }
+            75% { transform: rotate(-5deg) scale(1.05); }
+            100% { transform: rotate(0deg) scale(1); }
         }
         
-        .logo-container:hover .emoji-rotate {
-            animation: rotate 0.5s ease;
+        .logo-container:hover .professional-icon {
+            animation: rotate 0.6s ease;
+        }
+        
+        .professional-icon {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .professional-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+        
+        .logo-container:hover .professional-icon::before {
+            left: 100%;
+            opacity: 1;
         }
         
         .pulse-btn {
@@ -1875,63 +1907,18 @@
     </style>
 </head>
 <body>
-<!-- HEADER START: Only include once -->
-<nav class="bg-gradient-to-r from-black to-gray-800 text-white py-4 shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto px-6">
-        <!-- Desktop Navigation -->
-        <div class="flex justify-between items-center">
-            <!-- Logo with animation -->
-            <a href="/" class="flex items-center space-x-2 group logo-container">
-                <span class="text-3xl emoji-rotate">🎭</span>
-                <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 group-hover:from-purple-500 group-hover:to-blue-400 transition-colors duration-300 text-glow">AI Emotion Detection</span>
-            </a>
-
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center space-x-1 nav-links">
-                <a href="/" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">Home</a>
-                <a href="/ai_app" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">AI App</a>
-                <a href="/about" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">About</a>
-                <a href="/contact" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">Contact</a>
-                <a href="/features" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">Features</a>
-
-                <a href="/ai_app" class="ml-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition-all shadow-md pulse-btn">Try Demo</a>
-            </div>
-
-            <!-- Mobile menu button with animation -->
-            <div class="md:hidden flex items-center">
-                <button id="mobile-menu-button" class="outline-none burger-menu">
-                    <span class="burger-line"></span>
-                    <span class="burger-line"></span>
-                    <span class="burger-line"></span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden pt-4 pb-2 mobile-menu-container">
-            <div class="flex flex-col space-y-2">
-                <a href="/" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">Home</a>
-                <a href="/ai_app" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">AI App</a>
-                <a href="/about" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">About</a>
-                <a href="/contact" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">Contact</a>
-                <a href="/demo" class="mobile-link px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition-all shadow-md text-center mt-2">Try Demo</a>
-            </div>
-        </div>
-    </div>
-</nav>
-<!-- HEADER END -->
+{% include 'header.html' %}
     <div class="content-wrapper">
         <div class="header">
-            <h1>🚀 Y.M.I.R AI Dashboard</h1>
+            <h1>Y.M.I.R AI Dashboard</h1>
             <p>Microservices Architecture - Real-time Emotion Detection</p>
         </div>
-        
         
         <!-- Main Dashboard -->
         <div class="dashboard-grid">
             <!-- Camera Section -->
             <div class="camera-section">
-                <h2>📹 Real-Time Camera Feed</h2>
+                <h2>Real-Time Camera Feed</h2>
                 
                 <div class="camera-controls">
                     <button id="startBtn" onclick="startCamera()">Start Camera</button>
@@ -1939,36 +1926,36 @@
                     <button onclick="refreshStatus()">Refresh Status</button>
                 </div>
 
-                <!-- 🎛️ Advanced Visual Controls -->
+                <!-- Advanced Visual Controls -->
                 <div class="advanced-controls" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                    <h3 style="margin-bottom: 15px; color: #4fd1c7;">🎛️ Advanced Visual Controls</h3>
+                    <h3 style="margin-bottom: 15px; color: #4fd1c7;">Advanced Visual Controls</h3>
                     
                     <!-- MediaPipe Toggles -->
                     <div class="control-section" style="margin-bottom: 15px;">
-                        <h4 style="color: #fbbf24; margin-bottom: 10px;">📐 MediaPipe Features</h4>
+                        <h4 style="color: #fbbf24; margin-bottom: 10px;">MediaPipe Features</h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
                             <label class="toggle-label">
                                 <input type="checkbox" id="toggle_face_mesh" checked onchange="updateVisualSettings()">
-                                <span>🔷 Face Mesh</span>
+                                <span>Face Mesh</span>
                             </label>
                             <label class="toggle-label">
                                 <input type="checkbox" id="toggle_body_pose" checked onchange="updateVisualSettings()">
-                                <span>🧍 Body Pose</span>
+                                <span>Body Pose</span>
                             </label>
                             <label class="toggle-label">
                                 <input type="checkbox" id="toggle_hand_tracking" checked onchange="updateVisualSettings()">
-                                <span>✋ Hand Tracking</span>
+                                <span>Hand Tracking</span>
                             </label>
                             <label class="toggle-label">
                                 <input type="checkbox" id="toggle_gaze_tracking" checked onchange="updateVisualSettings()">
-                                <span>👁️ Gaze Tracking</span>
+                                <span>Gaze Tracking</span>
                             </label>
                         </div>
                     </div>
 
                     <!-- YOLO Model Controls -->
                     <div class="control-section" style="margin-bottom: 15px;">
-                        <h4 style="color: #f97316; margin-bottom: 10px;">🎯 YOLO Object Detection</h4>
+                        <h4 style="color: #f97316; margin-bottom: 10px;">YOLO Object Detection</h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
                             <label class="toggle-label">
                                 <input type="checkbox" id="toggle_object_detection" checked onchange="updateVisualSettings()">
@@ -2009,11 +1996,11 @@
                             </div>
                             <label class="toggle-label">
                                 <input type="checkbox" id="toggle_quality_indicators" checked onchange="updateVisualSettings()">
-                                <span>📊 Quality Indicators</span>
+                                <span>Quality Indicators</span>
                             </label>
                             <label class="toggle-label">
                                 <input type="checkbox" id="toggle_fps_display" onchange="updateVisualSettings()">
-                                <span>📈 FPS Display</span>
+                                <span>FPS Display</span>
                             </label>
                         </div>
                     </div>
@@ -2054,7 +2041,7 @@
             
             <!-- Text Emotion Section -->
             <div class="text-emotion-section">
-                <h2>💬 Text Emotion Analysis</h2>
+                <h2>Text Emotion Analysis</h2>
                 
                 <div class="chat-container">
                     <div id="chatHistory" class="chat-history">
@@ -2089,7 +2076,7 @@
         <div class="music-carousel-container">
             <!-- AI Music Header -->
             <div class="music-carousel-header">
-                <h2 class="ai-music-title">🎵 AI-Based Recommended Music</h2>
+                <h2 class="ai-music-title">AI-Based Recommended Music</h2>
                 <div class="ai-badge">
                     <div class="ai-icon"></div>
                     <span>Powered by Neural Emotion Analysis</span>
@@ -2165,6 +2152,17 @@
                         'Content-Type': 'application/json',
                     }
                 };
+                
+                // Add Firebase auth token if user is authenticated
+                if (window.ymirAuth && window.ymirAuth.currentUser) {
+                    try {
+                        const token = await window.ymirAuth.currentUser.getIdToken();
+                        options.headers['Authorization'] = `Bearer ${token}`;
+                        console.log('🔐 Added auth token to API call');
+                    } catch (e) {
+                        console.warn('Failed to get auth token:', e);
+                    }
+                }
                 
                 if (body) {
                     options.body = JSON.stringify(body);
@@ -2874,7 +2872,7 @@
             const musicTrack = document.getElementById('musicTrack');
             if (!musicTrack) return;
             
-            const scrollAmount = 340; // Card width + gap
+            const scrollAmount = 170; // Half card width for smoother scrolling
             
             // Only scroll left if we're not already at the start
             if (currentTransform < 0) {
@@ -2909,7 +2907,7 @@
                 return;
             }
             
-            const scrollAmount = 340; // Card width + gap
+            const scrollAmount = 170; // Half card width for smoother scrolling
             
             // Calculate max scroll based on content width vs viewport width
             const totalWidth = currentAISongs.length * 340;
@@ -2955,7 +2953,7 @@
 
             // Remove existing listeners if any to prevent duplicates
             if (dragListenersAttached) {
-                console.log('🔧 Removing old drag listeners');
+                console.log('Removing old drag listeners');
                 container.removeEventListener('mousedown', window.carouselMouseDown);
                 document.removeEventListener('mousemove', window.carouselMouseMove);  
                 document.removeEventListener('mouseup', window.carouselMouseUp);
@@ -3036,7 +3034,7 @@
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('🖱️ Drag started, startTransform:', window.carouselStartTransform, 'startDragX:', window.carouselStartDragX);
-            }"}
+            }
 
             function drag(e) {
                 if (!window.carouselIsDragging) {
@@ -3062,7 +3060,7 @@
                 currentTransform = constrainedTransform;
                 
                 console.log('🖱️ Dragging, deltaX:', deltaX, 'currentX:', currentX, 'startDragX:', window.carouselStartDragX, 'newTransform:', constrainedTransform);
-            }"}
+            }
 
             function endDrag(e) {
                 if (!window.carouselIsDragging) return;
@@ -3771,7 +3769,7 @@
                 const musicTrack = document.getElementById('musicTrack');
                 if (!musicTrack) return;
                 
-                const scrollSpeed = e.deltaY > 0 ? -80 : 80; // Faster scroll, deltaY > 0 = scroll down = move right
+                const scrollSpeed = e.deltaY > 0 ? -40 : 40; // Gentler scroll, deltaY > 0 = scroll down = move right
                 currentTransform += scrollSpeed;
                 
                 // Apply constraints
@@ -3828,6 +3826,169 @@
                     this.style.transform = 'translateY(0)';
                 });
             });
+
+            // ===== FIREBASE AUTHENTICATION INTEGRATION =====
+            initializeHeaderAuth();
+        }
+
+        function initializeHeaderAuth() {
+            // Get authentication elements
+            const tempUserBanner = document.getElementById('tempUserBanner');
+            const authUserArea = document.getElementById('authUserArea');
+            const guestSignInBtn = document.getElementById('guestSignInBtn');
+            const headerSignInBtn = document.getElementById('headerSignInBtn');
+            const headerSignOutBtn = document.getElementById('headerSignOutBtn');
+            const userName = document.getElementById('userName');
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            
+            // Mobile elements
+            const mobileTempBanner = document.getElementById('mobileTempBanner');
+            const mobileAuthUser = document.getElementById('mobileAuthUser');
+            const mobileGuestSignIn = document.getElementById('mobileGuestSignIn');
+            const mobileSignInBtn = document.getElementById('mobileSignInBtn');
+            const mobileSignOutBtn = document.getElementById('mobileSignOutBtn');
+            const mobileUserName = document.getElementById('mobileUserName');
+            
+            // Connect sign-in buttons to Firebase auth system
+            if (guestSignInBtn) {
+                guestSignInBtn.addEventListener('click', function() {
+                    if (window.ymirAuth) {
+                        window.ymirAuth.openAuthModal();
+                    } else {
+                        console.warn('Firebase auth system not loaded');
+                    }
+                });
+            }
+            
+            if (headerSignInBtn) {
+                headerSignInBtn.addEventListener('click', function() {
+                    if (window.ymirAuth) {
+                        window.ymirAuth.openAuthModal();
+                    } else {
+                        console.warn('Firebase auth system not loaded');
+                    }
+                });
+            }
+            
+            if (mobileSignInBtn) {
+                mobileSignInBtn.addEventListener('click', function() {
+                    if (window.ymirAuth) {
+                        window.ymirAuth.openAuthModal();
+                    } else {
+                        console.warn('Firebase auth system not loaded');
+                    }
+                });
+            }
+            
+            if (mobileGuestSignIn) {
+                mobileGuestSignIn.addEventListener('click', function() {
+                    if (window.ymirAuth) {
+                        window.ymirAuth.openAuthModal();
+                    } else {
+                        console.warn('Firebase auth system not loaded');
+                    }
+                });
+            }
+            
+            // Connect sign-out buttons
+            if (headerSignOutBtn) {
+                headerSignOutBtn.addEventListener('click', function() {
+                    if (window.ymirAuth) {
+                        window.ymirAuth.signOut();
+                    } else {
+                        console.warn('Firebase auth system not loaded');
+                    }
+                });
+            }
+            
+            if (mobileSignOutBtn) {
+                mobileSignOutBtn.addEventListener('click', function() {
+                    if (window.ymirAuth) {
+                        window.ymirAuth.signOut();
+                    } else {
+                        console.warn('Firebase auth system not loaded');
+                    }
+                });
+            }
+            
+            // User menu dropdown toggle
+            if (userMenuBtn && userDropdown) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function() {
+                    userDropdown.classList.add('hidden');
+                });
+            }
+            
+            // Listen for Firebase authentication state changes
+            document.addEventListener('userStateChange', function(event) {
+                const { state, user, isTemporary } = event.detail;
+                updateHeaderAuthUI(state, user, isTemporary);
+            });
+            
+            // Initial UI state check
+            if (window.ymirAuth) {
+                const status = window.ymirAuth.getUserStatus();
+                updateHeaderAuthUI(
+                    status.isAuthenticated ? 'authenticated' : (status.hasTemporaryData ? 'temporary' : 'guest'),
+                    status.user,
+                    !status.isAuthenticated
+                );
+            }
+        }
+        
+        function updateHeaderAuthUI(state, user, isTemporary) {
+            console.log('🔄 Updating header auth UI:', { state, user: user?.email, isTemporary });
+            
+            // Get elements
+            const tempUserBanner = document.getElementById('tempUserBanner');
+            const authUserArea = document.getElementById('authUserArea');
+            const guestSignInBtn = document.getElementById('guestSignInBtn');
+            const userName = document.getElementById('userName');
+            
+            // Mobile elements
+            const mobileTempBanner = document.getElementById('mobileTempBanner');
+            const mobileAuthUser = document.getElementById('mobileAuthUser');
+            const mobileGuestSignIn = document.getElementById('mobileGuestSignIn');
+            const mobileUserName = document.getElementById('mobileUserName');
+            
+            // Hide all sections first
+            if (tempUserBanner) tempUserBanner.classList.add('hidden');
+            if (authUserArea) authUserArea.classList.add('hidden');
+            if (guestSignInBtn) guestSignInBtn.classList.add('hidden');
+            if (mobileTempBanner) mobileTempBanner.classList.add('hidden');
+            if (mobileAuthUser) mobileAuthUser.classList.add('hidden');
+            if (mobileGuestSignIn) mobileGuestSignIn.classList.add('hidden');
+            
+            if (state === 'authenticated' && user) {
+                // Show authenticated user UI
+                if (authUserArea) authUserArea.classList.remove('hidden');
+                if (mobileAuthUser) mobileAuthUser.classList.remove('hidden');
+                
+                // Update user names
+                const displayName = user.displayName || user.email?.split('@')[0] || 'User';
+                if (userName) userName.textContent = displayName;
+                if (mobileUserName) mobileUserName.textContent = displayName;
+                
+                console.log('✅ Header: Showing authenticated user UI for', displayName);
+            } else if (state === 'temporary' || isTemporary) {
+                // Show temporary user banner
+                if (tempUserBanner) tempUserBanner.classList.remove('hidden');
+                if (mobileTempBanner) mobileTempBanner.classList.remove('hidden');
+                
+                console.log('⏱️ Header: Showing temporary user UI');
+            } else {
+                // Show guest sign-in button
+                if (guestSignInBtn) guestSignInBtn.classList.remove('hidden');
+                if (mobileGuestSignIn) mobileGuestSignIn.classList.remove('hidden');
+                
+                console.log('👤 Header: Showing guest sign-in UI');
+            }
         }
 
 
@@ -4180,9 +4341,9 @@
             // Initialize visual settings
             updateVisualSettings();
             
-            // Start periodic status updates
-            statusUpdateInterval = setInterval(refreshStatus, 5000);
-            textStatusUpdateInterval = setInterval(refreshTextStatus, 10000);
+            // Start periodic status updates (reduced frequency to save API calls)
+            statusUpdateInterval = setInterval(refreshStatus, 30000);  // 30 seconds instead of 5
+            textStatusUpdateInterval = setInterval(refreshTextStatus, 60000);  // 60 seconds instead of 10
         });
         
         // Cleanup on page unload
@@ -4373,6 +4534,148 @@
 
 <!-- Font Awesome for icons -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
+<!-- Firebase Authentication System -->
+<script src="{{ url_for('static', filename='js/firebase-auth.js') }}"></script>
+
+<script>
+// Integration with existing Y.M.I.R functionality
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Y.M.I.R Dashboard with Authentication Ready');
+    
+    // Listen for user state changes
+    document.addEventListener('userStateChange', function(event) {
+        const { state, user, isTemporary, data } = event.detail;
+        
+        console.log(`👤 User state changed to: ${state}`);
+        
+        if (state === 'authenticated') {
+            console.log(`✅ User ${user.email} signed in successfully`);
+            // Trigger data sync or UI updates for authenticated users
+            onUserAuthenticated(user, data);
+        } else {
+            console.log('⏱️ Operating in temporary mode');
+            // Handle temporary user mode
+            onTemporaryMode(data);
+        }
+    });
+    
+    // Override existing data saving functions to use Firebase Auth
+    if (window.ymirAuth) {
+        // Replace emotion saving with authenticated saving
+        window.saveEmotionData = function(emotionData) {
+            return window.ymirAuth.saveData('emotions', emotionData);
+        };
+        
+        // Replace conversation saving
+        window.saveChatMessage = function(messageData) {
+            return window.ymirAuth.saveData('conversations', messageData);
+        };
+        
+        // Replace music history saving
+        window.saveMusicHistory = function(musicData) {
+            return window.ymirAuth.saveData('musicHistory', musicData);
+        };
+        
+        console.log('🔗 Integrated authentication with existing Y.M.I.R functions');
+    }
+});
+
+function onUserAuthenticated(user, temporaryData) {
+    // Show welcome message if there was temporary data migrated
+    if (temporaryData.emotions.length > 0 || temporaryData.conversations.length > 0) {
+        showNotification('✅ Welcome back! Your temporary session data has been saved to your account.', 'success');
+    }
+    
+    // Update UI to show authenticated features
+    updateDashboardForAuthenticatedUser(user);
+    
+    // Load user's historical data
+    loadUserHistory(user);
+}
+
+function onTemporaryMode(data) {
+    // Show temporary mode indicators
+    updateDashboardForTemporaryUser();
+    
+    // Periodically remind users to sign in if they have significant data
+    if (data.emotions.length > 5 || data.conversations.length > 3) {
+        setTimeout(() => {
+            showNotification('💾 You have unsaved emotion data. Sign in to preserve your progress!', 'info');
+        }, 30000); // Show after 30 seconds
+    }
+}
+
+function updateDashboardForAuthenticatedUser(user) {
+    // Add any user-specific UI elements
+    console.log('🎨 Updating dashboard for authenticated user');
+    
+    // Enable advanced features for authenticated users
+    enableAdvancedFeatures();
+}
+
+function updateDashboardForTemporaryUser() {
+    // Show temporary user limitations
+    console.log('⏱️ Dashboard in temporary mode');
+    
+    // Limit certain features or show prompts
+    showTemporaryUserPrompts();
+}
+
+function enableAdvancedFeatures() {
+    // Enable features only available to authenticated users
+    const advancedControls = document.querySelectorAll('.auth-required');
+    advancedControls.forEach(control => {
+        control.style.display = 'block';
+        control.classList.remove('disabled');
+    });
+}
+
+function showTemporaryUserPrompts() {
+    // Add subtle prompts for sign-in throughout the interface
+    const emotionSection = document.querySelector('.emotion-section');
+    if (emotionSection && !document.querySelector('.temp-prompt')) {
+        const promptDiv = document.createElement('div');
+        promptDiv.className = 'temp-prompt';
+        promptDiv.innerHTML = `
+            <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); 
+                        border-radius: 8px; padding: 10px; margin: 10px 0; text-align: center;">
+                <small style="color: #ffc107;">
+                    💡 <a href="#" onclick="window.ymirAuth?.openAuthModal()" style="color: #4070ff; text-decoration: none;">
+                        Sign in
+                    </a> to save your emotional journey and get personalized insights
+                </small>
+            </div>
+        `;
+        emotionSection.appendChild(promptDiv);
+    }
+}
+
+function loadUserHistory(user) {
+    // Load user's historical emotion data, conversations, etc.
+    console.log('📊 Loading user history...');
+    
+    // This would integrate with your existing data loading functions
+    // For now, just log that we would load user-specific data
+    console.log(`📈 Loading data for user: ${user.email}`);
+}
+
+function showNotification(message, type = 'info') {
+    // Use the notification system from firebase-auth.js
+    if (window.ymirAuth) {
+        window.ymirAuth.showNotification(message, type);
+    }
+}
+
+// Export functions for global access
+window.YMIRAuth = {
+    onUserAuthenticated,
+    onTemporaryMode,
+    updateDashboardForAuthenticatedUser,
+    updateDashboardForTemporaryUser,
+    showNotification
+};
+</script>
 
 </body>
 </html>

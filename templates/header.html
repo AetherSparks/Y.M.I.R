@@ -6,8 +6,10 @@
         <div class="flex justify-between items-center">
             <!-- Logo with animation -->
             <a href="/" class="flex items-center space-x-2 group logo-container">
-                <span class="text-3xl emoji-rotate">🎭</span>
-                <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 group-hover:from-purple-500 group-hover:to-blue-400 transition-colors duration-300 text-glow">AI Emotion Detection</span>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 professional-icon">
+                    <span class="text-white font-bold text-lg">Y</span>
+                </div>
+                <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 group-hover:from-purple-500 group-hover:to-blue-400 transition-colors duration-300 text-glow">Y.M.I.R</span>
             </a>
 
             <!-- Desktop Menu -->
@@ -18,7 +20,40 @@
                 <a href="/contact" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">Contact</a>
                 <a href="/features" class="nav-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all font-medium relative overflow-hidden">Features</a>
 
-                <a href="/ai_app" class="ml-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition-all shadow-md pulse-btn">Try Demo</a>
+                <!-- Authentication Section -->
+                <div class="flex items-center space-x-3 ml-4">
+                    <!-- Temporary User Banner (Hidden by default, shown by auth system) -->
+                    <div id="tempUserBanner" class="hidden bg-yellow-600 bg-opacity-20 border border-yellow-500 border-opacity-50 rounded-lg px-3 py-1 text-sm">
+                        <span class="text-yellow-300">Temporary</span>
+                        <button id="headerSignInBtn" class="ml-2 text-blue-400 hover:text-blue-300 font-semibold underline">Sign In</button>
+                    </div>
+                    
+                    <!-- Authenticated User Area (Hidden by default, shown when signed in) -->
+                    <div id="authUserArea" class="hidden flex items-center space-x-2">
+                        <div class="flex items-center space-x-2 bg-blue-600 bg-opacity-20 border border-blue-500 border-opacity-50 rounded-lg px-3 py-1">
+                            <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-xs font-bold text-white" id="userAvatar">U</div>
+                            <span id="userName" class="text-sm font-medium text-blue-300">User</span>
+                            <button id="userMenuBtn" class="text-blue-400 hover:text-blue-300 ml-1">Settings</button>
+                        </div>
+                        
+                        <!-- User Dropdown Menu -->
+                        <div id="userDropdown" class="hidden absolute top-full right-0 mt-2 w-48 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50">
+                            <div class="py-1">
+                                <button id="viewProfileBtn" class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Profile</button>
+                                <button id="settingsBtn" class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Settings</button>
+                                <div class="border-t border-gray-600 my-1"></div>
+                                <button id="headerSignOutBtn" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300">Sign Out</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Guest Sign In Button (Default state) -->
+                    <button id="guestSignInBtn" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition-all shadow-md">
+                        Sign In
+                    </button>
+                </div>
+
+                <a href="/ai_app" class="ml-2 px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-500 transition-all shadow-md pulse-btn">Try Demo</a>
             </div>
 
             <!-- Mobile menu button with animation -->
@@ -38,7 +73,29 @@
                 <a href="/ai_app" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">AI App</a>
                 <a href="/about" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">About</a>
                 <a href="/contact" class="mobile-link px-4 py-2 rounded-lg hover:bg-blue-600 hover:bg-opacity-20 transition-all">Contact</a>
-                <a href="/demo" class="mobile-link px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition-all shadow-md text-center mt-2">Try Demo</a>
+                
+                <!-- Mobile Authentication Section -->
+                <div class="border-t border-gray-600 my-2 pt-2">
+                    <!-- Mobile Temporary User Banner -->
+                    <div id="mobileTempBanner" class="hidden mobile-link px-4 py-2 bg-yellow-600 bg-opacity-20 border border-yellow-500 border-opacity-50 rounded-lg text-center">
+                        <span class="text-yellow-300 text-sm">Temporary Session</span>
+                        <button id="mobileSignInBtn" class="block w-full mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-500 transition-all">Sign In to Save Data</button>
+                    </div>
+                    
+                    <!-- Mobile Authenticated User -->
+                    <div id="mobileAuthUser" class="hidden mobile-link px-4 py-2 bg-blue-600 bg-opacity-20 border border-blue-500 border-opacity-50 rounded-lg text-center">
+                        <div class="flex items-center justify-center space-x-2 mb-2">
+                            <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-xs font-bold text-white">U</div>
+                            <span id="mobileUserName" class="text-sm font-medium text-blue-300">User</span>
+                        </div>
+                        <button id="mobileSignOutBtn" class="block w-full px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-500 transition-all">Sign Out</button>
+                    </div>
+                    
+                    <!-- Mobile Guest Sign In -->
+                    <button id="mobileGuestSignIn" class="mobile-link w-full px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition-all shadow-md text-center">Sign In</button>
+                </div>
+                
+                <a href="/ai_app" class="mobile-link px-4 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-500 transition-all shadow-md text-center mt-2">Try Demo</a>
             </div>
         </div>
     </div>
@@ -77,14 +134,37 @@
     }
     
     @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        25% { transform: rotate(10deg); }
-        75% { transform: rotate(-10deg); }
-        100% { transform: rotate(0deg); }
+        0% { transform: rotate(0deg) scale(1); }
+        25% { transform: rotate(5deg) scale(1.05); }
+        75% { transform: rotate(-5deg) scale(1.05); }
+        100% { transform: rotate(0deg) scale(1); }
     }
     
-    .logo-container:hover .emoji-rotate {
-        animation: rotate 0.5s ease;
+    .logo-container:hover .professional-icon {
+        animation: rotate 0.6s ease;
+    }
+    
+    .professional-icon {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .professional-icon::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+        transform: rotate(45deg);
+        transition: all 0.6s;
+        opacity: 0;
+    }
+    
+    .logo-container:hover .professional-icon::before {
+        left: 100%;
+        opacity: 1;
     }
     
     .pulse-btn {
@@ -188,6 +268,170 @@
                     this.style.transform = 'translateY(0)';
                 });
             });
+            
+            // ===== FIREBASE AUTHENTICATION INTEGRATION =====
+            // Initialize header authentication UI
+            initializeHeaderAuth();
         });
+    }
+    
+    function initializeHeaderAuth() {
+        // Get authentication elements
+        const tempUserBanner = document.getElementById('tempUserBanner');
+        const authUserArea = document.getElementById('authUserArea');
+        const guestSignInBtn = document.getElementById('guestSignInBtn');
+        const headerSignInBtn = document.getElementById('headerSignInBtn');
+        const headerSignOutBtn = document.getElementById('headerSignOutBtn');
+        const userName = document.getElementById('userName');
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        // Mobile elements
+        const mobileTempBanner = document.getElementById('mobileTempBanner');
+        const mobileAuthUser = document.getElementById('mobileAuthUser');
+        const mobileGuestSignIn = document.getElementById('mobileGuestSignIn');
+        const mobileSignInBtn = document.getElementById('mobileSignInBtn');
+        const mobileSignOutBtn = document.getElementById('mobileSignOutBtn');
+        const mobileUserName = document.getElementById('mobileUserName');
+        
+        // Connect sign-in buttons to Firebase auth system
+        if (guestSignInBtn) {
+            guestSignInBtn.addEventListener('click', function() {
+                if (window.ymirAuth) {
+                    window.ymirAuth.openAuthModal();
+                } else {
+                    console.warn('Firebase auth system not loaded');
+                }
+            });
+        }
+        
+        if (headerSignInBtn) {
+            headerSignInBtn.addEventListener('click', function() {
+                if (window.ymirAuth) {
+                    window.ymirAuth.openAuthModal();
+                } else {
+                    console.warn('Firebase auth system not loaded');
+                }
+            });
+        }
+        
+        if (mobileSignInBtn) {
+            mobileSignInBtn.addEventListener('click', function() {
+                if (window.ymirAuth) {
+                    window.ymirAuth.openAuthModal();
+                } else {
+                    console.warn('Firebase auth system not loaded');
+                }
+            });
+        }
+        
+        if (mobileGuestSignIn) {
+            mobileGuestSignIn.addEventListener('click', function() {
+                if (window.ymirAuth) {
+                    window.ymirAuth.openAuthModal();
+                } else {
+                    console.warn('Firebase auth system not loaded');
+                }
+            });
+        }
+        
+        // Connect sign-out buttons
+        if (headerSignOutBtn) {
+            headerSignOutBtn.addEventListener('click', function() {
+                if (window.ymirAuth) {
+                    window.ymirAuth.signOut();
+                } else {
+                    console.warn('Firebase auth system not loaded');
+                }
+            });
+        }
+        
+        if (mobileSignOutBtn) {
+            mobileSignOutBtn.addEventListener('click', function() {
+                if (window.ymirAuth) {
+                    window.ymirAuth.signOut();
+                } else {
+                    console.warn('Firebase auth system not loaded');
+                }
+            });
+        }
+        
+        // User menu dropdown toggle
+        if (userMenuBtn && userDropdown) {
+            userMenuBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                userDropdown.classList.add('hidden');
+            });
+        }
+        
+        // Listen for Firebase authentication state changes
+        document.addEventListener('userStateChange', function(event) {
+            const { state, user, isTemporary } = event.detail;
+            updateHeaderAuthUI(state, user, isTemporary);
+        });
+        
+        // Initial UI state check
+        if (window.ymirAuth) {
+            const status = window.ymirAuth.getUserStatus();
+            updateHeaderAuthUI(
+                status.isAuthenticated ? 'authenticated' : (status.hasTemporaryData ? 'temporary' : 'guest'),
+                status.user,
+                !status.isAuthenticated
+            );
+        }
+    }
+    
+    function updateHeaderAuthUI(state, user, isTemporary) {
+        console.log('🔄 Updating header auth UI:', { state, user: user?.email, isTemporary });
+        
+        // Get elements
+        const tempUserBanner = document.getElementById('tempUserBanner');
+        const authUserArea = document.getElementById('authUserArea');
+        const guestSignInBtn = document.getElementById('guestSignInBtn');
+        const userName = document.getElementById('userName');
+        
+        // Mobile elements
+        const mobileTempBanner = document.getElementById('mobileTempBanner');
+        const mobileAuthUser = document.getElementById('mobileAuthUser');
+        const mobileGuestSignIn = document.getElementById('mobileGuestSignIn');
+        const mobileUserName = document.getElementById('mobileUserName');
+        
+        // Hide all sections first
+        if (tempUserBanner) tempUserBanner.classList.add('hidden');
+        if (authUserArea) authUserArea.classList.add('hidden');
+        if (guestSignInBtn) guestSignInBtn.classList.add('hidden');
+        if (mobileTempBanner) mobileTempBanner.classList.add('hidden');
+        if (mobileAuthUser) mobileAuthUser.classList.add('hidden');
+        if (mobileGuestSignIn) mobileGuestSignIn.classList.add('hidden');
+        
+        if (state === 'authenticated' && user) {
+            // Show authenticated user UI
+            if (authUserArea) authUserArea.classList.remove('hidden');
+            if (mobileAuthUser) mobileAuthUser.classList.remove('hidden');
+            
+            // Update user names
+            const displayName = user.displayName || user.email?.split('@')[0] || 'User';
+            if (userName) userName.textContent = displayName;
+            if (mobileUserName) mobileUserName.textContent = displayName;
+            
+            console.log('✅ Header: Showing authenticated user UI for', displayName);
+        } else if (state === 'temporary' || isTemporary) {
+            // Show temporary user banner
+            if (tempUserBanner) tempUserBanner.classList.remove('hidden');
+            if (mobileTempBanner) mobileTempBanner.classList.remove('hidden');
+            
+            console.log('⏱️ Header: Showing temporary user UI');
+        } else {
+            // Show guest sign-in button
+            if (guestSignInBtn) guestSignInBtn.classList.remove('hidden');
+            if (mobileGuestSignIn) mobileGuestSignIn.classList.remove('hidden');
+            
+            console.log('👤 Header: Showing guest sign-in UI');
+        }
     }
 </script>

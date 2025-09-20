@@ -3,7 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - AI Emotion Detection</title>
+    <title>Y.M.I.R - Advanced AI Emotion Intelligence Platform | Professional Emotion Detection</title>
+    <meta name="description" content="Y.M.I.R is a professional AI-powered emotion detection and analysis platform. Advanced facial recognition, sentiment analysis, and personalized recommendations for enterprise applications.">
+    <meta name="keywords" content="AI emotion detection, emotion intelligence, facial analysis, sentiment analysis, machine learning, enterprise AI, emotional intelligence platform, Y.M.I.R">
+    <meta name="author" content="Y.M.I.R Development Team">
+    <meta property="og:title" content="Y.M.I.R - Advanced AI Emotion Intelligence Platform">
+    <meta property="og:description" content="Professional AI-powered emotion detection with advanced facial recognition and sentiment analysis">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="/">
+    <link rel="canonical" href="/">
+    <meta name="robots" content="index, follow">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Root Variables */
@@ -456,10 +465,10 @@
     <!-- Hero Section with Black Gradient -->
     <section class="flex items-center justify-center min-h-screen px-6 py-20 relative">
         <div class="max-w-4xl text-center z-10 fade-in">
-            <h1 class="text-6xl font-bold mb-6 glow-text typing-text" id="typing-text">Welcome to AI Emotion Detection</h1>
+            <h1 class="text-6xl font-bold mb-6 glow-text typing-text" id="typing-text">Welcome to Y.M.I.R</h1>
             <div class="accent-line"></div>
             <p class="text-xl mb-10 text-blue-100 max-w-2xl mx-auto">Experience cutting-edge facial emotion recognition powered by advanced AI. Unlock personalized interactions based on your emotional state.</p>
-            <button onclick="window.location.href='/ai_app'" class="neon-button">Get Started 🚀</button>
+            <button onclick="window.location.href='/ai_app'" class="neon-button">Get Started</button>
         </div>
     </section>
 
@@ -725,7 +734,7 @@
             <p class="text-lg mb-6">Join thousands of users who are already benefiting from our AI Emotion Detection platform.</p>
             <button onclick="window.location.href='/ai_app'" 
                 class="bg-gradient-btn text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition transform hover:scale-105 animate-bounce">
-                Get Started 🚀
+                Get Started
             </button>
         </div>
     </section>
@@ -773,7 +782,7 @@
         
         /* Refined Typing Animation */
         document.addEventListener("DOMContentLoaded", function() {
-            const text = "Welcome to AI Emotion Detection";
+            const text = "Welcome to Y.M.I.R";
             const typingText = document.getElementById("typing-text");
             
             // Clear initial text
@@ -816,6 +825,10 @@
             });
         });
     </script>
+
+    <!-- Firebase Authentication -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth-styles.css') }}">
+    <script src="{{ url_for('static', filename='js/firebase-auth.js') }}"></script>
 
 </body>
 </html>
