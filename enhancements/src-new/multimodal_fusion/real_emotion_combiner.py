@@ -377,8 +377,8 @@ class RealEmotionCombiner:
         except Exception as e:
             print(f"❌ Firebase initialization error: {e}")
     
-    def get_latest_facial_emotions(self, minutes_back: int = 10) -> Optional[Dict[str, Any]]:
-        """Get latest facial emotions from Firebase (last X minutes)"""
+    def get_latest_facial_emotions(self, minutes_back: int = 10, session_id: str = None) -> Optional[Dict[str, Any]]:
+        """🎯 Get latest facial emotions for specific session from Firebase"""
         if not self.firebase_client:
             if not self.silent:
                 print("❌ Firebase not available for facial emotions")
@@ -391,14 +391,33 @@ class RealEmotionCombiner:
             current_time = datetime.now(timezone.utc)
             
             # 🔍 DEBUG: Show what we're looking for
+            local_time = datetime.now()
             print(f"🔍 DEBUG: Looking for facial emotions after {cutoff_time} (UTC)")
             print(f"🔍 DEBUG: Current time: {current_time} (UTC)")
+            print(f"🔍 DEBUG: Session ID filter: {session_id or 'ALL SESSIONS'}")
+            print(f"🔍 DEBUG: Local time: {local_time} (Local)")
+            print(f"🔍 DEBUG: Timezone offset: {local_time.astimezone().utcoffset()}")
             
-            # Query Firebase for recent emotion readings (FACIAL ONLY - NO role field)
+            # 🎯 Query Firebase for recent emotion readings for specific session
             emotions_ref = self.firebase_client.collection('emotion_readings')
             
-            # Get recent readings and filter for facial emotions (no role field = facial)
-            query = emotions_ref.where('timestamp', '>=', cutoff_time).limit(20)  # Get more to filter
+            # 🎯 SESSION-SPECIFIC QUERY: Filter by session_id if provided
+            if session_id:
+                print(f"🎯 Filtering emotions for session: {session_id}")
+                # Get emotions for this specific session only
+                query = emotions_ref.where('session_id', '==', session_id)
+            else:
+                print(f"⚠️ No session filter - using global emotions (legacy mode)")
+                query = emotions_ref
+            
+            # 🛡️ CLOCK SKEW PROTECTION: Look 6 hours in both directions for system clock issues
+            extended_cutoff = datetime.now(timezone.utc) - timedelta(hours=6)
+            future_cutoff = datetime.now(timezone.utc) + timedelta(hours=1)
+            
+            print(f"🔍 DEBUG: Extended search range: {extended_cutoff} to {future_cutoff}")
+            
+            # 🎯 Apply time range filter to the session-specific query
+            query = query.where('timestamp', '>=', extended_cutoff).where('timestamp', '<=', future_cutoff).limit(50)
             
             docs = query.stream()
             
@@ -406,13 +425,31 @@ class RealEmotionCombiner:
             docs_list = list(docs)
             print(f"🔍 DEBUG: Found {len(docs_list)} total documents in range")
             
+            # 🔇 Simplified logging (reduced spam)
+            facial_docs = 0
+            text_docs = 0
+            
             for i, doc in enumerate(docs_list):
                 data = doc.to_dict()
-                print(f"🔍 DEBUG Doc {i}: timestamp={data.get('timestamp')}, has_role={'role' in data}, has_emotions={'emotions' in data}, has_face_id={'face_id' in data}")
+                
                 if 'role' not in data:
-                    print(f"    📹 Potential facial: {list(data.keys())}")
+                    facial_docs += 1
                 else:
-                    print(f"    💬 Text emotion: role={data.get('role')}")
+                    text_docs += 1
+            
+            # 🔍 DEBUG: Check for any facial emotions (no role field)
+            facial_count = 0
+            text_count = 0
+            
+            for doc in docs_list:
+                data = doc.to_dict()
+                if 'role' not in data:
+                    facial_count += 1
+                    # 🔇 Simplified: Removed excessive facial emotion logging
+                else:
+                    text_count += 1
+            
+            print(f"🔍 DEBUG: Total docs: {len(docs_list)}, Facial: {facial_count}, Text: {text_count}")
             
             # Filter for facial emotions only (strict filtering)
             for doc in docs_list:
@@ -440,8 +477,8 @@ class RealEmotionCombiner:
             print(f"❌ Error reading facial emotions from Firebase: {e}")
             return None
     
-    def get_latest_text_emotions(self, minutes_back: int = 10) -> Optional[Dict[str, Any]]:
-        """🔥 Get LATEST text emotions from Firebase with recency prioritization"""
+    def get_latest_text_emotions(self, minutes_back: int = 10, session_id: str = None) -> Optional[Dict[str, Any]]:
+        """🎯 Get LATEST text emotions for specific session from Firebase"""
         if not self.firebase_client:
             if not self.silent:
                 print("❌ Firebase not available for text emotions")
@@ -458,8 +495,18 @@ class RealEmotionCombiner:
             
             emotions_ref = self.firebase_client.collection('emotion_readings')
             
+            print(f"🔍 DEBUG: Looking for text emotions with session filter: {session_id or 'ALL SESSIONS'}")
+            
+            # 🎯 Apply session filter if provided
+            if session_id:
+                base_query = emotions_ref.where('session_id', '==', session_id)
+                print(f"🎯 Filtering text emotions for session: {session_id}")
+            else:
+                base_query = emotions_ref
+                print(f"⚠️ No session filter for text emotions (legacy mode)")
+            
             # 🔍 STEP 1: Check for very recent text emotions (priority)
-            recent_query = emotions_ref.where('timestamp', '>=', recent_cutoff).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(5)
+            recent_query = base_query.where('timestamp', '>=', recent_cutoff).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(5)
             recent_docs = list(recent_query.stream())
             
             recent_text_emotions = []
@@ -496,8 +543,8 @@ class RealEmotionCombiner:
                     'is_recent_activity': True
                 }
             
-            # 🔍 STEP 2: If no recent activity, look in extended range
-            extended_query = emotions_ref.where('timestamp', '>=', extended_cutoff).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(10)
+            # 🔍 STEP 2: If no recent activity, look in extended range with session filter
+            extended_query = base_query.where('timestamp', '>=', extended_cutoff).order_by('timestamp', direction=firestore.Query.DESCENDING).limit(10)
             extended_docs = list(extended_query.stream())
             
             text_emotions = []
@@ -540,17 +587,18 @@ class RealEmotionCombiner:
             print(f"❌ Error reading text emotions from Firebase: {e}")
             return None
     
-    def combine_real_emotions(self, minutes_back: int = 10, strategy: str = 'adaptive') -> Optional[RealCombinedEmotion]:
-        """🎯 ADVANCED Combine emotions using multiple fusion strategies"""
+    def combine_real_emotions(self, minutes_back: int = 10, strategy: str = 'adaptive', session_id: str = None) -> Optional[RealCombinedEmotion]:
+        """🎯 SESSION-AWARE Combine emotions for specific user"""
         if not self.silent:
-            print(f"\\n🔗 COMBINING REAL EMOTIONS (last {minutes_back} minutes, strategy: {strategy})")
+            print(f"\\n🎯 COMBINING EMOTIONS FOR USER SESSION: {session_id or 'GLOBAL'}")
+            print(f"🔗 Strategy: {strategy}, Time Range: {minutes_back} minutes")
             print("=" * 70)
         
-        # Get facial emotions from Firebase
-        facial_data = self.get_latest_facial_emotions(minutes_back)
+        # 🎯 Get facial emotions for this specific session
+        facial_data = self.get_latest_facial_emotions(minutes_back, session_id=session_id)
         
-        # Get text emotions from JSON files
-        text_data = self.get_latest_text_emotions(minutes_back)
+        # 🎯 Get text emotions for this specific session
+        text_data = self.get_latest_text_emotions(minutes_back, session_id=session_id)
         
         # Prepare data for advanced fusion with NORMALIZED SCALES
         facial_fusion_data = None
@@ -839,13 +887,14 @@ class RealEmotionCombiner:
 # Global instance for function-only access
 _combiner_instance = None
 
-def get_combined_emotion(minutes_back: int = 10, strategy: str = 'adaptive'):
+def get_combined_emotion(minutes_back: int = 10, strategy: str = 'adaptive', session_id: str = None):
     """
-    🎯 ADVANCED function to get combined emotion using multiple fusion strategies
+    🎯 SESSION-AWARE function to get combined emotion for specific user
     
     Args:
         minutes_back: How many minutes back to look for emotions
         strategy: Fusion strategy ('simple', 'adaptive', 'confidence_based', 'temporal_weighted', 'weighted_average')
+        session_id: USER SESSION ID for personalized emotions (NEW!)
         
     Returns:
         Dict with emotion info or None if no emotions found
@@ -855,7 +904,8 @@ def get_combined_emotion(minutes_back: int = 10, strategy: str = 'adaptive'):
             'source': str,           # Method used for combination
             'strategy': str,         # Fusion strategy used
             'facial_data': dict,     # Raw facial data (if available)
-            'text_data': dict        # Raw text data (if available)
+            'text_data': dict,       # Raw text data (if available)
+            'session_id': str        # User session ID
         }
     """
     global _combiner_instance
@@ -864,11 +914,13 @@ def get_combined_emotion(minutes_back: int = 10, strategy: str = 'adaptive'):
         _combiner_instance = RealEmotionCombiner(silent=False)  # DEBUG: Show detailed output
     
     try:
-        combined = _combiner_instance.combine_real_emotions(minutes_back=minutes_back, strategy=strategy)
+        # 🎯 NEW: Pass session_id for personalized emotion retrieval
+        combined = _combiner_instance.combine_real_emotions(minutes_back=minutes_back, strategy=strategy, session_id=session_id)
         
         if combined:
             return {
                 'emotion': combined.dominant_emotion,
+                'session_id': session_id,  # 🎯 NEW: Include session ID in response
                 'confidence': combined.confidence,
                 'source': combined.combination_method,
                 'strategy': strategy,

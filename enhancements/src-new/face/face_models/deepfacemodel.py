@@ -323,6 +323,10 @@ class DeepFaceEnsemble:
         
         return confidence
     
+    def analyze_face_without_context(self, face_id: int, face_roi: np.ndarray) -> Optional[Dict[str, Any]]:
+        """Analyze face emotions WITHOUT any context (pure raw detection)"""
+        return self.analyze_face_with_context(face_id, face_roi, environment_context=None)
+    
     def analyze_face_with_context(self, face_id: int, face_roi: np.ndarray, 
                                  environment_context: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
         """Analyze face emotions with optional environmental context"""

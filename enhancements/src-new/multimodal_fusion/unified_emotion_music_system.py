@@ -569,6 +569,77 @@ Respond in this EXACT JSON format:
                 'therapeutic_benefit': f'{target} music for emotional balance and well-being',
                 'confidence': 0.7
             }
+    
+    def get_fallback_therapeutic_strategy(self, original_emotion: str, target_emotion: str, 
+                                        available_moods: List[str], current_tracks_count: int) -> Dict[str, Any]:
+        """🧠 AI-powered fallback when the primary therapeutic recommendation has few songs"""
+        
+        # If we have enough tracks, don't need fallback
+        if current_tracks_count >= 5:
+            return {
+                'alternative_moods': [target_emotion],
+                'reasoning': f'Sufficient {target_emotion} tracks available ({current_tracks_count} songs)'
+            }
+        
+        # Use smart AI-powered fallback or intelligent default
+        if self.gemini_available and self.model:
+            try:
+                prompt = f"""
+THERAPEUTIC MUSIC FALLBACK ANALYSIS:
+
+ORIGINAL EMOTION: {original_emotion}
+PRIMARY TARGET: {target_emotion} (only {current_tracks_count} songs available)
+AVAILABLE MOODS: {', '.join(available_moods)}
+
+TASK: Suggest 2-3 ALTERNATIVE therapeutic moods from our available list for better song selection.
+
+RULES:
+1. ONLY use moods from our available list: {', '.join(available_moods)}
+2. Maintain therapeutic benefit for {original_emotion}
+3. Prioritize moods likely to have more songs
+4. Provide brief reasoning
+
+Respond in JSON:
+{{
+    "alternative_moods": ["mood1", "mood2", "mood3"],
+    "reasoning": "Brief explanation of why these alternatives work therapeutically"
+}}
+"""
+                
+                response = self.model.generate_content(prompt)
+                parsed = self._parse_ai_response(response.text if hasattr(response, 'text') else str(response))
+                
+                if parsed:
+                    # Validate that suggested moods are actually available
+                    valid_moods = [mood for mood in parsed.get('alternative_moods', []) if mood in available_moods]
+                    if valid_moods:
+                        return {
+                            'alternative_moods': valid_moods,
+                            'reasoning': f"🤖 AI: {parsed.get('reasoning', 'AI-selected therapeutic alternatives')}"
+                        }
+                    
+            except Exception as e:
+                print(f"⚠️ AI fallback failed: {e}")
+        
+        # Smart default fallback based on therapeutic principles
+        therapeutic_alternatives = {
+            'calm': ['neutral', 'joy'],
+            'joy': ['excitement', 'calm', 'neutral'],
+            'neutral': ['calm'],
+            'excitement': ['joy', 'neutral'],
+            'anger': ['calm', 'neutral'],    # Should not reach here normally
+            'sadness': ['calm', 'joy'],      # Should not reach here normally
+            'fear': ['calm', 'neutral']      # Should not reach here normally
+        }
+        
+        alternatives = therapeutic_alternatives.get(target_emotion.lower(), ['calm', 'neutral'])
+        # Filter to only available moods
+        available_alternatives = [mood for mood in alternatives if mood.title() in available_moods or mood.lower() in [m.lower() for m in available_moods]]
+        
+        return {
+            'alternative_moods': available_alternatives[:3],  # Limit to 3 alternatives
+            'reasoning': f'Therapeutic alternatives for {target_emotion} with broader song selection'
+        }
 
 class AdvancedMusicRecommendationEngine:
     """🎵 ADVANCED Music recommendation engine with 4 strategies + ML models"""
@@ -734,18 +805,72 @@ class AdvancedMusicRecommendationEngine:
         # Get therapeutic benefits for this emotion
         benefits = self.therapeutic_benefits.get(emotion, ['General Wellness'])
         
-        # Filter music by therapeutic benefits if column exists
+        # 🔧 TEMPORARILY DISABLED: Skip therapeutic benefit filtering to debug
         therapeutic_tracks = self.music_df.copy()
+        print(f"🔧 DEBUG: Total tracks before filtering: {len(self.music_df)}")
+        print(f"🔧 DEBUG: Looking for benefits: {benefits}")
         if 'Mental_Health_Benefit' in self.music_df.columns:
-            therapeutic_tracks = self.music_df[
-                self.music_df['Mental_Health_Benefit'].isin(benefits)
-            ].copy()
+            # Show actual values in dataset
+            unique_benefits = self.music_df['Mental_Health_Benefit'].unique()[:10]
+            print(f"🔧 DEBUG: Actual Mental_Health_Benefit values in dataset: {unique_benefits}")
+            # COMMENTED OUT: therapeutic_tracks = self.music_df[self.music_df['Mental_Health_Benefit'].isin(benefits)].copy()
+        print(f"🔧 DEBUG: Tracks after filtering: {len(therapeutic_tracks)}")
         
-        # Also filter by emotion if available
+        # 🚨 THERAPEUTIC EMOTION MAPPING: Map negative emotions to healing music
         if 'Mood_Label' in therapeutic_tracks.columns:
-            emotion_tracks = therapeutic_tracks[therapeutic_tracks['Mood_Label'] == emotion]
-            if len(emotion_tracks) > 0:
+            # Define therapeutic emotion mapping for healing
+            therapeutic_emotion_map = {
+                'angry': 'Neutral',     # Angry people need neutral music
+                'anger': 'Neutral',     # Not angry music!
+                'sad': 'Joy',       # Sad people need uplifting music 
+                'sadness': 'Joy',   # Not sadness music - give them joy!
+                'fear': 'Neutral',      # Fearful people need neutral music
+                'afraid': 'Neutral',    # Not fear music!
+                'disgust': 'Neutral',   # Disgusted people need neutral music
+                'worried': 'Neutral',   # Worried people need neutral music
+                'anxious': 'Neutral',   # Anxious people need neutral music
+                'stressed': 'Neutral',  # Stressed people need neutral music
+                'frustrated': 'Neutral', # Frustrated people need neutral music
+                # Positive emotions can stay the same or be enhanced
+                'happy': 'Joy',      # Happy people can get more joy
+                'joy': 'Joy',        # Joy stays joy
+                'excited': 'Joy',    # Excited people get joyful music
+                'neutral': 'Neutral',   # Neutral people get neutral music
+                'calm': 'Neutral'       # Calm people get neutral music
+            }
+            
+            # Get the therapeutic target emotion
+            target_emotion = therapeutic_emotion_map.get(emotion.lower(), emotion.lower())
+            
+            if target_emotion != emotion.lower():
+                print(f"🏥 THERAPEUTIC MAPPING: {emotion} → {target_emotion} (healing approach)")
+            else:
+                print(f"😊 MAINTAINING: {emotion} → {target_emotion} (positive state)")
+            
+            # Look for the therapeutic target emotion in dataset (case insensitive)
+            emotion_tracks = therapeutic_tracks[therapeutic_tracks['Mood_Label'].str.lower() == target_emotion.lower()]
+            print(f"🎵 Found {len(emotion_tracks)} therapeutic songs for target '{target_emotion}'")
+            
+            if len(emotion_tracks) >= 5:  # Good amount of songs found
                 therapeutic_tracks = emotion_tracks
+                print(f"✅ Using {len(therapeutic_tracks)} therapeutic '{target_emotion}' songs for healing")
+            elif len(emotion_tracks) > 0:
+                print(f"⚠️ Only {len(emotion_tracks)} songs for '{target_emotion}', adding fallback...")
+                # Add fallback therapeutic emotions
+                fallback_emotions = self._get_therapeutic_fallbacks(target_emotion)
+                for fallback in fallback_emotions:
+                    fallback_tracks = therapeutic_tracks[therapeutic_tracks['Mood_Label'].str.lower() == fallback]
+                    if len(fallback_tracks) > 0:
+                        emotion_tracks = pd.concat([emotion_tracks, fallback_tracks]).drop_duplicates()
+                        print(f"📈 Added {len(fallback_tracks)} '{fallback}' therapeutic songs")
+                        if len(emotion_tracks) >= 10:  # Stop when we have enough
+                            break
+                
+                therapeutic_tracks = emotion_tracks if len(emotion_tracks) >= 5 else therapeutic_tracks
+                print(f"🎯 Final therapeutic track count: {len(therapeutic_tracks)}")
+            else:
+                print(f"❌ No therapeutic songs found for '{target_emotion}', using all available")
+                print(f"📊 Available mood labels: {therapeutic_tracks['Mood_Label'].value_counts().head(10).to_dict()}")
         
         # Score based on audio features preference
         therapeutic_tracks = self._score_tracks_by_audio_features(therapeutic_tracks, emotion)
@@ -918,9 +1043,9 @@ class AdvancedMusicRecommendationEngine:
         # 🎵 ENHANCED THERAPEUTIC MUSIC SELECTION
         regulating_tracks = pd.DataFrame()
         
-        # First priority: Find tracks with exact mood match for therapeutic target
+        # First priority: Find tracks with exact mood match for therapeutic target (case-insensitive)
         if 'Mood_Label' in self.music_df.columns:
-            regulating_tracks = self.music_df[self.music_df['Mood_Label'] == target_emotion].copy()
+            regulating_tracks = self.music_df[self.music_df['Mood_Label'].str.lower() == target_emotion.lower()].copy()
             print(f"Found {len(regulating_tracks)} tracks with mood label '{target_emotion}'")
         
         # Second priority: Use audio features to find therapeutic tracks
@@ -1040,6 +1165,21 @@ class AdvancedMusicRecommendationEngine:
                     ]
         
         return filtered_df.head(limit)
+    
+    def _get_fallback_emotions(self, emotion):
+        """Get fallback emotions for cases where the primary emotion has few songs"""
+        fallback_map = {
+            'fear': ['calm', 'neutral'],  # Calming songs for fear
+            'angry': ['calm', 'neutral'],  # Calming songs for anger  
+            'sad': ['calm', 'neutral'],   # Calming/uplifting for sadness
+            'disgust': ['calm', 'neutral'],
+            'surprise': ['neutral', 'calm'],
+            'happy': ['joy', 'calm', 'neutral'],
+            'joy': ['happy', 'neutral'],
+            'neutral': ['calm'],
+            'calm': ['neutral']
+        }
+        return fallback_map.get(emotion, ['neutral', 'calm'])
     
     def _score_tracks_by_audio_features(self, tracks_df: pd.DataFrame, emotion: str) -> pd.DataFrame:
         """Score tracks based on how well they match audio feature preferences"""
@@ -1467,7 +1607,11 @@ class UnifiedEmotionMusicSystem:
                 if not self.silent:
                     print(f"🎭 Using REAL emotion combiner for multi-emotion analysis...")
                 
-                emotion_result = self.real_emotion_combiner(minutes_back=minutes_back, strategy=strategy)
+                # 🎯 Pass session_id for personalized emotion retrieval
+                emotion_result = self.real_emotion_combiner(minutes_back=minutes_back, strategy=strategy, session_id=session_id)
+                
+                if not self.silent:
+                    print(f"🎯 Session-specific emotion lookup for: {session_id}")
                 
                 if not emotion_result:
                     if not self.silent:

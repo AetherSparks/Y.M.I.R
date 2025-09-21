@@ -40,15 +40,29 @@ load_dotenv()
 try:
     import firebase_admin
     from firebase_admin import credentials, firestore, auth
+    
+    # Initialize Firebase app if not already initialized
+    if not firebase_admin._apps:
+        cred = credentials.Certificate('firebase_credentials.json')
+        firebase_admin.initialize_app(cred)
+    
     FIREBASE_AVAILABLE = True
-    print("✅ Firebase available for real-time chat storage and authentication")
-except ImportError:
+    print("✅ Firebase initialized for authentication")
+    print(f"🔍 Firebase auth module available: {auth is not None}")
+except ImportError as import_error:
     firebase_admin = None
     credentials = None
     firestore = None
     auth = None
     FIREBASE_AVAILABLE = False
-    print("❌ Firebase not available - install: pip install firebase-admin")
+    print(f"⚠️ Firebase not available: {import_error}")
+except Exception as firebase_error:
+    firebase_admin = None
+    credentials = None
+    firestore = None
+    auth = None
+    FIREBASE_AVAILABLE = False
+    print(f"🔥 Firebase initialization error: {firebase_error}")
 
 # Encryption for secure chat storage
 try:
@@ -56,57 +70,61 @@ try:
     import base64
     import hashlib
     ENCRYPTION_AVAILABLE = True
-    print("✅ Encryption available for secure chat storage")
+    # Encryption available
 except ImportError:
     ENCRYPTION_AVAILABLE = False
-    print("⚠️ Encryption not available - install: pip install cryptography")
+    # Encryption not available
 
 # Google Gemini API with rotation system
 try:
     import google.generativeai as genai
     from gemini_api_manager import get_gemini_model, get_api_status, gemini_manager
     GEMINI_AVAILABLE = True
-    print("✅ Google Gemini API with rotation system available")
+    # Gemini API available
 except ImportError:
     GEMINI_AVAILABLE = False
-    print("❌ Google Gemini API not available")
+    # Gemini API not available
 
 # Production-grade ML emotion detection
 try:
     from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
     import torch
     ML_AVAILABLE = True
-    print("✅ Transformers available for production ML emotion detection")
+    # Transformers available
 except ImportError:
     ML_AVAILABLE = False
-    print("⚠️ Transformers not available")
+    # Transformers not available
 
 # TextBlob fallback
 try:
     from textblob import TextBlob
     TEXTBLOB_AVAILABLE = True
-    print("✅ TextBlob available as fallback")
+    # TextBlob available
 except ImportError:
     TEXTBLOB_AVAILABLE = False
-    print("❌ TextBlob not available")
+    # TextBlob not available
 
 app = Flask(__name__)
 CORS(app)  # 🎯 ENABLE CORS FOR MICROSERVICE COMMUNICATION
 
 def verify_firebase_token(token):
     """Verify Firebase auth token and return user info"""
-    if not FIREBASE_AVAILABLE or not token:
+    print(f"🔍 Token verification: FIREBASE_AVAILABLE={FIREBASE_AVAILABLE}, token_present={bool(token)}, auth_available={auth is not None}")
+    
+    if not FIREBASE_AVAILABLE or not token or auth is None:
+        print("❌ Firebase verification failed: missing requirements")
         return None
     
     try:
         decoded_token = auth.verify_id_token(token)
+        print(f"✅ Token verified for user: {decoded_token.get('email')}")
         return {
             'uid': decoded_token.get('uid'),
             'email': decoded_token.get('email'),
             'name': decoded_token.get('name', decoded_token.get('email', 'User'))
         }
     except Exception as e:
-        print(f"❌ Firebase token verification failed: {e}")
+        print(f"❌ Firebase token verification error: {e}")
         return None
 
 @dataclass
@@ -118,7 +136,7 @@ class ChatMessage:
     emotion: Optional[str] = None
     confidence: Optional[float] = None
     metadata: Optional[Dict[str, Any]] = None
-    id: str = None
+    id: Optional[str] = None
     
     def __post_init__(self):
         if self.id is None:
@@ -140,12 +158,12 @@ class UserProfile:
     """User profile with preferences and history"""
     user_id: str
     name: Optional[str] = None
-    preferences: Dict[str, Any] = None
+    preferences: Optional[Dict[str, Any]] = None
     conversation_style: str = "balanced"
-    emotion_history: List[str] = None
-    topics_of_interest: List[str] = None
-    created_at: datetime = None
-    last_active: datetime = None
+    emotion_history: Optional[List[str]] = None
+    topics_of_interest: Optional[List[str]] = None
+    created_at: Optional[datetime] = None
+    last_active: Optional[datetime] = None
     
     def __post_init__(self):
         if self.preferences is None:
@@ -165,9 +183,7 @@ class FirebaseChatStorage:
     def __init__(self):
         self.db = None
         self.encryption_key = None
-        self.session_id = str(uuid.uuid4())
-        
-        print(f"🔑 Chat Session ID: {self.session_id}")
+        self.session_id = None  # Wait for frontend to set session ID
         
         # Initialize encryption
         if ENCRYPTION_AVAILABLE:
@@ -177,9 +193,14 @@ class FirebaseChatStorage:
         if FIREBASE_AVAILABLE:
             self._initialize_firebase()
         
-        print(f"🔥 Firebase Chat Storage initialized")
-        print(f"   📊 Encryption: {'✅ Enabled' if self.encryption_key else '❌ Disabled'}")
-        print(f"   🗄️ Firebase: {'✅ Connected' if self.db else '❌ Offline'}")
+        # Chat session initialized
+    
+    def set_session_id(self, session_id: str):
+        """Set the session ID for emotion storage synchronization"""
+        if session_id:
+            self.session_id = session_id
+            return True
+        return False
     
     def _setup_encryption(self):
         """Setup encryption for secure chat storage"""
@@ -194,13 +215,13 @@ class FirebaseChatStorage:
                 self.encryption_key = Fernet.generate_key()
                 with open(key_file, 'wb') as f:
                     f.write(self.encryption_key)
-                print("🔑 Generated new encryption key for chat storage")
+                # Generated new encryption key
             
             self.cipher = Fernet(self.encryption_key)
-            print("✅ Chat encryption enabled")
+            # Chat encryption enabled
             
         except Exception as e:
-            print(f"⚠️ Encryption setup failed: {e}")
+            # Encryption setup failed
             self.encryption_key = None
     
     def _initialize_firebase(self):
@@ -209,7 +230,7 @@ class FirebaseChatStorage:
             # Check if Firebase is already initialized
             if firebase_admin._apps:
                 self.db = firestore.client()
-                print("✅ Using existing Firebase connection for chat")
+                # Using existing Firebase connection
                 return
             
             # Look for credentials file
@@ -224,13 +245,15 @@ class FirebaseChatStorage:
                     cred = credentials.Certificate(str(cred_path))
                     firebase_admin.initialize_app(cred)
                     self.db = firestore.client()
-                    print(f"✅ Firebase chat storage initialized with {cred_path}")
+                    # Firebase chat storage initialized
                     return
             
-            print("⚠️ Firebase credentials not found for chat storage")
+            # Firebase credentials not found
+            pass
             
         except Exception as e:
-            print(f"❌ Firebase chat initialization error: {e}")
+            # Firebase initialization error
+            pass
     
     def _encrypt_content(self, content: str) -> str:
         """Encrypt chat content for secure storage"""
@@ -241,7 +264,7 @@ class FirebaseChatStorage:
             encrypted = self.cipher.encrypt(content.encode())
             return base64.b64encode(encrypted).decode()
         except Exception as e:
-            print(f"⚠️ Encryption failed: {e}")
+            # Encryption failed
             return content
     
     def _decrypt_content(self, encrypted_content: str) -> str:
@@ -254,13 +277,14 @@ class FirebaseChatStorage:
             decrypted = self.cipher.decrypt(encrypted_bytes)
             return decrypted.decode()
         except Exception as e:
-            print(f"⚠️ Decryption failed: {e}")
+            # Decryption failed
             return encrypted_content
     
     def store_message(self, message: ChatMessage) -> bool:
         """Store chat message in Firebase with encryption"""
-        if not self.db:
-            print("⚠️ Firebase not available for chat storage")
+        
+        if not self.db or not self.session_id:
+            print(f"❌ STORAGE FAILED: Firebase not available (db={self.db is not None}) or no session ID ('{self.session_id}')")
             return False
         
         try:
@@ -285,7 +309,9 @@ class FirebaseChatStorage:
             doc_ref.set(doc_data)
             
             # Also update latest emotions collection for quick access
+            print(f"🔍 DEBUG: Checking emotion storage - emotion: {message.emotion}, session: {self.session_id}")
             if message.emotion and message.emotion != 'neutral':
+                print(f"✅ Storing text emotion to Firebase...")
                 # 🎭 MULTI-EMOTION: Store ALL emotions like face microservice
                 all_emotions = message.metadata.get('emotion_analysis', {}).get('all_emotions', {}) if message.metadata else {}
                 
@@ -300,19 +326,22 @@ class FirebaseChatStorage:
                     'role': message.role
                 }
                 
-                print(f"💬 Storing text emotions: dominant={message.emotion}, all={len(all_emotions)} emotions")
+                # Storing text emotions to Firebase
                 
                 # Store in emotion_readings collection (same as face microservice)
                 emotion_ref = self.db.collection('emotion_readings').document()
                 emotion_ref.set(emotion_doc)
                 
-                print(f"💬 Stored text emotion: {message.emotion} ({message.confidence:.2f})")
+                print(f"🔥 TEXT EMOTION STORED: {message.emotion} (confidence: {message.confidence}) session: {self.session_id}")
+                print(f"✅ Stored to emotion_readings collection successfully!")
+            else:
+                print(f"❌ TEXT EMOTION NOT STORED: emotion='{message.emotion}', reason: neutral or empty")
             
-            print(f"🔥 Message stored in Firebase: {message.role} - {message.content[:50]}...")
+            # Message stored in Firebase
             return True
             
         except Exception as e:
-            print(f"❌ Firebase chat storage error: {e}")
+            # Firebase chat storage error
             return False
     
     def get_recent_messages(self, limit: int = 20) -> List[ChatMessage]:
@@ -348,7 +377,7 @@ class FirebaseChatStorage:
             return messages
             
         except Exception as e:
-            print(f"❌ Error retrieving messages: {e}")
+            # Error retrieving messages
             return []
     
     def get_latest_emotion(self, minutes_back: int = 10) -> Optional[Dict[str, Any]]:
@@ -366,14 +395,14 @@ class FirebaseChatStorage:
             
             for doc in query.stream():
                 data = doc.to_dict()
-                print(f"💬 Found Firebase text emotion: {data}")
+                # Found Firebase text emotion
                 return data
             
-            print(f"💬 No text emotions found in Firebase (last {minutes_back} minutes)")
+            # No recent text emotions found
             return None
             
         except Exception as e:
-            print(f"❌ Error getting latest emotion: {e}")
+            # Error getting latest emotion
             return None
 
 class UserCentricLearningSystem:
@@ -386,7 +415,7 @@ class UserCentricLearningSystem:
         self.session_corrections = []
         self._load_learning_data()
         
-        print("🎓 User-centric learning system initialized")
+        # User-centric learning system initialized
         
     def _load_learning_data(self):
         """Load user learning data from persistent storage"""
@@ -396,11 +425,13 @@ class UserCentricLearningSystem:
                     data = json.load(f)
                     self.user_corrections = data.get('corrections', {})
                     self.user_patterns = data.get('patterns', {})
-                    print(f"📊 Loaded {len(self.user_corrections)} user corrections and {len(self.user_patterns)} patterns")
+                    # User learning data loaded
             else:
-                print("📝 No existing learning data found, starting fresh")
+                # No existing learning data found
+                pass
         except Exception as e:
-            print(f"⚠️ Failed to load learning data: {e}")
+            # Failed to load learning data
+            pass
             self.user_corrections = {}
             self.user_patterns = {}
     
@@ -416,7 +447,8 @@ class UserCentricLearningSystem:
             with open(self.learning_data_file, 'w') as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
-            print(f"⚠️ Failed to save learning data: {e}")
+            # Failed to save learning data
+            pass
     
     def record_user_correction(self, original_text: str, predicted_emotion: str, 
                              predicted_confidence: float, user_corrected_emotion: str,
@@ -443,8 +475,7 @@ class UserCentricLearningSystem:
         # Save persistently
         self._save_learning_data()
         
-        print(f"🎓 User correction recorded: {predicted_emotion} → {user_corrected_emotion}")
-        print(f"   Text: '{original_text[:50]}...'")
+        # User correction recorded
         
         return correction_id
     
@@ -480,7 +511,7 @@ class UserCentricLearningSystem:
         # Convert set to list for JSON serialization
         user_data['vocabulary'] = list(user_data['vocabulary'])
         
-        print(f"🧠 Updated patterns for user {user_id}: {len(user_data['frequent_corrections'])} correction patterns")
+        # User patterns updated
     
     def get_personalized_confidence_adjustment(self, text: str, predicted_emotion: str, 
                                              base_confidence: float, user_id: str = "default") -> float:
@@ -498,7 +529,7 @@ class UserCentricLearningSystem:
                 correction_rate = count / max(1, len(self.user_corrections))
                 if correction_rate > 0.3:  # 30% correction rate threshold
                     confidence_multiplier *= (1.0 - correction_rate * 0.5)  # Reduce confidence
-                    print(f"🎓 Reducing confidence for {predicted_emotion} (user corrects {correction_rate:.1%} of time)")
+                    # Adjusting confidence based on user corrections
         
         # Check if text contains words user associates with different emotions
         words = text.lower().split()
@@ -517,7 +548,7 @@ class UserCentricLearningSystem:
             if max_evidence / total_evidence > 0.6:  # Strong evidence for different emotion
                 confidence_multiplier *= 0.7
                 suggested_emotion = max(word_evidence.items(), key=lambda x: x[1])[0]
-                print(f"🎓 User's vocabulary suggests {suggested_emotion} instead of {predicted_emotion}")
+                # User vocabulary analysis complete
         
         return confidence_multiplier
     
@@ -544,7 +575,7 @@ class UserCentricLearningSystem:
             suggestion_strength = emotion_scores[suggested_emotion] / sum(emotion_scores.values())
             
             if suggested_emotion != predicted_emotion and suggestion_strength > 0.4:
-                print(f"🎓 User pattern suggests: {suggested_emotion} (strength: {suggestion_strength:.2f})")
+                # User pattern suggestion applied
                 return suggested_emotion
         
         return None
@@ -585,25 +616,31 @@ class AIContextPreprocessor:
         
     def _init_context_models(self):
         """Initialize AI models for context analysis"""
+        self.intensity_analyzer = None
+        self.informal_processor = None
+        
+        if not ML_AVAILABLE:
+            return
+            
         try:
             # Sentiment intensity model for confidence adjustment
-            from transformers import pipeline
             self.intensity_analyzer = pipeline(
                 "text-classification",
                 model="cardiffnlp/twitter-roberta-base-sentiment-latest",
                 return_all_scores=True
             )
-            print("✅ Context intensity analyzer loaded")
+            # Context intensity analyzer loaded
             
             # Text preprocessing model for informal language
             self.informal_processor = pipeline(
                 "text2text-generation",
                 model="t5-small"  # Lightweight for real-time processing
             )
-            print("✅ Context informal language processor loaded")
+            # Context informal language processor loaded
             
         except Exception as e:
-            print(f"⚠️ Context models failed to load: {e}")
+            # Context models failed to load
+            pass
             self.intensity_analyzer = None
             self.informal_processor = None
     
@@ -635,7 +672,7 @@ class AIContextPreprocessor:
                 return 1.0  # Neutral adjustment
                 
         except Exception as e:
-            print(f"⚠️ Context confidence analysis failed: {e}")
+            # Context confidence analysis failed
             return 1.0
     
     def preprocess_informal_text(self, text: str) -> str:
@@ -650,19 +687,21 @@ class AIContextPreprocessor:
             # Generate normalized text
             result = self.informal_processor(prompt, max_length=len(text) + 50, do_sample=False)
             
-            if result and len(result) > 0 and 'generated_text' in result[0]:
-                preprocessed = result[0]['generated_text']
+            if result and hasattr(result, '__len__') and len(result) > 0:
+                if isinstance(result[0], dict) and 'generated_text' in result[0]:
+                    preprocessed = str(result[0]['generated_text'])
                 
                 # Extract the actual normalized text (remove the prompt)
                 if prompt in preprocessed:
                     preprocessed = preprocessed.replace(prompt, "").strip()
                 
-                # Only use if significantly different and reasonable length
-                if len(preprocessed) > 0 and len(preprocessed) < len(text) * 2:
-                    return preprocessed
+                    # Only use if significantly different and reasonable length
+                    if len(preprocessed) > 0 and len(preprocessed) < len(text) * 2:
+                        return preprocessed
                     
         except Exception as e:
-            print(f"⚠️ Text preprocessing failed: {e}")
+            # Text preprocessing failed
+            pass
             
         return text  # Return original if preprocessing fails
     
@@ -682,10 +721,11 @@ class AIContextPreprocessor:
                         environment = emotion_data.get('environment', {})
                         
                         if environment:
-                            print(f"🎯 YOLO Environmental Context: {environment}")
+                            # YOLO environmental context applied
                             return self._process_environmental_context(environment)
         except Exception as e:
-            print(f"⚠️ Failed to get environmental context: {e}")
+            # Failed to get environmental context
+            pass
         
         return {}
     
@@ -744,9 +784,9 @@ class AIContextPreprocessor:
         }
         
         if processed_context['has_context']:
-            print(f"🧠 Environmental emotion adjustments: {context_modifiers}")
+            # Environmental emotion adjustments applied
         
-        return processed_context
+            return processed_context
 
 class ProductionEmotionAnalyzer:
     """Production-grade emotion analysis with AI context awareness"""
@@ -803,7 +843,7 @@ class ProductionEmotionAnalyzer:
         
         for config in self.model_configs:
             try:
-                print(f"🔄 Loading {config['name']}...")
+                # Loading emotion model
                 
                 # Load model and tokenizer
                 model = AutoModelForSequenceClassification.from_pretrained(config['model_id'])
@@ -837,17 +877,18 @@ class ProductionEmotionAnalyzer:
                 }
                 
                 successful_models += 1
-                print(f"✅ {config['name']} loaded successfully")
+                # Emotion model loaded successfully
                 
             except Exception as e:
-                print(f"⚠️ Failed to load {config['name']}: {e}")
+                # Failed to load emotion model
                 continue
         
         if successful_models == 0:
-            print("❌ No emotion models loaded, using fallback")
+            # No emotion models loaded, using fallback
             self._setup_fallback_model()
         else:
-            print(f"✅ {successful_models}/{len(self.model_configs)} emotion models loaded")
+            # Emotion models loaded
+            pass
     
     def _setup_fallback_model(self):
         """Setup lightweight fallback model"""
@@ -865,10 +906,11 @@ class ProductionEmotionAnalyzer:
                 'emotions': ['negative', 'neutral', 'positive']
             }
             self.fallback_available = True
-            print("✅ Fallback sentiment model loaded")
+            # Fallback sentiment model loaded
             
         except Exception as e:
-            print(f"❌ Even fallback model failed: {e}")
+            # Fallback model failed
+            pass
     
     def _analyze_with_ensemble(self, text: str) -> Dict[str, Any]:
         """Use ensemble of models for robust emotion detection"""
@@ -943,11 +985,11 @@ class ProductionEmotionAnalyzer:
             
             # Case 3: Results is in different format - try to handle gracefully
             else:
-                print(f"⚠️ Unknown result format from {model_name}: {type(results)}")
+                # Unknown result format
                 return None
             
             if not standardized_emotions:
-                print(f"⚠️ No emotions extracted from {model_name}")
+                # No emotions extracted
                 return None
             
             return {
@@ -957,7 +999,7 @@ class ProductionEmotionAnalyzer:
             }
             
         except Exception as e:
-            print(f"⚠️ Single model {model_name} error: {e}")
+            # Single model error
             return None
     
     def _ensemble_vote(self, model_results: Dict[str, Dict]) -> Dict[str, Any]:
@@ -1019,7 +1061,7 @@ class ProductionEmotionAnalyzer:
         
         try:
             # 🧠 STEP 1: AI-driven context analysis and preprocessing
-            print(f"🧠 AI Context Preprocessing: '{text}'")
+            # AI context preprocessing
             
             # Get confidence multiplier based on sentiment intensity
             context_confidence_multiplier = self.context_preprocessor.analyze_context_confidence(text)
@@ -1027,8 +1069,7 @@ class ProductionEmotionAnalyzer:
             # Preprocess informal text using AI (not rules)
             preprocessed_text = self.context_preprocessor.preprocess_informal_text(text)
             
-            print(f"   📝 Preprocessed: '{preprocessed_text}'")
-            print(f"   📊 Context Multiplier: {context_confidence_multiplier:.2f}")
+            # Text preprocessed with context multiplier
             
             # 🧠 STEP 2: Use ensemble approach with preprocessed text
             result = self._analyze_with_ensemble(preprocessed_text)
@@ -1058,14 +1099,14 @@ class ProductionEmotionAnalyzer:
                     # Apply environmental adjustment to predicted emotion
                     if predicted_emotion in emotion_modifiers:
                         environmental_multiplier = emotion_modifiers[predicted_emotion]
-                        print(f"   🎯 Environmental adjustment for {predicted_emotion}: {environmental_multiplier:.2f}")
+                        # Environmental adjustment applied
                     
                     # Check if environment suggests different emotion
                     if emotion_modifiers:
                         max_env_emotion = max(emotion_modifiers.items(), key=lambda x: x[1])
                         if max_env_emotion[1] > 1.2 and max_env_emotion[0] != predicted_emotion:
                             result['environment_suggested_emotion'] = max_env_emotion[0]
-                            print(f"   🌍 Environment suggests: {max_env_emotion[0]} (strength: {max_env_emotion[1]:.2f})")
+                            # Environment suggestion applied
                 
                 # Apply all adjustments: context + user learning + environmental
                 combined_multiplier = context_confidence_multiplier * user_confidence_multiplier * environmental_multiplier
@@ -1074,18 +1115,12 @@ class ProductionEmotionAnalyzer:
                 
                 result['confidence'] = adjusted_confidence
                 
-                print(f"   🎯 Complete Confidence Adjustments:")
-                print(f"      Original: {original_confidence:.3f}")
-                print(f"      Context Multiplier: {context_confidence_multiplier:.3f}")
-                print(f"      User Learning Multiplier: {user_confidence_multiplier:.3f}")
-                print(f"      Environmental Multiplier: {environmental_multiplier:.3f}")
-                print(f"      Combined Multiplier: {combined_multiplier:.3f}")
-                print(f"      Final Confidence: {adjusted_confidence:.3f}")
+                # Confidence adjustments completed
                 
                 # Add suggestions if available
                 if suggested_emotion:
                     result['user_suggested_emotion'] = suggested_emotion
-                    print(f"   🎓 User pattern suggests: {suggested_emotion}")
+                    # User pattern suggestion applied
                 
                 # Store environmental context in result
                 if environmental_context.get('has_context'):
@@ -1115,7 +1150,7 @@ class ProductionEmotionAnalyzer:
             return result
             
         except Exception as e:
-            print(f"❌ AI emotion analysis failed: {e}")
+            # AI emotion analysis failed
             return self._get_neutral_result()
 
 class FunctionCalling:
@@ -1217,7 +1252,7 @@ class FunctionCalling:
 class GeminiChatbot:
     """Production-ready Gemini chatbot with ensemble emotion detection"""
     
-    def __init__(self, api_key: str = None, user_info: dict = None):
+    def __init__(self, api_key: str = None, user_info: dict = None, session_id: str = None):
         # Use API rotation manager instead of single key
         self.model = None
         self.chat_session = None
@@ -1231,7 +1266,12 @@ class GeminiChatbot:
         
         # 🔥 Initialize Firebase chat storage (like ChatGPT)
         self.firebase_storage = FirebaseChatStorage()
-        print("🔥 ChatGPT-style Firebase storage enabled")
+        # ChatGPT-style Firebase storage enabled
+        
+        # 🔥 CRITICAL: Set session ID if provided
+        if session_id:
+            self.firebase_storage.session_id = session_id
+            print(f"🔗 GeminiChatbot initialized with session ID: {session_id}")
         
         # Configuration
         self.config = {
@@ -1268,10 +1308,10 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
         """Initialize Gemini API with rotation system"""
         try:
             if not GEMINI_AVAILABLE:
-                print("❌ Gemini API not available")
+                # Gemini API not available
                 return
             
-            print("🔧 Initializing Gemini with rotation system...")
+            # Initializing Gemini with rotation system
             
             generation_config = {
                 'temperature': self.config['temperature'],
@@ -1289,14 +1329,14 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
             
             if self.model:
                 self.chat_session = self.model.start_chat(history=[])
-                print("✅ Gemini API initialized with rotation system")
+                # Gemini API initialized with rotation system
             else:
-                print("❌ Failed to get model from rotation manager")
+                # Failed to get model from rotation manager
                 self.model = None
                 self.chat_session = None
             
         except Exception as e:
-            print(f"❌ Gemini initialization error: {e}")
+            # Gemini initialization error
             self.model = None
             self.chat_session = None
     
@@ -1322,7 +1362,7 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
                     data['email'] = self.current_user['email']
                     
                     self.user_profile = UserProfile(**data)
-                    print(f"✅ User profile loaded from Firebase for {self.current_user['email']}")
+                    # User profile loaded from Firebase
                 else:
                     # Create new Firebase profile
                     self._create_firebase_profile()
@@ -1332,7 +1372,7 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
                 self._save_user_profile()
                 
             except Exception as e:
-                print(f"⚠️ Firebase profile loading error: {e}")
+                # Firebase profile loading error
                 self._create_temporary_profile()
         else:
             # Create temporary profile for unauthenticated users
@@ -1343,18 +1383,12 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
         self.user_profile = UserProfile(
             user_id=self.current_user['uid'],
             name=self.current_user['name'],
-            email=self.current_user['email'],
-            conversations_count=0,
-            total_emotions_detected=0,
-            dominant_emotion_history=[],
-            preferred_response_style="supportive",
-            privacy_settings={'store_conversations': True, 'analyze_patterns': True},
             created_at=datetime.now(),
             last_active=datetime.now(),
             conversation_style="balanced"
         )
         self._save_user_profile()
-        print(f"✅ New Firebase profile created for {self.current_user['email']}")
+        # New Firebase profile created
     
     def _create_temporary_profile(self):
         """Create temporary user profile for unauthenticated users"""
@@ -1362,7 +1396,7 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
             user_id=f"temp_user_{int(time.time())}",
             conversation_style="balanced"
         )
-        print("✅ Temporary profile created for guest user")
+        # Temporary profile created for guest user
     
     def _create_new_profile(self):
         """Legacy method - use Firebase or temporary profile instead"""
@@ -1384,7 +1418,7 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
                 profile_data['last_active'] = self.user_profile.last_active
                 
                 db.collection('user_profiles').document(self.current_user['uid']).set(profile_data)
-                print(f"✅ Profile saved to Firebase for {self.current_user['email']}")
+                # Profile saved to Firebase
             else:
                 # Don't save temporary profiles to disk
                 print("⏭️ Temporary profile - not saving to disk")
@@ -1477,35 +1511,38 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
             self.firebase_storage.store_message(user_message)
             self.conversation_history.append(user_message)
             
-            # 🧠 BACKGROUND: Start detailed AI emotion analysis in thread
+            # 🧠 BACKGROUND: Start detailed AI emotion analysis in thread (non-blocking)
             def detailed_emotion_analysis():
-                detailed_emotion = self.emotion_analyzer.analyze_text_emotion(user_input)
-                
-                # Update Firebase with detailed AI analysis
-                if detailed_emotion['dominant_emotion'] != basic_emotion['dominant_emotion']:
-                    print(f"🔄 Emotion updated: {basic_emotion['dominant_emotion']} → {detailed_emotion['dominant_emotion']}")
+                try:
+                    detailed_emotion = self.emotion_analyzer.analyze_text_emotion(user_input)
                     
-                    # Store updated emotion with AI context in Firebase
-                    if detailed_emotion.get('ai_context'):
-                        enhanced_message = ChatMessage(
-                            id=user_message.id,  # Same ID to update
-                            role='user',
-                            content=user_input,
-                            timestamp=datetime.now(),
-                            emotion=detailed_emotion['dominant_emotion'],
-                            confidence=detailed_emotion['confidence'],
-                            metadata={
-                                'emotion_analysis': detailed_emotion,
-                                'ai_context': detailed_emotion['ai_context'],
-                                'all_emotions': detailed_emotion.get('all_emotions', {}),
-                                'preprocessing_applied': detailed_emotion['ai_context'].get('preprocessing_applied', False)
-                            }
-                        )
-                        # Update Firebase with AI-enhanced analysis
-                        self.firebase_storage.store_message(enhanced_message)
-                        print(f"🧠 AI-enhanced emotion stored: {detailed_emotion['dominant_emotion']} (confidence: {detailed_emotion['confidence']:.3f})")
+                    # Update Firebase with detailed AI analysis
+                    if detailed_emotion['dominant_emotion'] != basic_emotion['dominant_emotion']:
+                        # Emotion updated with AI analysis
+                        
+                        # Store updated emotion with AI context in Firebase
+                        if detailed_emotion.get('ai_context'):
+                            enhanced_message = ChatMessage(
+                                id=user_message.id,  # Same ID to update
+                                role='user',
+                                content=user_input,
+                                timestamp=datetime.now(),
+                                emotion=detailed_emotion['dominant_emotion'],
+                                confidence=detailed_emotion['confidence'],
+                                metadata={
+                                    'emotion_analysis': detailed_emotion,
+                                    'ai_context': detailed_emotion['ai_context'],
+                                    'all_emotions': detailed_emotion.get('all_emotions', {}),
+                                    'preprocessing_applied': detailed_emotion['ai_context'].get('preprocessing_applied', False)
+                                }
+                            )
+                            # Update Firebase with AI-enhanced analysis
+                            self.firebase_storage.store_message(enhanced_message)
+                            # AI-enhanced emotion stored
+                except Exception as e:
+                    print(f"⚠️ Background emotion analysis failed: {e}")
             
-            # Start background AI analysis
+            # Start background AI analysis (non-blocking)
             threading.Thread(target=detailed_emotion_analysis, daemon=True).start()
             
             # Check for function calls (keep this fast)
@@ -1523,36 +1560,38 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
             if function_results:
                 enhanced_prompt += f"\n\nFunction results: {'; '.join(function_results)}"
             
-            # Generate response (fast with basic emotion)
+            # Generate response (fast with basic emotion - shortened prompt)
             if self.model and self.chat_session:
                 try:
-                    response = self.chat_session.send_message(enhanced_prompt)
-                    response_text = response.text
+                    # Use shorter prompt for faster response
+                    quick_prompt = f"Brief supportive reply (max 50 words) to: '{user_input[:100]}'"
+                    response = self.chat_session.send_message(quick_prompt)
+                    response_text = response.text[:200]  # Limit response length
                 except Exception as e:
                     error_msg = str(e).lower()
                     if ('quota' in error_msg or 'limit' in error_msg or 'exhausted' in error_msg or 
                         '429' in error_msg or 'exceeded' in error_msg):
-                        print(f"🔄 Quota exhausted, rotating API key: {e}")
+                        # Quota exhausted, rotating API key
                         # Mark current key as exhausted and rotate
                         if GEMINI_AVAILABLE:
                             gemini_manager.mark_key_exhausted(str(e))
                         # Try to reinitialize with new key
-                        print("🔄 Attempting to reinitialize with new API key...")
+                        # Attempting to reinitialize with new API key
                         self._initialize_gemini()
                         if self.model and self.chat_session:
-                            print("✅ Successfully reinitialized! Retrying request...")
+                            # Successfully reinitialized
                             try:
-                                response = self.chat_session.send_message(enhanced_prompt)
-                                response_text = response.text
-                                print("✅ Request successful with new API key!")
+                                response = self.chat_session.send_message(quick_prompt)
+                                response_text = response.text[:200]
+                                # Request successful with new API key
                             except Exception as retry_error:
-                                print(f"❌ Retry failed even with new key: {retry_error}")
+                                # Retry failed with new key
                                 response_text = self._generate_fallback_response(user_input, basic_emotion)
                         else:
-                            print("❌ Failed to reinitialize model - no keys available")
+                            # Failed to reinitialize model
                             response_text = self._generate_fallback_response(user_input, basic_emotion)
                     else:
-                        print(f"Gemini API error: {e}")
+                        # Gemini API error
                         response_text = self._generate_fallback_response(user_input, basic_emotion)
             else:
                 response_text = self._generate_fallback_response(user_input, basic_emotion)
@@ -1587,7 +1626,7 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
             }
             
         except Exception as e:
-            print(f"❌ Response generation error: {e}")
+            # Response generation error
             return {
                 'response': f"I apologize, but I encountered an error: {str(e)}",
                 'emotion': {'dominant_emotion': 'neutral', 'confidence': 0.5},
@@ -1690,7 +1729,7 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
                         emotions_in_session.append(msg.emotion)
                         
                 except Exception as e:
-                    print(f"⚠️ Error processing message: {e}")
+                    # Error processing message
                     continue
             
             conversation_data = {
@@ -1711,11 +1750,11 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
             with open(filename, 'w') as f:
                 json.dump(conversation_data, f, indent=2, default=str, ensure_ascii=False)
             
-            print(f"✅ Conversation saved to {filename}")
+            # Conversation saved
             return filename
             
         except Exception as e:
-            print(f"❌ Conversation save error: {e}")
+            # Conversation save error
             return None
 
 # Global instances
@@ -1815,32 +1854,57 @@ def api_analyze_text():
 @app.route('/api/chat', methods=['POST'])
 def api_chat():
     """API endpoint for complete chat with emotion analysis and AI response"""
+    print("🔥 CHAT ENDPOINT CALLED - DEBUG ACTIVE")
     try:
         data = request.get_json()
         if not data or 'message' not in data:
             return jsonify({'error': 'Missing message parameter'}), 400
         
         user_message = data['message']
+        frontend_session_id = data.get('session_id')  # Get session ID from frontend
+        
+        # 🔍 DEBUG: Check what's actually in the request
+        print(f"🔍 DEBUG: Request data keys: {list(data.keys())}")
+        print(f"🔍 DEBUG: frontend_session_id value: '{frontend_session_id}'")
         
         # Check for Firebase auth token
         auth_token = request.headers.get('Authorization')
+        print(f"🔍 Auth header: {auth_token}")
         if auth_token and auth_token.startswith('Bearer '):
             auth_token = auth_token[7:]  # Remove 'Bearer ' prefix
+            print(f"🔍 Cleaned token: {auth_token[:20]}...")
+        else:
+            print("❌ No valid Bearer token found")
         
         # Verify Firebase token and get user info
         user_info = verify_firebase_token(auth_token) if auth_token else None
+        print(f"🔍 User info result: {user_info}")
         
         # Create or get chatbot instance for this user
         if user_info:
-            # Authenticated user - create chatbot with Firebase user info
-            user_chatbot = GeminiChatbot(user_info=user_info)
-            print(f"🔐 Authenticated user: {user_info['email']}")
+            # Authenticated user - create chatbot with Firebase user info and session ID
+            user_chatbot = GeminiChatbot(user_info=user_info, session_id=frontend_session_id)
+            # Authenticated user
         else:
             # Temporary user - use existing chatbot or create temporary one
             user_chatbot = chatbot
-            print("👤 Temporary user session")
+            # 🔥 CRITICAL: Set session ID for temporary user
+            if frontend_session_id:
+                print(f"🔗 Setting session ID for temporary user: {frontend_session_id}")
+                user_chatbot.firebase_storage.session_id = frontend_session_id
+            # Temporary user session
+        
+        # 🔥 DEBUG: Session ID status
+        if frontend_session_id:
+            print(f"✅ Session ID provided from frontend: {frontend_session_id}")
+        else:
+            print("⚠️ No session ID provided from frontend")
+        
+        # 🔥 DEBUG: Check session ID
+        print(f"🔍 Text microservice session ID: {user_chatbot.firebase_storage.session_id}")
         
         # Generate complete response using the appropriate chatbot
+        print(f"🎭 Processing text message for emotion analysis...")
         response_data = user_chatbot.generate_response(user_message)
         
         # Add emotion_analysis to user_message for frontend compatibility
@@ -2057,6 +2121,34 @@ def api_status():
         'user_corrections_recorded': len(emotion_analyzer.context_preprocessor.learning_system.user_corrections) if hasattr(emotion_analyzer.context_preprocessor, 'learning_system') else 0
     })
 
+@app.route('/api/session', methods=['POST'])
+def api_set_session():
+    """🎯 Set session ID for text emotion storage synchronization"""
+    try:
+        data = request.get_json()
+        session_id = data.get('session_id')
+        
+        if not session_id:
+            return jsonify({
+                'success': False,
+                'message': 'session_id is required'
+            }), 400
+        
+        # Update global chatbot session ID
+        success = chatbot.firebase_storage.set_session_id(session_id)
+        
+        return jsonify({
+            'success': success,
+            'message': 'Text session ID updated successfully' if success else 'Failed to update session ID',
+            'session_id': chatbot.firebase_storage.session_id
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Failed to set text session ID: {str(e)}'
+        }), 500
+
 @app.route('/api/user_feedback', methods=['POST'])
 def api_user_feedback():
     """🎓 API endpoint for user to correct emotion predictions (user-centric learning)"""
@@ -2190,17 +2282,9 @@ def api_emotion_suggestions():
         }), 500
 
 if __name__ == '__main__':
-    print("🤖 Starting Y.M.I.R Text Emotion Detection MICROSERVICE - FULL PRODUCTION")
-    print("=" * 80)
-    print("🌐 Microservice running on: http://localhost:5003")
-    print("📱 CORS enabled for integration with main app")
-    print("🧠 Advanced emotion analysis with ensemble models")
-    print("🤖 Gemini AI integration with streaming responses")
-    print("🔧 Function calling capabilities enabled")
-    print("👤 User profiles and conversation memory")
-    print("📊 Advanced analytics and session management")
-    print("🏥 Health check: http://localhost:5003/health")
-    print("=" * 80)
+    print("Y.M.I.R Text Emotion Detection MICROSERVICE")
+    print("Microservice running on: http://localhost:5003")
+    print("Health check: http://localhost:5003/health")
     
     # 🎯 START ON PORT 5003 AS MICROSERVICE - PRODUCTION MODE
     # 🚀 DISABLE DEBUG: Prevents crashes and auto-restart on file changes

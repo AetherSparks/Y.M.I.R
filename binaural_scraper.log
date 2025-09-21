@@ -1,0 +1,568 @@
+2025-09-21 17:50:49,804 - INFO - 🔑 Initializing Spotify Client Credentials...
+2025-09-21 17:50:49,805 - INFO - ✅ Client Credentials authentication successful
+2025-09-21 17:50:49,805 - INFO - 🧠 Binaural Beats Scraper initialized
+2025-09-21 17:50:49,805 - INFO - 📊 Existing tracks: 0
+2025-09-21 17:50:49,805 - INFO - 🚀 Starting experimental dataset enhancement...
+2025-09-21 17:50:49,805 - INFO - 📊 Current experimental tracks: 0
+2025-09-21 17:50:49,805 - INFO - 🎯 Starting experimental search from category: focus
+2025-09-21 17:50:49,805 - INFO - 🎵 Processing category: FOCUS
+2025-09-21 17:50:49,807 - INFO - 🔍 Searching: 'binaural beats focus' (offset: 0)
+2025-09-21 17:50:49,807 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:50:51,453 - INFO - 🆕 Found 50 new URIs for focus
+2025-09-21 17:50:51,453 - INFO - ⚙️ Processing batch of 50 URIs...
+2025-09-21 17:50:51,865 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=0zPjaADTobUrNEhcm7AIgE,1BuCouboYGuflWmKXVQitn,7KTLZDTOrszIj4oJbLsvBo,0cs5hF9tyFE8T9OrqCUvHy,3qLXPfi9yIfO6FwGQitXmM,2fcYqiCaNXlHaYSulNACDV,0MNw11tZf2BzyWXNqwBymp,3s9EBJwNvoYRic4wqG3blc,6SkbY9jfHpu87zELwrrsEi,3Xu94JRuFVpuLoqH9JR579,25A4NHhtbzTEyIeOiGQwOk,4TXwpgbeWTa0H4xsaf5WuK,03U857f5H97ETAJpT0sIjl,7nUYJEs5vT12rc7NowCPMg,5fGHdEzFhZJsXxYo3IEXES,0GMn2Ee93o4SAYuKFMhCn5,3AJOT8GwL6IXT0xFicIaA1,0a4PFNipJK9BmSftOHTewZ,3hLOMdg4kPBeYp6kMHpQcN,3urTYNqBF9sJAv4IQL1q9Y with Params: {} returned 403 due to None
+2025-09-21 17:50:51,865 - WARNING - ⚠️ Audio features failed: http status: 403, code: -1 - https://api.spotify.com/v1/audio-features/?ids=0zPjaADTobUrNEhcm7AIgE,1BuCouboYGuflWmKXVQitn,7KTLZDTOrszIj4oJbLsvBo,0cs5hF9tyFE8T9OrqCUvHy,3qLXPfi9yIfO6FwGQitXmM,2fcYqiCaNXlHaYSulNACDV,0MNw11tZf2BzyWXNqwBymp,3s9EBJwNvoYRic4wqG3blc,6SkbY9jfHpu87zELwrrsEi,3Xu94JRuFVpuLoqH9JR579,25A4NHhtbzTEyIeOiGQwOk,4TXwpgbeWTa0H4xsaf5WuK,03U857f5H97ETAJpT0sIjl,7nUYJEs5vT12rc7NowCPMg,5fGHdEzFhZJsXxYo3IEXES,0GMn2Ee93o4SAYuKFMhCn5,3AJOT8GwL6IXT0xFicIaA1,0a4PFNipJK9BmSftOHTewZ,3hLOMdg4kPBeYp6kMHpQcN,3urTYNqBF9sJAv4IQL1q9Y:
+ None, reason: None - using defaults
+2025-09-21 17:50:52,250 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:50:53,177 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:50:54,073 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:50:55,088 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:50:56,162 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:50:57,083 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:50:58,034 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:50:58,729 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:50:59,597 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:51:00,590 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:51:01,263 - INFO - ✅ Processed batch: 20 tracks for focus
+2025-09-21 17:51:01,263 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:51:02,197 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=1SuOsKY9fLaSxBCjAq4Ibp,0pBjP9lPN7PgoqpYNS5UWQ,0kfstDZX5PVMWN8wko5IZd,0u1mnbJLFDj8hijn6Fk4eO,5GjR5BRmkB6kyn0dbMH5TH,6YXLVPezfZ5cs3p2alDYB9,74I8ev3qLp1dmT6Y0Eh24r,1pRvdHvpXSrPw0ZepBIyns,3WtrPhm050B8X9supJFbEY,3Q5YkYi0V924Y2tB1kTw5E,4zxTLBlDyOxvSFWcXfDhuK,0LgplLtg4g8N8paUWEz7GK,3ZEZ4QFFlXdxCkIIFrwRCZ,44HWVk8c2nfDCc2lvgb68m,0pbQEkDVF80VZBUHLmrdaz,1ZXAA7i6oF92zueTYzlv5u,3howeXxDCxeP1UWfXM7aAr,0LqbZADi92Hi4JBNIoLqpV,2Umf3B7gYhkocbveXW35Ui,63SvuIM9L3ONAcYS2ODUoN with Params: {} returned 403 due to None
+2025-09-21 17:51:02,197 - WARNING - ⚠️ Audio features failed: http status: 403, code: -1 - https://api.spotify.com/v1/audio-features/?ids=1SuOsKY9fLaSxBCjAq4Ibp,0pBjP9lPN7PgoqpYNS5UWQ,0kfstDZX5PVMWN8wko5IZd,0u1mnbJLFDj8hijn6Fk4eO,5GjR5BRmkB6kyn0dbMH5TH,6YXLVPezfZ5cs3p2alDYB9,74I8ev3qLp1dmT6Y0Eh24r,1pRvdHvpXSrPw0ZepBIyns,3WtrPhm050B8X9supJFbEY,3Q5YkYi0V924Y2tB1kTw5E,4zxTLBlDyOxvSFWcXfDhuK,0LgplLtg4g8N8paUWEz7GK,3ZEZ4QFFlXdxCkIIFrwRCZ,44HWVk8c2nfDCc2lvgb68m,0pbQEkDVF80VZBUHLmrdaz,1ZXAA7i6oF92zueTYzlv5u,3howeXxDCxeP1UWfXM7aAr,0LqbZADi92Hi4JBNIoLqpV,2Umf3B7gYhkocbveXW35Ui,63SvuIM9L3ONAcYS2ODUoN:
+ None, reason: None - using defaults
+2025-09-21 17:51:02,549 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:51:03,635 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:58:31,013 - INFO - 🔑 Initializing Spotify Client Credentials...
+2025-09-21 17:58:31,013 - INFO - ✅ Client Credentials authentication successful
+2025-09-21 17:58:31,013 - INFO - 🧠 Binaural Beats Scraper initialized
+2025-09-21 17:58:31,013 - INFO - 📊 Existing tracks: 0
+2025-09-21 17:58:31,015 - INFO - 🚀 Starting experimental dataset enhancement...
+2025-09-21 17:58:31,015 - INFO - 📊 Current experimental tracks: 0
+2025-09-21 17:58:31,015 - INFO - 🎯 Starting experimental search from category: focus
+2025-09-21 17:58:31,015 - INFO - 🎵 Processing category: FOCUS
+2025-09-21 17:58:31,015 - INFO - 🔍 Searching: 'binaural beats focus' (offset: 0)
+2025-09-21 17:58:31,015 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:58:32,321 - INFO - 🆕 Found 50 new URIs for focus
+2025-09-21 17:58:32,321 - INFO - ⚙️ Processing batch of 50 URIs...
+2025-09-21 17:58:32,781 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=0zPjaADTobUrNEhcm7AIgE,1BuCouboYGuflWmKXVQitn,7KTLZDTOrszIj4oJbLsvBo,0cs5hF9tyFE8T9OrqCUvHy,3qLXPfi9yIfO6FwGQitXmM,2fcYqiCaNXlHaYSulNACDV,0MNw11tZf2BzyWXNqwBymp,3s9EBJwNvoYRic4wqG3blc,6SkbY9jfHpu87zELwrrsEi,3Xu94JRuFVpuLoqH9JR579,25A4NHhtbzTEyIeOiGQwOk,4TXwpgbeWTa0H4xsaf5WuK,03U857f5H97ETAJpT0sIjl,7nUYJEs5vT12rc7NowCPMg,5fGHdEzFhZJsXxYo3IEXES,0GMn2Ee93o4SAYuKFMhCn5,3AJOT8GwL6IXT0xFicIaA1,0a4PFNipJK9BmSftOHTewZ,3hLOMdg4kPBeYp6kMHpQcN,3urTYNqBF9sJAv4IQL1q9Y with Params: {} returned 403 due to None
+2025-09-21 17:58:32,781 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 17:58:32,977 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:58:33,955 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:58:35,370 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 17:58:36,500 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:04,400 - INFO - 🔑 Initializing Spotify Client Credentials...
+2025-09-21 18:03:04,404 - INFO - ✅ Client Credentials authentication successful
+2025-09-21 18:03:04,404 - INFO - 🧠 Binaural Beats Scraper initialized
+2025-09-21 18:03:04,404 - INFO - 📊 Existing tracks: 0
+2025-09-21 18:03:04,404 - INFO - 🚀 Starting experimental dataset enhancement...
+2025-09-21 18:03:04,404 - INFO - 📊 Current experimental tracks: 0
+2025-09-21 18:03:04,404 - INFO - 🎯 Starting experimental search from category: focus
+2025-09-21 18:03:04,404 - INFO - 🎵 Processing category: FOCUS
+2025-09-21 18:03:04,404 - INFO - 🔍 Searching: 'binaural beats focus' (offset: 0)
+2025-09-21 18:03:05,034 - INFO - 🆕 Found 50 new URIs for focus
+2025-09-21 18:03:05,034 - INFO - ⚙️ Processing batch of 50 URIs...
+2025-09-21 18:03:05,036 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:06,181 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=0zPjaADTobUrNEhcm7AIgE,1BuCouboYGuflWmKXVQitn,7KTLZDTOrszIj4oJbLsvBo,0cs5hF9tyFE8T9OrqCUvHy,3qLXPfi9yIfO6FwGQitXmM,2fcYqiCaNXlHaYSulNACDV,0MNw11tZf2BzyWXNqwBymp,3s9EBJwNvoYRic4wqG3blc,6SkbY9jfHpu87zELwrrsEi,3Xu94JRuFVpuLoqH9JR579,25A4NHhtbzTEyIeOiGQwOk,4TXwpgbeWTa0H4xsaf5WuK,03U857f5H97ETAJpT0sIjl,7nUYJEs5vT12rc7NowCPMg,5fGHdEzFhZJsXxYo3IEXES,0GMn2Ee93o4SAYuKFMhCn5,3AJOT8GwL6IXT0xFicIaA1,0a4PFNipJK9BmSftOHTewZ,3hLOMdg4kPBeYp6kMHpQcN,3urTYNqBF9sJAv4IQL1q9Y with Params: {} returned 403 due to None
+2025-09-21 18:03:06,181 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:03:06,396 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:07,277 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:08,792 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:09,785 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:10,713 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:11,825 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:12,774 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:13,812 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:15,102 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:15,841 - INFO - ✅ Processed batch: 20 tracks for focus
+2025-09-21 18:03:15,841 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:16,825 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=1SuOsKY9fLaSxBCjAq4Ibp,0pBjP9lPN7PgoqpYNS5UWQ,0kfstDZX5PVMWN8wko5IZd,0u1mnbJLFDj8hijn6Fk4eO,5GjR5BRmkB6kyn0dbMH5TH,6YXLVPezfZ5cs3p2alDYB9,74I8ev3qLp1dmT6Y0Eh24r,1pRvdHvpXSrPw0ZepBIyns,3WtrPhm050B8X9supJFbEY,3Q5YkYi0V924Y2tB1kTw5E,4zxTLBlDyOxvSFWcXfDhuK,0LgplLtg4g8N8paUWEz7GK,3ZEZ4QFFlXdxCkIIFrwRCZ,44HWVk8c2nfDCc2lvgb68m,0pbQEkDVF80VZBUHLmrdaz,1ZXAA7i6oF92zueTYzlv5u,3howeXxDCxeP1UWfXM7aAr,0LqbZADi92Hi4JBNIoLqpV,2Umf3B7gYhkocbveXW35Ui,63SvuIM9L3ONAcYS2ODUoN with Params: {} returned 403 due to None
+2025-09-21 18:03:16,825 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:03:17,338 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:18,280 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:19,309 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:20,393 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:21,344 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:22,328 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:23,329 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:24,190 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:03:25,180 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:34,748 - INFO - 🔑 Initializing Spotify Client Credentials...
+2025-09-21 18:04:34,748 - INFO - ✅ Client Credentials authentication successful
+2025-09-21 18:04:34,749 - INFO - 🧠 Binaural Beats Scraper initialized
+2025-09-21 18:04:34,749 - INFO - 📊 Existing tracks: 0
+2025-09-21 18:04:34,749 - INFO - 🚀 Starting experimental dataset enhancement...
+2025-09-21 18:04:34,750 - INFO - 📊 Current experimental tracks: 0
+2025-09-21 18:04:34,750 - INFO - 🎯 Starting experimental search from category: focus
+2025-09-21 18:04:34,750 - INFO - 🎵 Processing category: FOCUS
+2025-09-21 18:04:34,751 - INFO - 🔍 Searching: 'binaural beats focus' (offset: 0)
+2025-09-21 18:04:34,752 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:35,995 - INFO - 🆕 Found 50 new URIs for focus
+2025-09-21 18:04:35,995 - INFO - ⚙️ Processing batch of 50 URIs...
+2025-09-21 18:04:36,537 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=0zPjaADTobUrNEhcm7AIgE,1BuCouboYGuflWmKXVQitn,7KTLZDTOrszIj4oJbLsvBo,0cs5hF9tyFE8T9OrqCUvHy,3qLXPfi9yIfO6FwGQitXmM,2fcYqiCaNXlHaYSulNACDV,0MNw11tZf2BzyWXNqwBymp,3s9EBJwNvoYRic4wqG3blc,6SkbY9jfHpu87zELwrrsEi,3Xu94JRuFVpuLoqH9JR579,25A4NHhtbzTEyIeOiGQwOk,4TXwpgbeWTa0H4xsaf5WuK,03U857f5H97ETAJpT0sIjl,7nUYJEs5vT12rc7NowCPMg,5fGHdEzFhZJsXxYo3IEXES,0GMn2Ee93o4SAYuKFMhCn5,3AJOT8GwL6IXT0xFicIaA1,0a4PFNipJK9BmSftOHTewZ,3hLOMdg4kPBeYp6kMHpQcN,3urTYNqBF9sJAv4IQL1q9Y with Params: {} returned 403 due to None
+2025-09-21 18:04:36,537 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:04:36,745 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:37,619 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:38,629 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:39,716 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:41,045 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:42,069 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:43,092 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:44,541 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:46,265 - INFO - ✅ Processed batch: 20 tracks for focus
+2025-09-21 18:04:46,880 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=1SuOsKY9fLaSxBCjAq4Ibp,0pBjP9lPN7PgoqpYNS5UWQ,0kfstDZX5PVMWN8wko5IZd,0u1mnbJLFDj8hijn6Fk4eO,5GjR5BRmkB6kyn0dbMH5TH,6YXLVPezfZ5cs3p2alDYB9,74I8ev3qLp1dmT6Y0Eh24r,1pRvdHvpXSrPw0ZepBIyns,3WtrPhm050B8X9supJFbEY,3Q5YkYi0V924Y2tB1kTw5E,4zxTLBlDyOxvSFWcXfDhuK,0LgplLtg4g8N8paUWEz7GK,3ZEZ4QFFlXdxCkIIFrwRCZ,44HWVk8c2nfDCc2lvgb68m,0pbQEkDVF80VZBUHLmrdaz,1ZXAA7i6oF92zueTYzlv5u,3howeXxDCxeP1UWfXM7aAr,0LqbZADi92Hi4JBNIoLqpV,2Umf3B7gYhkocbveXW35Ui,63SvuIM9L3ONAcYS2ODUoN with Params: {} returned 403 due to None
+2025-09-21 18:04:46,880 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:04:47,068 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:48,007 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:48,722 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:50,566 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:51,693 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:53,010 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:53,737 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:55,071 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:56,500 - INFO - ✅ Processed batch: 40 tracks for focus
+2025-09-21 18:04:56,500 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:57,732 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=6b5mdCKyPveuHjUMaCcxPt,1IM6un6pmD6X1IbbIhmIYK,0RJ3TLhRbTQuMHZQxBVd0a,0elEWikL3qJ0EhcYLBOKV9,5AARqk2H7qFJExRiARrrbj,55Wb5rQmoDN0XnwcjkJgDz,2PmCqlhuxdpgUhroL6xDLO,3tutiIJiTF49uq0XbxM3QZ,2cQDEktZdK8Secwsj4mp9c,510SAQVymnFSFVEIx3rAQM with Params: {} returned 403 due to None
+2025-09-21 18:04:57,732 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:04:58,246 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:04:59,680 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:02,057 - INFO - ✅ Processed batch: 50 tracks for focus
+2025-09-21 18:05:02,057 - INFO - 📊 Category progress: 50/50
+2025-09-21 18:05:02,057 - INFO - 💾 Scraper state saved
+2025-09-21 18:05:02,063 - INFO - 💾 Saved 50 processed URIs
+2025-09-21 18:05:02,063 - INFO - ✅ Completed focus: 50 tracks
+2025-09-21 18:05:02,063 - INFO - 🎵 Processing category: SLEEP
+2025-09-21 18:05:02,064 - INFO - 🔍 Searching: 'binaural beats sleep' (offset: 0)
+2025-09-21 18:05:02,064 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:03,205 - INFO - 🆕 Found 42 new URIs for sleep
+2025-09-21 18:05:03,206 - INFO - 💾 Scraper state saved
+2025-09-21 18:05:03,207 - INFO - 💾 Saved 92 processed URIs
+2025-09-21 18:05:03,208 - INFO - 🔍 Searching: 'binaural beats sleep' (offset: 50)
+2025-09-21 18:05:03,989 - INFO - 🆕 Found 50 new URIs for sleep
+2025-09-21 18:05:03,989 - INFO - ⚙️ Processing batch of 92 URIs...
+2025-09-21 18:05:04,594 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=0SwQvUL1itONmEfwvELokQ,0tPuFBwxHeJ4XizUCfmlNw,5HOxy6bdXrKJmWkZ4yNSVj,23ZArgJyzjrMe1cgNTdZrV,36lzrgDGa8P5nu902UcxQV,4EpqIH5WVZ0Rr5mNgFjR35,3FbHRGwmunrmiTc3m788vh,48c3SvDDyx3X9kNWpxIzRw,6Lir2q6To3PpO7DzpvkCu1,1Hn5UX9z0wcG5TH8H2R7Db,4SNblLfSnDT2JKQAoIznL7,72BCbCi6fbqhgX2OM91TSX,5IcSRQm7DL9nbeC36xjywE,5FKEefHYTTVZaeuXaVrkEG,4mGHSHWbRK8MeiZcFhzjvX,2dsPYdcL9KKG0ZI2FStaWL,3uwaqhEnBoYHIxooQ3UfwZ,4Rc07DM9AVT6eRwvR3LVE7,3D0DKHqbGd5CDmay4uhDWm,5gVvMHb2vzVsDpO0Xy3UZZ with Params: {} returned 403 due to None
+2025-09-21 18:05:04,594 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:05:05,616 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:06,648 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:08,241 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:09,569 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:10,736 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:11,663 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:13,607 - INFO - ✅ Processed batch: 20 tracks for sleep
+2025-09-21 18:05:13,607 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:14,756 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=6kQkejaJwYjF3XzIlHh2st,6PeUdhaDuRPAsK9Rt4fy52,6MrD4KIOvC7t2RyghovJbT,4GMI1XsdwrFikfuvI9BBty,1x0wsc1w83gfYRf4UgMvQm,0EZbC1gf76X3B5AAnqwjR8,0h0rK1qfiEUMGGV36TqKt5,7twkADLVrE7kPlduYKxnph,3pss7zysZ8ncbj56XlPpl3,1nwZaKS7S65x7w4LXwVXDN,1JE32N6BgP6kYm5o62cG4J,5Qn9Fb4x9MSXaASQcrNmM0,02d6g59KTjIoMEeyYWRh6x,5w9znMVt2FNKExzFwaHrSA,6vGLtG3berGyygEKOGm6sx,4TSkdIf9zT1dmQBUjGdYFB,5tKwfwZmnYTYheDjPSA8OB,48mAQMswntFvcdBw7DSaHq,5ee4JiRtdMEwp2EpgjQfTb,3AE4jmo39N2z8RC05mMWpS with Params: {} returned 403 due to None
+2025-09-21 18:05:14,757 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:05:15,968 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:17,086 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:18,108 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:19,237 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:20,569 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:22,095 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:23,229 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:24,460 - INFO - ✅ Processed batch: 40 tracks for sleep
+2025-09-21 18:05:25,024 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=3QMYbpqs5449hRSc6TQghq,3DeWAEV3OkUcvyQyvuyJpY,3ILi3krevK8Q5k5Iq1lGhG,4SC9mr52R8kzD6wGfxcq32,2tIIth8UwyReGW4gJ0X2Lp,2lFWEbBf8ULVfwkEyPY4vD,2NiHurpLk3uWYCWzxeYgmi,53abX1JN9O5Yp4AicZT7Qg,4sBxL8ormCFDgVfcDxoIPZ,4lwgKKHlGfFhxRUOnvRCj4,5Alzulv8gkD3I6getq46dj,1Hum3F6Oz7d3f9IiynVPyn,19eTOHMjJ4oa23StaHxCji,1sWwbuPJkmXv15dkRoUGPB,3md9ih5DcuqhYO6FVs6KDs,3ZMdWYTLrOuRaZQyFZXdv3,1LBYMiod9OB1KkegpQ87av,6i3j8YmSlOp4FYPDsx6vDV,5jTqOFu42zk0lhSXki94rb,10KQw4PMdOrs45UujUmSMB with Params: {} returned 403 due to None
+2025-09-21 18:05:25,025 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:05:25,485 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:26,202 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:27,229 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:28,658 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:29,685 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:31,126 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:32,244 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:34,159 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:34,904 - INFO - ✅ Processed batch: 60 tracks for sleep
+2025-09-21 18:05:35,409 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=3ScpWG1R4loofwHwRBRXgS,4J5FE6r667cys7k6blpLvn,4Ut6P2LRC1YBPEWAYslgmX,0XA561xP4FljWKMLvdFf3t,11ALAeKVd4n6rtOsheDBWX,6j5fChQXRy5woXYZmZObFh,7IJ8mkMmKNVlaPiXOKlEY4,2AEly7gar0qPwcBYEogbxg,3fBoH3mPWiicBOdKNj8b72,0z6gRI7XGqBbfz2xd9RFz0,6cbK8OIfHPPQlZSmGjbIrd,0mgsi9bG5oizpqCfvgOoR7,5c2Z8yYAOWgQUNt9RIWLWH,67HfhlRMgp95U89cAb1s7i,7IaYp2r0swafSd7iPXk8Ds,4sEsRrs0Sc9nE3spv7vytr,4a1UOkKIClf1GMydZzsenC,5wQAPyKX6y4mRD3z5eUOYb,3rTYQ0lOPJbvpB3Yp9nyPB,0NT47jFPxbVw3pJ7NCJeGb with Params: {} returned 403 due to None
+2025-09-21 18:05:35,409 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:05:35,586 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:36,646 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:37,727 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:38,704 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:40,029 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:41,670 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:42,656 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:43,710 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:45,146 - INFO - ✅ Processed batch: 80 tracks for sleep
+2025-09-21 18:05:45,146 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:46,156 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=1tLfW2FVdyIJ7P6OjO4BD7,148Qnq8xJUrVimwaVgKYbs,7f5KGaujux2Ttq6mXbGAt2,0trzVEcw0S5RH5fKnpW24L,1W27eEt4EdjmEsuiSaUeVn,4iDVD6WmqXlstOrNAPLJPo,202EUZ4N0BzzF8upaPyZ5b,5kIqkd0ILkHsT0HupHTNSQ,4MCYXrUEq95RfGvkdd5SjY,1iidEjzO7ugoUBswOdE6ES,7dWlBJTHiVWeFlA7ATMAXc,2yFAKm5Hb2AGIsmAigxje7 with Params: {} returned 403 due to None
+2025-09-21 18:05:46,156 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:05:47,091 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:47,976 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:48,727 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:51,807 - INFO - ✅ Processed batch: 92 tracks for sleep
+2025-09-21 18:05:51,807 - INFO - 📊 Category progress: 92/50
+2025-09-21 18:05:51,807 - INFO - ✅ Completed sleep: 92 tracks
+2025-09-21 18:05:51,807 - INFO - 🎵 Processing category: MEDITATION
+2025-09-21 18:05:51,807 - INFO - 🔍 Searching: 'binaural beats meditation' (offset: 0)
+2025-09-21 18:05:52,638 - INFO - 🆕 Found 33 new URIs for meditation
+2025-09-21 18:05:52,641 - INFO - 💾 Scraper state saved
+2025-09-21 18:05:52,642 - INFO - 💾 Saved 175 processed URIs
+2025-09-21 18:05:52,643 - INFO - 🔍 Searching: 'binaural beats meditation' (offset: 50)
+2025-09-21 18:05:53,226 - INFO - 🆕 Found 49 new URIs for meditation
+2025-09-21 18:05:53,226 - INFO - ⚙️ Processing batch of 82 URIs...
+2025-09-21 18:05:53,715 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=5lRxPbxSEooNvRbZAi14sx,4tIrCzxoa1XtdxDWIxX4pe,1dxw76djF4d0uVWVUHTCWN,4wuqlQXpPpEVRhCCyvoe1u,3jq1sm2DxRycXbStX7bngE,5hQhfIlRbiCitlcN34jIJ7,2umB2QdDZn4v79HvdK3HSp,0fSO7X9DnmPuK9CSwDNElC,7DmgSLTCTHH2FAw7U1XQ1R,4XHRFHcsMI3qdTJowVSaXk,2bAaV2sWxZKE0uJDiG7s1R,0IJoi1TO1TMWaB8sY37G0m,6Wm1YW0SRtzcoepTlOzPXV,1241hto1PAVoORrqql198g,6WjpFbemfEPtG8cTNjYgTK,77BrQJ6R1OOjRRqzDSPXSj,6Cj9DsMdRYRBvADyYxsWJJ,68uwidfZXMZlNkARfeO1dR,3RTGuQhwBbXW1KBoqowo2w,6nsGhL1YjFYgeLXOZ8jYWv with Params: {} returned 403 due to None
+2025-09-21 18:05:53,715 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:05:54,191 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:55,044 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:56,050 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:57,025 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:58,140 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:59,071 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:05:59,994 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:00,709 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:01,636 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:02,691 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:03,386 - INFO - ✅ Processed batch: 20 tracks for meditation
+2025-09-21 18:06:03,884 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=5b1fzB7GuXuxst6m8tci4g,2jmulajDwGBtWgywbvOdAm,0QzZ2Tu71wzlzdvu2yZH74,5RQqEXdc6c0enKPLL2Jg9U,6CJbAeERVXFtkFBC3ZVY9R,2JJJCv0fzUlEBCVKnKrwHr,1mELhA2LJi8xSUhwYfsFcF,1RUpNUC0zGp4Fu0lobd1Q1,2mj0Vf7UepRY8x2YzqtOME,5KR7tEtxMYp3qwUFmcaxtz,5hGA6uqAzCNrP82o7n7OgB,328WH7om0Qh2aGtHpMRbm9,5aKLb84axp3Isxl8p5Zkfp,1dhb0Dus4aB9jkGgBQE1ol,692bCGR2lWd8Hvt405LA8g,2OEhKymz67Y8GzpADKFe1X,6j05P5066Uud2phjmaOVhI,3ExYFv6zBLOTiOVnJXNvD1,3ERFU6EQTFldbHmztk8O4a,2O456leFLIhaQfIWqQMzOE with Params: {} returned 403 due to None
+2025-09-21 18:06:03,884 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:06:04,476 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:05,153 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:06,212 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:07,571 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:08,695 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:09,646 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:11,625 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:12,630 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:13,716 - INFO - ✅ Processed batch: 40 tracks for meditation
+2025-09-21 18:06:13,720 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:14,846 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=3eyaknX7U7J0KLEDTmWpw9,2q6Degmj0Tzk4SRzIhnHF1,2LjbwWU6uOylUddVmcLHHI,3nctPvHyzlEXI5u80D4QcG,45x8ZNKBIpm4xM4RnQN5mH,2gmxrEkYnXPCZrnpgI4UcK,6XIb16uGYlK6MojQjGQOp3,6U88PsMObNDDj9IvLgXATH,7GobzVmEepokoC8Pma7P5u,4yhKvrcaopGgMLRBPPMQDi,2xNiz7hGJFzmbH93xliDi5,67kdTEGgn9TVUedqCbv3oI,2yfBZtOP506CnjtfT60tBR,6BPVfULcAFTaZwLRz1mXLY,3uv3oh8hhrW4YCy0YxbWI1,3o7EjPxErBipy7U6nGwJsT,41JVfdiZbYWfaDDIq8WvXZ,5xX6iYolWLpQt4JCVhQd2W,6d6ao1fYEC0NlzZyTHOVZR,0YC12xqjTliHY2OpfvhFf4 with Params: {} returned 403 due to None
+2025-09-21 18:06:14,846 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:06:15,628 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:17,019 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:18,008 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:19,140 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:20,181 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:21,499 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:22,224 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:23,443 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:24,161 - INFO - ✅ Processed batch: 60 tracks for meditation
+2025-09-21 18:06:24,162 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:25,154 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=1N4yIFZRkqsxaoOpigqjy2,0bPT7v5bklZTcP6HIWax3V,64IGvjZPNHNfEh1KxFpqom,3aBJ1dY5FfAokvVlQgTq66,1WSkebrCD9vqJTl3i8aJj5,06AGOSNGdjZcgg7VL7rn3n,2GoKcnoDOHgOQEfJr4Q3Hl,3hqUm2MYAa1vg7YSdKfRYV,0Ex1uXjccU6sUIJ3f7beCE,55cKPZSwhcSr8gne1YKygg,3FldAK1YerS7oPDhuaqSco,4X7mYN944mQwvaV9EhKYqX,6pBAo34crqtlVF1AUzygrY,37yKAJ2lWWRGV5DMUx5t3x,1yYO7oy3MmCRbACDHScBBc,14DEIfjUNcUwh6iqF9vJEc,0zKermaUjT3N3jZJVWYamH,7dKWgI3lyBK0VQH7elQ4HO,5WsIslywFGDJPoXjuTtxGo,18xv50tebrZHFdpKZvumHW with Params: {} returned 403 due to None
+2025-09-21 18:06:25,155 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:06:25,698 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:26,721 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:28,151 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:29,175 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:30,099 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:31,226 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:32,659 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:33,985 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:34,769 - INFO - ✅ Processed batch: 80 tracks for meditation
+2025-09-21 18:06:35,213 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=6fsLnAGFoGqJml8Kgha7F3,6mkC2k5XEdlohNovllu9bG with Params: {} returned 403 due to None
+2025-09-21 18:06:35,218 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:06:35,218 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:36,150 - INFO - ✅ Processed batch: 82 tracks for meditation
+2025-09-21 18:06:36,150 - INFO - 📊 Category progress: 82/50
+2025-09-21 18:06:36,150 - INFO - ✅ Completed meditation: 82 tracks
+2025-09-21 18:06:36,150 - INFO - 🎵 Processing category: RELAXATION
+2025-09-21 18:06:36,152 - INFO - 🔍 Searching: 'binaural beats relaxation' (offset: 0)
+2025-09-21 18:06:36,152 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:37,310 - INFO - 🆕 Found 27 new URIs for relaxation
+2025-09-21 18:06:37,311 - INFO - 💾 Scraper state saved
+2025-09-21 18:06:37,312 - INFO - 💾 Saved 251 processed URIs
+2025-09-21 18:06:37,312 - INFO - 🔍 Searching: 'binaural beats relaxation' (offset: 50)
+2025-09-21 18:06:38,203 - INFO - 🆕 Found 37 new URIs for relaxation
+2025-09-21 18:06:38,203 - INFO - ⚙️ Processing batch of 64 URIs...
+2025-09-21 18:06:38,739 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=2lXi2EK7BZ1zYm23xlffsE,0vaJV1Nf6alKHMzZGprsQ0,6eSSBG0N5aI5MhEMRiJAGY,3RYIwVEBcvN0VccQ6gDNIa,1hmfS61fW72GFSX42ydVGa,3Ky4Z3SJTs6sQCjnXQdISi,0IBvO0DATt03dwHVDpZtrv,7Hd06xvKzC8WEhDZcCzB2k,1MIY5WX7lxmjc6rl6OD5nA,0xWV6Vv8eclY9ORYyDhAFO,18ULtvEKi7V4vWwc9P4Muw,2fkH9JL03cYn4zHcreOhYA,4FM9aiU6fxcSQeO9wolVgO,7zd7lKvWbsB7R8sBM0eV12,2AOOPSqK33CKXdoWaD4R2R,2IjNl7mWHMBjK4Fxju6WM3,2HMsPObE855BSuyX8hWGMg,4HHIrLV2K182MTefcazGBG,3FsXeP7peCCaQbYBZtqh9Y,1OlJspb9gidiyvGzagK5Qt with Params: {} returned 403 due to None
+2025-09-21 18:06:38,740 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:06:40,135 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:41,166 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:42,073 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:43,172 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:44,175 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:45,464 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:46,178 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:47,056 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:47,914 - INFO - ✅ Processed batch: 20 tracks for relaxation
+2025-09-21 18:06:48,472 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=6O41DAhpUb1SfLZli2DzXv,2YyHGicg6pQHvsnXCjd0Jb,0h9WMW74D5ClKAPA2kuMjW,2UWH1rVY1idYmsmjngTI1S,7CFbrjw6uzGgBOwm68TRuJ,1PAqAsQA0rAtnA3JAlw6LY,4yLPNHqoUKx30WnQRd4Yhz,1usdKy0qCnhqs0t6UrvReU,4W7eEhfzY5gHjc2okRmYmC,6AnTLNfmtUrFvG0pvcIgrm,3zjYe1s7BJQWSrWvS8ci4J,0vWp0PJ8iHleaCJ2wDwNUG,0WGqH7n2qVr1AAnee8GPOT,4aegZQyubQKrGUzlrfFQ8S,1aQHnOaEYZsDCFXnWXvBjN,2DYBlv5K8jflTmgxJAHkdr,5J8ItAYKcO2Td0R0Hh3kbJ,68K3OR3WGx8Pft1sB09rFj,4ZDEugW2tzWWVBIY0iCKne,7dIGhIpmnKCYMZJQuKKGtC with Params: {} returned 403 due to None
+2025-09-21 18:06:48,472 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:06:48,734 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:50,065 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:51,186 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:52,218 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:53,573 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:54,664 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:55,563 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:56,580 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:57,577 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:06:58,338 - INFO - ✅ Processed batch: 40 tracks for relaxation
+2025-09-21 18:06:58,916 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=00JZ8gYC7ete4eCxHN3SJG,0pUsqn9giNMySEhVoUvTG1,0VmI0GHLTuq3xjupMJraI9,5gEnuFhSgmq9QtJ9W6HKVY,6dpFlnZf9edlollK6wBgtW,4JutUmgrCPYg02Ud9RaMku,5rrsgbvBOFVGKaaidlhD5o,46AHi07eTONHZf6iiMSIAb,3RTj5UGjGOtGBI9sTCFJB1,234m4fJHe0xRgs8mjnvt79,3jixt9OMtNhcvsmer28YWI,7nCF1ytZGdeZTNPWcsoeAE,74YvZ6Smf3dAT4BKujhufF,1ceFbynOnDRdIkWnwDpQS9,2eZdVBVWyUQHzPdt3RyAVO,7CcLZrFSa1THgT3PmXQKG5,6Ax1MlJEwKebvCSouabGHA,19mh7o0dMwcptLTbMGwejR,10ovQcONvlLx9gbOU8Q8rJ,2BmIE4bCrPqK4sTgSJaVXv with Params: {} returned 403 due to None
+2025-09-21 18:06:58,924 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:06:59,478 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:00,210 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:01,080 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:02,166 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:03,132 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:04,141 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:05,055 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:05,982 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:06,674 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:07,548 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:08,712 - INFO - ✅ Processed batch: 60 tracks for relaxation
+2025-09-21 18:07:08,713 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:09,728 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=0CFxTObc4fjNg18EPclLlm,7cO579Qao3G5fKF16VIGlM,1KkUe6id3umEE9NocE6JXG,5i3PwHr2pMY7nVCElaihZJ with Params: {} returned 403 due to None
+2025-09-21 18:07:09,728 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:07:10,665 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:11,400 - INFO - ✅ Processed batch: 64 tracks for relaxation
+2025-09-21 18:07:11,400 - INFO - 📊 Category progress: 64/50
+2025-09-21 18:07:11,400 - INFO - ✅ Completed relaxation: 64 tracks
+2025-09-21 18:07:11,400 - INFO - 🎵 Processing category: CREATIVITY
+2025-09-21 18:07:11,400 - INFO - 🔍 Searching: 'binaural beats creativity' (offset: 0)
+2025-09-21 18:07:12,124 - INFO - 🆕 Found 44 new URIs for creativity
+2025-09-21 18:07:12,126 - INFO - 💾 Scraper state saved
+2025-09-21 18:07:12,129 - INFO - 💾 Saved 332 processed URIs
+2025-09-21 18:07:12,129 - INFO - 🔍 Searching: 'binaural beats creativity' (offset: 50)
+2025-09-21 18:07:12,754 - INFO - 🆕 Found 49 new URIs for creativity
+2025-09-21 18:07:12,754 - INFO - ⚙️ Processing batch of 93 URIs...
+2025-09-21 18:07:13,198 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=5Jv8nBJgDXipxRivrvqc8h,3WbwiHZaPHTxxy0OTJvbMD,5sDhRH5Umgcs0ChHL8A37q,5Z6hdVHH39nARjTBfMUVl6,6rklXQk7wrWeCqn6nwEOko,2GjKg3xi1HxT69ZOgjUFQ5,2OnWBoMaAUr0VhAM38fX7B,04uAaTE5mouHAXuc8ZGQ28,4T9tS11PP7Py6VFQuREbt5,5xCwkh8A96Wl1L1dThA0QI,3Lcl25z9wp8pqZrFX9RdF1,3uh18fpoK2Gdur5MEYNikk,57mllmQ7QjPzC3aBD0G18l,4b45ZiuRRvhCgWbp44chV3,5V0wkj3S3yejcXUKFb79bB,6K8JUY1UmXrBWb8Zno2kwD,2pxToDbPnvrcRmfPJe3sK2,6tnZrYzfe4EIrwPpZANcaY,5Cs4li9xDA2MwFudR6Waqn,4bO5PUmEimVv9lGR4HkbHk with Params: {} returned 403 due to None
+2025-09-21 18:07:13,198 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:07:13,596 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:14,523 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:15,565 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:16,692 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:19,089 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:20,172 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:21,206 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:22,148 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:23,040 - INFO - ✅ Processed batch: 20 tracks for creativity
+2025-09-21 18:07:23,658 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=137WBR6cCBbgM4dGoIe5B7,3gDSLkwuRdhoBaHlhiHHj4,0qR68SzuYf2Q5KmRUksYGm,5qEJvpVNO13CkBa6TNQe8c,5WFQASHaltpsDsAc7AbYCS,0QkKG32jjhd0BFTXxF5frt,55VhFmUKZ0kd81IjiA1eax,2EEE52LkF52gFe3lfHdh7K,54NE68p9jjgkUMlYv31ZBW,3Hns8xvbJHdCNTr7G0dzPw,68KkoHUNr7WWrSJ1JG6hlM,7zfPSqEFj1ydI8pW2lv6nW,0PvWhKnUHNL0dKgCXkl0RS,4p8AGacVJfJgapD8wOhVM1,6hkDI9jJrwTAxeanBzRuBf,6frqORXo6ImnkUsqKbNbXq,5JbaU0pJLVhi9WM894hQ6Q,3Z4zcQiYVCzAir6kxw9AAH,3W22cODkTwXmYNQ9TdjSu9,7MG1OIvYd6BqtQ2RPAhEd6 with Params: {} returned 403 due to None
+2025-09-21 18:07:23,658 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:07:24,580 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:26,622 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:27,671 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:28,685 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:29,535 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:30,214 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:31,126 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:32,720 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:33,414 - INFO - ✅ Processed batch: 40 tracks for creativity
+2025-09-21 18:07:34,087 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=4msoyHoSqH52uo8wn8B5TJ,3oAQneTgiIToCyps8z2RHK,7m7yzbimMxS5ShLuc6Smgy,176HkSw66G4BajQDWGPn8b,1a5VMX7YHk6DU7hPkCIKCG,27qNOjbnToO9nQD9qGsQ30,41EOmcbiN4bzHvFGlajKUq,539n9ximdla48l6YbUltwU,6winCy4hGoUxaGgCH1nXg9,6r5POrnJNWINjMPuj1dY3a,3C6w4S7VQKKgdGsBMeoAOp,45LyahNsE7R6OXgeXHfb8X,0OY8j4qeIU35HtX8U9wsQd,6MlU599SrzShpxKzMlPuuU,7bR3tb4MN1SRLBlX2U06n5,5zSRNJBA8ZbtBH3vNVZ2QY,3R7gvbU0IYF1ho4Xft7miE,7mB7CXHVOZiHINF4EjfmFp,54TQ4824J24PRtVZjWHSte,4u8xyy7RqWDvihxJ3MCaFI with Params: {} returned 403 due to None
+2025-09-21 18:07:34,088 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:07:34,710 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:36,141 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:37,172 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:38,139 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:39,220 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:40,652 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:41,673 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:42,633 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:43,554 - INFO - ✅ Processed batch: 60 tracks for creativity
+2025-09-21 18:07:43,554 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:44,527 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=6zcRbFk0aSIhdwmO7PHWPT,4XCqNlTSz6vuItjJtwHhko,66pYbSKbgEdESKtdjhp0Q0,3tW2usRQsdmNTN5ZJhLnuG,4da9JU6NzqPrBGuNvJtuKR,2Nma8551dKd8zMnXHFK8Fx,0s6tCs9yUQAGJa04BHCZYs,6XVqQPu1E8qw4fJ9FUn47E,4mR15VB92F1p15SqkLSX7s,3gEbZqS92x6wx58riiqo2j,3NByQKZysvVSilHz2ehgCG,7sPbAB7aWqXLU8h5FzrHkn,6yormtKBrB8AYhqZvvpsRv,2J0oiQ44yXuwV8g9UNydUt,3YfbeXVUIJRhTy5sm1c5Q0,67HkjhtNdSAdRinfNtkm9z,5eZ5qDpxUZfKbiMMY9gZvr,0VmO9HZqTEPpFlEtTvQMn4,5TfI0AUv6caJfoWZMkpyO0,5tB1c8ELSl9GpYSDdSnNE0 with Params: {} returned 403 due to None
+2025-09-21 18:07:44,527 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:07:45,167 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:47,207 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:48,188 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:49,460 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:50,688 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:51,570 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:52,608 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:53,556 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:54,246 - INFO - ✅ Processed batch: 80 tracks for creativity
+2025-09-21 18:07:54,246 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:55,399 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=4yC7pvvz5ysVouItAHQFFj,00ta8U6cHV5VKMhI2EkBLA,2nJc6r7R1RqYv28L3gCxe4,6Zr6pU1ZdQCHFJsL0G7syh,0Cm4eun4sYTjZfIZNCw4yv,5wwEuPvICnYkywBYYycYWk,5mTeezwds6VQqDor8Jjzlz,0NDPvhz98NPzrkQJQ1RCuW,7AovCnz1yVowY0zDOCVZRb,1FK3TpJy9iVjncjmNIYa73,4G5JiPo1GBAMnqvxRonZ98,2Fwp916WposRsJ5bId7vW1,0YREEI76CVyLlbpB3Bu6BT with Params: {} returned 403 due to None
+2025-09-21 18:07:55,399 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:07:56,040 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:56,743 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:57,618 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:58,482 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:07:59,601 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:00,979 - INFO - ✅ Processed batch: 93 tracks for creativity
+2025-09-21 18:08:00,980 - INFO - 📊 Category progress: 93/50
+2025-09-21 18:08:00,980 - INFO - ✅ Completed creativity: 93 tracks
+2025-09-21 18:08:00,980 - INFO - 🎵 Processing category: HEALING
+2025-09-21 18:08:00,980 - INFO - 🔍 Searching: '432hz healing frequency' (offset: 0)
+2025-09-21 18:08:00,980 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:02,308 - INFO - 🆕 Found 50 new URIs for healing
+2025-09-21 18:08:02,308 - INFO - ⚙️ Processing batch of 50 URIs...
+2025-09-21 18:08:03,076 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=5LiVu0hJYcMeI1wFMMI1ua,3aIbn9nXOrZsih1lPSZBlq,69cUoAXV2Ft69VtvUGjEdG,7aCyV2LKrEkF9s4QYMUfJV,6jioVcdtpf4XNhTx3vHYH5,3iiYXGqLjmkIsilMmwr2lf,0Tern15ldJpbTSyrGcHhxa,3z8Ynf7wwd6Sgrhc1yVVGR,2uezXLiwa3wEYNM4YzIkSl,5cYRNHTyhbHygNB2rVeE8L,3hsx0rbAtJ7mgeYtAdYj0H,3yIQcmQRENtTIzwGJ1y86s,3jMd2XITzD1V5lcFL4N7Vg,1V8AIEcIomgRhBnGF2lHsS,3LqjqvvbQFlKswy6OoXO8Q,4GEY6dZ64XpqE4hoJQ3NMf,3YRHlXJSAaX5FjTzzSANzw,4ovQlgSLQsDpmE4SplH10J,3hYhkdtngMUw4r3ZcSAYzM,2CCuFgTZnWYy5bA8RegAN2 with Params: {} returned 403 due to None
+2025-09-21 18:08:03,076 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:08:04,485 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:05,234 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:06,165 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:07,198 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:08,093 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:09,018 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:09,734 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:12,255 - INFO - ✅ Processed batch: 20 tracks for healing
+2025-09-21 18:08:12,789 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=2AI0s9ePJRZwkoSMtH5AUp,4SG8OnGozZ7eHWHmPLovOO,2OEU6svcAsOprt4hjxOym3,04ZBCOEwkO96SOnbdo24xq,3JqpPS25wTVGqYNgZtETcc,3cTEK5a6H0fTuvOZOIHUFV,1BE9IXzcpMpofwVnHtJoMV,1N8yTbcS5yh1xq05H9u0h9,2GWmu3yokojq4FF9OuyL5n,7GsJN0APR3nUitlMNIrJrR,2xvRQh8mJ1Q0ITjLcpTItv,4u79483wfCBt3Z7OKWnJ7C,1XssoBlRvk6uVQfNGFK4w9,4AEJaxJXSDm5NPXBnimoeE,6CDsbA8hHuESwDlIBaFkgd,3dlHENCSCO2q8Rsfl7gIKv,0gsnFivQk4zVyMKEiZKQib,6Q5srgcFqi0DQJnOTk13nI,292LUTipp8FgNAHkfTflrQ,6k3HHaYOvLzOFpaOeOtvNp with Params: {} returned 403 due to None
+2025-09-21 18:08:12,789 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:08:12,952 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:14,017 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:14,711 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:15,583 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:17,024 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:18,021 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:18,703 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:19,691 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:20,597 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:21,656 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:22,557 - INFO - ✅ Processed batch: 40 tracks for healing
+2025-09-21 18:08:22,557 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:23,557 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=6vEQ139G3Y5lWAOFAjIh9l,6t7WCR1CbiGn7qyvapglMM,4CGQqo1UxBmSIPCOCO0sRj,0XMp2qUAObRSFEm2SQpxRY,5l3NJgeZMm5snK5Mqy33h4,1SBLeUUYFUK7EkBqoNLfQb,09DLjYLPYozwWwFlYiKiGy,5ygExbMGWeLZXabmTXTpZ3,3S405yhX19ekDqzHgz43Hp,38Pal4w5ij4ClrpOabO9LI with Params: {} returned 403 due to None
+2025-09-21 18:08:23,557 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:08:24,003 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:25,042 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:26,019 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:27,040 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:28,118 - INFO - ✅ Processed batch: 50 tracks for healing
+2025-09-21 18:08:28,119 - INFO - 📊 Category progress: 50/50
+2025-09-21 18:08:28,120 - INFO - 💾 Scraper state saved
+2025-09-21 18:08:28,122 - INFO - 💾 Saved 431 processed URIs
+2025-09-21 18:08:28,123 - INFO - ✅ Completed healing: 50 tracks
+2025-09-21 18:08:28,124 - INFO - 🎵 Processing category: ISOCHRONIC
+2025-09-21 18:08:28,125 - INFO - 🔍 Searching: 'isochronic tones' (offset: 0)
+2025-09-21 18:08:28,126 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:29,358 - INFO - 🆕 Found 48 new URIs for isochronic
+2025-09-21 18:08:29,358 - INFO - 💾 Scraper state saved
+2025-09-21 18:08:29,363 - INFO - 💾 Saved 479 processed URIs
+2025-09-21 18:08:29,363 - INFO - 🔍 Searching: 'isochronic tones' (offset: 50)
+2025-09-21 18:08:30,103 - INFO - 🆕 Found 48 new URIs for isochronic
+2025-09-21 18:08:30,103 - INFO - ⚙️ Processing batch of 96 URIs...
+2025-09-21 18:08:30,722 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=1HGrYRiMrx7wHgsGbEjFXO,7n7ZbsQiOM2ZBebl45OoFW,0E49z1rgBoRKV1AOtDqBEN,1PlURd9tx9xzNHQ2MJEVWW,4oceh8Kjn1kLXhlPTh1Qwp,5wHiTilG9jpFhNPSe0CZwY,17sylgBkYgt7i8oNMGF4YY,5zqYIKPDvjb2W01cZfrwC6,1FBqzjTMGyeT2uAmNEAbsa,1SGAZyFhaT6PIHlQCxJkTD,43GtNLtMDMBE4M3oTLfuOj,4eu5ep3QTCntPoVxVpbp4V,1eVyppvCVkJwWQtvYhShIR,0UHgHDbYtx6a5kInxzAQak,2S4NyodB56PeGrzWZP01r3,57FmQJ8DTz1ShvhWjp3DZN,1hs0knn55WemMyh4YJ7cGt,37VnMJ4boXaPCCFFNqcMfY,4YnGoT3eSeVXaMDBsl3Qcc,487u5ArODIWquZYuKSuvFM with Params: {} returned 403 due to None
+2025-09-21 18:08:30,724 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:08:32,682 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:33,565 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:34,624 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:35,582 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:36,631 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:37,706 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:38,728 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:39,908 - INFO - ✅ Processed batch: 20 tracks for isochronic
+2025-09-21 18:08:40,858 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=1hUSK4Ef17Cyw5GSzG0n8L,7kuRmzs59ADc7CY5ho2cgU,7uOpI6E3JhUwve6vnfPyHB,7hEPnZhheJYXdt3pRKRduR,0bfQ8Dyb0K1hjCNfSOKryg,6EpFrubqXwYGG52THvRUgy,7y3cONggV9eQXXgchSUGgT,6sKfjggglJUR99SpEBoeo0,5nNRyJoGLyM2i3dXuJQd6m,38OuVTdLR1JddH6DaAoh2N,61lSONpgiBmMzWdVYcBC3k,39kjOGqOrW9hiSI08XwXfm,28KZr0vrWX9pQC4cTvfZWE,4Ke3WMoGDMdw7bQpDQ9mF2,0H4lQ7tEbxbzohcBRpplqu,4ptDp5AjrFGG5nR9C04IAs,2G76khsh9s0o9UBlGkrR9M,3VXAQ2co5l4q0MOzFOBKNl,0CtgRpAgA3CXKFqRJv6pig,2CuIoUYJd8SE7201YZiKvh with Params: {} returned 403 due to None
+2025-09-21 18:08:40,858 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:08:42,609 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:44,238 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:45,721 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:47,178 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:48,245 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:49,669 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:50,471 - INFO - ✅ Processed batch: 40 tracks for isochronic
+2025-09-21 18:08:51,100 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=3oEJWiSNTB5gmNh6FTw5N1,2CxsQKx7IqXZh34U3Ptnjk,0K5E6uWTaAlUnhdxCGPv4g,4932hM8jFRZWtmlbfDrWb1,6SxFjkBUfkZIKdtfhnGAGB,1vYaqKPXvNQhRRcFC0HZt7,2NCV2I9blGXXn5JzgDvREv,1YBJ9JonZqcRNCqK5UQzRv,7yuNdwomzgDRloHzvkPksM,6tHFFnbGmPRiPq1512TQqs,7t1ToYLTOm27a5UYTmOkhM,4v46nOYCNe0AQ84Jzqzrrc,6sm6sZ4LY5JQNJAJ9V1ed0,39GNl9swnVrZTtqn0qkuBB,4Ed4ad5Fn24eUqG22DPJN8,7FWO1u5C1SofxYE6lNWxfQ,7glwZxmknwECmFfwWmHxFp,6XeEeacUajS5GVEkeyWwia,2S4aaI4gUO7GHFpePe4qwv,1XEvVJ4XNGBQPYxTy3mpxv with Params: {} returned 403 due to None
+2025-09-21 18:08:51,102 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:08:51,625 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:52,534 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:53,524 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:54,530 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:55,516 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:56,554 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:57,533 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:58,580 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:08:59,611 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:00,548 - INFO - ✅ Processed batch: 60 tracks for isochronic
+2025-09-21 18:09:00,548 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:01,488 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=4OLjo7Y2JmgwOP9XItZgJp,2gs0ecDGj4cqQQazEWZi1p,5tcjfhVARFOTD6bD7t8GQY,46QjXEOz739wuehiFIMQIi,1WLc1LUsuxxI30z3QxCui1,2LF4ih0tqo0Jdc96egiL4C,6CAEEXofW1yXyaBiufLv0m,6E9Mt2U2tofpeqBYylkkpY,3owasH9HLXOwsYTvYqEd8T,3Cxri4NoQwOVvaYzZi2KvG,5TeYILMwnmbKweQkhrOhtl,2mcxr8PG6APVrMhVlKo6nM,1a2d01OfWTamTBgaYMUmVo,6649C61hRbx6wg9AVUzPJC,1WIv6hUEdcW8UeJnsHynfu,4D8di3cqIS05CWTBU73vNR,5Rg1B7Egy40TyLCbeD4YWB,0MQ3lH6UbqxVOLVqUWJcV9,4Xg4D5eqw7UCnOriN8dixy,0RN4bjKtfCDxYfWPrkAGSv with Params: {} returned 403 due to None
+2025-09-21 18:09:01,488 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:09:01,668 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:02,682 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:04,027 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:04,720 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:06,675 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:08,093 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:09,031 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:10,026 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:11,074 - INFO - ✅ Processed batch: 80 tracks for isochronic
+2025-09-21 18:09:11,075 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:12,205 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=7mywVguyXA86vjIxxEC2VR,04uPL4RM6g6I7IwHvBDDOV,1u2BBgdH2mvuRHE2eFoNWe,76ZSEvCFojF5AQlBWIBK2v,4FKSuqYkBUmJuNSrNBMPYV,0piFJsAE05DSFN5SJxRKsA,28cANXvTTIdDB6yFgggXcB,7g3urRMtsVqKUOU0MuOKam,4YPMQmYueKoHghH4bgo0Cw,15lMB6YW3TkfmdxpLx0eQe,4iQMYqM46pOhlo1eqPRiCN,2ctwiNlJChQGcT2p7UeByv,13o2netI703XHNckt7sUq9,76GWctgTgufbGvoAx0u6Bo,76HCNuEVtsmFpYByZsvSLU,5aJAEWhKvD9quRWog8UyYS with Params: {} returned 403 due to None
+2025-09-21 18:09:12,209 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:09:12,593 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:13,640 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:14,611 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:15,636 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:17,016 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:18,181 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:19,243 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:20,085 - INFO - ✅ Processed batch: 96 tracks for isochronic
+2025-09-21 18:09:20,087 - INFO - 📊 Category progress: 96/50
+2025-09-21 18:09:20,089 - INFO - ✅ Completed isochronic: 96 tracks
+2025-09-21 18:09:20,090 - INFO - 🎵 Processing category: AMBIENT
+2025-09-21 18:09:20,091 - INFO - 🔍 Searching: 'nature sounds meditation' (offset: 0)
+2025-09-21 18:09:20,969 - INFO - 🆕 Found 49 new URIs for ambient
+2025-09-21 18:09:20,987 - INFO - 💾 Scraper state saved
+2025-09-21 18:09:21,017 - INFO - 💾 Saved 576 processed URIs
+2025-09-21 18:09:21,043 - INFO - 🔍 Searching: 'nature sounds meditation' (offset: 50)
+2025-09-21 18:09:21,780 - INFO - 🆕 Found 50 new URIs for ambient
+2025-09-21 18:09:21,781 - INFO - ⚙️ Processing batch of 99 URIs...
+2025-09-21 18:09:22,440 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=7rbdKNARg0eWP3H1bvkZbi,1k9IdKVscuUnbY1NDYdGId,7244jlCIRFqRp8yhMaklLN,17tA00gTfxh9wySixKMLQA,3rpIXnNkN2SdqjWy2F0jG1,3yi6KSXnJBgECOPX2hYT0L,7v1y4sYII9vdEsUIEwT13E,01VRlzhuv5LS1WLZsBJuek,4FcBeIBHkXK6BP5ORKQNiQ,11gvVIKblQIJ3YFf7A8q0o,6Rc6HI4F2HcozOyG4rJ6y5,72WBF6dxJLFHsuyWnLYqja,0z0tdo4Py49oemeS0zlN0A,6WG9MiMWeiaN7k6TGAfz96,6fxmnuFVUhgbYdnA4Mo6aO,46zf9nmHqmfX82HeMjxPlP,5HLF9qyqBKWJoNks93acco,5wBnuppXZtGmunVOHXBzQx,1A8GlhMgz6zUK71VudxNlg,1nsZUQW8WhE9S3GMOvtW7t with Params: {} returned 403 due to None
+2025-09-21 18:09:22,447 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:09:24,579 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:25,569 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:26,231 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:27,149 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:28,099 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:29,210 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:30,123 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:31,123 - INFO - ✅ Processed batch: 20 tracks for ambient
+2025-09-21 18:09:31,123 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:32,059 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=5Nz1iZac1crI5ZUREg0Yun,73FLtGtyNXx6QOpbNdQoZn,281v2Wyp5L95zxUkDBVRuR,7L5qMVBbRoSD6WDLAKiPOG,54SIgvfNyWRsUZGU6M8GcI,6jf2hNfTeJa3KHUcCVSoqi,5by6VGGUOmnGy2kuYhsMD5,4pBrFEAMxNJcvdtYjrNfAw,1t8I6Nc4fpuWQzRQuAXrTl,1t6Vvj20LIXss9Eol4v2r7,1ztHb61dnYsuTVP0EfoTH4,75IFOtvq9OaL329QnoLBgk,0HrACxwrvS69z76nFZWw0T,6Gtbc8Ogxg5Z5kAKvRtqIl,7H75CFafG7g6rX0PVdhfi9,4JjBfIP9o8BDjDnYSVjOQO,4d9dpnAawU6l80QO8WIKzz,3AJtM4NMaWoZZmWtoVrTUq,2yQpPMB09kt85h5cNibcmM,2SredkgmiVcErzt7hkH5wl with Params: {} returned 403 due to None
+2025-09-21 18:09:32,060 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:09:32,553 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:33,513 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:34,191 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:35,057 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:35,959 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:36,638 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:37,608 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:38,481 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:39,190 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:40,190 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:41,106 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:41,793 - INFO - ✅ Processed batch: 40 tracks for ambient
+2025-09-21 18:09:42,258 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=17zgZnoo5Te92UTMd8Gte2,34SUEroznWC8R56VYSGKx1,7IG19CsbscbIrXHGSwGv9m,4dfhZp7iOU4divEiFTsGhI,725O87xqZeLxr9RjCWyVg6,5QyAJmtEFJdnEgCPXDQgKy,4ufzIRCcrmJ0Xxd6BVK7yu,6mrL5KgnTMd2ae0ClF7obQ,2ElXIde9edGAyNjPaXgIHW,5ewdZMH2qZY47UQtGeHFcc,6OOLvHlCfpfrL5eOTavcig,1jrJ8QNXm2gpjDG8L8Xkbs,4kGImfSp6W3tgEWXM4j2hk,5Ib96cyGrJO5UCHepKSwge,0wjq5TtW5Jhu51pOUhrtws,6ZxbHu5i0VEAy4Mied3gBL,72ZSG2bSLuUUMZuDWJASrk,7l1XV19coB7tAqnpuU3oHf,5vPZ1FYmRWZUwk9fj5x450,5KAkvgPSUrEObeFbPuVT5G with Params: {} returned 403 due to None
+2025-09-21 18:09:42,258 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:09:42,520 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:43,526 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:44,490 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:45,242 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:46,171 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:47,108 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:47,951 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:48,655 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:49,553 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:50,633 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:51,534 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:52,279 - INFO - ✅ Processed batch: 60 tracks for ambient
+2025-09-21 18:09:52,664 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=44j2j7zbnmDgrliMbBx0TG,5Ogu8Uuy3xeOxsauuCVRk1,2uDeVbXRghzvKGhv34V8oz,3EvomX9g0fEOKTCRUTcvg1,65LSaoUF97lGOO33OTQYEG,6stcbLlpURUR2ARkwO93XE,6O9l7A57SQ4Z5VwSKyu0UH,7H6ckuFM3xcPHxtjDS6iyp,3UWZCkynli9KhYRi6hPBAL,4enTV4FdCAHogFlsCIcvJC,4NK5m1KFyz4t6ZZMw2OGPd,7KjpmZmgh4GWoNC6O6ieq6,4KcWZP9eE4Axpf7T2WTFay,4lTSreahDs3wf2oUZQXXKM,3oQfS6ULpEzKJLDrT0ymXe,4i9TFKldKr9lfoqd70aN3R,1GIdNFQsoUxMAqk5WP8h6V,3YhxGkAJAIPY5PvSA19SA4,4JSl7jspo0pnnh4iy3z2NQ,5VvuA65G3ZsIdziIVJ3Xm4 with Params: {} returned 403 due to None
+2025-09-21 18:09:52,664 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:09:52,664 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:53,580 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:54,506 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:55,174 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:56,111 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:56,991 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:58,142 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:59,031 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:09:59,961 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:00,653 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:01,600 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:02,587 - INFO - ✅ Processed batch: 80 tracks for ambient
+2025-09-21 18:10:02,587 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:03,547 - ERROR - HTTP Error for GET to https://api.spotify.com/v1/audio-features/?ids=05QUReykHPzRkRxzFLZELT,3s1aJ4dXDURDVp33brQOrT,3ZOEytgrvLwQaqXreDs2Jx,4WVL0pnA9tjDScs4OeUnAL,5TfZEYItGZ5Fvqrh3pTP3J,7nIjIiE3DCyJPLLJwyzRWG,2Aublgl4Oksoq6M2UtgqO0,2ZV13LO6ajtsojw9vsz608,7dQVFdm3kFrGKTzyp7g5Ng,2IfDGY0NSaCucgusiXGhFX,3MUvY777QPZrXGRcAvEOTM,0nmlgTycCaKprKw4L05Xoa,0NNW7wkzc9sbO9PKhAp3d8,2s7wg4yYlTN477e2DdIyg7,3nOeoQTNF1RZekM2SZHWTK,4mXjtvZbKDOmct5RiI0zw0,7s4Xam2lILlWlxSp7ocB7D,1MXQqcJyL2SDRJvn1A7yJZ,6iWH1F0LTNYcSKsQzg7nsG with Params: {} returned 403 due to None
+2025-09-21 18:10:03,547 - WARNING - ⚠️ Audio features forbidden (403) - using defaults
+2025-09-21 18:10:03,732 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:04,682 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:05,642 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:06,940 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:07,637 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:08,589 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:09,465 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:10,204 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:11,164 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:12,070 - INFO - ⏱️ Rate limiting: sleeping 0.5s
+2025-09-21 18:10:12,809 - INFO - ✅ Processed batch: 99 tracks for ambient
+2025-09-21 18:10:12,809 - INFO - 📊 Category progress: 99/50
+2025-09-21 18:10:12,809 - INFO - ✅ Completed ambient: 99 tracks
+2025-09-21 18:10:12,809 - INFO - 🎉 Search complete! Found 626 experimental tracks
+2025-09-21 18:10:12,813 - INFO - 📄 Created new binaural beats dataset with headers
+2025-09-21 18:10:12,823 - INFO - 💾 Saved 626 experimental tracks to dataset
+2025-09-21 18:10:12,824 - INFO - 📁 Dataset location: datasets/binaural_beats_experimental.csv
+2025-09-21 18:10:12,827 - INFO - 💾 Saved 626 processed URIs
+2025-09-21 18:10:12,829 - INFO - 💾 Scraper state saved
+2025-09-21 18:10:12,830 - INFO - 📈 Category breakdown:
+2025-09-21 18:10:12,830 - INFO -   focus: 50 tracks
+2025-09-21 18:10:12,830 - INFO -   sleep: 92 tracks
+2025-09-21 18:10:12,830 - INFO -   meditation: 82 tracks
+2025-09-21 18:10:12,831 - INFO -   relaxation: 64 tracks
+2025-09-21 18:10:12,831 - INFO -   creativity: 93 tracks
+2025-09-21 18:10:12,831 - INFO -   healing: 50 tracks
+2025-09-21 18:10:12,831 - INFO -   isochronic: 96 tracks
+2025-09-21 18:10:12,831 - INFO -   ambient: 99 tracks
+2025-09-21 18:10:12,831 - INFO - 🎉 Successfully added 626 experimental tracks!
+2025-09-21 18:10:12,831 - INFO - ✅ Experimental dataset ready: datasets/binaural_beats_experimental.csv
+2025-09-21 18:10:12,833 - INFO - 🎯 Binaural beats scraping completed!

@@ -75,10 +75,8 @@ try:
     sys.path.append(str(combiner_path))
     from real_emotion_combiner import RealEmotionCombiner, RealCombinedEmotion
     EMOTION_COMBINER_AVAILABLE = True
-    print("✅ Multimodal emotion combiner available")
-except ImportError as e:
+except ImportError:
     EMOTION_COMBINER_AVAILABLE = False
-    print(f"⚠️ Emotion combiner not available: {e}")
     RealEmotionCombiner = None
     RealCombinedEmotion = None
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -149,34 +147,26 @@ class MicroserviceClient:
         # Initialize emotion combiner
         if EMOTION_COMBINER_AVAILABLE:
             self.emotion_combiner = RealEmotionCombiner()
-            print("✅ Emotion combiner initialized")
         else:
             self.emotion_combiner = None
     
     def check_face_service_health(self):
         """Check if face microservice is running"""
         try:
-            print(f"🏥 Checking health: {self.face_service_url}/health")
             response = requests.get(f'{self.face_service_url}/health', timeout=2)
-            print(f"🏥 Health response: {response.status_code}")
             return response.status_code == 200
-        except Exception as e:
-            print(f"🏥 Health check failed: {e}")
+        except Exception:
             return False
     
     def start_camera(self):
         """Start camera via microservice"""
         try:
-            print(f"🔄 Starting camera via microservice: {self.face_service_url}/api/start_camera")
-            response = requests.post(f'{self.face_service_url}/api/start_camera', timeout=15)  # Increased timeout
-            print(f"📡 Microservice response status: {response.status_code}")
-            result = response.json()
-            print(f"📊 Microservice response: {result}")
-            return result
+            response = requests.post(f'{self.face_service_url}/api/start_camera', timeout=15)
+            return response.json()
         except requests.exceptions.Timeout:
-            return {'success': False, 'error': 'Camera start timed out (>15s). Camera may be in use by another application.'}
+            return {'success': False, 'error': 'Camera start timed out'}
         except requests.exceptions.ConnectionError:
-            return {'success': False, 'error': 'Cannot connect to face microservice. Is it running on port 5002?'}
+            return {'success': False, 'error': 'Cannot connect to face microservice'}
         except Exception as e:
             return {'success': False, 'error': f'Microservice error: {str(e)}'}
     
@@ -207,12 +197,9 @@ class MicroserviceClient:
     def check_text_service_health(self):
         """Check if text microservice is running"""
         try:
-            print(f"🏥 Checking text service health: {self.text_service_url}/health")
             response = requests.get(f'{self.text_service_url}/health', timeout=2)
-            print(f"🏥 Text health response: {response.status_code}")
             return response.status_code == 200
-        except Exception as e:
-            print(f"🏥 Text health check failed: {e}")
+        except Exception:
             return False
     
     def analyze_text(self, text, is_user=True):
@@ -224,11 +211,22 @@ class MicroserviceClient:
         except Exception as e:
             return {'success': False, 'error': f'Text microservice error: {str(e)}'}
     
-    def chat_with_bot(self, message):
+    def chat_with_bot(self, message, auth_header=None, session_id=None):
         """Chat with bot via microservice"""
         try:
+            headers = {'Content-Type': 'application/json'}
+            if auth_header:
+                headers['Authorization'] = auth_header
+            
+            # Prepare payload with message and optional session_id
+            payload = {'message': message}
+            if session_id:
+                payload['session_id'] = session_id
+            
             response = requests.post(f'{self.text_service_url}/api/chat',
-                                   json={'message': message}, timeout=15)
+                                   json=payload, 
+                                   headers=headers,
+                                   timeout=45)
             return response.json()
         except Exception as e:
             return {'success': False, 'error': f'Chat microservice error: {str(e)}'}
@@ -319,7 +317,7 @@ import threading
 
 # Simple cache for music recommendations to prevent excessive API calls
 music_recommendation_cache = {}
-MUSIC_CACHE_DURATION = 300  # 5 minutes
+MUSIC_CACHE_DURATION = 20  # 20 seconds for immediate emotion response
 def monitor_combined_emotions():
     """Monitor and log combined emotions every 60 seconds"""
     import time
@@ -880,6 +878,22 @@ def api_face_status():
     result = microservice_client.get_face_service_status()
     return jsonify(result)
 
+@app.route('/api/mediapipe/landmarks')
+def api_mediapipe_landmarks():
+    """Proxy MediaPipe landmarks from face microservice"""
+    try:
+        response = requests.get(f'{FACE_MICROSERVICE_URL}/api/mediapipe/landmarks', timeout=5)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to get landmarks: {str(e)}',
+            'face_landmarks': [],
+            'pose_landmarks': [],
+            'hand_landmarks': [],
+            'gaze_landmarks': {}
+        })
+
 # Text Microservice API Routes
 @app.route('/api/text/analyze', methods=['POST'])
 def api_analyze_text():
@@ -892,7 +906,11 @@ def api_analyze_text():
 def api_chat():
     """Proxy chat to text microservice"""
     data = request.get_json()
-    result = microservice_client.chat_with_bot(data.get('message'))
+    # Forward Authorization header if present
+    auth_header = request.headers.get('Authorization')
+    # Forward session_id if present
+    session_id = data.get('session_id')
+    result = microservice_client.chat_with_bot(data.get('message'), auth_header, session_id)
     return jsonify(result)
 
 @app.route('/api/text/conversation')
@@ -978,16 +996,6 @@ def api_music_recommendations():
         minutes_back = int(request.args.get('minutes_back', 10))
         strategy = request.args.get('strategy', 'adaptive')
         
-        # 🚀 Check cache first to prevent excessive API calls
-        cache_key = f"{session_id}_{minutes_back}_{strategy}_{limit}"
-        current_time = datetime.now()
-        
-        if cache_key in music_recommendation_cache:
-            cached_data, cached_time = music_recommendation_cache[cache_key]
-            if (current_time - cached_time).total_seconds() < MUSIC_CACHE_DURATION:
-                print(f"💾 Using cached music recommendations (cached {(current_time - cached_time).total_seconds():.0f}s ago)")
-                return jsonify(cached_data)
-        
         # Import and use the unified emotion music system
         try:
             import sys
@@ -995,6 +1003,21 @@ def api_music_recommendations():
             from unified_emotion_music_system import get_emotion_and_music
             print(f"🎵 Generating new music recommendations for {session_id}")
             result = get_emotion_and_music(session_id, minutes_back, strategy, limit)
+            
+            # 🚀 Get current emotion for cache key
+            current_emotion = "unknown"
+            if result and result.get('combined_emotion'):
+                current_emotion = result['combined_emotion'].get('dominant_emotion', 'unknown')
+            
+            # Check cache with emotion-aware key
+            cache_key = f"{session_id}_{minutes_back}_{strategy}_{limit}_{current_emotion}"
+            current_time = datetime.now()
+            
+            if cache_key in music_recommendation_cache:
+                cached_data, cached_time = music_recommendation_cache[cache_key]
+                if (current_time - cached_time).total_seconds() < MUSIC_CACHE_DURATION:
+                    print(f"💾 Using cached music recommendations for {current_emotion} (cached {(current_time - cached_time).total_seconds():.0f}s ago)")
+                    return jsonify(cached_data)
             
             if result:
                 recommendations = result.get('music_recommendations', [])

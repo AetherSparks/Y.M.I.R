@@ -587,11 +587,55 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             font-size: 32px;
+            transition: all 0.3s ease;
             font-weight: 800;
             margin: 0 0 15px 0;
             text-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
             letter-spacing: 1px;
             position: relative;
+        }
+
+        .music-update-status {
+            text-align: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 10px 0;
+            animation: fadeInBounce 0.5s ease-out;
+        }
+
+        .music-update-status.loading {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60A5FA;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .music-update-status.success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ADE80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .music-update-status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        @keyframes fadeInBounce {
+            0% { opacity: 0; transform: translateY(-10px) scale(0.9); }
+            50% { transform: translateY(2px) scale(1.02); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .emotion-pulse {
+            animation: emotionPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes emotionPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         /* Enhanced AI Badge Styling - Dark Blue Neon Theme */
@@ -2301,6 +2345,191 @@
             }
         }
         /* =================== END THERAPIST FINDER STYLES =================== */
+        
+        /* =================== VISUAL SETTINGS MODAL STYLES =================== */
+        .settings-gear-btn {
+            background: linear-gradient(45deg, #4f46e5, #7c3aed);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            padding: 10px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .settings-gear-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+            background: linear-gradient(45deg, #5b21b6, #4338ca);
+        }
+
+        .gear-icon {
+            font-size: 18px;
+            animation: gear-rotate 3s linear infinite;
+        }
+
+        @keyframes gear-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .settings-text {
+            font-size: 14px;
+        }
+
+        .visual-settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .visual-settings-modal-content {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 40, 0.95));
+            border-radius: 20px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .visual-settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(100, 100, 255, 0.2);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(124, 58, 237, 0.1));
+        }
+
+        .visual-settings-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4fd1c7;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .visual-settings-body {
+            padding: 25px 30px;
+        }
+
+        .control-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(100, 100, 255, 0.1);
+        }
+
+        .control-section h4 {
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(100, 100, 255, 0.1);
+        }
+
+        .toggle-label:hover {
+            background: rgba(100, 100, 255, 0.1);
+            border-color: rgba(100, 100, 255, 0.3);
+        }
+
+        .toggle-label input[type="checkbox"] {
+            accent-color: #4f46e5;
+        }
+
+        .settings-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .settings-label {
+            color: #a3a3a3;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .settings-select, .settings-range {
+            width: 100%;
+            padding: 8px 12px;
+            background: #1f2937;
+            color: white;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .settings-select:focus, .settings-range:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .range-value {
+            color: #4fd1c7;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 768px) {
+            .visual-settings-modal-content {
+                margin: 10px;
+                max-height: 95vh;
+            }
+
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: span 1;
+            }
+
+            .settings-gear-btn .settings-text {
+                display: none;
+            }
+        }
+        /* =================== END VISUAL SETTINGS MODAL STYLES =================== */
     </style>
 </head>
 <body>
@@ -2318,89 +2547,23 @@
                 <h2>Real-Time Camera Feed</h2>
                 
                 <div class="camera-controls">
-                    <button id="startBtn" onclick="startCamera()">Start Camera</button>
-                    <button id="stopBtn" onclick="stopCamera()" class="btn-stop" disabled>Stop Camera</button>
-                    <button onclick="refreshStatus()">Refresh Status</button>
-                </div>
-
-                <!-- Advanced Visual Controls -->
-                <div class="advanced-controls" style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                    <h3 style="margin-bottom: 15px; color: #4fd1c7;">Advanced Visual Controls</h3>
+                    <button id="startBtn" onclick="startCamera()">📹 Start Camera</button>
+                    <button id="stopBtn" onclick="stopCamera()" class="btn-stop" disabled>⏹️ Stop Camera</button>
+                    <button onclick="refreshStatus()">🔄 Refresh</button>
                     
-                    <!-- MediaPipe Toggles -->
-                    <div class="control-section" style="margin-bottom: 15px;">
-                        <h4 style="color: #fbbf24; margin-bottom: 10px;">MediaPipe Features</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-                            <label class="toggle-label">
-                                <input type="checkbox" id="toggle_face_mesh" checked onchange="updateVisualSettings()">
-                                <span>Face Mesh</span>
-                            </label>
-                            <label class="toggle-label">
-                                <input type="checkbox" id="toggle_body_pose" checked onchange="updateVisualSettings()">
-                                <span>Body Pose</span>
-                            </label>
-                            <label class="toggle-label">
-                                <input type="checkbox" id="toggle_hand_tracking" checked onchange="updateVisualSettings()">
-                                <span>Hand Tracking</span>
-                            </label>
-                            <label class="toggle-label">
-                                <input type="checkbox" id="toggle_gaze_tracking" checked onchange="updateVisualSettings()">
-                                <span>Gaze Tracking</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- YOLO Model Controls -->
-                    <div class="control-section" style="margin-bottom: 15px;">
-                        <h4 style="color: #f97316; margin-bottom: 10px;">YOLO Object Detection</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-                            <label class="toggle-label">
-                                <input type="checkbox" id="toggle_object_detection" checked onchange="updateVisualSettings()">
-                                <span>📦 Object Detection</span>
-                            </label>
-                            <label class="toggle-label">
-                                <input type="checkbox" id="toggle_emotion_context" checked onchange="updateVisualSettings()">
-                                <span>🎭 Emotion Context</span>
-                            </label>
-                            <div style="grid-column: span 2;">
-                                <label style="color: #a3a3a3; font-size: 0.9em;">🎚️ Detection Confidence:</label>
-                                <input type="range" id="confidence_threshold" min="0.1" max="0.9" step="0.05" value="0.25" 
-                                       onchange="updateVisualSettings()" style="width: 100%; margin-left: 10px;">
-                                <span id="confidence_value" style="color: #4fd1c7;">0.25</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Performance Settings -->
-                    <div class="control-section">
-                        <h4 style="color: #ef4444; margin-bottom: 10px;">⚡ Performance & Quality</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-                            <div>
-                                <label style="color: #a3a3a3; font-size: 0.9em;">📹 Video Quality:</label>
-                                <select id="video_quality" onchange="updateVisualSettings()" style="width: 100%; padding: 5px; background: #1f2937; color: white; border: 1px solid #374151; border-radius: 4px;">
-                                    <option value="720p">720p (Recommended)</option>
-                                    <option value="1080p">1080p (High Quality)</option>
-                                    <option value="480p">480p (Fast)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="color: #a3a3a3; font-size: 0.9em;">🎚️ Analysis Interval:</label>
-                                <select id="analysis_interval" onchange="updateVisualSettings()" style="width: 100%; padding: 5px; background: #1f2937; color: white; border: 1px solid #374151; border-radius: 4px;">
-                                    <option value="15">15 frames (2x per sec)</option>
-                                    <option value="30" selected>30 frames (1x per sec)</option>
-                                    <option value="60">60 frames (0.5x per sec)</option>
-                                </select>
-                            </div>
-                            <label class="toggle-label">
-                                <input type="checkbox" id="toggle_quality_indicators" checked onchange="updateVisualSettings()">
-                                <span>Quality Indicators</span>
-                            </label>
-                            <label class="toggle-label">
-                                <input type="checkbox" id="toggle_fps_display" onchange="updateVisualSettings()">
-                                <span>FPS Display</span>
-                            </label>
-                        </div>
-                    </div>
+                    <!-- Advanced Control Buttons -->
+                    <button id="privacyModeBtn" onclick="togglePrivacyMode()" class="privacy-btn" title="Privacy Mode">
+                        <span>🔒</span> Privacy
+                    </button>
+                    <button id="exportSessionBtn" onclick="exportSessionData()" class="export-btn" title="Export Session Data">
+                        <span>💾</span> Export
+                    </button>
+                    
+                    <!-- Settings Gear Icon -->
+                    <button id="visualSettingsBtn" onclick="openVisualSettingsModal()" class="settings-gear-btn" title="Advanced Visual Controls">
+                        <span class="gear-icon">⚙️</span>
+                        <span class="settings-text">Settings</span>
+                    </button>
                 </div>
                 
                 <div class="video-container" id="videoContainer">
@@ -2408,7 +2571,10 @@
                         <div class="loading" id="loadingIndicator" style="display: none;"></div>
                         <p id="videoStatus">Click "Start Camera" to begin emotion detection</p>
                     </div>
-                    <img id="videoFeed" style="display: none;" />
+                    <div id="videoStreamContainer" style="position: relative; display: none;">
+                        <img id="videoFeed" style="display: block; width: 100%; height: auto;" />
+                        <canvas id="overlayCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+                    </div>
                 </div>
                 
                 <div id="errorDisplay"></div>
@@ -2432,6 +2598,97 @@
                     <h4>Face Service Status</h4>
                     <div id="emotionStatus">Checking face microservice status...</div>
                     <div id="serviceStatus">Loading...</div>
+                </div>
+                
+                <!-- Enhanced Advanced Analytics Panel -->
+                <div class="emotion-insights-panel" style="margin-top: 20px; background: rgba(40, 40, 40, 0.6); border-radius: 12px; padding: 20px; border: 1px solid rgba(100, 100, 255, 0.2);">
+                    <h4 style="color: #4fd1c7; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        <span>📊</span> Advanced Session Analytics
+                    </h4>
+                    
+                    <!-- Primary Stats Grid -->
+                    <div class="insights-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 15px;">
+                        <!-- Total Readings -->
+                        <div class="insight-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 12px; text-align: center;">
+                            <div style="color: #60a5fa; font-size: 0.8rem; margin-bottom: 4px;">Total Readings</div>
+                            <div id="totalReadings" style="font-size: 1.3rem; font-weight: 600; color: #4fd1c7;">0</div>
+                        </div>
+                        
+                        <!-- Average Confidence -->
+                        <div class="insight-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 12px; text-align: center;">
+                            <div style="color: #60a5fa; font-size: 0.8rem; margin-bottom: 4px;">Avg Confidence</div>
+                            <div id="avgConfidence" style="font-size: 1.3rem; font-weight: 600; color: #22c55e;">--</div>
+                        </div>
+                        
+                        <!-- Session Time -->
+                        <div class="insight-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 12px; text-align: center;">
+                            <div style="color: #60a5fa; font-size: 0.8rem; margin-bottom: 4px;">Session Time</div>
+                            <div id="sessionTime" style="font-size: 1.3rem; font-weight: 600; color: #fbbf24;">00:00</div>
+                        </div>
+                        
+                        <!-- Processing FPS -->
+                        <div class="insight-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 12px; text-align: center;">
+                            <div style="color: #60a5fa; font-size: 0.8rem; margin-bottom: 4px;">Processing FPS</div>
+                            <div id="processingFPS" style="font-size: 1.3rem; font-weight: 600; color: #a855f7;">--</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Metrics -->
+                    <div class="performance-section" style="margin-bottom: 15px;">
+                        <h5 style="color: #fbbf24; font-size: 0.9rem; margin-bottom: 10px;">⚡ Performance Metrics</h5>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div style="background: rgba(255, 255, 255, 0.03); border-radius: 6px; padding: 8px;">
+                                <span style="color: #a3a3a3; font-size: 0.8rem;">Active Models:</span>
+                                <span id="activeModels" style="color: #4fd1c7; font-weight: 600; margin-left: 5px;">0</span>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.03); border-radius: 6px; padding: 8px;">
+                                <span style="color: #a3a3a3; font-size: 0.8rem;">Total Frames:</span>
+                                <span id="totalFrames" style="color: #4fd1c7; font-weight: 600; margin-left: 5px;">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Current Detection Status -->
+                    <div class="detection-status" style="margin-bottom: 15px; padding: 10px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="color: #60a5fa; font-size: 0.8rem;">Current Emotion</div>
+                                <div id="currentEmotion" style="font-size: 1.1rem; font-weight: 600; color: #4fd1c7;">Waiting...</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #60a5fa; font-size: 0.8rem;">Confidence</div>
+                                <div id="currentConfidence" style="font-size: 1.1rem; font-weight: 600; color: #22c55e;">--</div>
+                            </div>
+                        </div>
+                        <div id="confidenceBar" style="height: 3px; background: rgba(79, 209, 199, 0.3); border-radius: 2px; margin-top: 8px; overflow: hidden;">
+                            <div id="confidenceProgress" style="height: 100%; background: linear-gradient(90deg, #4fd1c7, #00d4ff); width: 0%; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Storage Status -->
+                    <div class="storage-status" style="margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span id="storageIndicator" style="color: #22c55e; font-weight: 600;">🔴 Local</span>
+                            <span style="color: #a3a3a3; font-size: 0.8rem;">Storage Status</span>
+                            <span id="bufferedReadings" style="color: #4fd1c7; font-size: 0.8rem; margin-left: auto;">0 buffered</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Quick Actions -->
+                    <div class="quick-actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button onclick="togglePrivacyMode()" id="privacyToggle" class="quick-action-btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease;">
+                            🔒 Privacy
+                        </button>
+                        <button onclick="exportSessionData()" class="quick-action-btn" style="background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease;">
+                            💾 Export
+                        </button>
+                        <button onclick="takeEmotionSnapshot()" class="quick-action-btn" style="background: rgba(168, 85, 247, 0.2); color: #a855f7; border: 1px solid #a855f7; border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease;">
+                            📸 Snapshot
+                        </button>
+                        <button onclick="openVisualSettingsModal()" class="quick-action-btn" style="background: rgba(79, 70, 229, 0.2); color: #4f46e5; border: 1px solid #4f46e5; border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease;">
+                            ⚙️ Settings
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -2473,7 +2730,8 @@
         <div class="music-carousel-container">
             <!-- AI Music Header -->
             <div class="music-carousel-header">
-                <h2 class="ai-music-title">AI-Based Recommended Music</h2>
+                <h2 class="ai-music-title" id="musicTitle">AI-Based Recommended Music</h2>
+                <div class="music-update-status" id="musicUpdateStatus" style="display: none;"></div>
                 <div class="ai-badge">
                     <div class="ai-icon"></div>
                     <span>Powered by Neural Emotion Analysis</span>
@@ -2866,14 +3124,20 @@
                 };
                 
                 // Add Firebase auth token if user is authenticated
+                console.log('🔍 Auth Debug - window.ymirAuth:', !!window.ymirAuth);
+                console.log('🔍 Auth Debug - currentUser:', window.ymirAuth?.currentUser);
+                console.log('🔍 Auth Debug - getUserStatus:', window.ymirAuth?.getUserStatus?.());
+                
                 if (window.ymirAuth && window.ymirAuth.currentUser) {
                     try {
                         const token = await window.ymirAuth.currentUser.getIdToken();
                         options.headers['Authorization'] = `Bearer ${token}`;
-                        console.log('🔐 Added auth token to API call');
+                        console.log('🔐 Added auth token to API call:', token.substring(0, 50) + '...');
                     } catch (e) {
                         console.warn('Failed to get auth token:', e);
                     }
+                } else {
+                    console.warn('❌ No auth available - window.ymirAuth:', !!window.ymirAuth, 'currentUser:', !!window.ymirAuth?.currentUser);
                 }
                 
                 if (body) {
@@ -2899,10 +3163,22 @@
                 startBtn.disabled = true;
                 stopBtn.disabled = false;
                 
+                // Start insights tracking
+                startInsightsTracking();
+                
                 // Start video feed
                 videoFeed.src = '/api/video_feed?' + new Date().getTime();
-                videoFeed.style.display = 'block';
-                videoStatus.style.display = 'none';
+                
+                // Show video container with overlay
+                const videoPlaceholder = document.querySelector('.video-placeholder');
+                const videoStreamContainer = document.getElementById('videoStreamContainer');
+                const overlayCanvas = document.getElementById('overlayCanvas');
+                
+                videoPlaceholder.style.display = 'none';
+                videoStreamContainer.style.display = 'block';
+                
+                // Initialize canvas overlay
+                setupCanvasOverlay();
                 
                 // Start emotion updates
                 startEmotionUpdates();
@@ -2928,11 +3204,28 @@
                 // Stop high-performance video loop
                 stopHighPerformanceVideoLoop();
                 
-                // Stop video feed
+                // Stop video feed and hide overlay
                 const videoFeed = document.getElementById('videoFeed');
+                const videoPlaceholder = document.querySelector('.video-placeholder');
+                const videoStreamContainer = document.getElementById('videoStreamContainer');
+                
                 if (videoFeed) {
                     videoFeed.src = '';
-                    videoFeed.style.display = 'none';
+                }
+                
+                if (videoStreamContainer) {
+                    videoStreamContainer.style.display = 'none';
+                }
+                
+                if (videoPlaceholder) {
+                    videoPlaceholder.style.display = 'block';
+                }
+                
+                // Clear canvas overlay
+                const overlayCanvas = document.getElementById('overlayCanvas');
+                if (overlayCanvas) {
+                    const ctx = overlayCanvas.getContext('2d');
+                    ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
                 }
                 
                 const videoStatus = document.getElementById('videoStatus');
@@ -2943,6 +3236,9 @@
                 
                 // Stop emotion updates
                 stopEmotionUpdates();
+                
+                // Stop overlay updates
+                stopOverlayUpdates();
                 
                 showStatus('Camera stopped successfully!', 'success');
             } else {
@@ -2972,6 +3268,260 @@
             emotionDisplay.innerHTML = '<p style="text-align: center; color: #666;">Emotion analysis stopped</p>';
             stableEmotion.style.display = 'none';
         }
+        
+        // =================== MEDIAPIPE VISUAL OVERLAYS ===================
+        
+        let overlayUpdateInterval = null;
+        
+        function setupCanvasOverlay() {
+            const videoFeed = document.getElementById('videoFeed');
+            const overlayCanvas = document.getElementById('overlayCanvas');
+            
+            if (!videoFeed || !overlayCanvas) return;
+            
+            // Resize canvas to match video when video loads
+            videoFeed.addEventListener('loadedmetadata', () => {
+                updateCanvasSize();
+            });
+            
+            // Start drawing overlays
+            startOverlayUpdates();
+        }
+        
+        function updateCanvasSize() {
+            const videoFeed = document.getElementById('videoFeed');
+            const overlayCanvas = document.getElementById('overlayCanvas');
+            
+            if (videoFeed && overlayCanvas) {
+                overlayCanvas.width = videoFeed.offsetWidth;
+                overlayCanvas.height = videoFeed.offsetHeight;
+            }
+        }
+        
+        function startOverlayUpdates() {
+            // Update overlays every 100ms for smooth rendering
+            overlayUpdateInterval = setInterval(async () => {
+                await updateMediaPipeOverlays();
+            }, 100);
+        }
+        
+        function stopOverlayUpdates() {
+            if (overlayUpdateInterval) {
+                clearInterval(overlayUpdateInterval);
+                overlayUpdateInterval = null;
+            }
+        }
+        
+        async function updateMediaPipeOverlays() {
+            try {
+                // Fetch landmarks from backend
+                const response = await fetch('/api/mediapipe/landmarks');
+                if (!response.ok) return;
+                
+                const data = await response.json();
+                if (!data.success) return;
+                
+                // Clear and redraw overlays
+                const overlayCanvas = document.getElementById('overlayCanvas');
+                const ctx = overlayCanvas.getContext('2d');
+                
+                // Clear previous frame
+                ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                
+                // Draw enabled features
+                if (currentVisualSettings.show_face_mesh && data.face_landmarks) {
+                    drawFaceMesh(ctx, data.face_landmarks, overlayCanvas.width, overlayCanvas.height);
+                }
+                
+                if (currentVisualSettings.show_body_pose && data.pose_landmarks) {
+                    drawBodyPose(ctx, data.pose_landmarks, overlayCanvas.width, overlayCanvas.height);
+                }
+                
+                if (currentVisualSettings.show_hand_tracking && data.hand_landmarks) {
+                    drawHandTracking(ctx, data.hand_landmarks, overlayCanvas.width, overlayCanvas.height);
+                }
+                
+                if (currentVisualSettings.show_gaze_tracking && data.gaze_landmarks) {
+                    drawGazeTracking(ctx, data.gaze_landmarks, overlayCanvas.width, overlayCanvas.height);
+                }
+                
+            } catch (error) {
+                console.log('MediaPipe overlay update failed:', error);
+            }
+        }
+        
+        function drawFaceMesh(ctx, landmarks, canvasWidth, canvasHeight) {
+            ctx.strokeStyle = '#00FF00';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = '#00FF00';
+            
+            // Draw face contour landmarks
+            landmarks.forEach((landmark, index) => {
+                const x = landmark.x * canvasWidth;
+                const y = landmark.y * canvasHeight;
+                
+                // Draw landmark points
+                ctx.beginPath();
+                ctx.arc(x, y, 1, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            
+            // Draw face mesh connections (simplified)
+            ctx.beginPath();
+            for (let i = 0; i < landmarks.length - 1; i++) {
+                const current = landmarks[i];
+                const next = landmarks[i + 1];
+                
+                ctx.moveTo(current.x * canvasWidth, current.y * canvasHeight);
+                ctx.lineTo(next.x * canvasWidth, next.y * canvasHeight);
+            }
+            ctx.stroke();
+        }
+        
+        function drawBodyPose(ctx, landmarks, canvasWidth, canvasHeight) {
+            ctx.strokeStyle = '#FF0000';
+            ctx.lineWidth = 2;
+            ctx.fillStyle = '#FF0000';
+            
+            // Draw pose landmarks
+            landmarks.forEach((landmark, index) => {
+                const x = landmark.x * canvasWidth;
+                const y = landmark.y * canvasHeight;
+                
+                if (landmark.visibility > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            });
+            
+            // Draw pose connections
+            const connections = [
+                [11, 12], [11, 13], [13, 15], [12, 14], [14, 16], // Arms
+                [11, 23], [12, 24], [23, 24], // Torso
+                [23, 25], [24, 26], [25, 27], [26, 28], // Legs
+                [0, 1], [1, 2], [2, 3], [3, 7], // Face outline
+            ];
+            
+            ctx.beginPath();
+            connections.forEach(([startIdx, endIdx]) => {
+                if (landmarks[startIdx] && landmarks[endIdx] && 
+                    landmarks[startIdx].visibility > 0.5 && landmarks[endIdx].visibility > 0.5) {
+                    const start = landmarks[startIdx];
+                    const end = landmarks[endIdx];
+                    
+                    ctx.moveTo(start.x * canvasWidth, start.y * canvasHeight);
+                    ctx.lineTo(end.x * canvasWidth, end.y * canvasHeight);
+                }
+            });
+            ctx.stroke();
+        }
+        
+        function drawHandTracking(ctx, handLandmarks, canvasWidth, canvasHeight) {
+            ctx.strokeStyle = '#0000FF';
+            ctx.lineWidth = 2;
+            ctx.fillStyle = '#0000FF';
+            
+            handLandmarks.forEach(hand => {
+                // Draw hand landmarks
+                hand.landmarks.forEach((landmark, index) => {
+                    const x = landmark.x * canvasWidth;
+                    const y = landmark.y * canvasHeight;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+                
+                // Draw hand connections
+                const handConnections = [
+                    [0, 1], [1, 2], [2, 3], [3, 4], // Thumb
+                    [0, 5], [5, 6], [6, 7], [7, 8], // Index
+                    [0, 9], [9, 10], [10, 11], [11, 12], // Middle
+                    [0, 13], [13, 14], [14, 15], [15, 16], // Ring
+                    [0, 17], [17, 18], [18, 19], [19, 20], // Pinky
+                    [5, 9], [9, 13], [13, 17] // Palm
+                ];
+                
+                ctx.beginPath();
+                handConnections.forEach(([startIdx, endIdx]) => {
+                    if (hand.landmarks[startIdx] && hand.landmarks[endIdx]) {
+                        const start = hand.landmarks[startIdx];
+                        const end = hand.landmarks[endIdx];
+                        
+                        ctx.moveTo(start.x * canvasWidth, start.y * canvasHeight);
+                        ctx.lineTo(end.x * canvasWidth, end.y * canvasHeight);
+                    }
+                });
+                ctx.stroke();
+            });
+        }
+        
+        function drawGazeTracking(ctx, gazeLandmarks, canvasWidth, canvasHeight) {
+            ctx.strokeStyle = '#FFFF00';
+            ctx.lineWidth = 2;
+            ctx.fillStyle = '#FFFF00';
+            
+            if (gazeLandmarks.left_eye && gazeLandmarks.right_eye) {
+                // Draw eye centers
+                const leftEye = gazeLandmarks.left_eye;
+                const rightEye = gazeLandmarks.right_eye;
+                
+                ctx.beginPath();
+                ctx.arc(leftEye.x * canvasWidth, leftEye.y * canvasHeight, 3, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(rightEye.x * canvasWidth, rightEye.y * canvasHeight, 3, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Draw gaze direction
+                if (gazeLandmarks.gaze_direction) {
+                    const gazeDir = gazeLandmarks.gaze_direction;
+                    const eyeCenter = {
+                        x: (leftEye.x + rightEye.x) / 2 * canvasWidth,
+                        y: (leftEye.y + rightEye.y) / 2 * canvasHeight
+                    };
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(eyeCenter.x, eyeCenter.y);
+                    ctx.lineTo(
+                        eyeCenter.x + gazeDir.x * 50,
+                        eyeCenter.y + gazeDir.y * 50
+                    );
+                    ctx.stroke();
+                    
+                    // Draw arrow head
+                    const arrowLength = 10;
+                    const arrowAngle = Math.PI / 6;
+                    const angle = Math.atan2(gazeDir.y, gazeDir.x);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(
+                        eyeCenter.x + gazeDir.x * 50,
+                        eyeCenter.y + gazeDir.y * 50
+                    );
+                    ctx.lineTo(
+                        eyeCenter.x + gazeDir.x * 50 - arrowLength * Math.cos(angle - arrowAngle),
+                        eyeCenter.y + gazeDir.y * 50 - arrowLength * Math.sin(angle - arrowAngle)
+                    );
+                    ctx.moveTo(
+                        eyeCenter.x + gazeDir.x * 50,
+                        eyeCenter.y + gazeDir.y * 50
+                    );
+                    ctx.lineTo(
+                        eyeCenter.x + gazeDir.x * 50 - arrowLength * Math.cos(angle + arrowAngle),
+                        eyeCenter.y + gazeDir.y * 50 - arrowLength * Math.sin(angle + arrowAngle)
+                    );
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        // Add window resize handler to update canvas size
+        window.addEventListener('resize', updateCanvasSize);
+        
+        // =================== END MEDIAPIPE OVERLAYS ===================
         
         function updateEmotionDisplay(data) {
             if (data.error) {
@@ -3107,7 +3657,11 @@
             showLoading(true);
             
             try {
-                const result = await apiCall('/api/text/chat', 'POST', { message: message });
+                const sessionId = generateSessionId(); // Get current session ID
+                const result = await apiCall('/api/text/chat', 'POST', { 
+                    message: message,
+                    session_id: sessionId 
+                });
                 
                 if (result.success) {
                     // Add user message
@@ -3253,6 +3807,183 @@
             show_fps_display: false
         };
 
+        // Visual Settings Modal Functions
+        function openVisualSettingsModal() {
+            const modal = document.getElementById('visualSettingsModal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVisualSettingsModal() {
+            const modal = document.getElementById('visualSettingsModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateConfidenceValue() {
+            const value = document.getElementById('confidence_threshold').value;
+            document.getElementById('confidence_value').textContent = value;
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('visualSettingsModal');
+            if (event.target === modal) {
+                closeVisualSettingsModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('visualSettingsModal');
+                if (modal && modal.style.display === 'flex') {
+                    closeVisualSettingsModal();
+                }
+            }
+        });
+
+        // Emotion Insights Panel Functions
+        let sessionStartTime = null;
+        let emotionDetectionCount = 0;
+        let insightsUpdateInterval = null;
+
+        function startInsightsTracking() {
+            sessionStartTime = new Date();
+            emotionDetectionCount = 0;
+            
+            // Update session time every second
+            insightsUpdateInterval = setInterval(updateSessionTime, 1000);
+        }
+
+        function updateSessionTime() {
+            if (!sessionStartTime) return;
+            
+            const now = new Date();
+            const elapsed = Math.floor((now - sessionStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            
+            const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('sessionTime').textContent = timeDisplay;
+        }
+
+        function updateEmotionInsights(emotion, confidence) {
+            try {
+                // Update confidence level and bar with null checks
+                const confidencePercent = Math.round(confidence * 100);
+                
+                const confidenceLevelEl = document.getElementById('confidenceLevel');
+                if (confidenceLevelEl) {
+                    confidenceLevelEl.textContent = `${confidencePercent}%`;
+                    
+                    // Color code confidence level
+                    if (confidence >= 0.8) {
+                        confidenceLevelEl.style.color = '#22c55e'; // Green
+                    } else if (confidence >= 0.6) {
+                        confidenceLevelEl.style.color = '#fbbf24'; // Yellow
+                    } else {
+                        confidenceLevelEl.style.color = '#ef4444'; // Red
+                    }
+                }
+                
+                const confidenceProgressEl = document.getElementById('confidenceProgress');
+                if (confidenceProgressEl) {
+                    confidenceProgressEl.style.width = `${confidencePercent}%`;
+                }
+                
+                // Update emotion count
+                emotionDetectionCount++;
+                const emotionCountEl = document.getElementById('emotionCount');
+                if (emotionCountEl) {
+                    emotionCountEl.textContent = emotionDetectionCount;
+                }
+                
+                // Also call the advanced analytics update if available
+                if (typeof updateAdvancedInsights === 'function') {
+                    updateAdvancedInsights(emotion, confidence);
+                }
+                
+            } catch (error) {
+                console.warn('⚠️ updateEmotionInsights error:', error.message);
+                // Continue execution without breaking the app
+            }
+        }
+
+        function exportEmotionData() {
+            // Simple export function - you can enhance this
+            const sessionData = {
+                sessionStart: sessionStartTime,
+                sessionDuration: sessionStartTime ? Math.floor((new Date() - sessionStartTime) / 1000) : 0,
+                emotionCount: emotionDetectionCount,
+                timestamp: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(sessionData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `emotion_session_${new Date().toISOString().slice(0,10)}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Emotion data exported successfully!', 'success');
+        }
+
+        function takeEmotionSnapshot() {
+            // Take a snapshot of current emotion state
+            const currentEmotion = document.querySelector('#emotionContent')?.textContent || 'No emotion detected';
+            const confidence = document.getElementById('confidenceLevel')?.textContent || '--';
+            
+            const snapshot = {
+                timestamp: new Date().toISOString(),
+                emotion: currentEmotion,
+                confidence: confidence,
+                sessionTime: document.getElementById('sessionTime')?.textContent || '00:00'
+            };
+            
+            console.log('📸 Emotion Snapshot:', snapshot);
+            showNotification(`Snapshot captured: ${currentEmotion} (${confidence})`, 'info');
+        }
+
+        function showNotification(message, type = 'info') {
+            // Simple notification system
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'rgba(34, 197, 94, 0.9)' : type === 'error' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(59, 130, 246, 0.9)'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(8px);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Slide in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
         async function updateVisualSettings() {
             // Get all settings from UI
             currentVisualSettings = {
@@ -3354,6 +4085,49 @@
                 // Apply visual settings before starting
                 await updateVisualSettings();
                 
+                // 🎯 CRITICAL: Sync session ID with face microservice BEFORE starting camera
+                const sessionId = generateSessionId();
+                console.log(`🔗 Syncing session ID with face microservice: ${sessionId}`);
+                
+                try {
+                    const sessionSyncResult = await fetch('http://localhost:5002/api/session', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ session_id: sessionId })
+                    });
+                    
+                    if (sessionSyncResult.ok) {
+                        const syncData = await sessionSyncResult.json();
+                        console.log('✅ Face session ID synchronized:', syncData);
+                    } else {
+                        console.warn('⚠️ Failed to sync session ID, continuing anyway');
+                    }
+                } catch (syncError) {
+                    console.warn('⚠️ Face session sync failed:', syncError.message);
+                }
+                
+                // 🎯 ALSO sync session ID with text microservice
+                try {
+                    const textSessionSyncResult = await fetch('http://localhost:5003/api/session', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ session_id: sessionId })
+                    });
+                    
+                    if (textSessionSyncResult.ok) {
+                        const textSyncData = await textSessionSyncResult.json();
+                        console.log('✅ Text session ID synchronized:', textSyncData);
+                    } else {
+                        console.warn('⚠️ Failed to sync text session ID, continuing anyway');
+                    }
+                } catch (textSyncError) {
+                    console.warn('⚠️ Text session sync failed:', textSyncError.message);
+                }
+                
                 // Start camera with optimizations
                 const result = await apiCall('/api/camera/start', 'POST');
                 
@@ -3404,6 +4178,37 @@
 
         // 🎵 AI Music Carousel System - ONLY uses real therapeutic music data from CSV
 
+        // 🎯 Session Management for Personalized Music
+        let globalSessionId = null; // Global session ID for consistency
+        
+        function generateSessionId() {
+            // Always return the same session ID once generated
+            if (globalSessionId) {
+                console.log(`🔄 Using consistent session ID: ${globalSessionId}`);
+                return globalSessionId;
+            }
+            
+            // Try to get existing session from localStorage first
+            let sessionId = localStorage.getItem('ymir_session_id');
+            
+            if (!sessionId) {
+                // Generate new session ID with timestamp and random component
+                const timestamp = Date.now();
+                const random = Math.random().toString(36).substring(2, 15);
+                sessionId = `ymir_${timestamp}_${random}`;
+                
+                // Store for future use
+                localStorage.setItem('ymir_session_id', sessionId);
+                console.log(`🆕 Generated new session ID: ${sessionId}`);
+            } else {
+                console.log(`🔄 Using existing session ID: ${sessionId}`);
+            }
+            
+            // Store globally for consistency
+            globalSessionId = sessionId;
+            return sessionId;
+        }
+
         let currentlyPlaying = null;
 
         function createSongCard(song, index) {
@@ -3428,17 +4233,70 @@
             const musicTrack = document.getElementById('musicTrack');
             
             try {
+                // 🎯 VISUAL FEEDBACK: Show updating indicator
+                showMusicUpdateIndicator('🔄 Analyzing your emotions...');
                 console.log('🎵 Loading AI-powered therapeutic music recommendations...');
                 
-                // 🚀 CALL THE REAL AI MUSIC API
-                const response = await fetch('/api/music/recommendations?session_id=user123&limit=100');
+                // 🧠 STEP 1: Get real session ID and current emotion from combiner
+                const sessionId = generateSessionId(); // Generate or get real session ID
+                
+                console.log('🔍 Fetching current emotion from combiner...');
+                let currentEmotion = 'neutral';
+                let emotionConfidence = 0.5;
+                
+                try {
+                    // 🎯 Get the REAL emotion from the existing combiner API
+                    const emotionResponse = await fetch('/api/combined_emotions');
+                    const emotionData = await emotionResponse.json();
+                    
+                    if (emotionData.success && emotionData.combined_emotion) {
+                        currentEmotion = emotionData.combined_emotion.dominant_emotion || 'neutral';
+                        emotionConfidence = emotionData.combined_emotion.confidence || 0.5;
+                        
+                        console.log(`🎭 REAL EMOTION: ${currentEmotion} (confidence: ${emotionConfidence.toFixed(2)})`);
+                        console.log(`🔀 Combination method: ${emotionData.combined_emotion.combination_method}`);
+                        console.log(`🎭 Multi-emotion: ${emotionData.combined_emotion.is_multi_emotion}`);
+                        
+                        // Store current emotion for tracking changes
+                        window.lastEmotionState = {
+                            emotion: currentEmotion,
+                            confidence: emotionConfidence,
+                            timestamp: Date.now()
+                        };
+                        
+                        // Update AI status with real emotion
+                        const aiStatus = document.getElementById('aiStatus');
+                        if (aiStatus) {
+                            if (emotionData.combined_emotion.is_multi_emotion) {
+                                const topEmotions = emotionData.combined_emotion.top_emotions || [];
+                                const emotionList = topEmotions.map(([emotion, conf]) => `${emotion}(${(conf*100).toFixed(0)}%)`).join(', ');
+                                aiStatus.textContent = `Multi-emotion: ${emotionList} - therapeutic music adapting...`;
+                            } else {
+                                aiStatus.textContent = `Therapeutic music for ${currentEmotion} mood (${(emotionConfidence*100).toFixed(0)}% confidence)`;
+                            }
+                        }
+                    } else {
+                        console.log('⚠️ No current emotion data - using neutral fallback');
+                    }
+                } catch (emotionError) {
+                    console.log('⚠️ Emotion API error - using neutral fallback:', emotionError);
+                }
+                
+                // 🚀 STEP 2: Call music API with REAL emotion data
+                console.log(`🎵 Requesting therapeutic music for emotion: ${currentEmotion}`);
+                showMusicUpdateIndicator(`🎭 Finding ${currentEmotion} music...`);
+                const response = await fetch(`/api/music/recommendations?session_id=${sessionId}&emotion=${currentEmotion}&confidence=${emotionConfidence}&limit=100`);
                 const data = await response.json();
                 
                 if (data.success && data.recommendations && data.recommendations.length > 0) {
-                    console.log('✅ AI Music API Success!');
-                    console.log(`🎭 Emotion: ${data.emotion.dominant} (${data.emotion.confidence})`);
-                    console.log(`🎵 Songs: ${data.recommendations.length}`);
-                    console.log(`🤖 Multi-emotion: ${data.emotion.is_multi_emotion}`);
+                    console.log('✅ AI Therapeutic Music API Success!');
+                    console.log(`🎭 Input Emotion: ${currentEmotion} (confidence: ${emotionConfidence.toFixed(2)})`);
+                    
+                    // 🎯 VISUAL FEEDBACK: Show successful update
+                    showMusicUpdateIndicator(`✅ Updated for ${currentEmotion}!`, 'success');
+                    console.log(`🎵 Therapeutic Songs: ${data.recommendations.length}`);
+                    console.log(`🤖 Multi-emotion: ${data.emotion?.is_multi_emotion || false}`);
+                    console.log(`🏥 Therapeutic Strategy: AI-powered healing music selection`);
                     
                     // Convert API data to display format
                     const aiSongs = data.recommendations.map(track => ({
@@ -3457,17 +4315,35 @@
                     
                     console.log('🎵 AI Music carousel loaded with', allSongs.length, 'therapeutic recommendations');
                     
+                    // 🎯 VISUAL FEEDBACK: Update title and show completion
+                    updateMusicTitle(`🎭 ${currentEmotion.charAt(0).toUpperCase() + currentEmotion.slice(1)} Music`);
+                    flashMusicContainer();
+                    setTimeout(() => hideMusicUpdateIndicator(), 3000);
+                    
                     // Update emotion display
                     updateEmotionDisplay(data.emotion);
                     
+                    // Update emotion insights panel safely
+                    if (data.emotion && data.emotion.dominant && data.emotion.confidence) {
+                        try {
+                            updateEmotionInsights(data.emotion.dominant, data.emotion.confidence);
+                        } catch (error) {
+                            console.warn('⚠️ updateEmotionInsights call failed:', error.message);
+                        }
+                    }
+                    
                 } else {
-                    console.log('⚠️ AI Music API failed - no recommendations available');
-                    musicTrack.innerHTML = '<div class="song-card" style="opacity: 0.6;"><div class="song-info"><div class="song-title">🎵 No AI recommendations</div><div class="song-artist">Please check your emotion detection system</div></div></div>';
+                    console.log(`⚠️ AI Music API failed for emotion '${currentEmotion}' - no recommendations available`);
+                    showMusicUpdateIndicator(`❌ No music found for ${currentEmotion}`, 'error');
+                    musicTrack.innerHTML = `<div class="song-card" style="opacity: 0.6;"><div class="song-info"><div class="song-title">🎵 No therapeutic music found</div><div class="song-artist">for ${currentEmotion} mood - please check system</div></div></div>`;
+                    setTimeout(() => hideMusicUpdateIndicator(), 5000);
                 }
                 
             } catch (error) {
-                console.error('❌ AI Music API error:', error);
-                musicTrack.innerHTML = '<div class="song-card" style="opacity: 0.6;"><div class="song-info"><div class="song-title">⚠️ API Connection Error</div><div class="song-artist">Please refresh the page</div></div></div>';
+                console.error('❌ AI Therapeutic Music API error:', error);
+                showMusicUpdateIndicator('❌ Music system error', 'error');
+                musicTrack.innerHTML = '<div class="song-card" style="opacity: 0.6;"><div class="song-info"><div class="song-title">⚠️ Therapeutic Music Error</div><div class="song-artist">Emotion detection may be offline</div></div></div>';
+                setTimeout(() => hideMusicUpdateIndicator(), 5000);
             }
         }
         
@@ -4452,6 +5328,42 @@
         `;
         document.head.appendChild(style);
 
+        // 🎯 VISUAL FEEDBACK FUNCTIONS
+        function showMusicUpdateIndicator(message, type = 'loading') {
+            const statusElement = document.getElementById('musicUpdateStatus');
+            if (statusElement) {
+                statusElement.textContent = message;
+                statusElement.className = `music-update-status ${type}`;
+                statusElement.style.display = 'block';
+            }
+        }
+
+        function hideMusicUpdateIndicator() {
+            const statusElement = document.getElementById('musicUpdateStatus');
+            if (statusElement) {
+                statusElement.style.display = 'none';
+            }
+        }
+
+        function updateMusicTitle(newTitle) {
+            const titleElement = document.getElementById('musicTitle');
+            if (titleElement) {
+                titleElement.textContent = newTitle;
+                titleElement.classList.add('emotion-pulse');
+                setTimeout(() => titleElement.classList.remove('emotion-pulse'), 2000);
+            }
+        }
+
+        function flashMusicContainer() {
+            const container = document.querySelector('.music-carousel-container');
+            if (container) {
+                container.style.boxShadow = '0 0 30px rgba(59, 130, 246, 0.6)';
+                setTimeout(() => {
+                    container.style.boxShadow = '';
+                }, 1000);
+            }
+        }
+
         // Initialize music carousel immediately (before DOM fully loads)
         function initCarouselEarly() {
             const musicTrack = document.getElementById('musicTrack');
@@ -4460,11 +5372,19 @@
                 initializeCarouselDragControls();
                 initializeWheelScroll();
                 
-                // 🔄 AUTO-REFRESH MUSIC EVERY 30 SECONDS
-                setInterval(() => {
-                    console.log('🔄 Auto-refreshing AI music recommendations...');
-                    initializeMusicCarousel();
-                }, 30000); // 30 seconds
+                // 🔄 SMART AUTO-REFRESH: More frequent when emotions are detected
+                const refreshInterval = currentEmotion && currentEmotion !== 'neutral' ? 20000 : 45000; // 20s for active emotions, 45s for neutral
+                
+                if (window.musicRecommendationInterval) {
+                    clearInterval(window.musicRecommendationInterval);
+                }
+                
+                window.musicRecommendationInterval = setInterval(() => {
+                    if (!window.privacyModeActive) {
+                        console.log(`🔄 Auto-refreshing therapeutic music (${refreshInterval/1000}s interval for ${currentEmotion})...`);
+                        initializeMusicCarousel();
+                    }
+                }, refreshInterval); // 30 seconds
             } else {
                 // Retry in 100ms if element not ready
                 setTimeout(initCarouselEarly, 100);
@@ -5448,6 +6368,96 @@
         .meditation-ring1 { animation: meditationRipple1 4s ease-in-out infinite; }
         .meditation-ring2 { animation: meditationRipple2 5s ease-in-out infinite; }
         .gratitude-hearts { animation: gratitudeFloat 4s ease-in-out infinite; }
+        
+        /* Advanced Session Analytics Panel Animations */
+        @keyframes notificationSlide {
+            0% { transform: translateX(100%) scale(0.9); opacity: 0; }
+            100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        
+        .emotion-badge {
+            animation: emotionPulse 1.5s ease-in-out infinite;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+        
+        @keyframes emotionPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1); }
+        }
+        
+        .confidence-meter {
+            font-weight: 700;
+            text-shadow: 0 0 6px currentColor;
+        }
+        
+        .fps-indicator {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+        
+        .model-count {
+            font-weight: 700;
+            text-shadow: 0 0 8px #4fd1c7;
+        }
+        
+        .storage-status {
+            font-weight: 600;
+            text-shadow: 0 0 6px currentColor;
+        }
+        
+        /* Privacy Mode Transition Effects */
+        #video {
+            transition: filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .privacy-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .privacy-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        .privacy-btn:hover::before {
+            left: 100%;
+        }
+        
+        /* Enhanced Insight Panel Styles */
+        .insight-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .insight-item:hover {
+            background: rgba(59, 130, 246, 0.05);
+            padding-left: 8px;
+            border-radius: 6px;
+        }
+        
+        .insight-label {
+            color: #93c5fd;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .insight-value {
+            color: #dbeafe;
+            font-weight: 600;
+            text-align: right;
+        }
     </style>
 
     <!-- Breathing Exercise Functions - Global Scope -->
@@ -6586,6 +7596,644 @@ function updateDashboardForTemporaryUser() {
     // Limit certain features or show prompts
     showTemporaryUserPrompts();
 }
+
+// ====================================================
+// 🚀 ADVANCED SESSION ANALYTICS & PRIVACY FEATURES
+// ====================================================
+
+// Session Analytics Variables
+let sessionAnalytics = {
+    totalReadings: 0,
+    emotionCounts: {},
+    confidenceSum: 0,
+    sessionStart: new Date(),
+    processingFPS: 0,
+    activeModels: 3, // MediaPipe, DeepFace, YOLO
+    totalFrames: 0,
+    lastFrameTime: 0,
+    emotionHistory: []
+};
+
+// Privacy Mode State
+window.privacyModeActive = false;
+
+// Current emotion tracking for analytics
+let currentEmotion = 'neutral';
+let currentConfidence = 0.0;
+
+// Track last facial emotion for music updates
+window.lastFacialEmotion = null;
+
+// Enhanced insights tracking with advanced session analytics
+function updateAdvancedInsights(emotion, confidence) {
+    currentEmotion = emotion || 'neutral';
+    currentConfidence = confidence || 0.0;
+    
+    const insights = document.getElementById('emotionInsights');
+    if (insights) {
+        const now = new Date();
+        
+        // Update session analytics
+        sessionAnalytics.totalReadings++;
+        sessionAnalytics.emotionCounts[currentEmotion] = (sessionAnalytics.emotionCounts[currentEmotion] || 0) + 1;
+        sessionAnalytics.confidenceSum += currentConfidence;
+        sessionAnalytics.totalFrames++;
+        
+        // Store emotion history
+        sessionAnalytics.emotionHistory.push({
+            emotion: currentEmotion,
+            confidence: currentConfidence,
+            timestamp: now.toISOString()
+        });
+        
+        // Calculate processing FPS
+        const currentTime = performance.now();
+        if (sessionAnalytics.lastFrameTime > 0) {
+            const frameDelta = currentTime - sessionAnalytics.lastFrameTime;
+            sessionAnalytics.processingFPS = Math.round(1000 / frameDelta);
+        }
+        sessionAnalytics.lastFrameTime = currentTime;
+        
+        const avgConfidence = sessionAnalytics.totalReadings > 0 ? 
+            (sessionAnalytics.confidenceSum / sessionAnalytics.totalReadings * 100).toFixed(1) : 0;
+        
+        const sessionDuration = Math.floor((now - sessionAnalytics.sessionStart) / 1000);
+        const minutes = Math.floor(sessionDuration / 60);
+        const seconds = sessionDuration % 60;
+        
+        // Get storage status
+        const storageStatus = window.ymirAuth ? 
+            (window.ymirAuth.getUserStatus().isAuthenticated ? 'Cloud Synced' : 'Local Storage') : 
+            'Session Only';
+        
+        insights.innerHTML = `
+            <div class="insight-item">
+                <span class="insight-label">Current Emotion:</span>
+                <span class="insight-value emotion-badge" style="background: ${getEmotionColor(currentEmotion)}; padding: 2px 8px; border-radius: 12px; color: white; font-weight: 600;">${currentEmotion.toUpperCase()}</span>
+            </div>
+            <div class="insight-item">
+                <span class="insight-label">Live Confidence:</span>
+                <span class="insight-value confidence-meter" style="color: ${confidence > 0.7 ? '#22c55e' : confidence > 0.5 ? '#f59e0b' : '#ef4444'};">${currentConfidence ? (currentConfidence * 100).toFixed(1) + '%' : 'N/A'}</span>
+            </div>
+            <div class="insight-item">
+                <span class="insight-label">Total Readings:</span>
+                <span class="insight-value">${sessionAnalytics.totalReadings}</span>
+            </div>
+            <div class="insight-item">
+                <span class="insight-label">Average Confidence:</span>
+                <span class="insight-value">${avgConfidence}%</span>
+            </div>
+            <div class="insight-item">
+                <span class="insight-label">Processing FPS:</span>
+                <span class="insight-value fps-indicator" style="color: ${sessionAnalytics.processingFPS > 15 ? '#22c55e' : sessionAnalytics.processingFPS > 10 ? '#f59e0b' : '#ef4444'};">${sessionAnalytics.processingFPS} FPS</span>
+            </div>
+            <div class="insight-item">
+                <span class="insight-label">Active Models:</span>
+                <span class="insight-value model-count" style="color: #4fd1c7;">${sessionAnalytics.activeModels}/3</span>
+            </div>
+            <div class="insight-item">
+                <span class="insight-label">Total Frames:</span>
+                <span class="insight-value">${sessionAnalytics.totalFrames.toLocaleString()}</span>
+            </div>
+            <div class="insight-item">
+                <span class="insight-label">Session Duration:</span>
+                <span class="insight-value">${minutes}:${seconds.toString().padStart(2, '0')}</span>
+            </div>
+            <div class="insight-item">
+                <span class="insight-label">Storage Status:</span>
+                <span class="insight-value storage-status" style="color: ${storageStatus === 'Cloud Synced' ? '#22c55e' : storageStatus === 'Local Storage' ? '#f59e0b' : '#6b7280'};">${storageStatus}</span>
+            </div>
+        `;
+    }
+}
+
+// Get emotion color for visual indicators
+function getEmotionColor(emotion) {
+    const emotionColors = {
+        'happy': '#22c55e',
+        'sad': '#3b82f6',
+        'angry': '#ef4444',
+        'fear': '#8b5cf6',
+        'surprise': '#f59e0b',
+        'disgust': '#84cc16',
+        'neutral': '#6b7280',
+        'calm': '#06d6a0',
+        'energetic': '#f97316'
+    };
+    return emotionColors[emotion.toLowerCase()] || '#6b7280';
+}
+
+// Privacy Mode Implementation
+function togglePrivacyMode() {
+    const videoElement = document.getElementById('video');
+    const privacyBtn = document.querySelector('[onclick="togglePrivacyMode()"]');
+    const privacyToggle = document.getElementById('privacyToggle');
+    
+    if (!window.privacyModeActive) {
+        // Enable privacy mode - blur all video elements
+        if (videoElement) {
+            videoElement.style.filter = 'blur(20px)';
+            videoElement.style.transition = 'filter 0.3s ease';
+        }
+        
+        // Also blur video container and iframe
+        const videoContainer = document.getElementById('videoContainer');
+        const videoIframe = document.querySelector('#videoContainer iframe');
+        const videoImg = document.querySelector('#videoContainer img');
+        
+        if (videoContainer) {
+            videoContainer.style.filter = 'blur(20px)';
+            videoContainer.style.transition = 'filter 0.3s ease';
+        }
+        if (videoIframe) {
+            videoIframe.style.filter = 'blur(20px)';
+            videoIframe.style.transition = 'filter 0.3s ease';
+        }
+        if (videoImg) {
+            videoImg.style.filter = 'blur(20px)';
+            videoImg.style.transition = 'filter 0.3s ease';
+        }
+        
+        // Update all privacy buttons
+        if (privacyBtn) {
+            privacyBtn.innerHTML = '<i class="fas fa-eye"></i> Show Camera';
+            privacyBtn.style.background = 'linear-gradient(45deg, #ef4444, #dc2626)';
+        }
+        if (privacyToggle) {
+            privacyToggle.innerHTML = '<i class="fas fa-eye"></i> Show';
+            privacyToggle.style.background = 'rgba(239, 68, 68, 0.3)';
+        }
+        
+        window.privacyModeActive = true;
+        
+        // 🛡️ FUNCTIONAL PRIVACY: Stop all data collection
+        stopDataCollection();
+        
+        // Show privacy notification
+        showAdvancedNotification('🔒 Privacy Mode Enabled - All data collection stopped', 'info');
+        
+        // Save privacy event to analytics
+        if (window.ymirAuth) {
+            window.ymirAuth.saveData('privacy_events', {
+                action: 'enabled',
+                timestamp: new Date().toISOString()
+            });
+        }
+    } else {
+        // Disable privacy mode - remove blur from all video elements
+        if (videoElement) {
+            videoElement.style.filter = 'none';
+        }
+        
+        // Also remove blur from video container and iframe
+        const videoContainer = document.getElementById('videoContainer');
+        const videoIframe = document.querySelector('#videoContainer iframe');
+        const videoImg = document.querySelector('#videoContainer img');
+        
+        if (videoContainer) {
+            videoContainer.style.filter = 'none';
+        }
+        if (videoIframe) {
+            videoIframe.style.filter = 'none';
+        }
+        if (videoImg) {
+            videoImg.style.filter = 'none';
+        }
+        
+        // Update all privacy buttons
+        if (privacyBtn) {
+            privacyBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Privacy Mode';
+            privacyBtn.style.background = 'linear-gradient(45deg, #6b7280, #4b5563)';
+        }
+        if (privacyToggle) {
+            privacyToggle.innerHTML = '<i class="fas fa-eye-slash"></i> Privacy';
+            privacyToggle.style.background = 'rgba(107, 114, 128, 0.3)';
+        }
+        
+        window.privacyModeActive = false;
+        
+        // 🛡️ RESUME DATA COLLECTION: Restart all services
+        resumeDataCollection();
+        
+        showAdvancedNotification('👁️ Privacy Mode Disabled - Data collection resumed', 'success');
+        
+        // Save privacy event to analytics
+        if (window.ymirAuth) {
+            window.ymirAuth.saveData('privacy_events', {
+                action: 'disabled',
+                timestamp: new Date().toISOString()
+            });
+        }
+    }
+}
+
+// Export Session Data Implementation
+function exportSessionData() {
+    try {
+        // Get dominant emotion from session
+        const dominantEmotion = Object.entries(sessionAnalytics.emotionCounts)
+            .sort(([,a], [,b]) => b - a)[0]?.[0] || 'neutral';
+        
+        const exportData = {
+            sessionInfo: {
+                sessionId: window.ymirAuth?.getUserStatus()?.sessionId || `guest_${Date.now()}`,
+                startTime: sessionAnalytics.sessionStart.toISOString(),
+                endTime: new Date().toISOString(),
+                duration: Math.floor((new Date() - sessionAnalytics.sessionStart) / 1000),
+                dominantEmotion: dominantEmotion,
+                totalReadings: sessionAnalytics.totalReadings
+            },
+            analytics: {
+                ...sessionAnalytics,
+                averageConfidence: sessionAnalytics.totalReadings > 0 ? 
+                    (sessionAnalytics.confidenceSum / sessionAnalytics.totalReadings) : 0,
+                emotionDistribution: Object.entries(sessionAnalytics.emotionCounts).map(([emotion, count]) => ({
+                    emotion,
+                    count,
+                    percentage: ((count / sessionAnalytics.totalReadings) * 100).toFixed(1)
+                }))
+            },
+            emotionTimeline: sessionAnalytics.emotionHistory,
+            systemInfo: {
+                userAgent: navigator.userAgent,
+                timestamp: new Date().toISOString(),
+                activeModels: ['MediaPipe Face Mesh', 'DeepFace', 'YOLO Detection'],
+                features: ['Face Mesh', 'Body Pose', 'Hand Tracking', 'Gaze Tracking'],
+                privacyModeUsed: window.privacyModeActive,
+                platform: navigator.platform,
+                language: navigator.language,
+                screenResolution: `${screen.width}x${screen.height}`
+            },
+            userData: window.ymirAuth?.getUserData() || null,
+            userStatus: window.ymirAuth?.getUserStatus() || { isAuthenticated: false }
+        };
+
+        // Create downloadable JSON file
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        
+        // Generate meaningful filename
+        const date = new Date().toISOString().split('T')[0];
+        const time = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');
+        link.download = `ymir_emotion_session_${date}_${time}_${dominantEmotion}.json`;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up blob URL
+        URL.revokeObjectURL(link.href);
+        
+        showAdvancedNotification('📊 Session data exported successfully!', 'success');
+        
+        console.log('🎯 Exported Session Data:', exportData);
+        
+        // Save export event to analytics
+        if (window.ymirAuth) {
+            window.ymirAuth.saveData('export_events', {
+                timestamp: new Date().toISOString(),
+                totalReadings: sessionAnalytics.totalReadings,
+                dominantEmotion: dominantEmotion,
+                sessionDuration: Math.floor((new Date() - sessionAnalytics.sessionStart) / 1000)
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Export failed:', error);
+        showAdvancedNotification('⚠️ Export failed. Please try again.', 'error');
+    }
+}
+
+// Enhanced notification system with better animations
+function showAdvancedNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `ymir-notification notification-${type}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        color: white;
+        font-weight: 500;
+        font-size: 14px;
+        z-index: 10000;
+        transform: translateX(100%);
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        max-width: 400px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        animation: notificationSlide 0.4s ease-out;
+    `;
+    
+    // Set background based on type
+    switch(type) {
+        case 'success':
+            notification.style.background = 'linear-gradient(45deg, rgba(34, 197, 94, 0.9), rgba(22, 163, 74, 0.9))';
+            notification.style.borderColor = 'rgba(34, 197, 94, 0.3)';
+            break;
+        case 'error':
+            notification.style.background = 'linear-gradient(45deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))';
+            notification.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            break;
+        case 'warning':
+            notification.style.background = 'linear-gradient(45deg, rgba(245, 158, 11, 0.9), rgba(217, 119, 6, 0.9))';
+            notification.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+            break;
+        default:
+            notification.style.background = 'linear-gradient(45deg, rgba(59, 130, 246, 0.9), rgba(37, 99, 235, 0.9))';
+            notification.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+    }
+    
+    notification.innerHTML = message;
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Animate out and remove
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
+        }, 400);
+    }, 4000);
+}
+
+// Initialize advanced features when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Advanced Y.M.I.R Features Initialized');
+    
+    // Set initial button states
+    const privacyToggle = document.getElementById('privacyToggle');
+    if (privacyToggle) {
+        privacyToggle.innerHTML = '<i class="fas fa-eye-slash"></i> Privacy';
+    }
+    
+    // Start session analytics
+    sessionAnalytics.sessionStart = new Date();
+    console.log('📊 Session Analytics Started:', sessionAnalytics.sessionStart);
+    
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+Shift+P for Privacy Mode
+        if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+            e.preventDefault();
+            togglePrivacyMode();
+        }
+        
+        // Ctrl+Shift+E for Export
+        if (e.ctrlKey && e.shiftKey && e.key === 'E') {
+            e.preventDefault();
+            exportSessionData();
+        }
+    });
+    
+    console.log('⌨️ Keyboard shortcuts enabled: Ctrl+Shift+P (Privacy), Ctrl+Shift+E (Export)');
+});
+
+// 📊 LIVE ANALYTICS: Fetch real-time data from face microservice
+function fetchLiveAnalytics() {
+    fetch('http://localhost:5002/api/status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.analytics) {
+                const analytics = data.analytics;
+                
+                // Update the advanced insights panel with live data
+                updateLiveAnalyticsDisplay(analytics, data);
+            }
+        })
+        .catch(error => {
+            console.warn('⚠️ Could not fetch live analytics:', error.message);
+        });
+}
+
+function updateLiveAnalyticsDisplay(analytics, systemData) {
+    const insights = document.getElementById('emotionInsights');
+    if (!insights) return;
+    
+    const totalReadings = analytics.total_readings || 0;
+    const avgConfidence = analytics.avg_confidence || 0;
+    const avgQuality = analytics.avg_quality || 0;
+    const sessionDuration = systemData.session_duration || 0;
+    
+    // Calculate FPS if available
+    const processingFPS = sessionAnalytics.processingFPS || 'N/A';
+    
+    // Format session time
+    const minutes = Math.floor(sessionDuration / 60);
+    const seconds = Math.floor(sessionDuration % 60);
+    const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Get current dominant emotion from analytics
+    const dominantEmotion = analytics.dominant_emotion || 'neutral';
+    const emotionConfidence = avgConfidence;
+    
+    // 🎵 MUSIC UPDATE: Check if emotion changed and trigger music update
+    if (window.lastFacialEmotion !== dominantEmotion && totalReadings > 0) {
+        console.log(`🎭 Facial emotion changed: ${window.lastFacialEmotion} → ${dominantEmotion} (readings: ${totalReadings})`);
+        window.lastFacialEmotion = dominantEmotion;
+        
+        // Trigger music recommendation update for facial emotion change
+        console.log(`🎵 Triggering music update for facial emotion: ${dominantEmotion}`);
+        showMusicUpdateIndicator(`🎭 ${dominantEmotion.charAt(0).toUpperCase() + dominantEmotion.slice(1)} detected via camera!`);
+        setTimeout(() => {
+            initializeMusicCarousel();
+        }, 500);
+    }
+    
+    // Update the analytics panel
+    insights.innerHTML = `
+        <div class="insight-item">
+            <span class="insight-label">Current Emotion:</span>
+            <span class="insight-value emotion-badge" style="background: ${getEmotionColor(dominantEmotion)}; padding: 2px 8px; border-radius: 12px; color: white; font-weight: 600;">${dominantEmotion.toUpperCase()}</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-label">Live Confidence:</span>
+            <span class="insight-value confidence-meter" style="color: ${emotionConfidence > 0.7 ? '#22c55e' : emotionConfidence > 0.5 ? '#f59e0b' : '#ef4444'};">${emotionConfidence ? (emotionConfidence * 100).toFixed(1) + '%' : 'N/A'}</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-label">Total Readings:</span>
+            <span class="insight-value total-counter" style="color: #3b82f6; font-weight: 600;">${totalReadings}</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-label">Avg Confidence:</span>
+            <span class="insight-value" style="color: #10b981;">${avgConfidence ? (avgConfidence * 100).toFixed(1) + '%' : '--'}</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-label">Session Time:</span>
+            <span class="insight-value session-timer" style="color: #8b5cf6; font-family: 'Monaco', monospace;">${timeDisplay}</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-label">Processing FPS:</span>
+            <span class="insight-value fps-counter" style="color: #f59e0b; font-weight: 600;">${processingFPS !== 'N/A' ? Math.round(processingFPS) : '--'}</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-label">Active Models:</span>
+            <span class="insight-value" style="color: #06b6d4;">${systemData.detector_available ? '3' : '0'}</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-label">Total Frames:</span>
+            <span class="insight-value" style="color: #84cc16;">${sessionAnalytics.totalFrames || 0}</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-label">Storage Status:</span>
+            <span class="insight-value storage-indicator" style="color: ${systemData.storage_status?.enabled ? '#22c55e' : '#ef4444'};">
+                ${systemData.storage_status?.buffer_size || 0} buffered
+            </span>
+        </div>
+    `;
+}
+
+// 🛡️ FUNCTIONAL PRIVACY CONTROLS
+function stopDataCollection() {
+    console.log('🔒 Privacy Mode: Stopping all data collection');
+    
+    // Stop camera via microservice API
+    fetch('http://localhost:5002/api/stop_camera', {
+        method: 'POST'
+    }).then(response => {
+        if (response.ok) {
+            console.log('✅ Camera stopped for privacy');
+        }
+    }).catch(error => {
+        console.warn('⚠️ Could not stop camera:', error.message);
+    });
+    
+    // Stop music recommendations polling
+    if (window.musicRecommendationInterval) {
+        clearInterval(window.musicRecommendationInterval);
+        window.musicRecommendationInterval = null;
+        console.log('🎵 Music recommendations paused');
+    }
+    
+    // Stop analytics polling
+    if (window.analyticsInterval) {
+        clearInterval(window.analyticsInterval);
+        window.analyticsInterval = null;
+        console.log('📊 Analytics polling paused');
+    }
+    
+    // Clear current data displays
+    const emotionDisplay = document.querySelector('.current-emotion');
+    if (emotionDisplay) {
+        emotionDisplay.textContent = '🔒 Privacy Mode Active';
+    }
+    
+    // Update insights panel
+    const insights = document.getElementById('emotionInsights');
+    if (insights) {
+        insights.innerHTML = `
+            <div style="text-align: center; padding: 20px; color: #ef4444;">
+                <i class="fas fa-shield-alt" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <div style="font-weight: 600;">Privacy Mode Active</div>
+                <div style="font-size: 0.9rem; margin-top: 5px;">All data collection stopped</div>
+            </div>
+        `;
+    }
+}
+
+function resumeDataCollection() {
+    console.log('👁️ Privacy Mode: Resuming data collection');
+    
+    // Restart camera via microservice API
+    fetch('http://localhost:5002/api/start_camera', {
+        method: 'POST'
+    }).then(response => {
+        if (response.ok) {
+            console.log('✅ Camera restarted');
+        }
+    }).catch(error => {
+        console.warn('⚠️ Could not restart camera:', error.message);
+    });
+    
+    // Restart smart music recommendations polling
+    if (!window.musicRecommendationInterval) {
+        console.log('🔄 Restarting smart music recommendations...');
+        initializeMusicCarousel(); // Use the smart initialization instead
+        
+        // Old function kept for compatibility but will be replaced by smart system
+        // window.musicRecommendationInterval = setInterval(() => {
+        //     if (!window.privacyModeActive) {
+        //         fetchAIMusicRecommendations();
+        //     }
+        } 30000; // Every 30 seconds
+        console.log('🎵 Music recommendations resumed');
+    }
+    
+    // Restart analytics polling
+    if (!window.analyticsInterval) {
+        window.analyticsInterval = setInterval(() => {
+            if (!window.privacyModeActive) {
+                fetchLiveAnalytics();
+            }
+        }, 2000); // Every 2 seconds
+        console.log('📊 Analytics polling resumed');
+    }
+    
+    // Clear privacy display
+    const emotionDisplay = document.querySelector('.current-emotion');
+    if (emotionDisplay) {
+        emotionDisplay.textContent = 'Waiting for emotions...';
+    }
+    
+    // Resume normal insights panel
+    setTimeout(fetchLiveAnalytics, 1000);
+
+
+// Store interval references for privacy control
+window.musicRecommendationInterval = null;
+window.analyticsInterval = null;
+
+// Start polling for live analytics every 2 seconds (with privacy mode check)
+window.analyticsInterval = setInterval(() => {
+    if (!window.privacyModeActive) {
+        fetchLiveAnalytics();
+    }
+}, 2000);
+
+// Initial fetch
+setTimeout(fetchLiveAnalytics, 1000);
+
+// Hook into existing emotion detection updates safely
+if (typeof window.updateInsights === 'function') {
+    const originalUpdateInsights = window.updateInsights;
+    window.updateInsights = function(emotion, confidence) {
+        try {
+            originalUpdateInsights(emotion, confidence);
+            updateAdvancedInsights(emotion, confidence);
+        } catch (error) {
+            console.warn('⚠️ updateInsights error:', error.message);
+        }
+    };
+} else {
+    window.updateInsights = function(emotion, confidence) {
+        try {
+            updateAdvancedInsights(emotion, confidence);
+        } catch (error) {
+            console.warn('⚠️ updateInsights error:', error.message);
+        }
+    };
+}
+
+// Performance monitoring
+setInterval(() => {
+    if (sessionAnalytics.totalReadings > 0) {
+        const avgFPS = sessionAnalytics.processingFPS;
+        if (avgFPS < 10) {
+            console.warn('⚠️ Low processing FPS detected:', avgFPS);
+        }
+    }
+}, 10000); // Check every 10 seconds
 
 function enableAdvancedFeatures() {
     // Enable features only available to authenticated users
@@ -8272,6 +9920,99 @@ window.YMIRAuth = {
 // Export daily check-in manager
 window.DailyCheckIn = () => dailyCheckIn;
 </script>
+
+<!-- Visual Settings Modal -->
+<div id="visualSettingsModal" class="visual-settings-modal">
+    <div class="visual-settings-modal-content">
+        <div class="visual-settings-header">
+            <h2>
+                <span class="gear-icon">⚙️</span>
+                Advanced Visual Controls
+            </h2>
+            <button class="close-button" onclick="closeVisualSettingsModal()">&times;</button>
+        </div>
+        
+        <div class="visual-settings-body">
+            <!-- MediaPipe Features Section -->
+            <div class="control-section">
+                <h4 style="color: #fbbf24;">MediaPipe Features</h4>
+                <div class="control-grid">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle_face_mesh" checked onchange="updateVisualSettings()">
+                        <span>Face Mesh</span>
+                    </label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle_body_pose" checked onchange="updateVisualSettings()">
+                        <span>Body Pose</span>
+                    </label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle_hand_tracking" checked onchange="updateVisualSettings()">
+                        <span>Hand Tracking</span>
+                    </label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle_gaze_tracking" checked onchange="updateVisualSettings()">
+                        <span>Gaze Tracking</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- YOLO Object Detection Section -->
+            <div class="control-section">
+                <h4 style="color: #f97316;">YOLO Object Detection</h4>
+                <div class="control-grid">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle_object_detection" checked onchange="updateVisualSettings()">
+                        <span>📦 Object Detection</span>
+                    </label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle_emotion_context" checked onchange="updateVisualSettings()">
+                        <span>🎭 Emotion Context</span>
+                    </label>
+                    <div class="settings-input-group full-width">
+                        <label class="settings-label">🎚️ Detection Confidence</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="range" id="confidence_threshold" class="settings-range" 
+                                   min="0.1" max="0.9" step="0.05" value="0.25" 
+                                   onchange="updateVisualSettings(); updateConfidenceValue()">
+                            <span id="confidence_value" class="range-value">0.25</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance & Quality Section -->
+            <div class="control-section">
+                <h4 style="color: #ef4444;">⚡ Performance & Quality</h4>
+                <div class="control-grid">
+                    <div class="settings-input-group">
+                        <label class="settings-label">📹 Video Quality</label>
+                        <select id="video_quality" class="settings-select" onchange="updateVisualSettings()">
+                            <option value="720p">720p (Recommended)</option>
+                            <option value="1080p">1080p (High Quality)</option>
+                            <option value="480p">480p (Fast)</option>
+                        </select>
+                    </div>
+                    <div class="settings-input-group">
+                        <label class="settings-label">🎚️ Analysis Interval</label>
+                        <select id="analysis_interval" class="settings-select" onchange="updateVisualSettings()">
+                            <option value="15">15 frames (2x per sec)</option>
+                            <option value="30" selected>30 frames (1x per sec)</option>
+                            <option value="60">60 frames (0.5x per sec)</option>
+                        </select>
+                    </div>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle_quality_indicators" checked onchange="updateVisualSettings()">
+                        <span>Quality Indicators</span>
+                    </label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle_fps_display" onchange="updateVisualSettings()">
+                        <span>FPS Display</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

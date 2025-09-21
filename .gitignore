@@ -51,3 +51,5 @@ enhancements/src-new/face/__pycache__
 enhancements/src-new/multimodal_fusion/__pycache__
 enhancements/src-new/face/face_models/__pycache__
 chat_encryption.key
+datasets/experimental_audio
+datasets/experimental_audio/

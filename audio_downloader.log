@@ -1,0 +1,248 @@
+2025-09-21 18:16:14,837 - INFO - 📁 Created audio directories in datasets/experimental_audio
+2025-09-21 18:16:14,837 - INFO - 🎵 Binaural Audio Downloader initialized
+2025-09-21 18:16:14,837 - INFO - 🚀 Starting experimental audio download...
+2025-09-21 18:16:14,844 - INFO - 📊 Loaded 626 experimental tracks
+2025-09-21 18:16:14,844 - INFO - 🎵 Processing category: FOCUS
+2025-09-21 18:16:14,844 - INFO - 📊 Progress: 1/25 in focus
+2025-09-21 18:16:15,134 - WARNING - ⚠️ No preview available: 40 Hz Binaural Beats
+2025-09-21 18:16:15,199 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for 40 Hz Binaural Beats
+2025-09-21 18:16:15,706 - INFO - 📊 Progress: 2/25 in focus
+2025-09-21 18:16:15,947 - WARNING - ⚠️ No preview available: 40 Hz Brain Waves - Binaural Beats
+2025-09-21 18:16:16,057 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for 40 Hz Brain Waves - Binaural Beats
+2025-09-21 18:16:16,566 - INFO - 📊 Progress: 3/25 in focus
+2025-09-21 18:16:16,791 - WARNING - ⚠️ No preview available: Jordan
+2025-09-21 18:16:16,868 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Jordan
+2025-09-21 18:16:17,380 - INFO - 📊 Progress: 4/25 in focus
+2025-09-21 18:16:17,669 - WARNING - ⚠️ No preview available: Binaural Beats For Studying
+2025-09-21 18:16:17,756 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Binaural Beats For Studying
+2025-09-21 18:16:18,272 - INFO - 📊 Progress: 5/25 in focus
+2025-09-21 18:16:18,639 - WARNING - ⚠️ No preview available: Declutter Your Mind
+2025-09-21 18:16:18,727 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Declutter Your Mind
+2025-09-21 18:16:19,243 - INFO - 📊 Progress: 6/25 in focus
+2025-09-21 18:16:19,565 - WARNING - ⚠️ No preview available: Recharging Yourself
+2025-09-21 18:16:19,638 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Recharging Yourself
+2025-09-21 18:16:20,145 - INFO - 📊 Progress: 7/25 in focus
+2025-09-21 18:16:20,387 - WARNING - ⚠️ No preview available: Tune Yourself for Exam
+2025-09-21 18:16:20,475 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Tune Yourself for Exam
+2025-09-21 18:16:20,986 - INFO - 📊 Progress: 8/25 in focus
+2025-09-21 18:16:21,243 - WARNING - ⚠️ No preview available: Intelligent Student
+2025-09-21 18:16:21,318 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Intelligent Student
+2025-09-21 18:16:21,829 - INFO - 📊 Progress: 9/25 in focus
+2025-09-21 18:16:22,013 - WARNING - ⚠️ No preview available: Fresh Ideas
+2025-09-21 18:16:22,093 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Fresh Ideas
+2025-09-21 18:16:22,602 - INFO - 📊 Progress: 10/25 in focus
+2025-09-21 18:16:22,847 - WARNING - ⚠️ No preview available: Pure Beta Binaural Beat - Increased Concentration
+2025-09-21 18:16:22,909 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Pure Beta Binaural Beat - Increased Concentration
+2025-09-21 18:16:23,424 - INFO - 📊 Progress: 11/25 in focus
+2025-09-21 18:16:23,587 - WARNING - ⚠️ No preview available: Peace of Mind
+2025-09-21 18:16:23,660 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Peace of Mind
+2025-09-21 18:16:24,182 - INFO - 📊 Progress: 12/25 in focus
+2025-09-21 18:16:24,558 - WARNING - ⚠️ No preview available: Endless Knowladge
+2025-09-21 18:16:24,608 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Endless Knowladge
+2025-09-21 18:16:25,122 - INFO - 📊 Progress: 13/25 in focus
+2025-09-21 18:16:25,326 - WARNING - ⚠️ No preview available: Quiet Waterfall
+2025-09-21 18:16:25,399 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Quiet Waterfall
+2025-09-21 18:16:25,914 - INFO - 📊 Progress: 14/25 in focus
+2025-09-21 18:16:26,102 - WARNING - ⚠️ No preview available: 40 Hz Studying
+2025-09-21 18:16:26,163 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for 40 Hz Studying
+2025-09-21 18:16:26,674 - INFO - 📊 Progress: 15/25 in focus
+2025-09-21 18:16:26,886 - WARNING - ⚠️ No preview available: Focus and Concentration
+2025-09-21 18:16:26,946 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Focus and Concentration
+2025-09-21 18:16:27,456 - INFO - 📊 Progress: 16/25 in focus
+2025-09-21 18:16:27,648 - WARNING - ⚠️ No preview available: Good Idea
+2025-09-21 18:16:27,693 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Good Idea
+2025-09-21 18:16:28,202 - INFO - 📊 Progress: 17/25 in focus
+2025-09-21 18:16:28,483 - WARNING - ⚠️ No preview available: Sunrise Journey
+2025-09-21 18:16:28,534 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Sunrise Journey
+2025-09-21 18:16:29,047 - INFO - 📊 Progress: 18/25 in focus
+2025-09-21 18:16:29,256 - WARNING - ⚠️ No preview available: Brain Activation for Memory
+2025-09-21 18:16:29,332 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Brain Activation for Memory
+2025-09-21 18:16:29,845 - INFO - 📊 Progress: 19/25 in focus
+2025-09-21 18:16:30,041 - WARNING - ⚠️ No preview available: Binaural Beats Focus Music
+2025-09-21 18:16:30,089 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Binaural Beats Focus Music
+2025-09-21 18:16:30,605 - INFO - 📊 Progress: 20/25 in focus
+2025-09-21 18:16:30,790 - WARNING - ⚠️ No preview available: Binaural Beats Focus
+2025-09-21 18:16:30,884 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Binaural Beats Focus
+2025-09-21 18:16:31,391 - INFO - 📊 Progress: 21/25 in focus
+2025-09-21 18:16:31,609 - WARNING - ⚠️ No preview available: Binaural Beats Focus
+2025-09-21 18:16:31,682 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Binaural Beats Focus
+2025-09-21 18:16:32,187 - INFO - 📊 Progress: 22/25 in focus
+2025-09-21 18:16:32,357 - WARNING - ⚠️ No preview available: Binaural Beats Focus
+2025-09-21 18:16:32,442 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Binaural Beats Focus
+2025-09-21 18:16:32,953 - INFO - 📊 Progress: 23/25 in focus
+2025-09-21 18:16:33,200 - WARNING - ⚠️ No preview available: As in Gardens so in Tombs
+2025-09-21 18:16:33,252 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for As in Gardens so in Tombs
+2025-09-21 18:16:33,760 - INFO - 📊 Progress: 24/25 in focus
+2025-09-21 18:16:34,028 - WARNING - ⚠️ No preview available: 12.5 Hz Focus - Binaural Beats
+2025-09-21 18:16:34,103 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for 12.5 Hz Focus - Binaural Beats
+2025-09-21 18:16:34,610 - INFO - 📊 Progress: 25/25 in focus
+2025-09-21 18:16:34,818 - WARNING - ⚠️ No preview available: Gateway to Heaven
+2025-09-21 18:16:34,882 - INFO - 🎛️ Generated synthetic binaural: 20.0Hz for Gateway to Heaven
+2025-09-21 18:16:35,389 - INFO - 🎵 Processing category: SLEEP
+2025-09-21 18:16:35,389 - INFO - 📊 Progress: 1/25 in sleep
+2025-09-21 18:16:35,610 - WARNING - ⚠️ No preview available: 3 Hz: Deep Sleep (Delta Waves)
+2025-09-21 18:16:35,679 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for 3 Hz: Deep Sleep (Delta Waves)
+2025-09-21 18:16:36,195 - INFO - 📊 Progress: 2/25 in sleep
+2025-09-21 18:16:36,400 - WARNING - ⚠️ No preview available: Binaural Beats (Deep Sleep)
+2025-09-21 18:16:36,481 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for Binaural Beats (Deep Sleep)
+2025-09-21 18:16:36,998 - INFO - 📊 Progress: 3/25 in sleep
+2025-09-21 18:16:37,185 - WARNING - ⚠️ No preview available: Mozart Effect
+2025-09-21 18:16:37,256 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for Mozart Effect
+2025-09-21 18:16:37,776 - INFO - 📊 Progress: 4/25 in sleep
+2025-09-21 18:16:37,972 - WARNING - ⚠️ No preview available: Lo Fi No Lyrics Music
+2025-09-21 18:16:38,044 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for Lo Fi No Lyrics Music
+2025-09-21 18:16:38,566 - INFO - 📊 Progress: 5/25 in sleep
+2025-09-21 18:16:38,873 - WARNING - ⚠️ No preview available: 30 Min Deep Sleep Music
+2025-09-21 18:16:38,927 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for 30 Min Deep Sleep Music
+2025-09-21 18:16:39,448 - INFO - 📊 Progress: 6/25 in sleep
+2025-09-21 18:16:39,762 - WARNING - ⚠️ No preview available: Binaural Sleep Music
+2025-09-21 18:16:39,828 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for Binaural Sleep Music
+2025-09-21 18:16:40,331 - INFO - 📊 Progress: 7/25 in sleep
+2025-09-21 18:16:40,604 - WARNING - ⚠️ No preview available: Binaural Sleep
+2025-09-21 18:16:40,651 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for Binaural Sleep
+2025-09-21 18:16:41,161 - INFO - 📊 Progress: 8/25 in sleep
+2025-09-21 18:16:41,339 - WARNING - ⚠️ No preview available: Binaural Beats for Deep Sleep
+2025-09-21 18:16:41,396 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for Binaural Beats for Deep Sleep
+2025-09-21 18:16:41,909 - INFO - 📊 Progress: 9/25 in sleep
+2025-09-21 18:16:42,102 - WARNING - ⚠️ No preview available: Sleep Music: Binaural Beats for Deep Slumber
+2025-09-21 18:16:42,151 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for Sleep Music: Binaural Beats for Deep Slumber
+2025-09-21 18:16:42,658 - INFO - 📊 Progress: 10/25 in sleep
+2025-09-21 18:16:42,825 - WARNING - ⚠️ No preview available: Deep Sleep Binaural Beats Relaxation Music
+2025-09-21 18:16:42,891 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for Deep Sleep Binaural Beats Relaxation Music
+2025-09-21 18:16:43,401 - INFO - 📊 Progress: 11/25 in sleep
+2025-09-21 18:16:43,559 - WARNING - ⚠️ No preview available: Relaxing Binaural Beats Music for Sleep
+2025-09-21 18:16:43,605 - INFO - 🎛️ Generated synthetic binaural: 2.0Hz for Relaxing Binaural Beats Music for Sleep
+2025-09-21 18:16:44,109 - INFO - 📊 Progress: 12/25 in sleep
+2025-09-21 18:16:44,386 - WARNING - ⚠️ No preview available: Binaural Beats Sleep Music
+2025-09-21 18:22:08,253 - INFO - 📁 Created audio directories in datasets/experimental_audio
+2025-09-21 18:22:08,261 - INFO - 🎵 Binaural Audio Downloader initialized
+2025-09-21 18:22:08,261 - INFO - 🚀 Starting experimental audio download...
+2025-09-21 18:22:08,265 - INFO - 📊 Loaded 626 experimental tracks
+2025-09-21 18:22:08,266 - INFO - 🎵 Processing category: FOCUS
+2025-09-21 18:22:08,266 - INFO - 📊 Progress: 1/25 in focus
+2025-09-21 18:22:08,266 - INFO - 🎯 Searching for REAL AUDIO: 40 Hz Binaural Beats by Miracle Healing Tones ABL
+2025-09-21 18:22:08,267 - INFO - 🔍 Searching YouTube: "Miracle Healing Tones ABL" "40 Hz Binaural Beats"
+2025-09-21 18:22:09,895 - INFO - 🎯 EXACT MATCH FOUND (score: 8): 40 Hz Binaural Beats
+2025-09-21 18:22:09,895 - INFO -    Uploader: Miracle Healing Tones ABL - Topic
+2025-09-21 18:22:34,977 - INFO - ✅ Downloaded YouTube audio: 40 Hz Binaural Beats
+2025-09-21 18:22:35,483 - INFO - 📊 Progress: 2/25 in focus
+2025-09-21 18:22:35,483 - INFO - 🎯 Searching for REAL AUDIO: 40 Hz Brain Waves - Binaural Beats by Binaural Tones
+2025-09-21 18:22:35,483 - INFO - 🔍 Searching YouTube: "Binaural Tones" "40 Hz Brain Waves - Binaural Beats"
+2025-09-21 18:22:37,296 - INFO - 🎯 EXACT MATCH FOUND (score: 9): 40 Hz Brain Waves - Binaural Beats
+2025-09-21 18:22:37,296 - INFO -    Uploader: Binaural Tones - Topic
+2025-09-21 18:22:45,228 - INFO - ✅ Downloaded YouTube audio: 40 Hz Brain Waves - Binaural Beats
+2025-09-21 18:22:45,737 - INFO - 📊 Progress: 3/25 in focus
+2025-09-21 18:22:45,737 - INFO - 🎯 Searching for REAL AUDIO: Jordan by Complete
+2025-09-21 18:22:45,737 - INFO - 🔍 Searching YouTube: "Complete" "Jordan"
+2025-09-21 18:22:47,213 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Complete - Jordan
+2025-09-21 18:22:47,213 - INFO -    Uploader: COMPLETE
+2025-09-21 18:22:52,624 - INFO - ✅ Downloaded YouTube audio: Jordan
+2025-09-21 18:22:53,128 - INFO - 📊 Progress: 4/25 in focus
+2025-09-21 18:22:53,128 - INFO - 🎯 Searching for REAL AUDIO: Binaural Beats For Studying by Binaural Beats Study Music
+2025-09-21 18:22:53,129 - INFO - 🔍 Searching YouTube: "Binaural Beats Study Music" "Binaural Beats For Studying"
+2025-09-21 18:22:54,623 - INFO - 🎯 EXACT MATCH FOUND (score: 4): Music for Concentration and Focus, Binaural Beats Study Music for Work and Studying
+2025-09-21 18:22:54,623 - INFO -    Uploader: Greenred Productions - Relaxing Music
+2025-09-21 18:27:27,186 - INFO - ✅ Downloaded YouTube audio: Binaural Beats For Studying
+2025-09-21 18:27:27,697 - INFO - 📊 Progress: 5/25 in focus
+2025-09-21 18:27:27,698 - INFO - 🎯 Searching for REAL AUDIO: Declutter Your Mind by Exam Study Music Academy
+2025-09-21 18:27:27,698 - INFO - 🔍 Searching YouTube: "Exam Study Music Academy" "Declutter Your Mind"
+2025-09-21 18:27:29,490 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Declutter Your Mind
+2025-09-21 18:27:29,490 - INFO -    Uploader: Exam Study Music Academy - Topic
+2025-09-21 18:27:40,605 - INFO - ✅ Downloaded YouTube audio: Declutter Your Mind
+2025-09-21 18:27:41,121 - INFO - 📊 Progress: 6/25 in focus
+2025-09-21 18:27:41,121 - INFO - 🎯 Searching for REAL AUDIO: Recharging Yourself by Study Music Guys
+2025-09-21 18:27:41,121 - INFO - 🔍 Searching YouTube: "Study Music Guys" "Recharging Yourself"
+2025-09-21 18:27:42,697 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Recharging Yourself
+2025-09-21 18:27:42,697 - INFO -    Uploader: Study Music Guys - Topic
+2025-09-21 18:27:53,719 - INFO - ✅ Downloaded YouTube audio: Recharging Yourself
+2025-09-21 18:27:54,225 - INFO - 📊 Progress: 7/25 in focus
+2025-09-21 18:27:54,225 - INFO - 🎯 Searching for REAL AUDIO: Tune Yourself for Exam by Study Music Guys
+2025-09-21 18:27:54,225 - INFO - 🔍 Searching YouTube: "Study Music Guys" "Tune Yourself for Exam"
+2025-09-21 18:27:56,065 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Tune Yourself for Exam
+2025-09-21 18:27:56,065 - INFO -    Uploader: Study Music Guys - Topic
+2025-09-21 18:28:09,497 - INFO - ✅ Downloaded YouTube audio: Tune Yourself for Exam
+2025-09-21 18:28:09,999 - INFO - 📊 Progress: 8/25 in focus
+2025-09-21 18:28:09,999 - INFO - 🎯 Searching for REAL AUDIO: Intelligent Student by Brain Study Music Guys
+2025-09-21 18:28:09,999 - INFO - 🔍 Searching YouTube: "Brain Study Music Guys" "Intelligent Student"
+2025-09-21 18:28:11,698 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Intelligent Student
+2025-09-21 18:28:11,698 - INFO -    Uploader: Brain Study Music Guys - Topic
+2025-09-21 18:28:20,041 - ERROR - ❌ YouTube download failed: [0;31mERROR:[0m The downloaded file is empty
+2025-09-21 18:28:20,292 - WARNING - ⚠️ No preview available: Intelligent Student
+2025-09-21 18:28:20,292 - INFO - 🎛️ Falling back to synthetic for: Intelligent Student
+2025-09-21 18:28:20,357 - ERROR - ❌ Synthetic generation failed: [Errno 2] No such file or directory: 'datasets\\experimental_audio\\focus\\synthetic\\Intelligent Student_synthetic_20.0Hz.wav'
+2025-09-21 18:28:20,862 - INFO - 📊 Progress: 9/25 in focus
+2025-09-21 18:28:20,862 - INFO - 🎯 Searching for REAL AUDIO: Fresh Ideas by Brain Study Music Guys
+2025-09-21 18:28:20,862 - INFO - 🔍 Searching YouTube: "Brain Study Music Guys" "Fresh Ideas"
+2025-09-21 18:28:22,362 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Fresh Ideas
+2025-09-21 18:28:22,362 - INFO -    Uploader: Brain Study Music Guys - Topic
+2025-09-21 18:28:34,199 - INFO - ✅ Downloaded YouTube audio: Fresh Ideas
+2025-09-21 18:28:34,709 - INFO - 📊 Progress: 10/25 in focus
+2025-09-21 18:28:34,709 - INFO - 🎯 Searching for REAL AUDIO: Pure Beta Binaural Beat - Increased Concentration by Miracle Tone
+2025-09-21 18:28:34,709 - INFO - 🔍 Searching YouTube: "Miracle Tone" "Pure Beta Binaural Beat - Increased Concentration"
+2025-09-21 18:28:36,594 - INFO - 🎯 EXACT MATCH FOUND (score: 6): Pure Beta Binaural Beat - Increased Concentration
+2025-09-21 18:28:36,594 - INFO -    Uploader: Miracle Tone - Topic
+2025-09-21 18:29:52,042 - INFO - ✅ Downloaded YouTube audio: Pure Beta Binaural Beat - Increased Concentration
+2025-09-21 18:29:52,555 - INFO - 📊 Progress: 11/25 in focus
+2025-09-21 18:29:52,555 - INFO - 🎯 Searching for REAL AUDIO: Peace of Mind by Exam Study Music Academy
+2025-09-21 18:29:52,556 - INFO - 🔍 Searching YouTube: "Exam Study Music Academy" "Peace of Mind"
+2025-09-21 18:29:53,904 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Peace of Mind
+2025-09-21 18:29:53,904 - INFO -    Uploader: Exam Study Music Academy - Topic
+2025-09-21 18:30:02,972 - INFO - ✅ Downloaded YouTube audio: Peace of Mind
+2025-09-21 18:30:03,478 - INFO - 📊 Progress: 12/25 in focus
+2025-09-21 18:30:03,478 - INFO - 🎯 Searching for REAL AUDIO: Endless Knowladge by Study Music Guys
+2025-09-21 18:30:03,478 - INFO - 🔍 Searching YouTube: "Study Music Guys" "Endless Knowladge"
+2025-09-21 18:30:05,198 - INFO - 🔍 Searching YouTube: Study Music Guys Endless Knowladge
+2025-09-21 18:30:06,706 - INFO - 🔍 Searching YouTube: Endless Knowladge Study Music Guys
+2025-09-21 18:30:08,285 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Endless Knowladge
+2025-09-21 18:30:08,285 - INFO -    Uploader: Study Music Guys - Topic
+2025-09-21 18:30:21,763 - INFO - ✅ Downloaded YouTube audio: Endless Knowladge
+2025-09-21 18:30:22,270 - INFO - 📊 Progress: 13/25 in focus
+2025-09-21 18:30:22,270 - INFO - 🎯 Searching for REAL AUDIO: Quiet Waterfall by Study Music Guys
+2025-09-21 18:30:22,270 - INFO - 🔍 Searching YouTube: "Study Music Guys" "Quiet Waterfall"
+2025-09-21 18:30:23,675 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Quiet Waterfall
+2025-09-21 18:30:23,675 - INFO -    Uploader: Study Music Guys - Topic
+2025-09-21 18:30:35,214 - INFO - ✅ Downloaded YouTube audio: Quiet Waterfall
+2025-09-21 18:30:35,721 - INFO - 📊 Progress: 14/25 in focus
+2025-09-21 18:30:35,722 - INFO - 🎯 Searching for REAL AUDIO: 40 Hz Studying by Elena Convera
+2025-09-21 18:30:35,722 - INFO - 🔍 Searching YouTube: "Elena Convera" "40 Hz Studying"
+2025-09-21 18:30:37,213 - INFO - 🔍 Searching YouTube: Elena Convera 40 Hz Studying
+2025-09-21 18:30:38,650 - INFO - 🔍 Searching YouTube: 40 Hz Studying Elena Convera
+2025-09-21 18:30:39,882 - INFO - 🔍 Searching YouTube: 40 Hz Studying
+2025-09-21 18:30:41,643 - INFO - 🎯 EXACT MATCH FOUND (score: 3): Intense Study - 40Hz Gamma Binaural Beats to Increase Productivity and Focus
+2025-09-21 18:30:41,644 - INFO -    Uploader: Study Sonic Focus
+2025-09-21 18:32:31,305 - INFO - ✅ Downloaded YouTube audio: 40 Hz Studying
+2025-09-21 18:32:31,811 - INFO - 📊 Progress: 15/25 in focus
+2025-09-21 18:32:31,811 - INFO - 🎯 Searching for REAL AUDIO: Focus and Concentration by Binaural Beats Study Music
+2025-09-21 18:32:31,812 - INFO - 🔍 Searching YouTube: "Binaural Beats Study Music" "Focus and Concentration"
+2025-09-21 18:32:33,879 - INFO - 🎯 EXACT MATCH FOUND (score: 4): Music for Concentration and Focus, Binaural Beats Study Music for Work and Studying
+2025-09-21 18:32:33,879 - INFO -    Uploader: Greenred Productions - Relaxing Music
+2025-09-21 18:36:32,791 - INFO - ✅ Downloaded YouTube audio: Focus and Concentration
+2025-09-21 18:36:33,303 - INFO - 📊 Progress: 16/25 in focus
+2025-09-21 18:36:33,304 - INFO - 🎯 Searching for REAL AUDIO: Good Idea by Brain Study Music Guys
+2025-09-21 18:36:33,304 - INFO - 🔍 Searching YouTube: "Brain Study Music Guys" "Good Idea"
+2025-09-21 18:36:35,018 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Good Idea
+2025-09-21 18:36:35,018 - INFO -    Uploader: Brain Study Music Guys - Topic
+2025-09-21 18:36:47,394 - INFO - ✅ Downloaded YouTube audio: Good Idea
+2025-09-21 18:36:47,919 - INFO - 📊 Progress: 17/25 in focus
+2025-09-21 18:36:47,919 - INFO - 🎯 Searching for REAL AUDIO: Sunrise Journey by Exam Study Music Academy
+2025-09-21 18:36:47,920 - INFO - 🔍 Searching YouTube: "Exam Study Music Academy" "Sunrise Journey"
+2025-09-21 18:36:49,832 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Sunrise Journey
+2025-09-21 18:36:49,833 - INFO -    Uploader: Exam Study Music Academy - Topic
+2025-09-21 18:37:00,897 - INFO - ✅ Downloaded YouTube audio: Sunrise Journey
+2025-09-21 18:37:01,406 - INFO - 📊 Progress: 18/25 in focus
+2025-09-21 18:37:01,406 - INFO - 🎯 Searching for REAL AUDIO: Brain Activation for Memory by Brain Study Music Guys
+2025-09-21 18:37:01,406 - INFO - 🔍 Searching YouTube: "Brain Study Music Guys" "Brain Activation for Memory"
+2025-09-21 18:37:03,258 - INFO - 🎯 EXACT MATCH FOUND (score: 5): Brain Activation for Memory
+2025-09-21 18:37:03,258 - INFO -    Uploader: Brain Study Music Guys - Topic
+2025-09-21 18:38:08,127 - INFO - ✅ Downloaded YouTube audio: Brain Activation for Memory
+2025-09-21 18:38:08,629 - INFO - 📊 Progress: 19/25 in focus
+2025-09-21 18:38:08,629 - INFO - 🎯 Searching for REAL AUDIO: Binaural Beats Focus Music by Binaural Beats Study Music
+2025-09-21 18:38:08,629 - INFO - 🔍 Searching YouTube: "Binaural Beats Study Music" "Binaural Beats Focus Music"
+2025-09-21 18:38:10,557 - INFO - 🎯 EXACT MATCH FOUND (score: 3): Intense Study - 40Hz Gamma Binaural Beats to Increase Productivity and Focus
+2025-09-21 18:38:10,557 - INFO -    Uploader: Study Sonic Focus
+2025-09-21 18:39:48,132 - INFO - ✅ Downloaded YouTube audio: Binaural Beats Focus Music
+2025-09-21 18:39:48,642 - INFO - 📊 Progress: 20/25 in focus
+2025-09-21 18:39:48,643 - INFO - 🎯 Searching for REAL AUDIO: Binaural Beats Focus by Binaural Beats Study Music
+2025-09-21 18:39:48,643 - INFO - 🔍 Searching YouTube: "Binaural Beats Study Music" "Binaural Beats Focus"
+2025-09-21 18:39:50,187 - INFO - 🎯 EXACT MATCH FOUND (score: 4): Deep Focus Music: 🔵 Binaural Beats Study Music, Concentration Music for Studying
+2025-09-21 18:39:50,188 - INFO -    Uploader: Greenred Productions - Relaxing Music
