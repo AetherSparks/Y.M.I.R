@@ -56,4 +56,4 @@ if __name__ == "__main__":
     # Generate 3 variations for alpha, beta, and gamma
     for band in ['alpha', 'beta', 'gamma', 'delta', 'theta', 'epsilon']:
         for v in range(1, 4):
-            generate_binaural_variation(base_freq=250, band=band, duration=12, version=v)
+            generate_binaural_variation(base_freq=250, band=band, duration=1000, version=v)
