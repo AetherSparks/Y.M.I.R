@@ -444,9 +444,10 @@ def ai_app():
                          face_service_available=face_service_status,
                          text_service_available=text_service_status)
 
-# ============================
-# EXPERIMENTAL SECTION ROUTES
-# ============================
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# EXPERIMENTAL SECTION ROUTES STARTING
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
 @app.route('/experimental')
 def experimental_home():
     """Experimental home page for binaural beats and brainwave entrainment"""
@@ -462,6 +463,24 @@ def isochronic_beats():
     """Isochronic tones session page"""
     return render_template('isochronic_beats.html')
 
+@app.route('/experimental/binaural_tone/<filename>')
+def serve_binaural_audio(filename):
+    """Serve binaural beat audio files"""
+    return send_from_directory('experimental/binaural_tone', filename)
+
+@app.route('/experimental/foreground_music/<path:filename>')
+def serve_foreground_music(filename):
+    """Serve foreground music files"""
+    return send_from_directory('experimental/foreground_music', filename)
+
+@app.route('/experimental/isochronic_tone/<filename>')
+def serve_isochronic_audio(filename):
+    """Serve isochronic tone audio files"""
+    return send_from_directory('experimental/isochronic_tone', filename)
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# EXPERIMENTAL SECTION ENDING
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 @app.route('/about')
 def about():

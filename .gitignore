@@ -53,3 +53,6 @@ enhancements/src-new/face/face_models/__pycache__
 chat_encryption.key
 datasets/experimental_audio
 datasets/experimental_audio/
+experimental/binaural_tone
+experimental/isochronic_tone
+__pycache__/
