@@ -1,17 +1,19 @@
 """
-🤖 Y.M.I.R Production-Ready Chatbot with Modern Emotion AI
-========================================================
-Real production-grade emotion detection without rule-based hacks:
+🤖 Y.M.I.R Flask Web Chatbot with Modern Emotion AI
+===================================================
+Web-based production-grade emotion detection and chatbot:
 - 🧠 Multiple SOTA emotion models with ensemble voting
 - 🎯 Context-aware transformers (not rule-based preprocessing!)
 - 🌊 Streaming responses like ChatGPT
 - 🔧 Function calling capabilities
-- 🎨 Rich terminal interface
+- 🌐 Flask web interface
 - 🧬 Gemini API integration
 - 💾 Persistent conversation history
 - 🛡️ Production-grade error handling
 """
+# type: ignore
 
+from flask import Flask, render_template, jsonify, request, Response, stream_template
 import os
 import json
 import time
@@ -31,30 +33,16 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dotenv import load_dotenv
 load_dotenv()
 
-# Google Gemini API with rotation system
+# Google Gemini API
 try:
     import google.generativeai as genai
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
-    from gemini_api_manager import get_gemini_model, get_api_status, gemini_manager
     GEMINI_AVAILABLE = True
-    print("✅ Google Gemini API with rotation system available")
+    print("✅ Google Gemini API available")
 except ImportError:
     GEMINI_AVAILABLE = False
     print("❌ Google Gemini API not available")
 
-# Enhanced UI
-from rich.console import Console
-from rich.panel import Panel
-from rich.markdown import Markdown
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.live import Live
-from rich.layout import Layout
-from rich.text import Text
-from rich.prompt import Prompt, Confirm
-from rich.table import Table
-from rich import box
+# We don't need Rich console for web interface - removed all Rich dependencies!
 
 # Production-grade ML emotion detection
 try:
@@ -65,8 +53,6 @@ try:
 except ImportError:
     ML_AVAILABLE = False
     print("⚠️ Transformers not available")
-
-console = Console()
 
 @dataclass
 class ChatMessage:
@@ -93,12 +79,12 @@ class UserProfile:
     """User profile with preferences and history"""
     user_id: str
     name: Optional[str] = None
-    preferences: Dict[str, Any] = None
+    preferences: Optional[Dict[str, Any]] = None
     conversation_style: str = "balanced"
-    emotion_history: List[str] = None
-    topics_of_interest: List[str] = None
-    created_at: datetime = None
-    last_active: datetime = None
+    emotion_history: Optional[List[str]] = None
+    topics_of_interest: Optional[List[str]] = None
+    created_at: Optional[datetime] = None
+    last_active: Optional[datetime] = None
     
     def __post_init__(self):
         if self.preferences is None:
@@ -166,7 +152,7 @@ class ProductionEmotionAnalyzer:
         
         for config in self.model_configs:
             try:
-                console.print(f"🔄 Loading {config['name']}...", style="dim yellow")
+                print(f"🔄 Loading {config['name']}...")
                 
                 # Load model and tokenizer
                 model = AutoModelForSequenceClassification.from_pretrained(config['model_id'])
@@ -200,17 +186,17 @@ class ProductionEmotionAnalyzer:
                 }
                 
                 successful_models += 1
-                console.print(f"✅ {config['name']} loaded successfully", style="green")
+                print(f"✅ {config['name']} loaded successfully")
                 
             except Exception as e:
-                console.print(f"⚠️ Failed to load {config['name']}: {e}", style="yellow")
+                print(f"⚠️ Failed to load {config['name']}: {e}")
                 continue
         
         if successful_models == 0:
-            console.print("❌ No emotion models loaded, using fallback", style="red")
+            print("❌ No emotion models loaded, using fallback")
             self._setup_fallback_model()
         else:
-            console.print(f"✅ {successful_models}/{len(self.model_configs)} emotion models loaded", style="green")
+            print(f"✅ {successful_models}/{len(self.model_configs)} emotion models loaded")
     
     def _setup_fallback_model(self):
         """Setup lightweight fallback model"""
@@ -228,10 +214,10 @@ class ProductionEmotionAnalyzer:
                 'emotions': ['negative', 'neutral', 'positive']
             }
             self.fallback_available = True
-            console.print("✅ Fallback sentiment model loaded", style="yellow")
+            print("✅ Fallback sentiment model loaded")
             
         except Exception as e:
-            console.print(f"❌ Even fallback model failed: {e}", style="red")
+            print(f"❌ Even fallback model failed: {e}")
     
     def _analyze_with_ensemble(self, text: str) -> Dict[str, Any]:
         """Use ensemble of models for robust emotion detection"""
@@ -254,7 +240,7 @@ class ProductionEmotionAnalyzer:
                     if result:
                         model_results[model_name] = result
                 except Exception as e:
-                    console.print(f"⚠️ Model {model_name} failed: {e}", style="dim red")
+                    print(f"⚠️ Model {model_name} failed: {e}")
         
         if not model_results:
             return self._get_neutral_result()
@@ -269,7 +255,7 @@ class ProductionEmotionAnalyzer:
             results = pipeline_model(text)
             
             # Debug: Check result format (disabled for production)
-            # console.print(f"Debug {model_name}: {type(results)} - {results[:2] if isinstance(results, list) else results}", style="dim blue")
+            # print(f"Debug {model_name}: {type(results)} - {results[:2] if isinstance(results, list) else results}")
             
             # Handle different result formats from different models
             standardized_emotions = {}
@@ -309,11 +295,11 @@ class ProductionEmotionAnalyzer:
             
             # Case 3: Results is in different format - try to handle gracefully
             else:
-                console.print(f"⚠️ Unknown result format from {model_name}: {type(results)}", style="dim yellow")
+                print(f"⚠️ Unknown result format from {model_name}: {type(results)}")
                 return None
             
             if not standardized_emotions:
-                console.print(f"⚠️ No emotions extracted from {model_name}", style="dim yellow")
+                print(f"⚠️ No emotions extracted from {model_name}")
                 return None
             
             return {
@@ -323,7 +309,7 @@ class ProductionEmotionAnalyzer:
             }
             
         except Exception as e:
-            console.print(f"⚠️ Single model {model_name} error: {e}", style="dim red")
+            print(f"⚠️ Single model {model_name} error: {e}")
             return None
     
     def _ensemble_vote(self, model_results: Dict[str, Dict]) -> Dict[str, Any]:
@@ -393,7 +379,7 @@ class ProductionEmotionAnalyzer:
             return result
             
         except Exception as e:
-            console.print(f"❌ Emotion analysis failed: {e}", style="red")
+            print(f"❌ Emotion analysis failed: {e}")
             return self._get_neutral_result()
 
 class FunctionCalling:
@@ -497,8 +483,8 @@ class FunctionCalling:
 class GeminiChatbot:
     """Production-ready Gemini chatbot with ensemble emotion detection"""
     
-    def __init__(self, api_key: str = None):
-        # Use API rotation manager instead of single key
+    def __init__(self, api_key: str):
+        self.api_key = api_key
         self.model = None
         self.chat_session = None
         
@@ -540,10 +526,13 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
         self._load_user_profile()
     
     def _initialize_gemini(self):
-        """Initialize Gemini API with rotation system"""
+        """Initialize Gemini API"""
         try:
             if not GEMINI_AVAILABLE:
-                raise Exception("Gemini API not available")
+                print("⚠️ Gemini API not available")
+                return
+            
+            genai.configure(api_key=self.api_key)  # type: ignore
             
             generation_config = {
                 'temperature': self.config['temperature'],
@@ -552,18 +541,17 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
                 'max_output_tokens': self.config['max_tokens']
             }
             
-            # Use rotation manager to get model
-            self.model = get_gemini_model(
+            self.model = genai.GenerativeModel(  # type: ignore
                 model_name=self.config['model_name'],
-                generation_config=generation_config,
+                generation_config=generation_config,  # type: ignore
                 safety_settings=self.config['safety_settings']
             )
             
             self.chat_session = self.model.start_chat(history=[])
-            console.print("✅ Gemini API initialized with rotation system", style="green")
+            print("✅ Gemini API initialized successfully")
             
         except Exception as e:
-            console.print(f"❌ Gemini initialization error: {e}", style="red")
+            print(f"❌ Gemini initialization error: {e}")
             self.model = None
     
     def _load_user_profile(self):
@@ -590,9 +578,9 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
                     
                     self.user_profile = UserProfile(**data)
                     self.user_profile.last_active = datetime.now()
-                console.print("✅ User profile loaded", style="green")
+                print("✅ User profile loaded")
             except Exception as e:
-                console.print(f"⚠️ Profile loading error: {e}", style="yellow")
+                print(f"⚠️ Profile loading error: {e}")
                 self._create_new_profile()
         else:
             self._create_new_profile()
@@ -604,28 +592,30 @@ Always be helpful, accurate, and emotionally intelligent in your responses."""
             conversation_style="balanced"
         )
         self._save_user_profile()
-        console.print("✅ New user profile created", style="green")
+        print("✅ New user profile created")
     
     def _save_user_profile(self):
         """Save user profile"""
         try:
+            if self.user_profile is None:
+                return
             profile_data = asdict(self.user_profile)
             
             # Handle datetime conversion safely
-            if hasattr(self.user_profile.created_at, 'isoformat'):
+            if self.user_profile.created_at is not None:
                 profile_data['created_at'] = self.user_profile.created_at.isoformat()
             else:
-                profile_data['created_at'] = str(self.user_profile.created_at)
+                profile_data['created_at'] = datetime.now().isoformat()
                 
-            if hasattr(self.user_profile.last_active, 'isoformat'):
+            if self.user_profile.last_active is not None:
                 profile_data['last_active'] = self.user_profile.last_active.isoformat()
             else:
-                profile_data['last_active'] = str(self.user_profile.last_active)
+                profile_data['last_active'] = datetime.now().isoformat()
             
             with open("user_profile.json", 'w') as f:
                 json.dump(profile_data, f, indent=2)
         except Exception as e:
-            console.print(f"⚠️ Profile saving error: {e}", style="yellow")
+            print(f"⚠️ Profile saving error: {e}")
     
     def _build_context_prompt(self, user_input: str, emotion_data: Dict[str, Any]) -> str:
         """Build context prompt with emotion and history"""
@@ -720,7 +710,7 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
             # Update profile
             if self.user_profile:
                 self.user_profile.last_active = datetime.now()
-                if emotion_data['dominant_emotion'] != 'neutral':
+                if emotion_data['dominant_emotion'] != 'neutral' and self.user_profile.emotion_history is not None:
                     self.user_profile.emotion_history.append(emotion_data['dominant_emotion'])
                     self.user_profile.emotion_history = self.user_profile.emotion_history[-20:]
                 self._save_user_profile()
@@ -735,12 +725,42 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
             }
             
         except Exception as e:
-            console.print(f"❌ Response generation error: {e}", style="red")
+            print(f"❌ Response generation error: {e}")
             return {
                 'response': f"I apologize, but I encountered an error: {str(e)}",
                 'emotion': {'dominant_emotion': 'neutral', 'confidence': 0.5},
                 'functions_used': [],
                 'streaming': False
+            }
+    
+    def get_response(self, message: str) -> Dict[str, Any]:
+        """Get response for web interface (wrapper around generate_response)"""
+        try:
+            result = self.generate_response(message)
+            
+            # Format for web interface
+            emotion_data = result.get('emotion', {})
+            emotion_context = "No emotion detected"
+            
+            if emotion_data and emotion_data.get('dominant_emotion'):
+                emotion = emotion_data['dominant_emotion']
+                confidence = emotion_data.get('confidence', 0.0)
+                emotion_context = f"Detected emotion: {emotion} ({confidence:.1%} confidence)"
+            
+            return {
+                'response': result['response'],
+                'emotion_analysis': emotion_data,
+                'emotion_context': emotion_context,
+                'timestamp': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            print(f"Gemini get_response error: {e}")
+            return {
+                'response': "I apologize, but I encountered an error. Please try again.",
+                'emotion_analysis': None,
+                'emotion_context': "Error in emotion analysis",
+                'timestamp': datetime.now().isoformat()
             }
     
     def save_conversation(self):
@@ -752,12 +772,12 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
                 user_profile_data = asdict(self.user_profile)
                 # Convert datetimes to strings safely
                 if hasattr(self.user_profile.created_at, 'isoformat'):
-                    user_profile_data['created_at'] = self.user_profile.created_at.isoformat()
+                    user_profile_data['created_at'] = self.user_profile.created_at.isoformat()  # type: ignore
                 else:
                     user_profile_data['created_at'] = str(self.user_profile.created_at)
                     
                 if hasattr(self.user_profile.last_active, 'isoformat'):
-                    user_profile_data['last_active'] = self.user_profile.last_active.isoformat()
+                    user_profile_data['last_active'] = self.user_profile.last_active.isoformat()  # type: ignore
                 else:
                     user_profile_data['last_active'] = str(self.user_profile.last_active)
             
@@ -775,7 +795,7 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
                         emotions_in_session.append(msg.emotion)
                         
                 except Exception as e:
-                    console.print(f"⚠️ Error processing message: {e}", style="yellow")
+                    print(f"⚠️ Error processing message: {e}")
                     continue
             
             conversation_data = {
@@ -796,245 +816,462 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
             with open(filename, 'w') as f:
                 json.dump(conversation_data, f, indent=2, default=str, ensure_ascii=False)
             
-            console.print(f"✅ Conversation saved to {filename}", style="green")
-            console.print(f"   📊 {conversation_data['session_stats']['total_messages']} messages, {len(conversation_data['session_stats']['emotions_detected'])} emotions detected", style="dim green")
+            print(f"✅ Conversation saved to {filename}")
+            print(f"   📊 {conversation_data['session_stats']['total_messages']} messages, {len(conversation_data['session_stats']['emotions_detected'])} emotions detected")
             return filename
             
         except Exception as e:
-            console.print(f"❌ Conversation save error: {e}", style="red")
+            print(f"❌ Conversation save error: {e}")
             return None
 
-class ChatInterface:
-    """Production-grade chat interface"""
-    
-    def __init__(self, chatbot: GeminiChatbot):
-        self.chatbot = chatbot
-        self.console = Console()
-    
-    def display_welcome(self):
-        """Display welcome message"""
-        welcome_text = """
-# 🚀 Y.M.I.R Production-Ready AI Chatbot
+# Terminal ChatInterface removed - web interface only!
 
-**🧠 Ensemble Emotion Detection:**
-- 🎯 **Multiple SOTA models** - RoBERTa, BERTweet, Twitter-RoBERTa
-- 🔄 **Weighted ensemble voting** - No single point of failure
-- ⚡ **Parallel processing** - Fast, scalable inference
-- 🎭 **Mixed emotion support** - Complex emotional states
+# Flask Web Application
+app = Flask(__name__)
 
-**✨ Production Features:**
-- 🌊 **Streaming responses** - ChatGPT-like experience
-- 🔧 **Function calling** - Web search, calculations
-- 💭 **Conversation memory** - Context-aware responses  
-- 🛡️ **Error handling** - Graceful degradation
-- 📊 **Model transparency** - See which models were used
+# Global chatbot instance
+web_chatbot = None
 
-**Commands:**
-- `/help` - Show this help
-- `/profile` - View your profile  
-- `/setup` - Setup your profile (name, style, interests)
-- `/stats` - Show session statistics
-- `/clear` - Clear conversation
-- `/save` - Save conversation
-- `/quit` - Exit
-
-Ready for production-grade emotional AI! 🎯
-        """
-        
-        self.console.print(Panel(Markdown(welcome_text), title="🚀 Y.M.I.R Production AI", border_style="blue"))
-    
-    def stream_response(self, response_data: Dict[str, Any]):
-        """Display response with production-grade emotion info"""
-        response_text = response_data['response']
-        emotion_data = response_data['emotion']
-        functions_used = response_data['functions_used']
-        
-        # Show ensemble emotion detection info
-        if emotion_data['dominant_emotion'] != 'neutral':
-            method = emotion_data.get('method', 'unknown')
-            confidence = emotion_data['confidence']
-            models_used = emotion_data.get('models_used', [])
-            mixed = emotion_data.get('mixed_emotions', False)
-            
-            # Color-code by confidence
-            if confidence >= 0.7:
-                confidence_color = "bright_green"
-            elif confidence >= 0.5:
-                confidence_color = "yellow"
-            else:
-                confidence_color = "red"
-            
-            mixed_indicator = " [MIXED]" if mixed else ""
-            emotion_text = f"🧠 Emotion: {emotion_data['dominant_emotion']} ({confidence:.1%}){mixed_indicator} via {method}"
-            self.console.print(emotion_text, style=f"dim {confidence_color}")
-            
-            if models_used:
-                models_text = f"   Models: {', '.join(models_used)}"
-                self.console.print(models_text, style="dim cyan")
-        
-        # Show functions
-        if functions_used:
-            func_text = f"🔧 Functions: {', '.join([f['function'] for f in functions_used])}"
-            self.console.print(func_text, style="dim blue")
-        
-        # Stream response
-        self.console.print("\n🤖 Y.M.I.R:", style="bold blue", end="")
-        
-        if response_data.get('streaming', True):
-            response_display = Text()
-            
-            with Live(response_display, refresh_per_second=10, console=self.console) as live:
-                for partial_response in self.chatbot._stream_response(response_text):
-                    response_display = Text(partial_response)
-                    live.update(response_display)
-        else:
-            self.console.print(f" {response_text}")
-    
-    def handle_command(self, command: str) -> bool:
-        """Handle commands"""
-        command = command.lower().strip()
-        
-        if command == '/help':
-            self.display_welcome()
-        elif command == '/profile':
-            self.display_user_profile()
-        elif command == '/setup':
-            self.setup_user_profile()
-        elif command == '/clear':
-            self.chatbot.conversation_history.clear()
-            self.console.print("✅ Conversation cleared", style="green")
-        elif command == '/save':
-            filename = self.chatbot.save_conversation()
-            if filename:
-                self.console.print(f"✅ Saved to {filename}", style="green")
-        elif command == '/stats':
-            self.show_session_stats()
-        elif command == '/quit':
-            return False
-        else:
-            self.console.print(f"❌ Unknown command: {command}", style="red")
-            self.console.print("Available commands: /help, /profile, /setup, /clear, /save, /stats, /quit", style="dim")
-        
-        return True
-    
-    def display_user_profile(self):
-        """Display user profile information"""
-        if not self.chatbot.user_profile:
-            self.console.print("❌ No user profile available", style="red")
-            return
-        
-        profile = self.chatbot.user_profile
-        
-        table = Table(title="👤 User Profile", box=box.ROUNDED)
-        table.add_column("Attribute", style="cyan")
-        table.add_column("Value", style="green")
-        
-        table.add_row("User ID", profile.user_id)
-        table.add_row("Name", profile.name or "Not set")
-        table.add_row("Conversation Style", profile.conversation_style)
-        table.add_row("Topics of Interest", ", ".join(profile.topics_of_interest) or "None")
-        table.add_row("Created", profile.created_at.strftime("%Y-%m-%d %H:%M") if hasattr(profile.created_at, 'strftime') else str(profile.created_at))
-        table.add_row("Last Active", profile.last_active.strftime("%Y-%m-%d %H:%M") if hasattr(profile.last_active, 'strftime') else str(profile.last_active))
-        table.add_row("Recent Emotions", ", ".join(profile.emotion_history[-5:]) or "None")
-        
-        self.console.print(table)
-    
-    def setup_user_profile(self):
-        """Setup user profile interactively"""
-        if not self.chatbot.user_profile:
-            self.console.print("❌ No user profile available", style="red")
-            return
-        
-        self.console.print("🔧 User Profile Setup", style="bold blue")
-        
-        # Get user name
-        name = Prompt.ask("What's your name? (optional)", default=self.chatbot.user_profile.name or "", show_default=False)
-        if name.strip():
-            self.chatbot.user_profile.name = name.strip()
-        
-        # Get conversation style
-        style_options = ["casual", "balanced", "formal"]
-        current_style = self.chatbot.user_profile.conversation_style
-        self.console.print(f"Current conversation style: {current_style}")
-        new_style = Prompt.ask("Conversation style", choices=style_options, default=current_style)
-        self.chatbot.user_profile.conversation_style = new_style
-        
-        # Get topics of interest
-        topics_input = Prompt.ask("Topics of interest (comma-separated)", default=", ".join(self.chatbot.user_profile.topics_of_interest), show_default=False)
-        if topics_input.strip():
-            topics = [topic.strip() for topic in topics_input.split(",") if topic.strip()]
-            self.chatbot.user_profile.topics_of_interest = topics
-        
-        # Save profile
-        self.chatbot._save_user_profile()
-        self.console.print("✅ Profile updated successfully!", style="green")
-    
-    def show_session_stats(self):
-        """Show current session statistics"""
-        stats_table = Table(title="📊 Session Statistics", box=box.ROUNDED)
-        stats_table.add_column("Metric", style="cyan")
-        stats_table.add_column("Value", style="green")
-        
-        total_messages = len(self.chatbot.conversation_history)
-        user_messages = len([msg for msg in self.chatbot.conversation_history if msg.role == 'user'])
-        assistant_messages = len([msg for msg in self.chatbot.conversation_history if msg.role == 'assistant'])
-        emotions_detected = list(set(msg.emotion for msg in self.chatbot.conversation_history if msg.emotion and msg.emotion != 'neutral'))
-        
-        stats_table.add_row("Total Messages", str(total_messages))
-        stats_table.add_row("Your Messages", str(user_messages))
-        stats_table.add_row("Y.M.I.R Messages", str(assistant_messages))
-        stats_table.add_row("Emotions Detected", ", ".join(emotions_detected) or "None")
-        stats_table.add_row("Models Available", str(len(self.chatbot.emotion_analyzer.models)))
-        
-        self.console.print(stats_table)
-    
-    def run(self):
-        """Main chat loop"""
-        self.display_welcome()
-        
+def init_web_chatbot():
+    """Initialize chatbot for web interface"""
+    global web_chatbot
+    api_key = os.getenv('GEMINI_API_KEY')
+    if api_key and GEMINI_AVAILABLE:
         try:
-            while True:
-                user_input = Prompt.ask("\n[bold cyan]You[/bold cyan]", console=self.console)
-                
-                if not user_input.strip():
-                    continue
-                
-                if user_input.startswith('/'):
-                    if not self.handle_command(user_input):
-                        break
-                    continue
-                
-                with self.console.status("[bold green]Analyzing emotions and generating response...", spinner="dots"):
-                    response_data = self.chatbot.generate_response(user_input)
-                
-                self.stream_response(response_data)
-                
-        except KeyboardInterrupt:
-            self.console.print("\n\n👋 Goodbye! Thanks for using Y.M.I.R!", style="bold blue")
+            web_chatbot = GeminiChatbot(api_key)
+            print("✅ Web chatbot initialized with Gemini API")
         except Exception as e:
-            self.console.print(f"\n❌ Unexpected error: {e}", style="red")
-        finally:
-            filename = self.chatbot.save_conversation()
-            if filename:
-                self.console.print(f"✅ Auto-saved to {filename}", style="dim green")
+            print(f"⚠️ Gemini chatbot failed, using fallback: {e}")
+            web_chatbot = SimpleFallbackChatbot()
+    else:
+        print("⚠️ Using fallback chatbot (no Gemini API)")
+        web_chatbot = SimpleFallbackChatbot()
 
-def main():
-    """Main function"""
-    console.print("🚀 Y.M.I.R Production-Ready AI with Ensemble Emotion Detection", style="bold blue")
-    console.print("=" * 75)
+class SimpleFallbackChatbot:
+    """Simple fallback chatbot when Gemini is not available"""
     
-    # Get API key from environment
+    def __init__(self):
+        self.emotion_analyzer = ProductionEmotionAnalyzer() if ML_AVAILABLE else None
+        self.conversation_history = deque(maxlen=50)
+        
+    def get_response(self, message: str) -> Dict[str, Any]:
+        """Get response with emotion analysis"""
+        
+        # Analyze emotion
+        emotion_result = None
+        if self.emotion_analyzer:
+            try:
+                emotion_result = self.emotion_analyzer.analyze_text_emotion(message)
+            except Exception as e:
+                print(f"Emotion analysis failed: {e}")
+        
+        # Generate simple response based on emotion
+        if emotion_result and emotion_result['dominant_emotion']:
+            emotion = emotion_result['dominant_emotion']
+            confidence = emotion_result['confidence']
+            
+            responses = {
+                'joy': f"I can sense your happiness! That's wonderful. Tell me more about what's making you feel so positive.",
+                'sadness': f"I notice you might be feeling sad. I'm here to listen and support you. What's on your mind?",
+                'anger': f"I sense some frustration. Let's work through this together. What's bothering you?",
+                'fear': f"I understand you might be feeling anxious. You're safe here. What's concerning you?",
+                'surprise': f"You seem surprised! What's caught your attention?",
+                'neutral': f"Thank you for sharing that. How are you feeling right now?"
+            }
+            
+            response = responses.get(emotion, responses['neutral'])
+            emotion_context = f"Detected emotion: {emotion} ({confidence:.1%} confidence)"
+        else:
+            response = "Hello! I'm Y.M.I.R, your AI companion. How can I help you today?"
+            emotion_context = "No emotion detected"
+        
+        # Store in conversation history
+        self.conversation_history.append({
+            'user': message,
+            'assistant': response,
+            'emotion': emotion_result,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        return {
+            'response': response,
+            'emotion_analysis': emotion_result,
+            'emotion_context': emotion_context,
+            'timestamp': datetime.now().isoformat()
+        }
+
+@app.route('/')
+def index():
+    """Serve the main chatbot page"""
+    # Try to load the HTML file
+    html_paths = [
+        'text_emotion_detection.html',
+        './text_emotion_detection.html',
+        os.path.join(os.path.dirname(__file__), 'text_emotion_detection.html')
+    ]
+    
+    for html_path in html_paths:
+        try:
+            if os.path.exists(html_path):
+                with open(html_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    if content.strip():  # Check if file has content
+                        print(f"✅ HTML file loaded from: {html_path}")
+                        return content
+        except Exception as e:
+            print(f"⚠️ Error reading {html_path}: {e}")
+            continue
+    
+    # If no HTML file found or empty, return embedded version
+    print("⚠️ HTML file not found or empty, serving embedded version")
+    return get_embedded_chatbot_html()
+
+def get_embedded_chatbot_html():
+    """Return embedded HTML for chatbot interface"""
+    return '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Y.M.I.R AI Chatbot</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .chat-container {
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 16px;
+            border: 1px solid rgba(100, 100, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chat-header {
+            padding: 20px;
+            background: linear-gradient(45deg, #4070ff, #00d4ff);
+            text-align: center;
+        }
+        
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: white;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background: #4070ff;
+            color: white;
+            align-self: flex-end;
+        }
+        
+        .bot-message {
+            background: rgba(100, 100, 100, 0.3);
+            color: #f0f0f0;
+            align-self: flex-start;
+        }
+        
+        .emotion-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+        }
+        
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid rgba(100, 100, 255, 0.2);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(50, 50, 50, 0.5);
+            color: #f0f0f0;
+            font-size: 1rem;
+        }
+        
+        .send-button {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #4070ff, #00d4ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .send-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status-indicator {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: rgba(100, 100, 100, 0.3);
+            border-radius: 12px;
+            align-self: flex-start;
+            max-width: 80px;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4070ff;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🤖 Y.M.I.R AI Chatbot</h1>
+            <div class="status-indicator" id="status">Ready to chat with emotion analysis</div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                Hello! I'm Y.M.I.R, your AI companion with advanced emotion detection. How are you feeling today?
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Type your message here..." maxlength="500">
+            <button id="sendButton" class="send-button">Send</button>
+        </div>
+    </div>
+    
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const status = document.getElementById('status');
+        
+        function addMessage(content, isUser = false, emotionContext = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = content;
+            
+            if (!isUser && emotionContext) {
+                const emotionBadge = document.createElement('div');
+                emotionBadge.className = 'emotion-badge';
+                emotionBadge.textContent = emotionContext;
+                messageDiv.appendChild(emotionBadge);
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function showTyping() {
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+        
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, true);
+            chatInput.value = '';
+            sendButton.disabled = true;
+            showTyping();
+            status.textContent = 'Analyzing emotion and generating response...';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    hideTyping();
+                    addMessage(data.response, false, data.emotion_context);
+                    status.textContent = 'Ready to chat';
+                } else {
+                    hideTyping();
+                    addMessage('Sorry, I encountered an error. Please try again.', false);
+                    status.textContent = 'Error occurred';
+                }
+                
+            } catch (error) {
+                hideTyping();
+                addMessage('Sorry, I had trouble connecting. Please try again.', false);
+                status.textContent = 'Connection error';
+                console.error('Chat error:', error);
+            }
+            
+            sendButton.disabled = false;
+            chatInput.focus();
+        }
+        
+        sendButton.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Focus input on load
+        chatInput.focus();
+    </script>
+</body>
+</html>'''
+
+@app.route('/api/chat', methods=['POST'])
+def api_chat():
+    """API endpoint for chat functionality"""
     try:
-        with console.status("[bold green]Initializing production AI systems with API rotation...", spinner="dots"):
-            chatbot = GeminiChatbot()
+        data = request.get_json()
+        message = data.get('message', '')
         
-        console.print("🎯 Production-ready emotion detection active!", style="green")
+        if not message:
+            return jsonify({
+                'success': False,
+                'error': 'No message provided'
+            })
         
-        interface = ChatInterface(chatbot)
-        interface.run()
+        if not web_chatbot:
+            return jsonify({
+                'success': False,
+                'error': 'Chatbot not initialized'
+            })
+        
+        # Get response from chatbot
+        result = web_chatbot.get_response(message)
+        
+        return jsonify({
+            'success': True,
+            'response': result['response'],
+            'emotion_context': result['emotion_context'],
+            'emotion_analysis': result.get('emotion_analysis'),
+            'timestamp': result['timestamp']
+        })
         
     except Exception as e:
-        console.print(f"❌ Startup error: {e}", style="red")
+        print(f"Chat API error: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
 
-if __name__ == "__main__":
-    main()
+@app.route('/api/status')
+def api_status():
+    """API endpoint to get chatbot status"""
+    return jsonify({
+        'chatbot_available': web_chatbot is not None,
+        'gemini_available': GEMINI_AVAILABLE,
+        'ml_available': ML_AVAILABLE,
+        'status': 'ready' if web_chatbot else 'not_initialized'
+    })
+
+def main_web():
+    """Initialize and run the web application"""
+    print("🚀 Starting Y.M.I.R Web Chatbot")
+    print("=" * 50)
+    
+    # Initialize chatbot
+    init_web_chatbot()
+    
+    print("🌐 Open browser and go to: http://localhost:5001")
+    print("🤖 Advanced emotion detection chatbot ready!")
+    print("=" * 50)
+    
+    # Start the Flask app
+    app.run(debug=True, host='0.0.0.0', port=5001, threaded=True)
+
+def main():
+    """Main function for terminal interface (deprecated - use --web instead)"""
+    print("❌ Terminal interface requires 'rich' package.")
+    print("Please run with --web flag instead:")
+    print("python chatbotwebapp.py --web")
+
+if __name__ == "__main__":  
+    # Check if running as web app or terminal
+    import sys
+    if '--web' in sys.argv:
+        main_web()
+    else:
+        main()

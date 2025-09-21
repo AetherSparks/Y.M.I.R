@@ -28,6 +28,7 @@ import statistics
 # Import our modular components from face_models folder
 from face_models.mediapipemodel import MediaPipeProcessor, MediaPipeConfig, FaceQuality
 from face_models.yolomodel import EnhancedYOLOProcessor, YOLOConfig, EmotionContextAnalyzer
+from true_ml_emotion_context import TrueMLEmotionContext
 from face_models.deepfacemodel import DeepFaceEnsemble, DeepFaceConfig
 
 # Firebase imports
@@ -58,13 +59,13 @@ class EnhancedEmotionConfig:
     min_face_quality_score: float = 0.6
     
     # Memory optimization
-    store_only_significant_changes: bool = True
-    emotion_change_threshold: float = 15.0  # Only store if emotion changes by 15%
+    store_only_significant_changes: bool = False  # Store ALL emotions for combiner
+    emotion_change_threshold: float = 5.0  # Reduced threshold for better data flow
     max_memory_entries: int = 1000
     
     # Database settings
     use_firebase: bool = True
-    firebase_collection: str = "emotion_sessions"
+    firebase_collection: str = "emotion_readings"
     
     # Display settings
     show_analytics: bool = True
@@ -102,7 +103,7 @@ class EmotionReading:
     def to_dict(self) -> Dict:
         """Convert to dictionary for storage"""
         return {
-            'timestamp': self.timestamp.isoformat(),
+            'timestamp': self.timestamp,
             'face_id': self.face_id,
             'emotions': self.emotions,
             'confidence': self.confidence,
@@ -360,6 +361,10 @@ class EnhancedEmotionDetector:
             self.deepface_ensemble = DeepFaceEnsemble(self.config.deepface_config)
             print("✅ DeepFace ensemble initialized")
             
+            # Initialize TRUE ML emotion context analyzer (NO RULES!)
+            self.true_ml_context = TrueMLEmotionContext(firebase_manager=None)
+            print("🧠 TRUE ML Emotion Context Analyzer initialized")
+            
         except Exception as e:
             print(f"❌ Component initialization error: {e}")
             raise
@@ -395,11 +400,22 @@ class EnhancedEmotionDetector:
                 print("❌ Camera not detected!")
                 return False
             
-            # Set camera properties
+            # 🚀 OPTIMIZED camera properties for smooth streaming
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.config.camera_width)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.config.camera_height)
             self.cap.set(cv2.CAP_PROP_FPS, self.config.camera_fps)
-            self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # Minimal buffer for real-time
+            
+            # Additional performance optimizations
+            self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))  # MJPEG for better performance
+            self.cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)  # Disable auto-exposure for stable framerate
+            self.cap.set(cv2.CAP_PROP_AUTOFOCUS, 0)  # Disable autofocus for performance
+            
+            # Try to reduce latency
+            try:
+                self.cap.set(cv2.CAP_PROP_BACKEND, cv2.CAP_DSHOW)  # DirectShow backend for Windows
+            except:
+                pass  # Ignore if not supported
             
             print(f"✅ Camera started ({self.config.camera_width}x{self.config.camera_height})")
             return True
@@ -452,13 +468,19 @@ class EnhancedEmotionDetector:
             
             # Emotion analysis (every 30 frames)
             if self.frame_count % self.config.emotion_analysis_interval == 0:
-                for face_info in faces[:2]:  # Limit to 2 faces for performance
+                print(f"🔍 DEBUG: Checking {len(faces)} faces for emotion analysis (frame {self.frame_count})")
+                for i, face_info in enumerate(faces[:2]):  # Limit to 2 faces for performance
+                    roi_size = face_info['roi'].size if 'roi' in face_info else 0
+                    print(f"🔍 DEBUG: Face {i} ROI size: {roi_size}")
                     if face_info['roi'].size > 0:
+                        print(f"🚀 Starting emotion analysis for face {i}")
                         threading.Thread(
                             target=self._analyze_face_emotions,
                             args=(face_info, self.current_environment_context),
                             daemon=True
                         ).start()
+                    else:
+                        print(f"⚠️ Skipping face {i} - empty ROI")
             
             # Draw all visualizations
             self.mediapipe_processor.draw_all_visualizations(frame, mediapipe_results)
@@ -486,22 +508,32 @@ class EnhancedEmotionDetector:
             face_bbox = face_info['bbox']
             quality_score = face_info.get('quality_score', 0.8)
             
-            # Analyze emotions with environmental context
-            emotion_result = self.deepface_ensemble.analyze_face_with_context(
-                face_id, face_roi, environment_context
+            # Analyze emotions WITHOUT rule-based context (get raw emotions first)
+            emotion_result = self.deepface_ensemble.analyze_face_without_context(
+                face_id, face_roi
             )
             
             if emotion_result:
-                # Create emotion reading
+                # 🧠 Apply TRUE ML context analysis (NO RULES!)
+                raw_emotions = emotion_result['emotions']
+                ml_enhanced_emotions = self.true_ml_context.analyze_context_pure_ml(
+                    self.detected_objects, raw_emotions
+                )
+                
+                print(f"🧠 TRUE ML EMOTION ENHANCEMENT:")
+                print(f"   🎭 Raw emotions: {max(raw_emotions.items(), key=lambda x: x[1])[0].upper()}")
+                print(f"   🤖 ML enhanced: {max(ml_enhanced_emotions.items(), key=lambda x: x[1])[0].upper()}")
+                
+                # Create emotion reading with ML-enhanced emotions
                 reading = EmotionReading(
                     timestamp=datetime.now(timezone.utc),
                     face_id=face_id,
-                    emotions=emotion_result['emotions'],
+                    emotions=ml_enhanced_emotions,  # Use ML-enhanced emotions
                     confidence=emotion_result['confidence'],
                     quality_score=quality_score,
                     context_objects=[obj['class'] for obj in self.detected_objects[:5]],
                     face_bbox=face_bbox,
-                    environment_context=environment_context,
+                    environment_context={'ml_enhanced': True, 'learning_samples': len(self.true_ml_context.raw_observations)},
                     stability=emotion_result.get('stability', 0.0)
                 )
                 
@@ -513,9 +545,24 @@ class EnhancedEmotionDetector:
                 self.emotion_analytics.add_reading(reading)
                 
                 # Store in Firebase if significant change
-                if self._is_significant_emotion_change(reading):
-                    self.firebase_manager.store_emotion_reading(reading)
-                    self.last_stored_emotions[face_id] = reading.emotions
+                print(f"🔍 DEBUG: Checking if emotion change is significant...")
+                is_significant = self._is_significant_emotion_change(reading)
+                print(f"🔍 DEBUG: Is significant change: {is_significant}")
+                print(f"🔍 DEBUG: Firebase manager available: {self.firebase_manager is not None}")
+                
+                if is_significant:
+                    try:
+                        result = self.firebase_manager.store_emotion_reading(reading)
+                        print(f"🔥 Enhanced Detector: Firebase storage result: {result}")
+                        if result:
+                            print(f"   ✅ Stored emotion successfully!")
+                            self.last_stored_emotions[face_id] = reading.emotions
+                        else:
+                            print(f"   ❌ Firebase storage failed")
+                    except Exception as e:
+                        print(f"   ❌ Firebase storage exception: {e}")
+                else:
+                    print(f"   ⚠️ Emotion change not significant enough to store")
                 
                 # 🧠 EXTENSIVE EMOTION ANALYSIS LOGGING
                 dominant_emotion = max(reading.emotions.items(), key=lambda x: x[1])
@@ -528,8 +575,8 @@ class EnhancedEmotionDetector:
                 # Show all emotions detected
                 print(f"   🎪 All Emotions Detected:")
                 sorted_emotions = sorted(reading.emotions.items(), key=lambda x: x[1], reverse=True)
-                for emotion, score in sorted_emotions[:4]:  # Top 4 emotions
-                    bar = "█" * int(score / 10)  # Visual bar
+                for emotion, score in sorted_emotions:  # Show ALL emotions (not just top 4)
+                    bar = "█" * max(1, int(score / 10))  # Visual bar
                     print(f"      {emotion.capitalize():12} {score:5.1f}% {bar}")
                 
                 # Show environmental context influence
@@ -576,7 +623,8 @@ class EnhancedEmotionDetector:
         controls = [
             f"🚀 Y.M.I.R v3.0 - Enhanced Modular System",
             f"FPS: {self.fps:.1f} | Faces: {len(self.current_emotions)} | Objects: {len(self.detected_objects)}",
-            "Controls: Q - Quit | F - Face Mesh | B - Body | H - Hands | A - Analytics | P - Privacy"
+            "Controls: Q - Quit | F - Face Mesh | B - Body | H - Hands | A - Analytics | P - Privacy",
+            "ML Controls: T - Train ML | M - ML Status | 1/2/3 - Speed | S - Save | E - Export"
         ]
         
         for i, text in enumerate(controls):
@@ -638,6 +686,20 @@ class EnhancedEmotionDetector:
         elif key == ord('3'):
             self.config.emotion_analysis_interval = 60  # 2 seconds
             print("Analysis speed: SLOW (2s)")
+        elif key == ord('t'):
+            # Force train TRUE ML system
+            print("🎓 Manually triggering TRUE ML training...")
+            self.true_ml_context.force_retrain()
+        elif key == ord('m'):
+            # Show TRUE ML status
+            insights = self.true_ml_context.get_discovery_insights()
+            print(f"\n🧠 TRUE ML STATUS:")
+            print(f"   📊 Observations: {insights['total_observations']}")
+            print(f"   🎯 Training Progress: {insights['training_progress']:.1f}%")
+            print(f"   ✅ Trained: {insights['is_trained']}")
+            if insights['is_trained']:
+                print(f"   🔍 Environment Patterns: {insights['environment_patterns']}")
+                print(f"   🎭 Emotion Patterns: {insights['emotion_patterns']}")
         
         return True
     

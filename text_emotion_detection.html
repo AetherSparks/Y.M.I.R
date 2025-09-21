@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>> Y.M.I.R Text Emotion Detection</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #4070ff;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(45deg, #4070ff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin: 10px 0 0 0;
+        }
+        
+        .chat-container {
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 16px;
+            border: 1px solid rgba(100, 100, 255, 0.2);
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+            position: relative;
+        }
+        
+        .user-message {
+            background: linear-gradient(45deg, #4070ff, #00d4ff);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .bot-message {
+            background: rgba(100, 100, 100, 0.3);
+            color: #f0f0f0;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+        
+        .emotion-analysis {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            padding: 6px 10px;
+            background: rgba(0, 212, 255, 0.2);
+            border-radius: 6px;
+            border-left: 3px solid #00d4ff;
+        }
+        
+        .emotion-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            margin-top: 5px;
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            font-weight: 600;
+        }
+        
+        .timestamp {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid rgba(100, 100, 255, 0.2);
+            background: rgba(20, 20, 20, 0.8);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(50, 50, 50, 0.7);
+            color: #f0f0f0;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 40px;
+            max-height: 120px;
+            font-family: inherit;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: #4070ff;
+            box-shadow: 0 0 10px rgba(64, 112, 255, 0.3);
+        }
+        
+        .send-button {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #4070ff, #00d4ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 80px;
+        }
+        
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(64, 112, 255, 0.4);
+        }
+        
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status-bar {
+            padding: 10px 20px;
+            background: rgba(20, 20, 20, 0.9);
+            text-align: center;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            border-top: 1px solid rgba(100, 100, 255, 0.1);
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: rgba(100, 100, 100, 0.3);
+            border-radius: 12px;
+            align-self: flex-start;
+            max-width: 100px;
+            margin-right: auto;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4070ff;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        .stats-panel {
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 16px;
+            border: 1px solid rgba(100, 100, 255, 0.2);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(64, 112, 255, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #4070ff;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4070ff;
+        }
+        
+        .stat-label {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>> Y.M.I.R Text Emotion Detection</h1>
+            <p>Advanced AI chatbot with real-time emotion analysis</p>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div>Hello! I'm Y.M.I.R, your AI companion with advanced emotion detection. I can analyze the emotions in your text and respond accordingly. How are you feeling today?</div>
+                    <div class="emotion-analysis">
+                        <strong>Emotion Analysis:</strong> Ready to analyze your emotions
+                    </div>
+                    <div class="timestamp" id="initialTimestamp"></div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="input-group">
+                    <textarea id="chatInput" class="chat-input" placeholder="Type your message here... I'll analyze your emotions and respond accordingly." maxlength="1000" rows="1"></textarea>
+                    <button id="sendButton" class="send-button">Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-bar" id="statusBar">
+            Ready to chat • Emotion detection active
+        </div>
+        
+        <div class="stats-panel">
+            <h3 style="text-align: center; margin-bottom: 20px; color: #4070ff;">📊 Session Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="messageCount">0</div>
+                    <div class="stat-label">Messages Sent</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="emotionsDetected">0</div>
+                    <div class="stat-label">Emotions Detected</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="lastEmotion">None</div>
+                    <div class="stat-label">Last Emotion</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="sessionTime">0:00</div>
+                    <div class="stat-label">Session Time</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize variables
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const statusBar = document.getElementById('statusBar');
+        
+        let messageCount = 0;
+        let emotionsDetected = 0;
+        let sessionStartTime = new Date();
+        
+        // Initialize timestamp
+        document.getElementById('initialTimestamp').textContent = new Date().toLocaleTimeString();
+        
+        // Auto-resize textarea
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+        
+        function updateSessionTime() {
+            const now = new Date();
+            const diff = Math.floor((now - sessionStartTime) / 1000);
+            const minutes = Math.floor(diff / 60);
+            const seconds = diff % 60;
+            document.getElementById('sessionTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Update session time every second
+        setInterval(updateSessionTime, 1000);
+        
+        function addMessage(content, isUser = false, emotionData = null, timestamp = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.textContent = content;
+            messageDiv.appendChild(contentDiv);
+            
+            if (!isUser && emotionData) {
+                const emotionDiv = document.createElement('div');
+                emotionDiv.className = 'emotion-analysis';
+                
+                if (emotionData.emotion_analysis && emotionData.emotion_analysis.dominant_emotion) {
+                    const emotion = emotionData.emotion_analysis.dominant_emotion;
+                    const confidence = (emotionData.emotion_analysis.confidence * 100).toFixed(1);
+                    emotionDiv.innerHTML = `<strong>Emotion Analysis:</strong> ${emotion} (${confidence}% confidence)`;
+                    
+                    // Update stats
+                    emotionsDetected++;
+                    document.getElementById('emotionsDetected').textContent = emotionsDetected;
+                    document.getElementById('lastEmotion').textContent = emotion;
+                } else {
+                    emotionDiv.innerHTML = `<strong>Emotion Analysis:</strong> ${emotionData.emotion_context || 'No specific emotion detected'}`;
+                }
+                
+                messageDiv.appendChild(emotionDiv);
+            }
+            
+            if (isUser) {
+                const badge = document.createElement('div');
+                badge.className = 'emotion-badge';
+                badge.textContent = 'Analyzing...';
+                messageDiv.appendChild(badge);
+            }
+            
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'timestamp';
+            timestampDiv.textContent = timestamp || new Date().toLocaleTimeString();
+            messageDiv.appendChild(timestampDiv);
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            if (isUser) {
+                messageCount++;
+                document.getElementById('messageCount').textContent = messageCount;
+            }
+        }
+        
+        function showTyping() {
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+        
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, true);
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            sendButton.disabled = true;
+            showTyping();
+            statusBar.textContent = 'Analyzing emotion and generating response...';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                hideTyping();
+                
+                if (data.success) {
+                    addMessage(data.response, false, data, data.timestamp);
+                    statusBar.textContent = 'Ready to chat • Emotion detection active';
+                } else {
+                    addMessage('Sorry, I encountered an error. Please try again.', false);
+                    statusBar.textContent = 'Error occurred • Please try again';
+                }
+                
+            } catch (error) {
+                hideTyping();
+                addMessage('Sorry, I had trouble connecting. Please check your connection and try again.', false);
+                statusBar.textContent = 'Connection error • Check your internet connection';
+                console.error('Chat error:', error);
+            }
+            
+            sendButton.disabled = false;
+            chatInput.focus();
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Focus input on load
+        chatInput.focus();
+        
+        // Check API status on load
+        fetch('/api/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.chatbot_available) {
+                    statusBar.textContent = `Ready to chat • ${data.gemini_available ? 'Gemini AI' : 'Fallback mode'} • Emotion detection active`;
+                } else {
+                    statusBar.textContent = 'Chatbot initializing... Please wait';
+                }
+            })
+            .catch(error => {
+                statusBar.textContent = 'Connection issues detected';
+                console.error('Status check failed:', error);
+            });
+    </script>
+</body>
+</html>

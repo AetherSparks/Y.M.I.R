@@ -1,0 +1,13 @@
+{
+    "include": [
+        ".",
+        "enhancements/src-new"
+    ],
+    "extraPaths": [
+        "./enhancements/src-new"
+    ],
+    "pythonVersion": "3.12",
+    "typeCheckingMode": "basic",
+    "reportMissingImports": false,
+    "reportMissingModuleSource": false
+}

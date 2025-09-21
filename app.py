@@ -1,5 +1,23 @@
-#ALL IMPORTS
+"""
+Y.M.I.R AI Emotion Detection System - Main Flask Application
+===========================================================
+Basic Flask app with microservices architecture for emotion detection,
+chatbot integration, and music recommendations.
+
+Author: Y.M.I.R Development Team
+Version: 1.0.0
+"""
+
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+from flask import Flask, render_template, request, jsonify, url_for, Response
+from flask_cors import CORS
+import os
+import requests
+import json
+from datetime import datetime
+import sys
+from pathlib import Path
+from dotenv import load_dotenv
 from email.message import EmailMessage
 import random
 from signal import signal
@@ -38,21 +56,44 @@ from transformers import pipeline, AutoModelForSequenceClassification, AutoToken
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
-#══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Load environment variables
+load_dotenv()
+
+# Import Firebase Authentication
+try:
+    from firebase_auth_backend import firebase_auth, add_auth_routes, require_auth, optional_auth
+    FIREBASE_AUTH_AVAILABLE = True
+    print("✅ Firebase Authentication available")
+except ImportError as e:
+    FIREBASE_AUTH_AVAILABLE = False
+    print(f"⚠️ Firebase Authentication not available: {e}")
+    firebase_auth = None
+
+# Import multimodal emotion combiner
+try:
+    combiner_path = Path(__file__).parent / 'enhancements' / 'src-new' / 'multimodal_fusion'
+    sys.path.append(str(combiner_path))
+    from real_emotion_combiner import RealEmotionCombiner, RealCombinedEmotion
+    EMOTION_COMBINER_AVAILABLE = True
+except ImportError:
+    EMOTION_COMBINER_AVAILABLE = False
+    RealEmotionCombiner = None
+    RealCombinedEmotion = None
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
-
-
-#Flask App════════════════════════════════════════════════════════Initialised══════════════════════════════════════════════════════════════════════════════
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Initialize Flask app
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY' , 'fallbackkey123')
-
-#══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
+app.secret_key = os.environ.get('SECRET_KEY', 'ymir-dev-key-2024')
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # Email Config
-# Email Config
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=587,
@@ -79,958 +120,264 @@ db = SQLAlchemy(app)
 #     "password": bool(app.config['MAIL_PASSWORD']),  # Jus   t print if it exists
 #     "use_tls": app.config['MAIL_USE_TLS']
 # })
-
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    favorites = db.relationship('FavoriteSong', backref='user', lazy=True)
-
-class FavoriteSong(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(120), nullable=False)
-    artist = db.Column(db.String(120), nullable=False)
-    link = db.Column(db.String(255), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-# === 📌 Load Required Models & Dataset ===
-MODEL_PATH = "models/ensemble_model.pkl"
-ENCODER_PATH = "models/label_encoder.pkl"
-SCALER_PATH = "models/scaler.pkl"
-DATASET_PATH = "datasets/therapeutic_music_enriched.csv"
+# Enable CORS for API calls
+CORS(app)
 
-# ✅ Load Model, Label Encoder, and Scaler
-with open(MODEL_PATH, "rb") as f:
-    ensemble_model = pickle.load(f)
+# Configure static files
+app.static_folder = 'static'
+app.template_folder = 'templates'
 
-with open(ENCODER_PATH, "rb") as f:
-    le = pickle.load(f)
+# Microservice URLs
+FACE_MICROSERVICE_URL = 'http://localhost:5002'
+TEXT_MICROSERVICE_URL = 'http://localhost:5003'
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-with open(SCALER_PATH, "rb") as f:
-    scaler = pickle.load(f)
 
-# ✅ Load Song Dataset
-df = pd.read_csv(DATASET_PATH)
-
-# === 📌 Emotion to Audio Mapping ===
-EMOTION_TO_AUDIO = {
-    "angry":       [0.4, 0.9, 5, -5.0, 0.3, 0.1, 0.0, 0.6, 0.2, 120],
-    "disgust":     [0.3, 0.7, 6, -7.0, 0.5, 0.2, 0.0, 0.5, 0.3, 100],
-    "fear":        [0.2, 0.6, 7, -10.0, 0.6, 0.3, 0.1, 0.4, 0.1, 80],
-    "happy":       [0.8, 0.9, 8, -3.0, 0.2, 0.4, 0.0, 0.5, 0.9, 130],
-    "sad":         [0.3, 0.4, 4, -12.0, 0.4, 0.6, 0.1, 0.3, 0.1, 70],
-    "surprise":    [0.7, 0.8, 9, -6.0, 0.4, 0.3, 0.0, 0.6, 0.7, 125],
-    "neutral":     [0.5, 0.5, 5, -8.0, 0.3, 0.4, 0.0, 0.4, 0.5, 110],
-    "boredom":     [0.2, 0.3, 4, -15.0, 0.2, 0.8, 0.1, 0.2, 0.1, 60],
-    "excitement":  [0.9, 1.0, 9, -2.0, 0.1, 0.2, 0.0, 0.7, 1.0, 140],
-    "relaxation":  [0.6, 0.3, 5, -10.0, 0.2, 0.9, 0.5, 0.3, 0.7, 80]
-}
-
-# === 📌 Emotion to Mood Mapping ===
-EMOTION_TO_MOOD = {
-    "angry":       ["Relaxation", "Serenity"],
-    "disgust":     ["Calm", "Neutral"],
-    "fear":        ["Reassurance", "Serenity"],
-    "happy":       ["Excitement", "Optimism"],
-    "sad":         ["Optimism", "Upliftment"],
-    "surprise":    ["Excitement", "Joy"],
-    "neutral":     ["Serenity", "Neutral"],
-    "boredom":     ["Upliftment", "Optimism"],
-    "excitement":  ["Joy", "Happy"],
-    "relaxation":  ["Calm", "Peaceful"]
-}
-
-# === 📌 Process Emotion Scores & Compute Features ===
-def process_emotions(emotion_file):
-    """Reads JSON emotion file, extracts values, and converts to audio features."""
-
-    # ✅ Load Emotion Data
-    with open(emotion_file, "r") as file:
-        emotions = json.load(file)
+class MicroserviceClient:
+    """Client to communicate with microservices"""
     
-    # print(f"\n📂 Loaded JSON Content:\n{json.dumps(emotions, indent=4)}\n")
-
-    # ✅ Fix: Extract the correct dictionary
-    emotions = emotions["final_average_emotions"]
-
-    # ✅ Debugging Print (to verify)
-    # print(f"DEBUG: extracted emotions -> {emotions}")
-    # print(f"DEBUG: type of each value -> {[type(v) for v in emotions.values()]}")
-
-    # ✅ Now, this should work fine
-    emotion_scores = {emotion: float(score) for emotion, score in emotions.items()}
-
-
-
-    
-    # print(f"\n📊 Extracted Emotion Scores:\n{emotion_scores}\n")
-
-    weighted_audio_features = np.zeros(len(list(EMOTION_TO_AUDIO.values())[0]))  
-
-
-
-
-    # print("\n🛠 Debugging Weighted Audio Features Calculation:")
-    for emotion, weight in emotion_scores.items():
-        if emotion in EMOTION_TO_AUDIO:
-            contribution = np.array(EMOTION_TO_AUDIO[emotion]) * weight
-            weighted_audio_features += contribution
-            # print(f"🔹 {emotion} ({weight}): {contribution}")
-
-    # ✅ Normalize Features Before Model Input
-    weighted_audio_features = scaler.transform([weighted_audio_features])[0]
-
-    # print(f"\n🎵 Final Normalized Audio Features (Input to Model):\n{weighted_audio_features}\n")
-
-    return weighted_audio_features.reshape(1, -1), emotion_scores
-
-
-# === 📌 Mood Prediction & Song Recommendation ===
-def recommend_songs(emotion_file):
-    """Predicts mood based on emotions and recommends matching songs.
-    
-    Args:
-        emotion_file: Path to file containing emotion data
+    def __init__(self):
+        self.face_service_url = FACE_MICROSERVICE_URL
+        self.text_service_url = TEXT_MICROSERVICE_URL
         
-    Returns:
-        list: List of dictionaries containing recommended songs with track, artist, and mood
-    """
-    import pickle
-    import logging
-    
-    # Set up logging
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
-    
-    try:
-        # ✅ Get Emotion-Based Features
-        emotion_vector, emotion_scores = process_emotions(emotion_file)
-        
-        # Load pre-trained transformations with error handling
-        try:
-            with open("models/scaler.pkl", "rb") as f:
-                scaler = pickle.load(f)
-        except (FileNotFoundError, pickle.PickleError) as e:
-            logger.error(f"Error loading scaler model: {e}")
-            raise RuntimeError("Failed to load scaler model")
-
-        try:
-            with open("models/pca.pkl", "rb") as f:
-                pca = pickle.load(f)
-        except (FileNotFoundError, pickle.PickleError) as e:
-            logger.error(f"Error loading PCA model: {e}")
-            raise RuntimeError("Failed to load PCA model")
-
-        # Apply transformations with validation
-        if emotion_vector.ndim == 1:
-            emotion_vector = emotion_vector.reshape(1, -1)
-            
-        # Standardize
-        emotion_vector_scaled = scaler.transform(emotion_vector)
-        # Reduce dimensions
-        emotion_vector_pca = pca.transform(emotion_vector_scaled)
-
-        # Debug confidence scores if needed
-        mood_probs = ensemble_model.predict_proba(emotion_vector_pca)
-        logger.debug(f"Model Confidence Scores: {dict(zip(le.classes_, mood_probs[0]))}")
-
-        # ✅ Predict Mood
-        predicted_mood_index = ensemble_model.predict(emotion_vector_pca)[0]
-        predicted_mood = le.inverse_transform([predicted_mood_index])[0]
-        logger.info(f"Initial Predicted Mood: {predicted_mood}")
-
-        # ✅ Find Top 2 Dominant Emotions with validation
-        if not emotion_scores:
-            logger.warning("No emotion scores found, using default neutral mood")
-            dominant_emotions = [("Neutral", 1.0)]
+        # Initialize emotion combiner
+        if EMOTION_COMBINER_AVAILABLE:
+            self.emotion_combiner = RealEmotionCombiner()
         else:
-            dominant_emotions = sorted(emotion_scores.items(), key=lambda x: x[1], reverse=True)[:2]
-            
-        mapped_moods = set()
-        for emotion, score in dominant_emotions:
-            mapped_moods.update(EMOTION_TO_MOOD.get(emotion, ["Neutral"]))
-        
-        logger.info(f"Dominant Emotions: {dominant_emotions} → Adjusted Moods: {mapped_moods}")
-
-        # ✅ Adjust Mood If Necessary
-        if predicted_mood not in mapped_moods and mapped_moods:
-            predicted_mood = list(mapped_moods)[0]  # Take the first mapped mood
-            logger.info(f"Adjusted mood to: {predicted_mood}")
-
-        # ✅ Filter Songs Based on Mood with validation
+            self.emotion_combiner = None
+    
+    def check_face_service_health(self):
+        """Check if face microservice is running"""
         try:
-            filtered_songs = df[df["Mood_Label"] == predicted_mood].copy()
-        except KeyError:
-            logger.error("Missing required column 'Mood_Label' in dataframe")
-            raise ValueError("Dataset missing required columns")
-
-        # ✅ Use Fallback Moods If No Songs Found
-        if filtered_songs.empty and mapped_moods:
-            logger.info(f"No songs found for {predicted_mood}, trying mapped moods: {mapped_moods}")
-            filtered_songs = df[df["Mood_Label"].isin(mapped_moods)].copy()
-
-        # ✅ Final Fallback to Neutral if Still Empty
-        if filtered_songs.empty:
-            logger.warning("No songs found for any mapped mood, falling back to Neutral")
-            filtered_songs = df[df["Mood_Label"] == "Neutral"].copy()
-            
-            # If still empty, return empty list with warning
-            if filtered_songs.empty:
-                logger.error("No songs found for any mood category, including Neutral")
-                return []
-
-        # ✅ Select Up to 10 Songs with duplicate handling
-        required_columns = ["Track Name", "Artist Name", "Mood_Label"]
-        if not all(col in filtered_songs.columns for col in required_columns):
-            logger.error(f"Missing required columns in dataframe. Required: {required_columns}")
-            raise ValueError("Dataset missing required columns")
-            
+            response = requests.get(f'{self.face_service_url}/health', timeout=2)
+            return response.status_code == 200
+        except Exception:
+            return False
+    
+    def start_camera(self):
+        """Start camera via microservice"""
         try:
-            # Drop duplicates more efficiently
-            filtered_songs.drop_duplicates(subset=["Track Name", "Artist Name"], inplace=True)
-            sample_size = min(10, len(filtered_songs))
-            
-            if sample_size == 0:
-                logger.warning("No songs available after filtering duplicates")
-                return []
-                
-            recommended_songs = filtered_songs.sample(sample_size)
+            response = requests.post(f'{self.face_service_url}/api/start_camera', timeout=15)
+            return response.json()
+        except requests.exceptions.Timeout:
+            return {'success': False, 'error': 'Camera start timed out'}
+        except requests.exceptions.ConnectionError:
+            return {'success': False, 'error': 'Cannot connect to face microservice'}
         except Exception as e:
-            logger.error(f"Error during sampling: {e}")
-            # Fallback to first N records if sampling fails
-            recommended_songs = filtered_songs.head(min(10, len(filtered_songs)))
-
-        # ✅ Create song list with error handling for missing values
-        song_list = []
-        for _, row in recommended_songs.iterrows():
-            try:
-                song_list.append({
-                    "track": row["Track Name"],
-                    "artist": row["Artist Name"],
-                    "mood": row["Mood_Label"],
-                })
-            except KeyError as e:
-                logger.warning(f"Skipping song due to missing data: {e}")
-                
-        logger.info(f"Successfully recommended {len(song_list)} songs")
-        return song_list
+            return {'success': False, 'error': f'Microservice error: {str(e)}'}
+    
+    def stop_camera(self):
+        """Stop camera via microservice"""
+        try:
+            response = requests.post(f'{self.face_service_url}/api/stop_camera', timeout=10)
+            return response.json()
+        except Exception as e:
+            return {'success': False, 'error': f'Microservice error: {str(e)}'}
+    
+    def get_emotions(self):
+        """Get current emotions from microservice"""
+        try:
+            response = requests.get(f'{self.face_service_url}/api/emotions', timeout=2)
+            return response.json()
+        except Exception as e:
+            return {'error': f'Microservice error: {str(e)}'}
+    
+    def get_face_service_status(self):
+        """Get face service status"""
+        try:
+            response = requests.get(f'{self.face_service_url}/api/status', timeout=2)
+            return response.json()
+        except Exception as e:
+            return {'error': f'Microservice error: {str(e)}'}
+    
+    def check_text_service_health(self):
+        """Check if text microservice is running"""
+        try:
+            response = requests.get(f'{self.text_service_url}/health', timeout=2)
+            return response.status_code == 200
+        except Exception:
+            return False
+    
+    def analyze_text(self, text, is_user=True):
+        """Analyze text emotion via microservice"""
+        try:
+            response = requests.post(f'{self.text_service_url}/api/analyze_text', 
+                                   json={'text': text, 'is_user': is_user}, timeout=10)
+            return response.json()
+        except Exception as e:
+            return {'success': False, 'error': f'Text microservice error: {str(e)}'}
+    
+    def chat_with_bot(self, message, auth_header=None, session_id=None):
+        """Chat with bot via microservice"""
+        try:
+            headers = {'Content-Type': 'application/json'}
+            if auth_header:
+                headers['Authorization'] = auth_header
+            
+            # Prepare payload with message and optional session_id
+            payload = {'message': message}
+            if session_id:
+                payload['session_id'] = session_id
+            
+            response = requests.post(f'{self.text_service_url}/api/chat',
+                                   json=payload, 
+                                   headers=headers,
+                                   timeout=45)
+            return response.json()
+        except Exception as e:
+            return {'success': False, 'error': f'Chat microservice error: {str(e)}'}
+    
+    def get_text_conversation(self):
+        """Get conversation history from text microservice"""
+        try:
+            response = requests.get(f'{self.text_service_url}/api/conversation', timeout=5)
+            return response.json()
+        except Exception as e:
+            return {'success': False, 'error': f'Text microservice error: {str(e)}'}
+    
+    def get_text_service_status(self):
+        """Get text service status"""
+        try:
+            response = requests.get(f'{self.text_service_url}/api/status', timeout=2)
+            return response.json()
+        except Exception as e:
+            return {'error': f'Text microservice error: {str(e)}'}
+    
+    def get_combined_emotions(self):
+        """Get combined emotions from both face and text microservices"""
+        if not self.emotion_combiner:
+            return {'error': 'Emotion combiner not available'}
         
-    except Exception as e:
-        logger.error(f"Unexpected error in recommend_songs: {e}")
-        # Return empty list rather than crashing
-        return []
-
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-console = Console()
-
-# Groq API Configuration
-GROQ_API_KEY = os.getenv('GROQ_API_KEY')
-GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-
-# Load emotion classifiers
-device = "cuda" if torch.cuda.is_available() else "cpu"
-emotion_models = [
-    pipeline("text-classification", model="bhadresh-savani/distilbert-base-uncased-emotion", device=0 if device == "cuda" else -1),
-    pipeline("text-classification", model="SamLowe/roberta-base-go_emotions", device=0 if device == "cuda" else -1),
-    pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base", device=0 if device == "cuda" else -1)
-]
-
-# Load sentiment analysis model
-sentiment_model = AutoModelForSequenceClassification.from_pretrained("cardiffnlp/twitter-roberta-base-sentiment")
-sentiment_tokenizer = AutoTokenizer.from_pretrained("cardiffnlp/twitter-roberta-base-sentiment")
-
-# Emotion mapping
-emotion_map = {
-    "joy": "happy", "happiness": "happy", "excitement": "happy",
-    "anger": "angry", "annoyance": "angry",
-    "sadness": "sad", "grief": "sad",
-    "fear": "fearful", "surprise": "surprised",
-    "disgust": "disgusted", "neutral": "neutral",
-}
-
-# Rolling emotion tracking
-previous_emotions = []
-
-# Chat session storage
-chat_session = []
-
-# Function to handle negations
-def handle_negations(text):
-    """Detects negations and flips associated emotions."""
-    negation_patterns = [
-        r"\b(not|never|no)\s+(happy|joyful|excited)\b",
-        r"\b(not|never|no)\s+(sad|depressed|unhappy)\b",
-        r"\b(not|never|no)\s+(angry|mad|furious)\b"
-    ]
-    
-    for pattern in negation_patterns:
-        match = re.search(pattern, text, re.IGNORECASE)
-        if match:
-            emotion = match.group(2).lower()
-            if emotion in ["happy", "joyful", "excited"]:
-                return "sad"
-            elif emotion in ["sad", "depressed", "unhappy"]:
-                return "happy"
-            elif emotion in ["angry", "mad", "furious"]:
-                return "calm"
-    return None
-
-# Function to analyze sentiment
-def detect_sentiment(text):
-    """Detects sentiment polarity (positive, neutral, negative)."""
-    inputs = sentiment_tokenizer(text, return_tensors="pt", truncation=True, padding=True)
-    outputs = sentiment_model(**inputs)
-    sentiment_scores = torch.nn.functional.softmax(outputs.logits, dim=-1)[0]
-    sentiment_labels = ["negative", "neutral", "positive"]
-    
-    return sentiment_labels[torch.argmax(sentiment_scores).item()]
-
-# Function to detect conversation emotions with improved weighting
-def detect_conversation_emotions(chat_history):
-    """Analyzes chat history, considers recent messages more, and balances emotion scores."""
-    emotion_scores = {}
-    emotion_counts = {}
-    model_emotions = []
-    
-    # More weight to recent messages
-    recent_weight = 1.5  
-    messages = chat_history[-5:]  # Use last 5 messages for better context
-    full_chat_text = " ".join([entry["user"] for entry in messages])
-
-    # Check for negation handling
-    negated_emotion = handle_negations(full_chat_text)
-    if negated_emotion:
-        return negated_emotion, {}, []
-
-    for model in emotion_models:
-        results = model(full_chat_text)
-        top_predictions = sorted(results, key=lambda x: x["score"], reverse=True)[:2]
-
-        for pred in top_predictions:
-            model_label = pred["label"].lower()
-            model_score = pred["score"]
-            mapped_emotion = emotion_map.get(model_label, "neutral")
-            model_emotions.append(f"{model_label} ({model_score:.2f}) → {mapped_emotion}")
-
-            if model_score < 0.4:  # Ignore weak emotions
-                continue  
-
-            # Apply weight to recent messages
-            weighted_score = model_score * (recent_weight if messages[-1]["user"] == full_chat_text else 1.0)
-
-            if mapped_emotion not in emotion_scores:
-                emotion_scores[mapped_emotion] = weighted_score
-                emotion_counts[mapped_emotion] = 1
+        try:
+            # Only get face emotions if camera is actually running
+            face_status = self.get_face_service_status()
+            face_emotions = {}
+            
+            if face_status.get('running') and not face_status.get('error'):
+                face_emotions = self.get_emotions()
             else:
-                emotion_scores[mapped_emotion] += weighted_score
-                emotion_counts[mapped_emotion] += 1
-
-    # Compute weighted average
-    avg_emotion_scores = {label: emotion_scores[label] / emotion_counts[label] for label in emotion_scores}
-
-    # Consider sentiment analysis
-    sentiment = detect_sentiment(full_chat_text)
-    if sentiment == "negative" and "sad" in avg_emotion_scores:
-        avg_emotion_scores["sad"] += 0.1  # Boost sadness slightly if sentiment is negative
-
-    # Rolling emotion tracking
-    if len(previous_emotions) > 5:
-        previous_emotions.pop(0)
-    previous_emotions.append(avg_emotion_scores)
-
-    # Compute final dominant emotion
-    if avg_emotion_scores:
-        dominant_emotion = max(avg_emotion_scores, key=avg_emotion_scores.get)
-    else:
-        dominant_emotion = "neutral"
-
-    return dominant_emotion, avg_emotion_scores, model_emotions
-
-# Function to generate chatbot response
-def generate_chatbot_response(user_input):
-    """Generates chatbot response using Groq API."""
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
-    payload = {"model": "llama3-70b-8192", "messages": [{"role": "user", "content": user_input}]}
-
-    try:
-        response = requests.post(GROQ_API_URL, headers=headers, json=payload)
-        response_json = response.json()
-
-        if response.status_code == 200 and "choices" in response_json:
-            return response_json["choices"][0]["message"]["content"].strip()
-        else:
-            console.print(f"[bold red][ERROR] Groq API request failed: {response_json}[/bold red]")
-            return "I'm sorry, but I couldn't process your request."
-    except Exception as e:
-        console.print(f"[bold red][ERROR] Groq API request failed: {e}[/bold red]")
-        return "I'm facing a technical issue. Please try again later."
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-# Suppress warnings
-warnings.filterwarnings("ignore")
-
-# Initialize Flask App
-app = Flask(__name__)
-CORS(app)  # Enable CORS for API calls
-
-# Mediapipe Modules
-mp_face_detection = mp.solutions.face_detection
-mp_face_mesh = mp.solutions.face_mesh
-mp_pose = mp.solutions.pose
-mp_hands = mp.solutions.hands
-
-face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.5)
-face_mesh = mp_face_mesh.FaceMesh(max_num_faces=5, min_detection_confidence=0.6)  # Multi-face support
-pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
-hands = mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5)
-
-# OpenCV Haar Cascade (Backup)
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml")
-
-# Dlib Face Landmarks
-DLIB_LANDMARK_PATH = "shape_predictor_68_face_landmarks.dat"
-try:
-    dlib_detector = dlib.get_frontal_face_detector()
-    dlib_predictor = dlib.shape_predictor(DLIB_LANDMARK_PATH)
-except Exception as e:
-    print(f"⚠️ Dlib Error: {e}")
-    dlib_detector, dlib_predictor = None, None
-
-# Open Webcam
-cap = cv2.VideoCapture(0)
-if not cap.isOpened():
-    print("❌ Camera not detected!")
-    exit()
-
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-
-# If No Faces Are Detected, Keep Last Known Faces for a While
-NO_FACE_LIMIT = 30  # Number of frames to retain last known faces
-no_face_counter = 0  # Tracks how many frames we’ve had no face detected
-fps = 0
-frame_count = 0
-start_time = time.time()
-frame_skip = 3  # Optimized FPS
-
-# Emotion Data Storage (Rolling Average)
-emotion_data = {"faces": {}, "lock": threading.Lock(),  "log":[],"average_emotions" :{}}
-emotion_history = deque(maxlen=5)  # Store last 5 emotion results for smoothing
-emotion_log = deque(maxlen=10)  # Store last 10 logs
-
-# Store emotions per face in a thread-safe dictionary
-emotion_data = {"faces": {}, "lock": threading.Lock()}
-last_known_faces = []  # Stores last detected faces
-
-# Colors for Visualization
-COLORS = {"face": (0, 255, 0), "eyes": (255, 0, 0), "body": (0, 255, 255), "hands": (0, 0, 255)}
-
-# Eye Aspect Ratio Threshold
-EYE_AR_THRESH = 0.30
-FRAME_COUNT = 0  # Frame counter for controlling emotion updates
-
-# Function to Analyze Emotions (Runs in Background)
-def analyze_emotion(face_id, face_roi):
-    current_time = time.time()
-
-    with emotion_data["lock"]:
-        # Ensure log list exists
-        if "log" not in emotion_data:
-            emotion_data["log"] = []
-
-        emotion_data["last_update"] = current_time
-
-    try:
-        resized_face = cv2.resize(face_roi, (224, 224))
-        emotion_result = DeepFace.analyze(resized_face, actions=['emotion'], enforce_detection=False, detector_backend='opencv')
-
-        with emotion_data["lock"]:
-            emotions = emotion_result[0]['emotion']
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(current_time))  # Format timestamp
-
-            # Store emotions and timestamp
-            emotion_data["faces"][face_id] = emotions
-            emotion_data["log"].append({"timestamp": timestamp, "emotions": emotions})
-
-            # Print emotions with timestamp
-            print(f"🕒 {timestamp} - Emotions: {emotions}")
-
-        # Save to JSON file (thread-safe)
-        with emotion_data["lock"]:
-            with open("emotion_log.json", "w") as f:
-                json.dump(emotion_data["log"], f, indent=4)
-
-    except Exception as e:
-        print(f"⚠️ Emotion detection error: {e}")
-
-# Gaze Tracking
-def eye_aspect_ratio(eye):
-    # Compute the Euclidean distances between the two sets of vertical eye landmarks
-    A = dist.euclidean(eye[1], eye[5])
-    B = dist.euclidean(eye[2], eye[4])
-    # Compute the Euclidean distance between the horizontal eye landmarks
-    C = dist.euclidean(eye[0], eye[3])
-    # Compute the eye aspect ratio
-    ear = (A + B) / (2.0 * C)
-    return ear
-
-def draw_gaze(frame, mesh_results):
-    if mesh_results.multi_face_landmarks:
-        for face_landmarks in mesh_results.multi_face_landmarks:
-            landmarks = face_landmarks.landmark
-            # Extract left and right eye landmarks
-            left_eye = [(landmarks[33].x, landmarks[33].y), (landmarks[160].x, landmarks[160].y),
-                        (landmarks[158].x, landmarks[158].y), (landmarks[133].x, landmarks[133].y),
-                        (landmarks[153].x, landmarks[153].y), (landmarks[144].x, landmarks[144].y)]
-            right_eye = [(landmarks[362].x, landmarks[362].y), (landmarks[385].x, landmarks[385].y),
-                         (landmarks[387].x, landmarks[387].y), (landmarks[263].x, landmarks[263].y),
-                         (landmarks[373].x, landmarks[373].y), (landmarks[380].x, landmarks[380].y)]
-            # Convert to pixel coordinates
-            left_eye = [(int(l[0] * frame.shape[1]), int(l[1] * frame.shape[0])) for l in left_eye]
-            right_eye = [(int(r[0] * frame.shape[1]), int(r[1] * frame.shape[0])) for r in right_eye]
-            # Draw eyes
-            for (x, y) in left_eye + right_eye:
-                cv2.circle(frame, (x, y), 2, COLORS["eyes"], -1)
-            # Calculate eye aspect ratio
-            left_ear = eye_aspect_ratio(left_eye)
-            right_ear = eye_aspect_ratio(right_eye)
-            ear = (left_ear + right_ear) / 2.0
-            # Display gaze direction
-            if ear < EYE_AR_THRESH:
-                cv2.putText(frame, "Looking forward", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                # Camera not running, don't trigger it with API calls
+                print("⚠️ Skipping face emotions check (camera not running)")
+                face_emotions = {'status': 'camera_not_running'}
+            
+            text_status = self.get_text_service_status()
+            
+            # Combine emotions using the fusion engine (works with Firebase data directly)
+            from real_emotion_combiner import get_combined_emotion
+            combined_result = get_combined_emotion(minutes_back=5, strategy='adaptive')
+            
+            if combined_result:
+                # Convert to expected format
+                combined = RealCombinedEmotion(
+                    dominant_emotion=combined_result['emotion'],
+                    confidence=combined_result['confidence'],
+                    combination_method=combined_result.get('strategy', 'adaptive'),
+                    facial_source=combined_result.get('facial_data'),
+                    text_source=combined_result.get('text_data')
+                )
             else:
-                cv2.putText(frame, "Looking away", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                combined = None
+            
+            if combined:
+                return {
+                    'success': True,
+                    'combined_emotion': {
+                        'dominant_emotion': combined.dominant_emotion,
+                        'confidence': combined.confidence,
+                        'combination_method': combined.combination_method,
+                        'timestamp': combined.timestamp.isoformat(),
+                        'facial_source': combined.facial_source,
+                        'text_source': combined.text_source,
+                        # Multi-emotion support
+                        'top_emotions': getattr(combined, 'top_emotions', [(combined.dominant_emotion, combined.confidence)]),
+                        'is_multi_emotion': getattr(combined, 'is_multi_emotion', False),
+                        'fusion_weights': getattr(combined, 'fusion_weights', {'facial': 0.5, 'text': 0.5}),
+                        'all_emotions': getattr(combined, 'all_fused_emotions', {combined.dominant_emotion: combined.confidence})
+                    },
+                    'face_emotions': face_emotions,
+                    'text_available': not text_status.get('error')
+                }
+            else:
+                return {
+                    'success': False,
+                    'error': 'No combined emotion data available'
+                }
+        except Exception as e:
+            return {'error': f'Combined emotion error: {str(e)}'}
 
-# Draw Face Mesh
-def draw_face_mesh(frame, mesh_results):
-    if mesh_results.multi_face_landmarks:
-        for face_landmarks in mesh_results.multi_face_landmarks:
-            for landmark in face_landmarks.landmark:
-                x_l, y_l = int(landmark.x * frame.shape[1]), int(landmark.y * frame.shape[0])
-                cv2.circle(frame, (x_l, y_l), 1, COLORS["face"], -1)
+# Initialize microservice client
+microservice_client = MicroserviceClient()
 
-# Draw Body Landmarks
-def draw_body_landmarks(frame, pose_results):
-    if pose_results.pose_landmarks:
-        for landmark in pose_results.pose_landmarks.landmark:
-            x_b, y_b = int(landmark.x * frame.shape[1]), int(landmark.y * frame.shape[0])
-            cv2.circle(frame, (x_b, y_b), 5, COLORS["body"], -1)
+# Add emotion combiner monitoring
+import threading
 
-# Draw Hand Landmarks
-def draw_hand_landmarks(frame, hand_results):
-    if hand_results.multi_hand_landmarks:
-        for hand_landmarks in hand_results.multi_hand_landmarks:
-            for landmark in hand_landmarks.landmark:
-                x_h, y_h = int(landmark.x * frame.shape[1]), int(landmark.y * frame.shape[0])
-                cv2.circle(frame, (x_h, y_h), 5, COLORS["hands"], -1)
-                
-                        
-
-# Function for Video Streaming
-# Function for Video Streaming
-def generate_frames():
-    global FRAME_COUNT, cap
-    last_frame_time = time.time()
-
-    # Ensure the camera is always open
-    if cap is None or not cap.isOpened():
-        cap = cv2.VideoCapture(0)
-
+# Simple cache for music recommendations to prevent excessive API calls
+music_recommendation_cache = {}
+MUSIC_CACHE_DURATION = 20  # 20 seconds for immediate emotion response
+def monitor_combined_emotions():
+    """Monitor and log combined emotions every 60 seconds"""
+    import time
     while True:
-        if cap is None or not cap.isOpened():
-            print("⚠️ Camera is closed! Restarting...")
-            cap = cv2.VideoCapture(0)  # Restart camera
-            time.sleep(1)  # Small delay to allow initialization
-
-        ret, frame = cap.read()
-        if not ret:
-            print("❌ Frame not captured! Retrying...")
-            continue  
-
-        frame = cv2.flip(frame, 1)  # Flip horizontally
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        # Limit FPS to 30
-        if time.time() - last_frame_time < 1 / 30:  
-            continue
-        last_frame_time = time.time()
-
-        # Process face detection & emotion analysis every 20 frames
-        if FRAME_COUNT % 20 == 0:
-            results = face_detection.process(rgb_frame)
-            if results.detections:
-                for idx, detection in enumerate(results.detections):
-                    bboxC = detection.location_data.relative_bounding_box
-                    h, w, _ = frame.shape
-                    x, y, w_box, h_box = int(bboxC.xmin * w), int(bboxC.ymin * h), int(bboxC.width * w), int(bboxC.height * h)
-                    
-                    face_roi = frame[y:y + h_box, x:x + w_box]
-                    if face_roi.size > 0:
-                        threading.Thread(target=analyze_emotion, args=(idx, face_roi)).start()
-                    break  
-
-        # Process Pose and Hands in separate threads
-        with ThreadPoolExecutor() as executor:
-            executor.submit(lambda: draw_face_mesh(frame, face_mesh.process(rgb_frame)))
-            executor.submit(lambda: draw_gaze(frame, face_mesh.process(rgb_frame)))
-            executor.submit(lambda: draw_body_landmarks(frame, pose.process(rgb_frame)))
-            executor.submit(lambda: draw_hand_landmarks(frame, hands.process(rgb_frame)))
-
-        FRAME_COUNT += 1
-        ret, buffer = cv2.imencode('.jpg', frame)
-        if not ret:
-            continue
-
-        frame = buffer.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-        
-        
-
-import json
-import json
-import threading
-def calculate_and_store_average_emotions():
-    with emotion_data["lock"]:
-        if "log" not in emotion_data:
-            emotion_data["log"] = []  # Ensure log exists
-
-        log_data = emotion_data["log"]
-        if log_data:  # Ensure log_data is not empty
-            emotion_sums = {}
-            emotion_counts = {}
-
-            for entry in log_data:
-                for emotion, confidence in entry["emotions"].items():
-                    if emotion in emotion_sums:
-                        emotion_sums[emotion] += confidence
-                        emotion_counts[emotion] += 1
-                    else:
-                        emotion_sums[emotion] = confidence
-                        emotion_counts[emotion] = 1
-
-            # ✅ FIX: Remove extra `/ 100`
-            average_emotions = {
-                emotion: round(emotion_sums[emotion] / emotion_counts[emotion], 2)  # Correct averaging
-                for emotion in emotion_sums
-            }
-            emotion_data["average_emotions"] = average_emotions
-
-            # ✅ Save to JSON immediately
-            try:
-                with open("emotion_log.json", "w") as f:
-                    json.dump({"log": log_data, "average_emotions": average_emotions}, f, indent=4)
-                    f.flush()  # Ensure data is written to disk
-            except Exception as e:
-                print(f"❌ Error writing to emotion_log.json: {e}")
-
-            # ✅ Debugging: Print updated average emotions
-            print("\n📊 **Updated Average Emotions:**")
-            for emotion, avg_confidence in average_emotions.items():
-                print(f"  {emotion.upper()}: {avg_confidence}")
-
-        else:
-            print("⚠️ No emotion data recorded.")
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-
-
-
-
-
-            
-            
-            
-            
-            
-
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-def calculate_final_emotions():
-    try:
-        # Load JSON files
-        with open("chat_results.json", "r") as f1, open("emotion_log.json", "r") as f2:
-            chat_data = json.load(f1)
-            emotion_log_data = json.load(f2)
-
-        # Extract dominant emotion from chat_results.json
-        dominant_emotion = chat_data["dominant_emotion"]
-
-        # Handle possible list structure in emotion_log.json
-        if isinstance(emotion_log_data["average_emotions"], list):
-            average_emotions = emotion_log_data["average_emotions"][0]  # Take the first entry if it's a list
-        else:
-            average_emotions = emotion_log_data["average_emotions"]
-
-        # Convert percentages to decimal
-        average_emotions = {emotion: confidence / 100 for emotion, confidence in average_emotions.items()}
-
-        # Assign 100% confidence to the dominant emotion from chat
-        dominant_emotion_dict = {emotion: 0.0 for emotion in average_emotions}
-        dominant_emotion_dict[dominant_emotion] = 1.0  # 100% as 1.0
-
-        # Convert both to DataFrames
-        df1 = pd.DataFrame([dominant_emotion_dict])  # From chat_results.json
-        df2 = pd.DataFrame([average_emotions])  # From emotion_log.json
-
-        # Combine and compute the average
-        final_average_df = pd.concat([df1, df2], ignore_index=True)
-        final_average_emotions = final_average_df.mean().round(4)  # Keep two decimal places
-
-        # Convert to dictionary
-        final_emotion_result = final_average_emotions.to_dict()
-
-        # Save to JSON
-        with open("final_average_emotions.json", "w") as f:
-            json.dump({"final_average_emotions": final_emotion_result}, f, indent=4)
-
-        return final_emotion_result
-
-    except Exception as e:
-        return {"error": str(e)}
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-
-import yt_dlp
-import os
-
-def search_youtube(song, artist):
-    query = f"{song} {artist} audio"
-    search_url = f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}"
-    # You can use YouTube API or scrape first result link
-    # For now, use yt-dlp to search:
-    ydl_opts = {
-        'quiet': True,
-        'default_search': 'ytsearch1',  # get top result
-        'skip_download': True,
-    }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        result = ydl.extract_info(query, download=False)
-        if 'entries' in result and result['entries']:
-            return result['entries'][0]['webpage_url']  # Top video URL
-    return None
-
-def download_youtube_async(song, artist, filename):
-    # Search & download audio from YouTube using yt-dlp
-    query = f"{artist} {song} audio"
-
-    try:
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'outtmpl': os.path.join(MUSIC_DIR, filename.replace('.mp3', '')),
-            'quiet': True,
-            'noplaylist': True,
-            'logger': None,
-            'no_warnings': True,
-            'progress_hooks': [],
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-            'default_search': 'ytsearch1',
-        }
-
-
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([query])
-
-        return jsonify({
-            'audio_link': url_for('static', filename=f'music/{filename}'),
-            'source': 'youtube'
-        })
-
-    except Exception as e:
-        print(f"Error downloading from YouTube: {e}")
-        return jsonify({'error': 'Song not found'}), 404
-
-
-
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-import threading
-import time
-import json
-
-latest_songs = []  # Store recommended songs
-latest_final_emotion = {}  # Store latest emotion data
-running = True  # Flag to control background process
-
-def update_all_in_background(interval=1):
-    """Continuously updates emotions, calculates final averages, and recommends songs."""
-    global latest_songs, latest_final_emotion
-
-    while running:
         try:
-            # print("\n🔄 Processing Emotions & Recommendations...")
-            
-            # Step 1: Process Video  Emotions
-            calculate_and_store_average_emotions()  
-
-            # Step 2: Calculate Final Emotion from Both Sources
-            final_emotions = calculate_final_emotions()  
-            latest_final_emotion = final_emotions  # Store it globally
-            
-            # Step 3: Recommend Songs Based on Final Emotion
-            latest_songs = recommend_songs("final_average_emotions.json")
-            
-            print("✅ Updated Final Emotion:", latest_final_emotion)  # Debugging print
-            print("✅ Updated Songs:", latest_songs[:3])  # Print first 3 songs as a check
-            print("✅ Music recommendations updated.")
-
+            time.sleep(60)  # Check every 60 seconds (reduced from 10 to save API calls)
+            if EMOTION_COMBINER_AVAILABLE and microservice_client.emotion_combiner:
+                # 🔍 CHECK: Only monitor if face service is actually running to avoid triggering camera
+                face_status = microservice_client.get_face_service_status()
+                
+                if face_status.get('running') and not face_status.get('error'):
+                    print(f"\n🔗 EMOTION COMBINER CHECK (camera running)")
+                    print("=" * 50)
+                    
+                    # Get combined emotions ONLY when camera is active
+                    combined_result = microservice_client.get_combined_emotions()
+                    
+                    if combined_result.get('success'):
+                        combined = combined_result['combined_emotion']
+                        print(f"🎯 COMBINED EMOTION: {combined['dominant_emotion'].upper()}")
+                        print(f"   Confidence: {combined['confidence']:.2f}")
+                        print(f"   Method: {combined['combination_method']}")
+                        print(f"   Timestamp: {combined['timestamp']}")
+                        
+                        if combined['facial_source']:
+                            print(f"   📹 Facial data: Available")
+                        else:
+                            print(f"   📹 Facial data: None")
+                            
+                        if combined['text_source']:
+                            print(f"   💬 Text data: Available")
+                        else:
+                            print(f"   💬 Text data: None")
+                    else:
+                        print(f"❌ Combined emotion error: {combined_result.get('error', 'Unknown')}")
+                    
+                    print("=" * 50)
+                else:
+                    # 🚫 DON'T call get_combined_emotions when camera is not running to avoid auto-start
+                    print(f"⏸️ Emotion combiner paused (camera not running)")
+                
         except Exception as e:
-            print(f"❌ Error updating: {e}")
+            print(f"⚠️ Emotion combiner monitoring error: {e}")
 
-        time.sleep(interval)  # Update every `interval` seconds
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-import re
-
-def clean_filename(text):
-    return re.sub(r'[^\w\-_\. ]', '_', text)
-
+# Start the monitoring thread
+if EMOTION_COMBINER_AVAILABLE:
+    monitor_thread = threading.Thread(target=monitor_combined_emotions, daemon=True)
+    monitor_thread.start()
+    print("✅ Emotion combiner monitoring started (every 60 seconds)")
 
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-# Flask Route: Home
-@app.route('/')
-
-def home1():
-    return render_template('home.html')
-
-@app.route('/ai_app')
-def ai_app():
-    return render_template('index.html')
-
-# About Page Route
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
-@app.route('/stop_camera', methods=['POST'])
-def stop_camera():
-    global cap
-    print("🛑 Stopping camera...")
-    if cap is not None:
-        cap.release()
-        cap = None
-    return ('', 204)
-
-analyzer = SentimentIntensityAnalyzer()
-
-app.secret_key = "your_secret_key"
+#reya's implementation
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 DATA_FILE = 'goals.json'
 POSTS_FILE = 'data/posts.json'
+app.secret_key = "your_secret_key"
+
+analyzer = SentimentIntensityAnalyzer()
 
 # Mood-based meditation scripts (more human-like and varied)
 SCRIPTS = {
@@ -1065,62 +412,6 @@ QUOTES = [
     "Inner calm is your superpower."
 ]
 
-@app.route("/meditation")
-def meditation():
-    return render_template("meditation.html")
-
-@app.route("/meditation/result", methods=["POST"])
-def meditation_result():
-    feeling = request.form.get("feeling", "").lower()
-
-    # Find matching script list based on mood keyword
-    for mood, scripts in SCRIPTS.items():
-        if mood in feeling:
-            script = random.choice(scripts)
-            break
-    else:
-        # Default script if mood not found
-        script = f"Let’s take a few moments to be still. You mentioned feeling '{feeling}'. Breathe deeply and allow peace to fill your body."
-
-    quote = random.choice(QUOTES)
-
-    return render_template("meditation_result.html", script=script, quote=quote)
-
-@app.route('/journal', methods=['GET', 'POST'])
-def journal():
-    if request.method == 'POST':
-        entry = request.form['entry']
-        sentiment, suggestion = analyze_journal(entry)
-        return render_template('journal.html', sentiment=sentiment, suggestion=suggestion, entry=entry)
-    return render_template('journal.html')
-
-def analyze_journal(text):
-    scores = analyzer.polarity_scores(text)
-    compound = scores['compound']
-
-    if compound >= 0.05:
-        sentiment = 'positive'
-    elif compound <= -0.05:
-        sentiment = 'negative'
-    else:
-        sentiment = 'neutral'
-
-    suggestions = {
-        "positive": "Keep up the positive energy! 😊",
-        "negative": "Try writing about what made you feel this way. 💬",
-        "neutral": "Explore your thoughts more deeply next time. ✍️"
-    }
-
-    return sentiment, suggestions.get(sentiment)
-
-@app.route('/breathing', methods=['GET', 'POST'])
-def breathing():
-    suggestion = None
-    if request.method == 'POST':
-        mood = request.form['mood'].lower()
-        suggestion = suggest_breathing(mood)
-    return render_template('breathing.html', suggestion=suggestion)
-
 def suggest_breathing(mood):
     techniques = {
         "anxious": "Box Breathing (4-4-4-4) – Inhale, hold, exhale, hold for 4 seconds each.",
@@ -1130,136 +421,79 @@ def suggest_breathing(mood):
         "neutral": "Guided Breath Awareness – Simply observe your breath."
     }
     return techniques.get(mood, "Try Box Breathing to get started.")
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-def load_goals():
-    if not os.path.exists(DATA_FILE):
-        return []
-    with open(DATA_FILE, 'r') as f:
-        return json.load(f)
 
-def save_goals(goals):
-    with open(DATA_FILE, 'w') as f:
-        json.dump(goals, f, indent=4)
 
-@app.route('/goals', methods=['GET', 'POST'])
-def goals():
-    if request.method == 'POST':
-        new_goal = request.form.get('goal')
-        if new_goal:
-            goals = load_goals()
-            goals.append({
-                "goal": new_goal,
-                "created": datetime.today().strftime('%Y-%m-%d'),
-                "streak": 0,
-                "last_checked": ""
-            })
-            save_goals(goals)
-            return redirect(url_for('goals'))
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Flask Route: Home
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+@app.route('/')
+def home1():
+    return render_template('home.html')
+
+@app.route('/ai_app')
+def ai_app():
+    """Main AI application dashboard"""
+    # Check if microservices are running
+    face_service_status = microservice_client.check_face_service_health()
+    text_service_status = microservice_client.check_text_service_health()
     
-    goals = load_goals()
-    return render_template('goals.html', goals=goals)
+    return render_template('ai_dashboard.html', 
+                         face_service_available=face_service_status,
+                         text_service_available=text_service_status)
 
-@app.route('/check_goal/<int:goal_index>')
-def check_goal(goal_index):
-    goals = load_goals()
-    today = datetime.today().strftime('%Y-%m-%d')
+# ============================
+# EXPERIMENTAL SECTION ROUTES
+# ============================
+@app.route('/experimental')
+def experimental_home():
+    """Experimental home page for binaural beats and brainwave entrainment"""
+    return render_template('experimental_home.html')
 
-    if goals[goal_index]["last_checked"] != today:
-        goals[goal_index]["last_checked"] = today
-        goals[goal_index]["streak"] += 1
-        save_goals(goals)
+@app.route('/experimental/binaural')
+def binaural_beats():
+    """Binaural beats session page"""
+    return render_template('binaural_beats.html')
 
-    return redirect(url_for('goals'))
+@app.route('/experimental/isochronic')
+def isochronic_beats():
+    """Isochronic tones session page"""
+    return render_template('isochronic_beats.html')
 
-@app.route('/sound-therapy', methods=['GET', 'POST'])
-def sound_therapy():
-    mood = request.form.get('mood') if request.method == 'POST' else None
 
-    mood_to_sound = {
-        "relaxed": {
-            "title": "Sunset Landscape",
-            "file": "Sunset-Landscape(chosic.com).mp3"
-        },
-        "anxious": {
-            "title": "White Petals",
-            "file": "keys-of-moon-white-petals(chosic.com).mp3"
-        },
-        "sad": {
-            "title": "Rainforest Sounds",
-            "file": "Rain-Sound-and-Rainforest(chosic.com).mp3"
-        },
-        "tired": {
-            "title": "Meditation",
-            "file": "meditation.mp3"
-        },
-        "focus": {
-            "title": "Magical Moments",
-            "file": "Magical-Moments-chosic.com_.mp3"
-        }
-    }
+@app.route('/about')
+def about():
+    return render_template('about.html')  
 
-    recommended = mood_to_sound.get(mood, None)
+@app.route('/features')
+def features():
+    return render_template('features.html')
 
-    # All available sounds (for browsing below)
-    all_sounds = list(mood_to_sound.values())
+@app.route('/pricing')
+def pricing():
+    return render_template('pricing.html')
 
-    return render_template('sound_therapy.html', recommended=recommended, all_sounds=all_sounds)
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
 
-def load_posts():
-    if os.path.exists(POSTS_FILE):
-        with open(POSTS_FILE, 'r') as f:
-            return json.load(f)
-    return []
+@app.route('/services')
+def services():
+    return render_template('services.html')
 
-def save_posts(posts):
-    with open(POSTS_FILE, 'w') as f:
-        json.dump(posts, f, indent=4)
+@app.route('/wellness')
+def wellness():
+    return render_template('wellness_tools.html')
 
-@app.route('/community', methods=['GET', 'POST'])
-def community_support():
-    posts = load_posts()
+@app.route('/gaming')
+def gaming():
+    return render_template('gaming.html')
 
-    if request.method == 'POST':
-        username = request.form['username']
-        message = request.form['message']
-        # Very basic AI reply simulation (you can plug in sentiment/local AI later)
-        ai_response = "Thanks for sharing. You're not alone on this journey 🌟"
-
-        posts.insert(0, {
-            'username': username,
-            'message': message,
-            'reply': ai_response
-        })
-
-        save_posts(posts)
-        return redirect(url_for('community_support'))
-
-    return render_template('community_support.html', posts=posts)
-
-# Sample movie list
-movie_data = [
-    {"title": "Inception", "genres": "Action|Sci-Fi|Thriller"},
-    {"title": "The Dark Knight", "genres": "Action|Crime|Drama"},
-    {"title": "Titanic", "genres": "Drama|Romance"},
-    {"title": "The Shawshank Redemption", "genres": "Drama"},
-    {"title": "Avatar", "genres": "Action|Adventure|Fantasy"}
-]
-
-@app.route('/recommend', methods=['GET', 'POST'])
-def home():
-    mood = None
-    recommendations = None
-    
-    if request.method == 'POST':
-        mood = request.form['mood']
-        recommendations = get_movie_recommendations(mood)
-
-    return render_template('recommendations.html', mood=mood, recommendations=recommendations)
-
-def get_movie_recommendations(mood):
-    # Filter movies based on mood, for simplicity we just return all movies here
-    # You can customize this logic to filter movies based on the mood
-    return movie_data
+@app.route('/cookies')
+def cookies():
+    return render_template('cookiepolicy.html')
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -1402,393 +636,541 @@ def book_appointment():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"success": False, "message": "Failed to send email!"}), 500
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+#Emotion based jorunaling and welness tool  [REYA'S IMPLEMENTATION]
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+@app.route("/meditation")
+def meditation():
+    return render_template("meditation.html")
 
-@app.route('/features')
-def features():
-    return render_template('features.html')
+@app.route("/meditation/result", methods=["POST"])
+def meditation_result():
+    feeling = request.form.get("feeling", "").lower()
 
-@app.route('/cookies')
-def cookies():
-    return render_template('cookiepolicy.html')
+    # Find matching script list based on mood keyword
+    for mood, scripts in SCRIPTS.items():
+        if mood in feeling:
+            script = random.choice(scripts)
+            break
+    else:
+        # Default script if mood not found
+        script = f"Let’s take a few moments to be still. You mentioned feeling '{feeling}'. Breathe deeply and allow peace to fill your body."
 
-@app.route('/services')
-def services():
-    return render_template('services.html')
+    quote = random.choice(QUOTES)
 
-@app.route('/pricing')
-def pricing():
-    return render_template('pricing.html')
+    return render_template("meditation_result.html", script=script, quote=quote)
 
-@app.route('/privacy')
-def privacy():
-    return render_template('privacy.html')
+@app.route('/breathing', methods=['GET', 'POST'])
+def breathing():
+    suggestion = None
+    if request.method == 'POST':
+        mood = request.form['mood'].lower()
+        suggestion = suggest_breathing(mood)
+    return render_template('breathing.html', suggestion=suggestion)
 
-@app.route('/wellness')
-def wellness():
-    return render_template('wellness_tools.html')
+@app.route('/journal', methods=['GET', 'POST'])
+def journal():
+    if request.method == 'POST':
+        entry = request.form['entry']
+        sentiment, suggestion = analyze_journal(entry)
+        return render_template('journal.html', sentiment=sentiment, suggestion=suggestion, entry=entry)
+    return render_template('journal.html')
 
-@app.route('/gaming')
-def gaming():
-    return render_template('gaming.html')
+def analyze_journal(text):
+    scores = analyzer.polarity_scores(text)
+    compound = scores['compound']
 
-@app.route('/emotion_history')
-def emotion_history():
-    return render_template('emotion_timeline.html')
+    if compound >= 0.05:
+        sentiment = 'positive'
+    elif compound <= -0.05:
+        sentiment = 'negative'
+    else:
+        sentiment = 'neutral'
 
-@app.route('/mood_transition')
-def mood_transition():
-    return render_template('mood_transition.html')
-
-
-@app.route('/save_favorite', methods=['POST'])
-def save_favorite():
-    data = request.json
-    song = {
-        'title': data['title'],
-        'artist': data['artist'],
-        'link': data['link']
+    suggestions = {
+        "positive": "Keep up the positive energy! 😊",
+        "negative": "Try writing about what made you feel this way. 💬",
+        "neutral": "Explore your thoughts more deeply next time. ✍️"
     }
 
-    # Load current list
-    if os.path.exists('favorites.json'):
-        with open('favorites.json', 'r') as f:
-            favorites = json.load(f)
-    else:
-        favorites = []
+    return sentiment, suggestions.get(sentiment)
 
-    # Avoid duplicates
-    if not any(f['title'] == song['title'] and f['artist'] == song['artist'] for f in favorites):
-        favorites.append(song)
-        with open('favorites.json', 'w') as f:
-            json.dump(favorites, f, indent=4)
-        return jsonify({'status': 'saved'})
-    else:
-        return jsonify({'status': 'duplicate'})
+def load_goals():
+    if not os.path.exists(DATA_FILE):
+        return []
+    with open(DATA_FILE, 'r') as f:
+        return json.load(f)
 
-# Get favorites
-@app.route('/get_favorites')
-def get_favorites():
-    if os.path.exists('favorites.json'):
-        with open('favorites.json', 'r') as f:
-            return jsonify(json.load(f))
-    return jsonify([])
+def save_goals(goals):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(goals, f, indent=4)
 
-@app.route('/get_neutral_songs', methods=['GET'])
-def get_neutral_songs():
-    neutral_songs = [
-        {"track": "On Top Of The World", "artist": "Imagine Dragons", "mood": "Neutral"},
-        {"track": "Counting Stars", "artist": "OneRepublic", "mood": "Neutral"},
-        {"track": "Let Her Go", "artist": "Passenger", "mood": "Neutral"},
-        {"track": "Photograph", "artist": "Ed Sheeran", "mood": "Neutral"},
-        {"track": "Paradise", "artist": "Coldplay", "mood": "Neutral"},
-        {"track": "Stay", "artist": "Zedd & Alessia Cara", "mood": "Neutral"},
-        {"track": "Happier", "artist": "Marshmello & Bastille", "mood": "Neutral"},
-        {"track": "Closer", "artist": "The Chainsmokers & Halsey", "mood": "Neutral"},
-        {"track": "Waves", "artist": "Dean Lewis", "mood": "Neutral"},
-        {"track": "Memories", "artist": "Maroon 5", "mood": "Neutral"}
-    ]
+@app.route('/goals', methods=['GET', 'POST'])
+def goals():
+    if request.method == 'POST':
+        new_goal = request.form.get('goal')
+        if new_goal:
+            goals = load_goals()
+            goals.append({
+                "goal": new_goal,
+                "created": datetime.today().strftime('%Y-%m-%d'),
+                "streak": 0,
+                "last_checked": ""
+            })
+            save_goals(goals)
+            return redirect(url_for('goals'))
     
-    return jsonify({"songs": neutral_songs})
+    goals = load_goals()
+    return render_template('goals.html', goals=goals)
 
+@app.route('/check_goal/<int:goal_index>')
+def check_goal(goal_index):
+    goals = load_goals()
+    today = datetime.today().strftime('%Y-%m-%d')
 
-@app.route('/remove_favorite', methods=['POST'])
-def remove_favorite():
-    data = request.get_json()
-    title = data.get('title')
-    artist = data.get('artist')
-    
-    # Load existing favorites
-    if os.path.exists('favorites.json'):
-        with open('favorites.json', 'r') as f:
-            favorites = json.load(f)
-    else:
-        favorites = []
+    if goals[goal_index]["last_checked"] != today:
+        goals[goal_index]["last_checked"] = today
+        goals[goal_index]["streak"] += 1
+        save_goals(goals)
 
-    # Remove the song
-    updated = [song for song in favorites if not (song['title'] == title and song['artist'] == artist)]
+    return redirect(url_for('goals'))
 
-    with open('favorites.json', 'w') as f:
-        json.dump(updated, f, indent=4)
+@app.route('/sound-therapy', methods=['GET', 'POST'])
+def sound_therapy():
+    mood = request.form.get('mood') if request.method == 'POST' else None
 
-    return jsonify({'success': True})
-
-
-
-def fetch_soundcloud(song, artist):
-    """Try to fetch from SoundCloud"""
-    filename = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
-    output_path = os.path.join(MUSIC_DIR, filename)
-    
-    query = f"scsearch:{artist} - {song}"
-    
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': os.path.join(MUSIC_DIR, os.path.splitext(filename)[0] + '.%(ext)s'),
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
-        'quiet': True,
+    mood_to_sound = {
+        "relaxed": {
+            "title": "Sunset Landscape",
+            "file": "Sunset-Landscape(chosic.com).mp3"
+        },
+        "anxious": {
+            "title": "White Petals",
+            "file": "keys-of-moon-white-petals(chosic.com).mp3"
+        },
+        "sad": {
+            "title": "Rainforest Sounds",
+            "file": "Rain-Sound-and-Rainforest(chosic.com).mp3"
+        },
+        "tired": {
+            "title": "Meditation",
+            "file": "meditation.mp3"
+        },
+        "focus": {
+            "title": "Magical Moments",
+            "file": "Magical-Moments-chosic.com_.mp3"
+        }
     }
+
+    recommended = mood_to_sound.get(mood, None)
+
+    # All available sounds (for browsing below)
+    all_sounds = list(mood_to_sound.values())
+
+    return render_template('sound_therapy.html', recommended=recommended, all_sounds=all_sounds)
+
+def load_posts():
+    if os.path.exists(POSTS_FILE):
+        with open(POSTS_FILE, 'r') as f:
+            return json.load(f)
+    return []
+
+def save_posts(posts):
+    with open(POSTS_FILE, 'w') as f:
+        json.dump(posts, f, indent=4)
+
+
+@app.route('/community', methods=['GET', 'POST'])
+def community_support():
+    posts = load_posts()
+
+    if request.method == 'POST':
+        username = request.form['username']
+        message = request.form['message']
+        # Very basic AI reply simulation (you can plug in sentiment/local AI later)
+        ai_response = "Thanks for sharing. You're not alone on this journey 🌟"
+
+        posts.insert(0, {
+            'username': username,
+            'message': message,
+            'reply': ai_response
+        })
+
+        save_posts(posts)
+        return redirect(url_for('community_support'))
+
+    return render_template('community_support.html', posts=posts)
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+#Emotion based movie recommendation [SNEHA'S IMPLEMENTATION]
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Sample movie list
+movie_data = [
+    {"title": "Inception", "genres": "Action|Sci-Fi|Thriller"},
+    {"title": "The Dark Knight", "genres": "Action|Crime|Drama"},
+    {"title": "Titanic", "genres": "Drama|Romance"},
+    {"title": "The Shawshank Redemption", "genres": "Drama"},
+    {"title": "Avatar", "genres": "Action|Adventure|Fantasy"}
+]
+
+@app.route('/recommend', methods=['GET', 'POST'])
+def home():
+    mood = None
+    recommendations = None
     
+    if request.method == 'POST':
+        mood = request.form['mood']
+        recommendations = get_movie_recommendations(mood)
+
+    return render_template('recommendations.html', mood=mood, recommendations=recommendations)
+
+def get_movie_recommendations(mood):
+    # Filter movies based on mood, for simplicity we just return all movies here
+    # You can customize this logic to filter movies based on the mood
+    return movie_data
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# API Routes - Proxy to microservices
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+@app.route('/api/camera/start', methods=['POST'])
+def api_start_camera():
+    """Proxy camera start to face microservice"""
+    result = microservice_client.start_camera()
+    return jsonify(result)
+
+@app.route('/api/camera/stop', methods=['POST'])
+def api_stop_camera():
+    """Proxy camera stop to face microservice"""
+    result = microservice_client.stop_camera()
+    return jsonify(result)
+
+@app.route('/api/camera/settings', methods=['POST'])
+def api_camera_settings():
+    """🎛️ Update visual settings for camera processing"""
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([query])
+        settings = request.get_json()
+        print(f"🎛️ Updating visual settings: {settings}")
         
-        if os.path.exists(output_path):
-            return output_path
-    except Exception as e:
-        print(f"SoundCloud error: {e}")
-        return None
-    
-def fetch_youtube_playlist_search(song, artist):
-    """Search for the song in popular music playlists"""
-    filename = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
-    output_path = os.path.join(MUSIC_DIR, filename)
-    
-    # Try to find the song in popular playlists
-    playlist_queries = [
-        f"top hits {artist}",
-        f"{artist} essentials",
-        f"best of {artist}"
-    ]
-    
-    for query in playlist_queries:
-        try:
-            ydl_opts = {
-                'quiet': True,
-                'extract_flat': True,
-                'force_generic_extractor': False
-            }
+        # Forward settings to face microservice
+        response = requests.post(f'{microservice_client.face_service_url}/api/settings',
+                               json=settings, timeout=5)
+        
+        if response.status_code == 200:
+            return jsonify({'success': True, 'message': 'Visual settings updated successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to update visual settings'}), 400
             
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                results = ydl.extract_info(f"ytsearch1:{query} playlist", download=False)
+    except Exception as e:
+        print(f"❌ Settings update error: {e}")
+        return jsonify({'success': False, 'message': f'Settings error: {str(e)}'}), 500
+
+# Also add direct API routes that match the microservice endpoints
+@app.route('/api/start_camera', methods=['POST'])
+def api_start_camera_direct():
+    """Direct proxy to microservice start_camera"""
+    result = microservice_client.start_camera()
+    return jsonify(result)
+
+@app.route('/api/stop_camera', methods=['POST'])
+def api_stop_camera_direct():
+    """Direct proxy to microservice stop_camera"""
+    result = microservice_client.stop_camera()
+    return jsonify(result)
+
+@app.route('/api/emotions')
+def api_get_emotions():
+    """Proxy emotion data from face microservice"""
+    result = microservice_client.get_emotions()
+    return jsonify(result)
+
+@app.route('/api/face_status')
+def api_face_status():
+    """Get face service status"""
+    result = microservice_client.get_face_service_status()
+    return jsonify(result)
+
+@app.route('/api/mediapipe/landmarks')
+def api_mediapipe_landmarks():
+    """Proxy MediaPipe landmarks from face microservice"""
+    try:
+        response = requests.get(f'{FACE_MICROSERVICE_URL}/api/mediapipe/landmarks', timeout=5)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to get landmarks: {str(e)}',
+            'face_landmarks': [],
+            'pose_landmarks': [],
+            'hand_landmarks': [],
+            'gaze_landmarks': {}
+        })
+
+# Text Microservice API Routes
+@app.route('/api/text/analyze', methods=['POST'])
+def api_analyze_text():
+    """Proxy text analysis to text microservice"""
+    data = request.get_json()
+    result = microservice_client.analyze_text(data.get('text'), data.get('is_user', True))
+    return jsonify(result)
+
+@app.route('/api/text/chat', methods=['POST'])
+def api_chat():
+    """Proxy chat to text microservice"""
+    data = request.get_json()
+    # Forward Authorization header if present
+    auth_header = request.headers.get('Authorization')
+    # Forward session_id if present
+    session_id = data.get('session_id')
+    result = microservice_client.chat_with_bot(data.get('message'), auth_header, session_id)
+    return jsonify(result)
+
+@app.route('/api/text/conversation')
+def api_text_conversation():
+    """Get conversation history from text microservice"""
+    result = microservice_client.get_text_conversation()
+    return jsonify(result)
+
+@app.route('/api/text_status')
+def api_text_status():
+    """Get text service status"""
+    result = microservice_client.get_text_service_status()
+    return jsonify(result)
+
+# 🎓 User Learning API Endpoints
+@app.route('/api/user_feedback', methods=['POST'])
+def api_user_feedback():
+    """🎓 Proxy user feedback to text microservice for learning"""
+    try:
+        data = request.get_json()
+        response = requests.post(f'{microservice_client.text_service_url}/api/user_feedback',
+                               json=data, timeout=10)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'User feedback error: {str(e)}'
+        }), 500
+
+@app.route('/api/learning_analytics')
+def api_learning_analytics():
+    """🎓 Get user learning analytics from text microservice"""
+    try:
+        user_id = request.args.get('user_id', 'default')
+        response = requests.get(f'{microservice_client.text_service_url}/api/learning_analytics',
+                              params={'user_id': user_id}, timeout=5)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Learning analytics error: {str(e)}'
+        }), 500
+
+@app.route('/api/emotion_suggestions')
+def api_emotion_suggestions():
+    """🎓 Get personalized emotion suggestions from text microservice"""
+    try:
+        text = request.args.get('text')
+        predicted_emotion = request.args.get('predicted_emotion')
+        user_id = request.args.get('user_id', 'default')
+        
+        response = requests.get(f'{microservice_client.text_service_url}/api/emotion_suggestions',
+                              params={
+                                  'text': text,
+                                  'predicted_emotion': predicted_emotion,
+                                  'user_id': user_id
+                              }, timeout=5)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Emotion suggestions error: {str(e)}'
+        }), 500
+
+@app.route('/api/combined_emotions')
+def api_combined_emotions():
+    """Get combined emotions from both face and text analysis"""
+    print(f"\n🔗 API CALL: /api/combined_emotions")
+    result = microservice_client.get_combined_emotions()
+    print(f"🔗 API RESULT: {result}")
+    return jsonify(result)
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# 🎵 EMOTION-BASED MUSIC RECOMMENDATION API
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+@app.route('/api/music/recommendations')
+def api_music_recommendations():
+    """🎵 Get emotion-based music recommendations for the carousel (100 songs for scrolling)"""
+    try:
+        session_id = request.args.get('session_id', 'default')
+        limit = int(request.args.get('limit', 100))  # Default 100 for carousel
+        minutes_back = int(request.args.get('minutes_back', 10))
+        strategy = request.args.get('strategy', 'adaptive')
+        
+        # Import and use the unified emotion music system
+        try:
+            import sys
+            sys.path.append('enhancements/src-new/multimodal_fusion')
+            from unified_emotion_music_system import get_emotion_and_music
+            print(f"🎵 Generating new music recommendations for {session_id}")
+            result = get_emotion_and_music(session_id, minutes_back, strategy, limit)
+            
+            # 🚀 Get current emotion for cache key
+            current_emotion = "unknown"
+            if result and result.get('combined_emotion'):
+                current_emotion = result['combined_emotion'].get('dominant_emotion', 'unknown')
+            
+            # Check cache with emotion-aware key
+            cache_key = f"{session_id}_{minutes_back}_{strategy}_{limit}_{current_emotion}"
+            current_time = datetime.now()
+            
+            if cache_key in music_recommendation_cache:
+                cached_data, cached_time = music_recommendation_cache[cache_key]
+                if (current_time - cached_time).total_seconds() < MUSIC_CACHE_DURATION:
+                    print(f"💾 Using cached music recommendations for {current_emotion} (cached {(current_time - cached_time).total_seconds():.0f}s ago)")
+                    return jsonify(cached_data)
+            
+            if result:
+                recommendations = result.get('music_recommendations', [])
                 
-                if not results or not results.get('entries'):
-                    continue
-                    
-                playlist_url = results['entries'][0].get('url')
-                if not playlist_url:
-                    continue
+                # Format for API response - ensure we have all the fields the frontend needs
+                formatted_recommendations = []
+                for track in recommendations:
+                    formatted_track = {
+                        # Essential display info
+                        'track_name': track.get('track_name', 'Unknown Track'),
+                        'artist_name': track.get('artist_name', 'Unknown Artist'),
+                        'album': track.get('album', 'Unknown Album'),
+                        
+                        # Metadata for UI
+                        'track_popularity': track.get('track_popularity', 50),
+                        'artist_popularity': track.get('artist_popularity', 50),
+                        'emotion_target': track.get('emotion_target', 'neutral'),
+                        'therapeutic_benefit': track.get('therapeutic_benefit', 'General Wellness'),
+                        'musical_features': track.get('musical_features', 'Balanced'),
+                        
+                        # Audio features for advanced UI (if needed)
+                        'audio_features': track.get('audio_features', {}),
+                        
+                        # Multi-emotion metadata
+                        'emotion_source': track.get('emotion_source', 'single'),
+                        'emotion_weight': track.get('emotion_weight', 1.0),
+                        'source_emotion': track.get('source_emotion', result.get('emotion')),
+                        'confidence_score': track.get('confidence_score', 0.5),
+                        'recommendation_reason': track.get('recommendation_reason', 'Emotion-based match')
+                    }
+                    formatted_recommendations.append(formatted_track)
                 
-                # Now get the playlist contents
-                playlist_opts = {
-                    'quiet': True,
-                    'extract_flat': True,
-                    'ignoreerrors': True,
+                api_result = {
+                    'success': True,
+                    'emotion': {
+                        'dominant': result.get('emotion'),
+                        'confidence': result.get('confidence'),
+                        'is_multi_emotion': result.get('is_multi_emotion', False),
+                        'top_emotions': result.get('top_emotions', []),
+                        'fusion_weights': result.get('fusion_weights', {})
+                    },
+                    'recommendations': formatted_recommendations,
+                    'metadata': {
+                        'total_songs': len(formatted_recommendations),
+                        'dataset_size': '3212',  # Your real dataset size
+                        'session_id': session_id,
+                        'processing_time_ms': result.get('processing_time_ms', 0),
+                        'timestamp': result.get('timestamp'),
+                        'update_interval': 30  # Tell frontend to update every 30 seconds
+                    }
                 }
                 
-                with yt_dlp.YoutubeDL(playlist_opts) as ydl_playlist:
-                    playlist_results = ydl_playlist.extract_info(playlist_url, download=False)
-                    
-                    if not playlist_results or not playlist_results.get('entries'):
-                        continue
-                    
-                    # Look for our song in the playlist
-                    song_lower = song.lower()
-                    for entry in playlist_results['entries']:
-                        if not entry:
-                            continue
-                            
-                        entry_title = entry.get('title', '').lower()
-                        if song_lower in entry_title:
-                            # Found the song! Download it
-                            song_url = entry.get('url')
-                            if not song_url:
-                                continue
-                                
-                            if not song_url.startswith('http'):
-                                song_url = f"https://www.youtube.com/watch?v={song_url}"
-                            
-                            download_opts = {
-                                'format': 'bestaudio/best',
-                                'outtmpl': os.path.join(MUSIC_DIR, os.path.splitext(filename)[0]),
-                                'postprocessors': [{
-                                    'key': 'FFmpegExtractAudio',
-                                    'preferredcodec': 'mp3',
-                                    'preferredquality': '192',
-                                }],
-                                'quiet': True,
-                            }
-                            
-                            with yt_dlp.YoutubeDL(download_opts) as ydl_download:
-                                ydl_download.download([song_url])
-                                
-                            if os.path.exists(output_path):
-                                return output_path
-        except Exception as e:
-            print(f"Playlist search error: {e}")
-            continue
-    
-    return None
-
-
-
-
-
-def filter_music_videos(videos, song, artist):
-    """Filter videos to prioritize official music content"""
-    if not videos:
-        return []
-    
-    scored_videos = []
-    song_lower = song.lower()
-    artist_lower = artist.lower()
-    
-    for video in videos:
-        if not video:
-            continue
-            
-        title = video.get('title', '').lower()
-        channel = video.get('channel', '').lower()
-        
-        score = 0
-        
-        # Check if it's a music video
-        if song_lower in title and artist_lower in title:
-            score += 10
-        elif song_lower in title:
-            score += 5
-        
-        # Prefer official artist channels
-        if artist_lower in channel:
-            score += 8
-        
-        # Prefer videos with "official" or "audio" in the title
-        if "official" in title:
-            score += 5
-        if "audio" in title:
-            score += 3
-            
-        # Avoid instrumental or cover versions
-        if "instrumental" in title or "karaoke" in title:
-            score -= 10
-        if "cover" in title and artist_lower not in title:
-            score -= 5
-        if 'trailer' in title or 'teaser' in title or 'preview' in title:
-            continue
-
-        # Prefer videos with appropriate duration (3-8 minutes typically)
-        duration = video.get('duration')
-        if not duration or duration < 60:  # Less than 1 min
-            continue  # skip short/incomplete videos
-
-            
-        if score > 0:
-            scored_videos.append((video, score))
-    
-    # Sort by score
-    scored_videos.sort(key=lambda x: x[1], reverse=True)
-    return [v[0] for v in scored_videos]
-
-
-def get_youtube_info(query, max_results=5):
-    """Get info about YouTube videos without downloading"""
-    ydl_opts = {
-        'quiet': True,
-        'extract_flat': False,
-        'force_generic_extractor': False,
-        'ignoreerrors': True,
-        'verbose': True,
-        'no_warnings': False,
-        'noplaylist': True
-    }
-    
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            results = ydl.extract_info(f"ytsearch{max_results}:{query}", download=False)
-            return results.get('entries', [])
-    except Exception as e:
-        print(f"YouTube search error: {e}")
-        return []
-
-
-
-def fetch_youtube_smart(song, artist):
-    """Enhanced YouTube downloader with smarter search and filtering"""
-    filename = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
-    output_path = os.path.join(MUSIC_DIR, filename)
-    
-    # Generate multiple search queries
-    queries = [
-        f"{artist} - {song} official audio",
-        f"{artist} - {song} official",
-        f"{artist} {song} official audio",
-        f"{song} by {artist} audio"
-    ]
-    
-    for query in queries:
-        # First get video info for better filtering
-        videos = get_youtube_info(query)
-        filtered_videos = filter_music_videos(videos, song, artist)
-        
-        if not filtered_videos:
-            continue
-            
-        # Get the best video URL
-        video_url = filtered_videos[0].get('url') or filtered_videos[0].get('id')
-        if not video_url:
-            continue
-            
-        if not video_url.startswith('http'):
-            video_url = f"https://www.youtube.com/watch?v={video_url}"
-        
-        # Download the best match
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'outtmpl': os.path.join(MUSIC_DIR, os.path.splitext(filename)[0]),
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }],
-            'quiet': True,
-        }
-        
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([video_url])
-            
-            if os.path.exists(output_path):
-                return output_path
-        except Exception as e:
-            print(f"Download error: {e}")
-            continue
-    
-    return None
-
-def fetch_with_retries(song, artist, max_retries=3):
-    """Try multiple methods with retries and backoff"""
-    methods = [
-        fetch_youtube_smart,
-        fetch_soundcloud,
-        fetch_youtube_playlist_search
-    ]
-    
-    for method in methods:
-        for attempt in range(max_retries):
-            try:
-                result = method(song, artist)
-                if result:
-                    return result
+                # 🚀 Cache the successful result
+                music_recommendation_cache[cache_key] = (api_result, current_time)
+                print(f"💾 Music recommendations cached for {MUSIC_CACHE_DURATION}s")
                 
-                # Add a small delay between retries
-                time.sleep(1 + random.random())
-            except Exception as e:
-                print(f"Error in {method.__name__}: {e}")
-                continue
+                return jsonify(api_result)
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': 'No emotion detected - please ensure face/text microservices are running',
+                    'recommendations': [],
+                    'metadata': {
+                        'session_id': session_id,
+                        'timestamp': datetime.now().isoformat()
+                    }
+                })
+            
+        except ImportError:
+            return jsonify({
+                'success': False,
+                'error': 'Music recommendation system not available',
+                'recommendations': []
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Music recommendation error: {str(e)}',
+            'recommendations': []
+        }), 500
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+@app.route('/api/video_feed')
+def api_video_feed():
+    """Proxy video feed from face microservice"""
+    try:
+        # Stream video from microservice
+        response = requests.get(f'{FACE_MICROSERVICE_URL}/video_feed', stream=True, timeout=30)
+        return Response(
+            response.iter_content(chunk_size=1024),
+            content_type=response.headers.get('content-type', 'multipart/x-mixed-replace; boundary=frame')
+        )
+    except Exception as e:
+        return jsonify({'error': f'Video feed error: {str(e)}'}), 500
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Health check endpoint
+@app.route('/health')
+def health_check():
+    """Health check endpoint for monitoring"""
+    face_service_health = microservice_client.check_face_service_health()
+    text_service_health = microservice_client.check_text_service_health()
     
-    return None
+    return jsonify({
+        'status': 'healthy',
+        'service': 'Y.M.I.R AI Main App',
+        'version': '1.0.0',
+        'microservices': {
+            'face_emotion_detection': {
+                'url': FACE_MICROSERVICE_URL,
+                'healthy': face_service_health
+            },
+            'text_emotion_analysis': {
+                'url': TEXT_MICROSERVICE_URL,
+                'healthy': text_service_health
+            }
+        }
+    })
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-MUSIC_DIR = os.path.join('static', 'music')
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# ===== MUSIC PLAYER API ENDPOINTS =====
+#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+import re
+import os
+import time
 
-# Ensure music folder exists
-os.makedirs(MUSIC_DIR, exist_ok=True)
-
-@app.route('/get_audio')
-def get_audio():
+@app.route('/api/get_audio')
+def api_get_audio():
+    """Get audio URL for a song using YouTube to MP3 conversion"""
     song = request.args.get('song')
     artist = request.args.get('artist')
     
@@ -1797,274 +1179,292 @@ def get_audio():
             'error': 'Missing song or artist parameter'
         }), 400
     
-    song_file_name = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
-
-    # 1. Check if already downloaded locally
-    local_path = os.path.join(MUSIC_DIR, song_file_name)
-    if os.path.exists(local_path):
-        return jsonify({
-            'audio_link': url_for('static', filename=f'music/{song_file_name}'),
-            'source': 'local'
-        })
-
-    
-    # 3. Fallback to YouTube using the methods from the first document
     try:
-        # Try multiple methods to fetch the song
-        result_path = fetch_with_retries(song, artist, max_retries=2)
-        
-        if result_path and os.path.exists(result_path):
-            filename = os.path.basename(result_path)
+        # Method 1: Try YouTube to MP3 API first
+        audio_url = get_audio_from_youtube_api(song, artist)
+        if audio_url:
             return jsonify({
-                'track': song,
-                'artist': artist,
-                'audio_link': url_for('static', filename=f'music/{filename}'),
-                'source': 'youtube'
+                'success': True,
+                'audio_url': audio_url,
+                'source': 'youtube_api',
+                'song': song,
+                'artist': artist
+            })
+        
+        # Method 2: Try direct YouTube search with yt-dlp
+        audio_url = get_audio_from_youtube_search(song, artist)
+        if audio_url:
+            return jsonify({
+                'success': True,
+                'audio_url': audio_url,
+                'source': 'youtube_search',
+                'song': song,
+                'artist': artist
+            })
+        
+        return jsonify({
+            'success': False,
+            'error': 'Unable to find audio on YouTube',
+            'song': song,
+            'artist': artist
+        }), 404
+        
+    except Exception as e:
+        print(f"❌ Audio fetch error: {e}")
+        return jsonify({
+            'error': f'Failed to fetch audio: {str(e)}'
+        }), 500
+
+def get_audio_from_youtube_api(song, artist):
+    """Get audio using YouTube to MP3 API with real YouTube search"""
+    try:
+        # Search for the song on YouTube
+        search_query = f"{artist} {song} official audio"
+        youtube_url = search_youtube_url_real(search_query)
+        
+        if not youtube_url:
+            return None
+        
+        print(f"🔍 Found YouTube URL: {youtube_url}")
+        
+        # Convert using your Railway API
+        api_url = 'https://yt-mp3-server-production.up.railway.app/api/convert'
+        
+        response = requests.post(api_url, 
+                               json={'url': youtube_url},
+                               headers={'Content-Type': 'application/json'},
+                               timeout=60)  # Increased timeout
+        
+        if response.ok:
+            # Create a blob URL from the response
+            blob_data = response.content
+            
+            # Save temporarily and serve via Flask
+            import tempfile
+            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.mp3')
+            temp_file.write(blob_data)
+            temp_file.close()
+            
+            # Move to static directory for serving
+            import shutil
+            filename = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
+            static_path = os.path.join('static', 'music', filename)
+            os.makedirs(os.path.dirname(static_path), exist_ok=True)
+            shutil.move(temp_file.name, static_path)
+            
+            # Return the Flask URL
+            from flask import url_for
+            return url_for('static', filename=f'music/{filename}', _external=True)
+        
+    except Exception as e:
+        print(f"⚠️ YouTube API error: {e}")
+        
+    return None
+
+def search_youtube_url_real(query):
+    """Search YouTube and return the best video URL using yt-dlp"""
+    try:
+        try:
+            import yt_dlp
+        except ImportError:
+            print("⚠️ yt-dlp not available, using fallback URLs")
+        
+        ydl_opts = {
+            'quiet': True,
+            'extract_flat': False,
+            'ignoreerrors': True,
+            'noplaylist': True,
+            'no_warnings': True,
+            'format': 'bestaudio[ext=m4a]/bestaudio/best[height<=720]/best',  # Optimal format from debug
+            'socket_timeout': 30,
+            'retries': 3,
+            'extractor_args': {
+                'youtube': {
+                    'skip': ['dash']  # Skip DASH formats that cause issues
+                }
+            }
+        }
+        
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            # Search for top 3 results
+            results = ydl.extract_info(f"ytsearch3:{query}", download=False)
+            
+            if results and results.get('entries'):
+                for entry in results['entries']:
+                    if entry and entry.get('id'):
+                        title = entry.get('title', '').lower()
+                        if 'official' in title or 'audio' in title:
+                            return f"https://www.youtube.com/watch?v={entry['id']}"
+                
+                # Fallback to first result
+                first_entry = results['entries'][0]
+                if first_entry and first_entry.get('id'):
+                    return f"https://www.youtube.com/watch?v={first_entry['id']}"
+        
+    except Exception as e:
+        print(f"⚠️ YouTube search error: {e}")
+        
+
+
+
+def get_audio_from_youtube_search(song, artist):
+    """Alternative method using yt-dlp direct download"""
+    try:
+        try:
+            import yt_dlp
+        except ImportError:
+            return None
+        
+        filename = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
+        output_path = os.path.join('static', 'music', filename)
+        
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        
+        queries = [
+            f"{artist} - {song} official audio",
+            f"{artist} {song} official",
+            f"{song} by {artist} audio"
+        ]
+        
+        for query in queries:
+            try:
+                ydl_opts = {
+                    'format': 'bestaudio[ext=m4a]/bestaudio/best[height<=720]/best',
+                    'outtmpl': os.path.splitext(output_path)[0],
+                    'postprocessors': [{
+                        'key': 'FFmpegExtractAudio',
+                        'preferredcodec': 'mp3',
+                        'preferredquality': '128',
+                    }],
+                    'quiet': True,
+                    'ignoreerrors': True,
+                    'no_warnings': True,
+                    'retries': 3,
+                    'socket_timeout': 30,
+                    'extractor_args': {
+                        'youtube': {
+                            'skip': ['dash']
+                        }
+                    }
+                }
+                
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([f"ytsearch1:{query}"])
+                
+                if os.path.exists(output_path):
+                    from flask import url_for
+                    return url_for('static', filename=f'music/{filename}', _external=True)
+                    
+            except Exception as e:
+                print(f"⚠️ Query '{query}' failed: {e}")
+                continue
+        
+    except Exception as e:
+        print(f"⚠️ YouTube search download error: {e}")
+        
+    return None
+
+def clean_filename(filename):
+    """Clean filename for filesystem compatibility"""
+    return re.sub(r'[<>:"/\\|?*]', '_', filename)
+
+@app.route('/api/check_local_music')
+def api_check_local_music():
+    """Check if a song is already cached locally"""
+    song = request.args.get('song')
+    artist = request.args.get('artist')
+    
+    if not song or not artist:
+        return jsonify({'error': 'Missing parameters'}), 400
+    
+    try:
+        filename = f"{clean_filename(artist)}_{clean_filename(song)}.mp3"
+        local_path = os.path.join('static', 'music', filename)
+        
+        if os.path.exists(local_path):
+            from flask import url_for
+            return jsonify({
+                'success': True,
+                'cached': True,
+                'audio_url': url_for('static', filename=f'music/{filename}', _external=True),
+                'source': 'local_cache'
             })
         else:
             return jsonify({
-                'error': 'Failed to fetch audio from all sources'
-            }), 404
+                'success': True,
+                'cached': False
+            })
+            
     except Exception as e:
-        print(f"YouTube fetch error: {e}")
-        return jsonify({
-            'error': f'Error fetching audio: {str(e)}'
-        }), 500
+        return jsonify({'error': str(e)}), 500
 
-
-
-# Flask Route: Get Emotions
-@app.route('/get_emotions', methods=['GET'])
-def get_emotions():
-    with emotion_data["lock"]:
-        return jsonify({
-            "faces": emotion_data.get("faces", {}),
-            "average_emotions": emotion_data.get("average_emotions", {})
-        })
-
-
-# Flask Route: Get Logs
-@app.route('/get_logs')
-def get_logs():
-    return jsonify(list(emotion_log))
-
-# Flask Route: Video Feed
-@app.route('/video_feed')
-def video_feed():
-    """Starts the video feed and reinitializes the camera if necessary."""
-    global cap
-
-    if cap is None or not cap.isOpened():
-        print("🔄 Restarting camera...")
-        cap = cv2.VideoCapture(0)  # Restart camera
-
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-########################################################################### 📸 CAMERA CONTROL ROUTES ############################################################################## 
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-running = True  # To control video streaming
-
-
-# @app.route('/toggle_camera', methods=['POST'])
-# def toggle_camera():
-#     """Pauses or resumes the camera feed based on user activity."""
-#     global cap
-#     action = request.json.get("action")  # Expecting 'pause' or 'resume'
-
-#     try:
-#         if action == "pause":
-#             if cap is not None and cap.isOpened():
-#                 print("⏸️ Camera paused.")
-#             return jsonify({"status": "Camera paused"}), 200
-
-#         elif action == "resume":
-#             if cap is None or not cap.isOpened():
-#                 cap = cv2.VideoCapture(0)  # Restart if needed
-#             print("▶️ Camera resumed.")
-#             return jsonify({"status": "Camera resumed"}), 200
-
-#         else:
-#             return jsonify({"error": "Invalid action"}), 400
-
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
-###🛑 CLEANUP AND EXIT ###
-
-def cleanup():
-    """Stops the camera, saves emotions, and releases resources on exit."""
-    global cap, running
-    try:
-        running = False  # Stop video stream loop
-
-        if cap is not None and cap.isOpened():
-            cap.release()  # Release webcam
-            cap = None  # Ensure it's fully removed
-            print("🎥 Camera released successfully.")
-
-        cv2.destroyAllWindows()
-        print("✅ Cleanup complete: Camera released, and emotions saved.")
-
-    except Exception as e:
-        print(f"❌ Error during cleanup: {e}")
-
-# Ensure cleanup runs when Flask stops
-atexit.register(cleanup)  # Runs cleanup when Flask app stops
-
-@app.route('/exit', methods=['POST'])
-def stop_server():
-    """Stops Flask when the user closes the tab."""
-    print("🛑 Received exit request. Shutting down server...")
-    cleanup()  # Perform cleanup action
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+@app.route('/api/get_album_art')
+def api_get_album_art():
+    """Get album art for a song using iTunes API"""
+    song = request.args.get('song')
+    artist = request.args.get('artist')
     
-
-@app.route('/emotion_timeline', methods=['GET'])
-def emotion_timeline():
-    """Returns emotion data over time for visualization"""
+    if not song or not artist:
+        return jsonify({'error': 'Missing parameters'}), 400
+    
     try:
-        # Get saved emotion records from the log
-        timeline_data = list(emotion_log)
+        # Try iTunes API (free)
+        search_term = f"{artist} {song}".replace(' ', '+')
+        itunes_url = f"https://itunes.apple.com/search?term={search_term}&media=music&limit=1"
         
-        # If we have chat data, add that too
-        if os.path.exists("chat_results.json"):
-            with open("chat_results.json", "r") as f:
-                chat_data = json.load(f)
-                if "emotion_scores" in chat_data:
-                    # Add timestamps to chat emotions
-                    chat_emotions = {
-                        "timestamp": chat_data["timestamp"],
-                        "emotions": chat_data["emotion_scores"]
-                    }
-                    timeline_data.append(chat_emotions)
+        response = requests.get(itunes_url, timeout=10)
+        if response.ok:
+            data = response.json()
+            if data.get('results') and len(data['results']) > 0:
+                # Get the largest artwork available
+                artwork_url = data['results'][0].get('artworkUrl100', '')
+                if artwork_url:
+                    # Upgrade to higher resolution
+                    artwork_url = artwork_url.replace('100x100', '500x500')
+                    return jsonify({
+                        'success': True,
+                        'image_url': artwork_url,
+                        'source': 'itunes',
+                        'song': song,
+                        'artist': artist
+                    })
         
-        return jsonify({"timeline": timeline_data})
+        # Fallback to placeholder
+        return jsonify({
+            'success': True,
+            'image_url': 'https://via.placeholder.com/400x400/6A5ACD/FFFFFF/png?text=🎵',
+            'source': 'placeholder',
+            'song': song,
+            'artist': artist
+        })
+        
     except Exception as e:
-        print(f"Error generating emotion timeline: {str(e)}")
-        return jsonify({"error": "Failed to generate emotion timeline"}), 500
-
-
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-@app.route('/chat', methods=['POST'])
-def chat():
-    """Handles chatbot interaction and continuously updates detected emotions."""
-    user_input = request.json.get("message", "").strip()
-    if not user_input:
-        return jsonify({"error": "No message provided."}), 400
-
-    chatbot_response = generate_chatbot_response(user_input)
-
-    # Log conversation
-    chat_session.append({"user": user_input, "chatbot": chatbot_response})
-
-    # Continuously detect dominant emotion
-    dominant_emotion, emotion_scores, model_emotions = detect_conversation_emotions(chat_session)
-
-    response_data = {
-        "response": chatbot_response,
-        "dominant_emotion": dominant_emotion,  # Always update detected emotion
-        "model_emotions": model_emotions
-    }
-
-    # Save chat results **after every message**
-    save_chat_results()
-
-    # If the user is ending the conversation
-    if user_input.lower() in ["quit", "bye", "exit", "goodbye", "end"]:
-        response_data["end_chat"] = True  # Notify frontend to stop input
-
-    return jsonify(response_data)
-
-@app.route('/detect_emotion', methods=['GET'])
-def detect_emotion():
-    """Detects the dominant emotion from the chat session (for real-time updates)."""
-    if not chat_session:
-        return jsonify({"dominant_emotion": "neutral", "model_emotions": []})  # Default if empty chat
-
-    dominant_emotion, emotion_scores, model_emotions = detect_conversation_emotions(chat_session)
-    return jsonify({"dominant_emotion": dominant_emotion, "model_emotions": model_emotions})
-
-@app.route('/save_chat', methods=['POST'])
-def save_chat():
-    """Saves chat conversation and detected emotion."""
-    if not chat_session:
-        return jsonify({"error": "No chat data to save."}), 400
-
-    save_chat_results()  # Save after every message
-    return jsonify({"message": "Chat saved successfully."})
-
-def save_chat_results():
-    """Saves chatbot results (full conversation + updated emotions) to `chat_results.json`."""
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    dominant_emotion, emotion_scores, model_emotions = detect_conversation_emotions(chat_session)
-
-    chat_data = {
-        "timestamp": timestamp,
-        "conversation": chat_session,
-        "dominant_emotion": dominant_emotion,
-        "emotion_scores": emotion_scores,
-        "model_emotions": model_emotions
-    }
-
-    with open("chat_results.json", "w") as f:
-        json.dump(chat_data, f, indent=4)
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-
-
-
-
-
-#════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-@app.route('/process_results', methods=['GET', 'POST'])
-def process_results():
-    try:
-        # Calculate final averaged emotions
-        final_emotions = calculate_final_emotions()
-        
-        # Check for errors in emotion calculationk
-        if not isinstance(final_emotions, dict):
-            return jsonify({"error": "Emotion processing failed, invalid data received."}), 500
-        
-        if "error" in final_emotions:
-            return jsonify({"error": final_emotions["error"]}), 400
-
-        # Fetch recommended songs
-        songs = recommend_songs("final_average_emotions.json")
-
-        # Ensure songs is a list
-        if not isinstance(songs, list):
-            songs = []  # Fallback to empty list if invalid
-
-        # Log response for debugging
-        # print("✅ Processed Emotions:", final_emotions)
-        # print("✅ Recommended Songs:", songs)
-
-        return jsonify({"final_emotions": final_emotions, "recommended_songs": songs})
-
-    except Exception as e:
-        print(f"❌ Error in /process_results: {str(e)}")
-        return jsonify({"error": "An unexpected error occurred while processing results."}), 500
+        return jsonify({'error': str(e)}), 500
 
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
 
-
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Add Firebase Authentication routes
+if FIREBASE_AUTH_AVAILABLE:
+    add_auth_routes(app)
+    print("✅ Firebase Authentication routes added")
+
 if __name__ == '__main__':
-    # Start background processing thread
-    background_thread = threading.Thread(target=update_all_in_background, daemon=True)
-    background_thread.start()
-    try:
-        app.run(debug=True, host='127.0.0.1', port=10000)
-
-    except KeyboardInterrupt:
-        print("\n🔴 Server stopped manually.")
+    print("🚀 Starting Y.M.I.R AI Emotion Detection System...")
+    print("📍 Home page: http://localhost:5000")
+    print("🔧 AI App: http://localhost:5000/ai_app")
+    
+    if FIREBASE_AUTH_AVAILABLE:
+        print("🔐 Authentication: Firebase Auth enabled")
+    else:
+        print("⚠️ Authentication: Running without Firebase Auth")
+    
+    # 🚀 PRODUCTION MODE: Disable debug to prevent auto-restart crashes
+    app.run(
+        debug=False,
+        host='localhost',
+        port=5000,
+        threaded=True
+    )
 #════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-
-        
-

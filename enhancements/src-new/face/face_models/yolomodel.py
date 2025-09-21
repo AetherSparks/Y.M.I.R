@@ -11,6 +11,8 @@ from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
 from collections import defaultdict
 import time
+import sys
+import os
 
 # YOLO imports
 try:
@@ -20,6 +22,57 @@ try:
 except ImportError:
     YOLO_AVAILABLE = False
     print("⚠️ YOLO not available - install: pip install ultralytics")
+
+# Gemini API for intelligent environment classification
+try:
+    # Load environment variables first
+    try:
+        from dotenv import load_dotenv
+        import sys
+        import os
+        
+        # Get the root project directory and load .env
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.abspath(os.path.join(current_dir, '../../../../'))
+        env_file = os.path.join(project_root, '.env')
+        
+        if os.path.exists(env_file):
+            load_dotenv(env_file)
+            print(f"📁 Loaded environment variables from {env_file}")
+        else:
+            load_dotenv()  # Try default .env loading
+            print("📁 Loaded environment variables")
+            
+    except ImportError:
+        print("⚠️ python-dotenv not available, trying without .env loading")
+    
+    # Add project root to path
+    if project_root not in sys.path:
+        sys.path.insert(0, project_root)
+    
+    # Try importing Gemini manager
+    from gemini_api_manager import GeminiAPIManager
+    GEMINI_AVAILABLE = True
+    print("✅ Gemini available for intelligent environment classification")
+    
+except ImportError as e:
+    print(f"⚠️ Gemini import failed: {e}")
+    # Try alternative import path
+    try:
+        current_file = os.path.abspath(__file__)
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_file)))))
+        sys.path.insert(0, root_dir)
+        from gemini_api_manager import GeminiAPIManager
+        GEMINI_AVAILABLE = True
+        print("✅ Gemini available for intelligent environment classification (alternative path)")
+    except ImportError as e2:
+        print(f"⚠️ Gemini not available after trying multiple paths: {e2}")
+        GEMINI_AVAILABLE = False
+        print("🔄 Using fallback environment classification")
+        
+except Exception as e:
+    print(f"⚠️ Gemini initialization error: {e}")
+    GEMINI_AVAILABLE = False
 
 @dataclass
 class YOLOConfig:
@@ -87,7 +140,8 @@ class EmotionContextAnalyzer:
         }
     
     def analyze_emotion_context(self, objects: List[Dict[str, Any]]) -> Dict[str, float]:
-        """Analyze environmental context and return emotion modifiers"""
+        """🚫 DISABLED: Old rule-based system replaced by TRUE ML"""
+        # Return neutral modifiers - TRUE ML system handles all context analysis
         context_modifiers = {
             'happiness': 1.0,
             'sadness': 1.0,
@@ -97,6 +151,9 @@ class EmotionContextAnalyzer:
             'disgust': 1.0,
             'neutral': 1.0
         }
+        
+        # Skip all rule-based logic - TRUE ML system is active
+        return context_modifiers
         
         if not objects:
             return context_modifiers
@@ -242,6 +299,18 @@ class EnhancedYOLOProcessor:
         
         # Initialize emotion context analyzer
         self.emotion_analyzer = EmotionContextAnalyzer()
+        
+        # Initialize Gemini for intelligent environment analysis
+        self.gemini_manager = None
+        self.last_gemini_call = 0  # Rate limiting for Gemini API
+        self.gemini_cache = {}     # Cache environment classifications
+        if GEMINI_AVAILABLE:
+            try:
+                self.gemini_manager = GeminiAPIManager()
+                print("🧠 Gemini environment classifier ready")
+            except Exception as e:
+                print(f"⚠️ Gemini initialization failed: {e}")
+                self.gemini_manager = None
         
         # Object tracking
         self.tracked_objects = {}
@@ -428,9 +497,14 @@ class EnhancedYOLOProcessor:
             # Limit to most relevant objects for performance
             objects = objects[:20]
             
-            # Analyze emotion context if enabled
+            # 🧠 SMART ENVIRONMENT CLASSIFICATION (data-driven, not rule-based)
             if self.config.emotion_context_enabled:
-                emotion_context = self.emotion_analyzer.get_environment_summary(objects)
+                environment_type = self._classify_environment_smart(objects)
+                emotion_context = {
+                    'type': environment_type,
+                    'ml_enhanced': True,
+                    'confidence': self._calculate_environment_confidence(objects)
+                }
                 emotion_context['detection_info'] = {
                     'model': self.yolo_model_name,
                     'objects_detected': len(objects),
@@ -449,6 +523,139 @@ class EnhancedYOLOProcessor:
             print(f"⚠️ Enhanced YOLO detection error: {e}")
         
         return objects, emotion_context
+    
+    def _classify_environment_smart(self, objects: List[Dict]) -> str:
+        """🧠 Gemini-powered intelligent environment classification"""
+        if not objects:
+            return "empty_space"
+        
+        # Use Gemini for intelligent analysis if available
+        if self.gemini_manager:
+            return self._classify_environment_with_gemini(objects)
+        else:
+            # Fallback to simple object-based classification
+            return self._classify_environment_fallback(objects)
+    
+    def _classify_environment_with_gemini(self, objects: List[Dict]) -> str:
+        """🧠 Use Gemini AI to intelligently classify the environment (with rate limiting)"""
+        try:
+            # Prepare object data for Gemini
+            object_list = []
+            for obj in objects[:10]:  # Limit to top 10 objects for efficiency
+                confidence = obj.get('confidence', 0.0)
+                class_name = obj.get('class', 'unknown')
+                object_list.append(f"{class_name} (confidence: {confidence:.2f})")
+            
+            objects_text = ", ".join(object_list)
+            
+            # 🛡️ RATE LIMITING: Only call Gemini every 2 minutes to preserve API quota
+            current_time = time.time()
+            if current_time - self.last_gemini_call < 120:  # 2 minutes
+                # Check cache for similar object combinations
+                cache_key = "_".join(sorted([obj.get('class', '') for obj in objects[:5]]))
+                if cache_key in self.gemini_cache:
+                    cached_result = self.gemini_cache[cache_key]
+                    print(f"🔄 Using cached environment classification: {cached_result}")
+                    return cached_result
+                else:
+                    # Return fallback without using API quota
+                    fallback = self._classify_environment_fallback(objects)
+                    print(f"⏰ Rate limited - using fallback: {fallback}")
+                    return fallback
+            
+            self.last_gemini_call = current_time
+            
+            prompt = f"""Analyze these detected objects and classify the environment type in 1-3 words:
+
+Objects detected: {objects_text}
+
+Based on these objects, what type of environment/setting is this? Choose the most accurate description from these categories or suggest a better one:
+
+- home_living_room
+- home_bedroom  
+- home_kitchen
+- home_office
+- work_office
+- outdoor_street
+- outdoor_park
+- restaurant_cafe
+- social_gathering
+- tech_workspace
+- creative_studio
+- fitness_gym
+- academic_classroom
+- medical_facility
+- retail_store
+- personal_space
+- busy_public_area
+- quiet_private_space
+
+Respond with just the environment type (no explanation):"""
+
+            # Get Gemini response using the model
+            model = self.gemini_manager.create_model()
+            response = model.generate_content(prompt)
+            response_text = response.text if hasattr(response, 'text') else str(response)
+            
+            if response_text and len(response_text.strip()) > 0:
+                # Clean and validate response
+                environment = response_text.strip().lower().replace(' ', '_')
+                # Remove any extra text, keep only the classification
+                environment = environment.split('\n')[0].split('.')[0].split(',')[0]
+                
+                print(f"🧠 Gemini classified environment: {environment}")
+                
+                # Cache the result for similar object combinations
+                cache_key = "_".join(sorted([obj.get('class', '') for obj in objects[:5]]))
+                self.gemini_cache[cache_key] = environment
+                
+                return environment
+            else:
+                print("⚠️ Gemini returned empty response, using fallback")
+                return self._classify_environment_fallback(objects)
+                
+        except Exception as e:
+            print(f"⚠️ Gemini environment classification error: {e}")
+            return self._classify_environment_fallback(objects)
+    
+    def _classify_environment_fallback(self, objects: List[Dict]) -> str:
+        """Simple fallback classification when Gemini is unavailable"""
+        object_names = [obj.get('class', '').lower() for obj in objects]
+        
+        # Simple pattern matching as fallback
+        if 'person' in object_names:
+            if any(obj in object_names for obj in ['dining table', 'wine glass', 'cake']):
+                return "social_dining"
+            elif any(obj in object_names for obj in ['laptop', 'computer', 'book']):
+                return "work_meeting"
+            else:
+                return "personal_space"
+        elif any(obj in object_names for obj in ['laptop', 'computer', 'keyboard']):
+            return "tech_workspace"
+        elif any(obj in object_names for obj in ['car', 'bicycle', 'traffic light']):
+            return "outdoor_transport"
+        elif any(obj in object_names for obj in ['couch', 'tv', 'bed']):
+            return "home_comfort"
+        elif len(objects) >= 5:
+            return "busy_environment"
+        else:
+            return "minimal_space"
+    
+    def _calculate_environment_confidence(self, objects: List[Dict]) -> float:
+        """Calculate confidence in environment classification"""
+        if not objects:
+            return 0.5
+        
+        # More objects = higher confidence up to a point
+        object_count = len(objects)
+        count_confidence = min(1.0, object_count / 5.0)
+        
+        # Higher average confidence in object detection = higher environment confidence
+        avg_detection_confidence = sum(obj.get('confidence', 0.5) for obj in objects) / len(objects)
+        
+        # Combine factors
+        final_confidence = (count_confidence * 0.6) + (avg_detection_confidence * 0.4)
+        return min(0.95, max(0.3, final_confidence))
     
     def _update_object_tracking(self, objects: List[Dict], timestamp: float):
         """Track objects over time for temporal context analysis"""
