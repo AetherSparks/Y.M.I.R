@@ -1,6 +1,8 @@
 import numpy as np
 import soundfile as sf
 import simpleaudio as sa
+import os
+
 
 BRAINWAVE_BANDS = {
     'delta': 3,    # Hz beat frequency
@@ -43,9 +45,18 @@ def generate_binaural_variation(base_freq=200.0, band='alpha', duration=10.0, fs
     stereo = np.vstack([left, right]).T
     stereo /= np.max(np.abs(stereo)) + 1e-12
 
-    filename = f'binaural_{band}_v{version}_{int(left_freq)}Hz.wav'
+
+    # Ensure the folder exists
+    output_folder = 'experimental/binaural_tone'
+    os.makedirs(output_folder, exist_ok=True)
+
+    # Create the full path for the WAV file
+    filename = os.path.join(output_folder, f'binaural_{band}_v{version}_{int(left_freq)}Hz.wav')
+
+    # Write the file
     sf.write(filename, stereo, fs)
     print(f"WAV written to {filename}")
+
 
     # Play (C-contiguous)
     audio_data = np.ascontiguousarray((stereo * 32767).astype(np.int16))

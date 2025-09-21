@@ -1,6 +1,8 @@
 import numpy as np
 import soundfile as sf
 import simpleaudio as sa
+import os
+
 
 BRAINWAVE_BANDS = {
     'delta': 3,
@@ -37,7 +39,12 @@ def generate_variation(base_freq, band, duration=10, fs=44100, version=1):
     stereo = np.vstack([signal, signal]).T
     stereo /= np.max(np.abs(stereo)) + 1e-12
     
-    filename = f'isochronic_{band}_v{version}_{int(carrier)}Hz.wav'
+    # Save to WAV
+    output_folder = 'experimental/isochronic_tone'
+    os.makedirs(output_folder, exist_ok=True)
+    # Create the full path for the WAV file
+    filename = os.path.join(output_folder, f'isochronic_{band}_v{version}_{int(carrier)}Hz.wav')
+    # Write the file
     sf.write(filename, stereo, fs)
     print(f"WAV written to {filename}")
     
