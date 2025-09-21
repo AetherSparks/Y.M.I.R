@@ -444,6 +444,25 @@ def ai_app():
                          face_service_available=face_service_status,
                          text_service_available=text_service_status)
 
+# ============================
+# EXPERIMENTAL SECTION ROUTES
+# ============================
+@app.route('/experimental')
+def experimental_home():
+    """Experimental home page for binaural beats and brainwave entrainment"""
+    return render_template('experimental_home.html')
+
+@app.route('/experimental/binaural')
+def binaural_beats():
+    """Binaural beats session page"""
+    return render_template('binaural_beats.html')
+
+@app.route('/experimental/isochronic')
+def isochronic_beats():
+    """Isochronic tones session page"""
+    return render_template('isochronic_beats.html')
+
+
 @app.route('/about')
 def about():
     return render_template('about.html')  
