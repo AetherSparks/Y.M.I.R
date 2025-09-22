@@ -8,6 +8,7 @@ Provides detailed anatomical feature extraction for emotion analysis.
 import cv2
 import numpy as np
 import mediapipe as mp
+import time
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
 from enum import Enum
@@ -38,6 +39,10 @@ class MediaPipeProcessor:
         self.config = config or MediaPipeConfig()
         self._init_mediapipe_models()
         
+        # Timestamp management for MediaPipe
+        self.last_timestamp_ms = 0
+        self.frame_count = 0
+        
         # Visual settings
         self.colors = {
             "face": (0, 255, 0),
@@ -50,6 +55,17 @@ class MediaPipeProcessor:
         }
         
         print("✅ MediaPipe processor initialized")
+    
+    def _get_next_timestamp_ms(self) -> int:
+        """Generate monotonically increasing timestamps for MediaPipe"""
+        self.frame_count += 1
+        # Generate timestamp that always increases
+        current_ms = int(time.time() * 1000)
+        if current_ms <= self.last_timestamp_ms:
+            # Ensure monotonic increase
+            current_ms = self.last_timestamp_ms + 1
+        self.last_timestamp_ms = current_ms
+        return current_ms
     
     def _init_mediapipe_models(self):
         """Initialize all MediaPipe models"""
@@ -175,13 +191,14 @@ class MediaPipeProcessor:
         
         return faces
     
-    def process_frame(self, frame: np.ndarray) -> Dict[str, Any]:
-        """Process frame with all MediaPipe models"""
+    def process_frame(self, frame: np.ndarray, timestamp_ms: Optional[int] = None) -> Dict[str, Any]:
+        """Process frame with MediaPipe models (timestamp-free for reliability)"""
         try:
             # Convert BGR to RGB for MediaPipe
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             
-            # Process with all models
+            # Process directly with numpy array (no timestamp management)
+            # This eliminates timestamp synchronization errors completely
             face_results = self.face_mesh.process(rgb_frame)
             pose_results = self.pose.process(rgb_frame)
             hand_results = self.hands.process(rgb_frame)

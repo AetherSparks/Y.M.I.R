@@ -741,7 +741,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-size: 32px;
+            font-size: 42px;  /* 🚀 INCREASED: 32px → 42px for bigger title */
             transition: all 0.3s ease;
             font-weight: 800;
             margin: 0 0 15px 0;
@@ -2894,7 +2894,7 @@
         <div class="music-carousel-container fade-in" style="--delay: 0.8s">
             <!-- AI Music Header -->
             <div class="music-carousel-header">
-                <h2 class="ai-music-title" id="musicTitle">AI-Based Recommended Music</h2>
+                <h2 class="ai-music-title" id="musicTitle">Therapeutic Music Recommendations</h2>
                 <div class="music-update-status" id="musicUpdateStatus" style="display: none;"></div>
                 <div class="ai-badge">
                     <div class="ai-icon"></div>
@@ -3320,39 +3320,90 @@
             showLoading(true);
             clearError();
             
-            const result = await apiCall('/api/camera/start', 'POST');
-            
-            if (result.success) {
-                isRunning = true;
-                startBtn.disabled = true;
-                stopBtn.disabled = false;
+            try {
+                console.log('🎥 Starting camera...');
+                const result = await apiCall('/api/camera/start', 'POST');
                 
-                // Start insights tracking
-                startInsightsTracking();
+                if (result.success) {
+                    console.log('✅ Camera start request successful');
+                    
+                    // Wait a moment for camera to initialize
+                    showStatus('Camera initializing...', 'info');
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // Verify camera is actually running
+                    const statusCheck = await apiCall('/api/camera/status', 'GET');
+                    console.log('🔍 Camera status check:', statusCheck);
+                    
+                    if (statusCheck.running) {
+                        isRunning = true;
+                        startBtn.disabled = true;
+                        stopBtn.disabled = false;
+                        
+                        // Start insights tracking
+                        startInsightsTracking();
+                        
+                        // Start video feed with retry logic
+                        await setupVideoFeed();
+                        
+                        // Show video container with overlay
+                        const videoPlaceholder = document.querySelector('.video-placeholder');
+                        const videoStreamContainer = document.getElementById('videoStreamContainer');
+                        
+                        videoPlaceholder.style.display = 'none';
+                        videoStreamContainer.style.display = 'block';
+                        
+                        // Initialize canvas overlay
+                        setupCanvasOverlay();
+                        
+                        // Start emotion updates
+                        startEmotionUpdates();
+                        
+                        showStatus('Camera started successfully!', 'success');
+                    } else {
+                        throw new Error('Camera did not start properly - status check failed');
+                    }
+                } else {
+                    throw new Error(result.error || result.message || 'Unknown camera start error');
+                }
+            } catch (error) {
+                console.error('❌ Camera start error:', error);
+                showError('Failed to start camera: ' + error.message);
                 
-                // Start video feed
-                videoFeed.src = '/api/video_feed?' + new Date().getTime();
-                
-                // Show video container with overlay
-                const videoPlaceholder = document.querySelector('.video-placeholder');
-                const videoStreamContainer = document.getElementById('videoStreamContainer');
-                const overlayCanvas = document.getElementById('overlayCanvas');
-                
-                videoPlaceholder.style.display = 'none';
-                videoStreamContainer.style.display = 'block';
-                
-                // Initialize canvas overlay
-                setupCanvasOverlay();
-                
-                // Start emotion updates
-                startEmotionUpdates();
-                
-                showStatus('Camera started successfully!', 'success');
-            } else {
-                showError('Failed to start camera: ' + (result.error || result.message));
+                // Reset button states
+                isRunning = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
             }
             
             showLoading(false);
+        }
+        
+        // Helper function to setup video feed with retry logic
+        async function setupVideoFeed() {
+            const maxRetries = 3;
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    console.log(`🎥 Setting up video feed (attempt ${i + 1}/${maxRetries})`);
+                    
+                    // Test if video feed is available
+                    const testResponse = await fetch('/api/video_feed', { method: 'HEAD' });
+                    if (testResponse.ok) {
+                        videoFeed.src = '/api/video_feed?' + new Date().getTime();
+                        console.log('✅ Video feed URL set successfully');
+                        return;
+                    } else {
+                        throw new Error(`Video feed not available (status: ${testResponse.status})`);
+                    }
+                } catch (error) {
+                    console.warn(`⚠️ Video feed setup attempt ${i + 1} failed:`, error.message);
+                    if (i < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    } else {
+                        throw new Error('Video feed setup failed after ' + maxRetries + ' attempts');
+                    }
+                }
+            }
         }
         
         async function stopCamera() {
@@ -4393,7 +4444,7 @@
             `;
         }
 
-        async function initializeMusicCarousel() {
+        async function initializeMusicCarousel(forcedEmotion = null, forcedConfidence = null) {
             const musicTrack = document.getElementById('musicTrack');
             
             try {
@@ -4401,49 +4452,54 @@
                 showMusicUpdateIndicator('🔄 Analyzing your emotions...');
                 console.log('🎵 Loading AI-powered therapeutic music recommendations...');
                 
-                // 🧠 STEP 1: Get real session ID and current emotion from combiner
+                // 🧠 STEP 1: Get real session ID and current emotion
                 const sessionId = generateSessionId(); // Generate or get real session ID
                 
-                console.log('🔍 Fetching current emotion from combiner...');
                 let currentEmotion = 'neutral';
                 let emotionConfidence = 0.5;
                 
-                try {
-                    // 🎯 Get the REAL emotion from the existing combiner API
-                    const emotionResponse = await fetch('/api/combined_emotions');
-                    const emotionData = await emotionResponse.json();
-                    
-                    if (emotionData.success && emotionData.combined_emotion) {
-                        currentEmotion = emotionData.combined_emotion.dominant_emotion || 'neutral';
-                        emotionConfidence = emotionData.combined_emotion.confidence || 0.5;
+                // 🎯 FORCED EMOTION: Use provided emotion (from facial detection)
+                if (forcedEmotion) {
+                    currentEmotion = forcedEmotion;
+                    emotionConfidence = forcedConfidence || 0.8; // Default confidence for facial
+                    console.log(`🎭 USING FORCED EMOTION: ${currentEmotion} (confidence: ${emotionConfidence.toFixed(2)}) - likely from facial detection`);
+                } else {
+                    console.log('🔍 Fetching current emotion from combiner...');
+                }
+                
+                // 🎯 ONLY fetch from combiner if we don't have forced emotion
+                if (!forcedEmotion) {
+                    try {
+                        // 🎯 Get the REAL emotion from the existing combiner API
+                        const emotionResponse = await fetch('/api/combined_emotions');
+                        const emotionData = await emotionResponse.json();
                         
-                        console.log(`🎭 REAL EMOTION: ${currentEmotion} (confidence: ${emotionConfidence.toFixed(2)})`);
-                        console.log(`🔀 Combination method: ${emotionData.combined_emotion.combination_method}`);
-                        console.log(`🎭 Multi-emotion: ${emotionData.combined_emotion.is_multi_emotion}`);
-                        
-                        // Store current emotion for tracking changes
-                        window.lastEmotionState = {
-                            emotion: currentEmotion,
-                            confidence: emotionConfidence,
-                            timestamp: Date.now()
-                        };
-                        
-                        // Update AI status with real emotion
-                        const aiStatus = document.getElementById('aiStatus');
-                        if (aiStatus) {
-                            if (emotionData.combined_emotion.is_multi_emotion) {
-                                const topEmotions = emotionData.combined_emotion.top_emotions || [];
-                                const emotionList = topEmotions.map(([emotion, conf]) => `${emotion}(${(conf*100).toFixed(0)}%)`).join(', ');
-                                aiStatus.textContent = `Multi-emotion: ${emotionList} - therapeutic music adapting...`;
-                            } else {
-                                aiStatus.textContent = `Therapeutic music for ${currentEmotion} mood (${(emotionConfidence*100).toFixed(0)}% confidence)`;
-                            }
+                        if (emotionData.success && emotionData.combined_emotion) {
+                            currentEmotion = emotionData.combined_emotion.dominant_emotion || 'neutral';
+                            emotionConfidence = emotionData.combined_emotion.confidence || 0.5;
+                            
+                            console.log(`🎭 REAL EMOTION: ${currentEmotion} (confidence: ${emotionConfidence.toFixed(2)})`);
+                            console.log(`🔀 Combination method: ${emotionData.combined_emotion.combination_method}`);
+                            console.log(`🎭 Multi-emotion: ${emotionData.combined_emotion.is_multi_emotion}`);
+                        } else {
+                            console.log('⚠️ No current emotion data - using neutral fallback');
                         }
-                    } else {
-                        console.log('⚠️ No current emotion data - using neutral fallback');
+                    } catch (emotionError) {
+                        console.log('⚠️ Emotion API error - using neutral fallback:', emotionError);
                     }
-                } catch (emotionError) {
-                    console.log('⚠️ Emotion API error - using neutral fallback:', emotionError);
+                }
+                
+                // Store current emotion for tracking changes
+                window.lastEmotionState = {
+                    emotion: currentEmotion,
+                    confidence: emotionConfidence,
+                    timestamp: Date.now()
+                };
+                
+                // 🎯 Update AI status with current emotion (forced or fetched)
+                const aiStatus = document.getElementById('aiStatus');
+                if (aiStatus) {
+                    aiStatus.textContent = `Therapeutic music for ${currentEmotion} mood (${(emotionConfidence*100).toFixed(0)}% confidence)`;
                 }
                 
                 // 🚀 STEP 2: Call music API with REAL emotion data
@@ -4479,8 +4535,8 @@
                     
                     console.log('🎵 AI Music carousel loaded with', allSongs.length, 'therapeutic recommendations');
                     
-                    // 🎯 VISUAL FEEDBACK: Update title and show completion
-                    updateMusicTitle(`🎭 ${currentEmotion.charAt(0).toUpperCase() + currentEmotion.slice(1)} Music`);
+                    // 🎯 VISUAL FEEDBACK: Keep static title, emotion shown in aiStatus
+                    // updateMusicTitle() removed - title stays "Therapeutic Music Recommendations"
                     flashMusicContainer();
                     setTimeout(() => hideMusicUpdateIndicator(), 3000);
                     
@@ -8134,7 +8190,7 @@ function updateLiveAnalyticsDisplay(analytics, systemData) {
         console.log(`🎵 Triggering music update for facial emotion: ${dominantEmotion}`);
         showMusicUpdateIndicator(`🎭 ${dominantEmotion.charAt(0).toUpperCase() + dominantEmotion.slice(1)} detected via camera!`);
         setTimeout(() => {
-            initializeMusicCarousel();
+            initializeMusicCarousel(dominantEmotion, emotionConfidence);  // 🎯 PASS FACIAL EMOTION DIRECTLY
         }, 500);
     }
     

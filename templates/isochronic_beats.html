@@ -62,95 +62,125 @@
                     <div class="card-primary">
                         <h2 class="text-2xl font-bold mb-6 text-center text-purple-300">Session Controls</h2>
                         
-                        <!-- Timer Display -->
-                        <div class="text-center mb-8">
-                            <div class="bg-gradient-to-r from-purple-900/40 to-pink-900/40 rounded-2xl p-8 mb-6">
-                                <div id="timer" class="text-5xl font-mono font-bold text-white mb-2">25:00</div>
-                                <div class="text-gray-400 text-sm">Session Time Remaining</div>
-                            </div>
-                            
-                            <!-- Time Presets -->
-                            <div class="grid grid-cols-4 gap-2 mb-6">
-                                <button class="time-preset btn-secondary text-sm py-2" data-time="5">5 min</button>
-                                <button class="time-preset btn-secondary text-sm py-2" data-time="15">15 min</button>
-                                <button class="time-preset btn-secondary text-sm py-2 selected" data-time="25">25 min</button>
-                                <button class="time-preset btn-secondary text-sm py-2" data-time="45">45 min</button>
-                            </div>
-                        </div>
-
                         <!-- Session Controls -->
-                        <div class="space-y-4">
+                        <div class="space-y-4 mb-6">
                             <button id="startBtn" class="btn-primary w-full py-4 text-lg font-semibold">
                                 Start Session
-                            </button>
-                            <button id="pauseBtn" class="btn-secondary w-full py-4 text-lg font-semibold hidden">
-                                Pause Session
                             </button>
                             <button id="stopBtn" class="btn-danger w-full py-3 text-lg hidden">
                                 Stop Session
                             </button>
                         </div>
 
-                        <!-- Volume Control -->
-                        <div class="mt-8">
-                            <label class="block text-sm font-medium text-gray-300 mb-3">Volume</label>
-                            <div class="flex items-center space-x-4">
-                                <span class="text-2xl">🔈</span>
-                                <input type="range" id="volumeSlider" min="0" max="100" value="50" 
-                                       class="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
-                                <span class="text-2xl">🔊</span>
+                        <!-- Spotify-Style Music Player -->
+                        <div class="bg-gradient-to-r from-gray-900/80 to-gray-800/80 rounded-2xl p-6 mb-6 border border-purple-500/20">
+                            <h3 class="text-lg font-bold mb-4 text-center text-purple-300">🎵 Background Music</h3>
+                            
+                            <!-- Album Art & Track Info -->
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-14 h-14 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-xl shadow-lg">
+                                    🎹
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div id="currentTrackName" class="text-white font-semibold truncate text-sm">Select a track</div>
+                                    <div id="currentArtist" class="text-gray-400 text-xs truncate">No artist selected</div>
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <div id="currentTime" class="text-xs text-gray-500">0:00</div>
+                                        <div class="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                            <div id="progressBarMusic" class="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                        </div>
+                                        <div id="totalTime" class="text-xs text-gray-500">0:00</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-center mt-2">
-                                <span id="volumeDisplay" class="text-sm text-gray-400">Volume: 50%</span>
+                            
+                            <!-- Music Controls -->
+                            <div class="flex items-center justify-center space-x-4 mb-4">
+                                <button id="prevBtn" class="p-2 rounded-full hover:bg-purple-600/20 transition-colors text-gray-300 hover:text-white">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                                    </svg>
+                                </button>
+                                <button id="musicPlayPauseBtn" class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-lg">
+                                    <svg id="musicPlayIcon" class="w-5 h-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                    <svg id="musicPauseIcon" class="w-5 h-5 text-white hidden" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                                    </svg>
+                                </button>
+                                <button id="nextBtn" class="p-2 rounded-full hover:bg-purple-600/20 transition-colors text-gray-300 hover:text-white">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <!-- Enhanced Volume Control -->
+                            <div class="flex items-center space-x-3 mb-4">
+                                <svg class="w-4 h-4 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+                                </svg>
+                                <div class="flex-1">
+                                    <input type="range" id="musicVolumeSlider" min="0" max="200" value="70" 
+                                           class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-purple">
+                                </div>
+                                <svg class="w-4 h-4 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM3 9v6h4l5 5V4L7 9H3z"/>
+                                </svg>
+                                <div class="min-w-0">
+                                    <span id="musicVolumeDisplay" class="text-xs text-purple-300 font-medium">70%</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Track Selection -->
+                            <div>
+                                <select id="musicSelect" class="w-full bg-gray-800/80 border border-purple-500/30 rounded-lg px-3 py-2 text-white text-sm focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20">
+                                    <option value="">🔇 No Background Music</option>
+                                    <option value="ludovico-night">🌙 Ludovico Einaudi - Night</option>
+                                    <option value="ludovico-nuvole" selected>☁️ Ludovico Einaudi - Nuvole Bianche</option>
+                                    <option value="peder-you-me">💫 Peder B. Helland - You & Me</option>
+                                    <option value="yiruma-river">🌊 Yiruma - River Flows in You</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Dual Volume Controls -->
+                        <div class="space-y-6">
+                            <!-- Isochronic Volume Control -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-3">Isochronic Tones Volume</label>
+                                <div class="flex items-center space-x-4">
+                                    <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                                    </svg>
+                                    <input type="range" id="isochronicVolumeSlider" min="0" max="100" value="30" 
+                                           class="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                                    <svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                                    </svg>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <span id="isochronicVolumeDisplay" class="text-sm text-gray-400">Isochronic: 30%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Frequency Info Panel -->
+                    <!-- Frequency Information Panel -->
                     <div class="card-primary">
-                        <h2 class="text-2xl font-bold mb-6 text-center text-pink-300">Tone Information</h2>
+                        <h2 class="text-2xl font-bold mb-6 text-center text-pink-300">🧠 Brainwave Frequency</h2>
                         
                         <!-- Current Frequency Display -->
-                        <div class="bg-gradient-to-r from-pink-900/40 to-purple-900/40 rounded-2xl p-6 mb-6">
-                            <div class="text-center">
-                                <div id="currentFreq" class="text-3xl font-bold text-white mb-2">10.0 Hz</div>
-                                <div id="freqType" class="text-pink-300 font-semibold">Alpha Rhythm</div>
-                                <div class="text-gray-400 text-sm mt-2">Pulse Frequency</div>
-                            </div>
+                        <div class="bg-gradient-to-r from-pink-900/40 to-purple-900/40 rounded-xl p-4 text-center mb-6">
+                            <div id="currentFreq" class="text-2xl font-bold text-white mb-1">10.0 Hz</div>
+                            <div id="freqType" class="text-pink-300 font-semibold">Alpha Waves</div>
+                            <div class="text-gray-400 text-sm mt-1">Target Brainwave Frequency</div>
                         </div>
 
                         <!-- Frequency Details -->
-                        <div id="frequencyDetails" class="space-y-4">
+                        <div id="frequencyDetails" class="space-y-3">
                             <!-- Will be populated by JavaScript based on goal -->
-                        </div>
-
-                        <!-- Audio Settings -->
-                        <div class="mt-6 space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Carrier Frequency</label>
-                                <select id="carrierFreqSelect" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white">
-                                    <option value="250">250 Hz (Low Tone)</option>
-                                    <option value="400" selected>400 Hz (Medium Tone)</option>
-                                    <option value="600">600 Hz (High Tone)</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Pulse Pattern</label>
-                                <select id="pulsePattern" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white">
-                                    <option value="square">Sharp Pulses (Square Wave)</option>
-                                    <option value="sine">Smooth Pulses (Sine Wave)</option>
-                                    <option value="sawtooth">Rising Pulses (Sawtooth)</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Duty Cycle</label>
-                                <input type="range" id="dutyCycle" min="10" max="90" value="50" class="w-full">
-                                <div class="text-center mt-1 text-sm text-gray-400">
-                                    On/Off Ratio: <span id="dutyCycleValue">50%</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -166,10 +196,6 @@
                             <div class="flex items-center space-x-2">
                                 <div class="text-xl">🎵</div>
                                 <span id="audioStatus" class="text-gray-400">Audio: Not Playing</span>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <div class="text-xl">⚡</div>
-                                <span id="pulseRate" class="text-gray-400">Pulse: 0 Hz</span>
                             </div>
                         </div>
                     </div>
@@ -192,15 +218,6 @@
                             <span>Start</span>
                             <span id="progressPercent">0%</span>
                             <span>Complete</span>
-                        </div>
-                    </div>
-
-                    <!-- Pulse Visualizer -->
-                    <div class="mb-6">
-                        <h4 class="text-lg font-semibold mb-4 text-purple-300 text-center">Pulse Visualization</h4>
-                        <div class="bg-gray-900 rounded-lg p-6 relative overflow-hidden" style="height: 120px;">
-                            <canvas id="pulseCanvas" class="w-full h-full"></canvas>
-                            <div id="pulseIndicator" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-purple-500 rounded-full opacity-0 transition-opacity duration-100"></div>
                         </div>
                     </div>
 
@@ -243,9 +260,16 @@
             </div>
         </section>
 
-        <!-- Hidden Audio Element -->
-        <audio id="isochronicAudio" loop>
-            <source src="/static/audio/isochronic_sample.mp3" type="audio/mpeg">
+        <!-- Hidden Audio Elements -->
+        <!-- Foreground Music Audio -->
+        <audio id="musicAudio" loop preload="auto" crossorigin="anonymous">
+            <source id="musicSource" src="" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        
+        <!-- Isochronic Tones Audio -->
+        <audio id="isochronicAudio" loop preload="auto" crossorigin="anonymous">
+            <source id="isochronicSource" src="" type="audio/wav">
             Your browser does not support the audio element.
         </audio>
     </main>
@@ -306,22 +330,6 @@
             box-shadow: 0 8px 25px rgba(147, 51, 234, 0.4);
         }
 
-        .btn-secondary {
-            background: rgba(30, 30, 30, 0.8);
-            border: 1px solid rgba(147, 51, 234, 0.3);
-            border-radius: 12px;
-            color: #f0f0f0;
-            padding: 8px 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(8px);
-        }
-
-        .btn-secondary:hover, .btn-secondary.selected {
-            background: rgba(147, 51, 234, 0.2);
-            border-color: rgba(147, 51, 234, 0.6);
-        }
-
         .btn-danger {
             background: linear-gradient(45deg, #dc2626, #ef4444);
             border: none;
@@ -342,7 +350,6 @@
         /* Status Indicators */
         .status-ready { background-color: #6b7280; }
         .status-playing { background-color: #9333ea; animation: pulse 2s infinite; }
-        .status-paused { background-color: #f59e0b; }
         .status-stopped { background-color: #dc2626; }
 
         @keyframes pulse {
@@ -350,30 +357,7 @@
             50% { opacity: 0.5; }
         }
 
-        /* Pulse Indicator Animation */
-        .pulse-active {
-            animation: pulseGlow 0.5s ease-in-out;
-        }
-
-        @keyframes pulseGlow {
-            0% { 
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.5);
-                box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7);
-            }
-            50% { 
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1.2);
-                box-shadow: 0 0 0 10px rgba(147, 51, 234, 0.3);
-            }
-            100% { 
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(1);
-                box-shadow: 0 0 0 20px rgba(147, 51, 234, 0);
-            }
-        }
-
-        /* Volume Slider Styling */
+        /* Enhanced Volume Slider Styling */
         input[type="range"] {
             background: transparent;
             cursor: pointer;
@@ -412,6 +396,63 @@
             border: none;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
+
+        /* Purple Music Player Slider */
+        .slider-purple::-webkit-slider-track {
+            background: #374151;
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        .slider-purple::-webkit-slider-thumb {
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #8b5cf6, #ec4899);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .slider-purple:hover::-webkit-slider-thumb {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.6);
+        }
+
+        .slider-purple::-moz-range-track {
+            background: #374151;
+            height: 8px;
+            border-radius: 4px;
+            border: none;
+        }
+
+        .slider-purple::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #8b5cf6, #ec4899);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Volume indicator colors */
+        .volume-low { color: #10b981; }
+        .volume-medium { color: #f59e0b; }
+        .volume-high { color: #ef4444; }
+        .volume-extreme { color: #dc2626; font-weight: bold; }
+
+        /* Progress bar animation */
+        @keyframes progressPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .progress-active {
+            animation: progressPulse 2s infinite;
+        }
     </style>
 
     <script>
@@ -420,81 +461,266 @@
             const urlParams = new URLSearchParams(window.location.search);
             const goal = urlParams.get('goal') || 'focus';
             
-            // Initialize session
-            initializeSession(goal);
+            console.log('🚀 Starting isochronic tones session for goal:', goal);
             
             // Session state
             let sessionActive = false;
-            let sessionPaused = false;
-            let sessionTimer = null;
-            let currentTime = 1500; // 25 minutes default
-            let totalTime = 1500;
             
-            // Audio context for isochronic tones generation
-            let audioContext = null;
-            let oscillator = null;
-            let gainNode = null;
-            let pulseGainNode = null;
-            let pulseTimer = null;
+            // Web Audio API for volume amplification
+            let audioContext, musicGainNode, musicSourceNode;
             
-            // Canvas for pulse visualization
-            let canvas = null;
-            let ctx = null;
+            // DOM elements - declare before use
+            let musicAudio, isochronicAudio, musicSource, isochronicSource;
+            let startBtn, stopBtn, musicVolumeSlider, isochronicVolumeSlider;
+            let musicVolumeDisplay, isochronicVolumeDisplay, musicSelect;
+            let statusIndicator, statusText, audioStatus;
             
-            // DOM elements
-            const startBtn = document.getElementById('startBtn');
-            const pauseBtn = document.getElementById('pauseBtn');
-            const stopBtn = document.getElementById('stopBtn');
-            const timer = document.getElementById('timer');
-            const volumeSlider = document.getElementById('volumeSlider');
-            const volumeDisplay = document.getElementById('volumeDisplay');
-            const statusIndicator = document.getElementById('statusIndicator');
-            const statusText = document.getElementById('statusText');
-            const audioStatus = document.getElementById('audioStatus');
-            const pulseRate = document.getElementById('pulseRate');
-            const progressBar = document.getElementById('progressBar');
-            const progressPercent = document.getElementById('progressPercent');
-            const pulseIndicator = document.getElementById('pulseIndicator');
-            const dutyCycle = document.getElementById('dutyCycle');
-            const dutyCycleValue = document.getElementById('dutyCycleValue');
+            // New music player elements
+            let musicPlayPauseBtn, musicPlayIcon, musicPauseIcon;
+            let currentTrackName, currentArtist, currentTime, totalTime;
+            let progressBarMusic, prevBtn, nextBtn;
             
-            // Initialize canvas
-            canvas = document.getElementById('pulseCanvas');
-            ctx = canvas.getContext('2d');
-            
-            // Event listeners
-            startBtn.addEventListener('click', startSession);
-            pauseBtn.addEventListener('click', pauseSession);
-            stopBtn.addEventListener('click', stopSession);
-            
-            // Volume control
-            volumeSlider.addEventListener('input', function() {
-                const volume = this.value;
-                volumeDisplay.textContent = `Volume: ${volume}%`;
-                if (gainNode) {
-                    gainNode.gain.value = volume / 100;
+            // Initialize DOM elements
+            function initializeDOMElements() {
+                console.log('🔧 Initializing DOM elements...');
+                
+                // Audio elements
+                musicAudio = document.getElementById('musicAudio');
+                isochronicAudio = document.getElementById('isochronicAudio');
+                musicSource = document.getElementById('musicSource');
+                isochronicSource = document.getElementById('isochronicSource');
+                
+                // Control elements
+                startBtn = document.getElementById('startBtn');
+                stopBtn = document.getElementById('stopBtn');
+                musicVolumeSlider = document.getElementById('musicVolumeSlider');
+                isochronicVolumeSlider = document.getElementById('isochronicVolumeSlider');
+                musicVolumeDisplay = document.getElementById('musicVolumeDisplay');
+                isochronicVolumeDisplay = document.getElementById('isochronicVolumeDisplay');
+                musicSelect = document.getElementById('musicSelect');
+                statusIndicator = document.getElementById('statusIndicator');
+                statusText = document.getElementById('statusText');
+                audioStatus = document.getElementById('audioStatus');
+                
+                // New music player elements
+                musicPlayPauseBtn = document.getElementById('musicPlayPauseBtn');
+                musicPlayIcon = document.getElementById('musicPlayIcon');
+                musicPauseIcon = document.getElementById('musicPauseIcon');
+                currentTrackName = document.getElementById('currentTrackName');
+                currentArtist = document.getElementById('currentArtist');
+                currentTime = document.getElementById('currentTime');
+                totalTime = document.getElementById('totalTime');
+                progressBarMusic = document.getElementById('progressBarMusic');
+                prevBtn = document.getElementById('prevBtn');
+                nextBtn = document.getElementById('nextBtn');
+                
+                // Verify all elements exist
+                const elements = {
+                    musicAudio, isochronicAudio, musicSource, isochronicSource,
+                    startBtn, stopBtn, musicVolumeSlider, isochronicVolumeSlider,
+                    musicVolumeDisplay, isochronicVolumeDisplay, musicSelect,
+                    statusIndicator, statusText, audioStatus,
+                    musicPlayPauseBtn, musicPlayIcon, musicPauseIcon,
+                    currentTrackName, currentArtist, currentTime, totalTime,
+                    progressBarMusic, prevBtn, nextBtn
+                };
+                
+                const missing = Object.entries(elements).filter(([name, element]) => !element);
+                if (missing.length > 0) {
+                    console.error('❌ Missing DOM elements:', missing.map(([name]) => name));
+                    return false;
                 }
-            });
+                
+                console.log('✅ All DOM elements initialized successfully');
+                return true;
+            }
             
-            // Duty cycle control
-            dutyCycle.addEventListener('input', function() {
-                dutyCycleValue.textContent = `${this.value}%`;
-            });
+            // Initialize Web Audio API for music amplification above 100%
+            function initializeWebAudio() {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    musicSourceNode = audioContext.createMediaElementSource(musicAudio);
+                    musicGainNode = audioContext.createGain();
+                    
+                    musicSourceNode.connect(musicGainNode);
+                    musicGainNode.connect(audioContext.destination);
+                    
+                    console.log('✅ Web Audio API initialized for music amplification');
+                    return true;
+                } catch (error) {
+                    console.warn('⚠️ Web Audio API not available:', error);
+                    return false;
+                }
+            }
             
-            // Time presets
-            document.querySelectorAll('.time-preset').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    if (!sessionActive) {
-                        document.querySelectorAll('.time-preset').forEach(b => b.classList.remove('selected'));
-                        this.classList.add('selected');
-                        
-                        const minutes = parseInt(this.dataset.time);
-                        currentTime = minutes * 60;
-                        totalTime = currentTime;
-                        updateTimerDisplay();
+            // Setup event listeners after DOM initialization
+            function setupEventListeners() {
+                console.log('🔗 Setting up event listeners...');
+                
+                // Session control listeners
+                startBtn.addEventListener('click', startSession);
+                stopBtn.addEventListener('click', stopSession);
+            
+                // Enhanced volume controls with color coding
+                musicVolumeSlider.addEventListener('input', function() {
+                    const volume = this.value;
+                    let displayClass = 'volume-low';
+                    let displayText = `${volume}%`;
+                    
+                    if (volume > 150) {
+                        displayClass = 'volume-extreme';
+                        displayText = `${volume}% ⚠️`;
+                    } else if (volume > 100) {
+                        displayClass = 'volume-high';
+                        displayText = `${volume}% 🔥`;
+                    } else if (volume > 75) {
+                        displayClass = 'volume-medium';
+                    }
+                    
+                    musicVolumeDisplay.textContent = displayText;
+                    musicVolumeDisplay.className = `text-xs font-medium ${displayClass}`;
+                    
+                    // Use Web Audio API for volumes above 100%, HTML audio for below
+                    if (musicGainNode && volume > 100) {
+                        musicAudio.volume = 1.0; // Keep HTML audio at max
+                        musicGainNode.gain.value = volume / 100; // Use gain for amplification
+                    } else {
+                        musicAudio.volume = Math.min(volume / 100, 1.0);
+                        if (musicGainNode) musicGainNode.gain.value = 1.0; // Reset gain
                     }
                 });
-            });
+                
+                isochronicVolumeSlider.addEventListener('input', function() {
+                    const volume = this.value;
+                    isochronicVolumeDisplay.textContent = `Isochronic: ${volume}%`;
+                    isochronicAudio.volume = Math.min(volume / 100, 1.0); // HTML audio element max is 1.0
+                });
+                
+                // Music player controls
+                musicPlayPauseBtn.addEventListener('click', function() {
+                    if (musicSelect.value) {
+                        if (musicAudio.paused) {
+                            musicAudio.play().then(() => {
+                                updatePlayPauseIcon(false);
+                            }).catch(console.error);
+                        } else {
+                            musicAudio.pause();
+                            updatePlayPauseIcon(true);
+                        }
+                    } else {
+                        alert('Please select a track first!');
+                    }
+                });
+                
+                // Previous/Next track buttons
+                prevBtn.addEventListener('click', function() {
+                    selectPreviousTrack();
+                });
+                
+                nextBtn.addEventListener('click', function() {
+                    selectNextTrack();
+                });
+                
+                // Music selection - can change during session
+                musicSelect.addEventListener('change', function() {
+                    const selectedMusic = this.value;
+                    const wasPlaying = !musicAudio.paused;
+                    
+                    if (selectedMusic) {
+                        const musicPath = getMusicPath(selectedMusic);
+                        const trackInfo = getTrackInfo(selectedMusic);
+                        
+                        musicSource.src = musicPath;
+                        musicAudio.load();
+                        
+                        // Update track display
+                        updateTrackDisplay(trackInfo);
+                        
+                        // If session is active, start playing the new music
+                        if (sessionActive && wasPlaying) {
+                            musicAudio.play().catch(console.error);
+                        }
+                    } else {
+                        // Stop music if "No Background Music" is selected
+                        musicAudio.pause();
+                        updatePlayPauseIcon(true);
+                        updateTrackDisplay({
+                            name: 'Select a track',
+                            artist: 'No artist selected'
+                        });
+                    }
+                });
+                
+                // Audio time update
+                musicAudio.addEventListener('timeupdate', function() {
+                    updateProgress();
+                });
+                
+                musicAudio.addEventListener('loadedmetadata', function() {
+                    updateTotalTime();
+                });
+                
+                musicAudio.addEventListener('play', function() {
+                    updatePlayPauseIcon(false);
+                    progressBarMusic.classList.add('progress-active');
+                });
+                
+                musicAudio.addEventListener('pause', function() {
+                    updatePlayPauseIcon(true);
+                    progressBarMusic.classList.remove('progress-active');
+                });
+                
+                musicAudio.addEventListener('ended', function() {
+                    updatePlayPauseIcon(true);
+                    progressBarMusic.classList.remove('progress-active');
+                    // Auto-play next track if repeat is off
+                    if (!musicAudio.loop) {
+                        selectNextTrack();
+                    }
+                });
+                
+                // Assessment slider handlers
+                document.getElementById('preStress').addEventListener('input', function() {
+                    document.getElementById('preStressValue').textContent = this.value;
+                });
+                
+                document.getElementById('preFocus').addEventListener('input', function() {
+                    document.getElementById('preFocusValue').textContent = this.value;
+                });
+                
+                document.getElementById('postStress').addEventListener('input', function() {
+                    document.getElementById('postStressValue').textContent = this.value;
+                });
+                
+                document.getElementById('postFocus').addEventListener('input', function() {
+                    document.getElementById('postFocusValue').textContent = this.value;
+                });
+                
+                document.getElementById('submitAssessment').addEventListener('click', function() {
+                    const assessmentData = {
+                        goal: goal,
+                        sessionType: 'isochronic',
+                        foregroundMusic: musicSelect.value,
+                        preStress: document.getElementById('preStress').value,
+                        preFocus: document.getElementById('preFocus').value,
+                        postStress: document.getElementById('postStress').value,
+                        postFocus: document.getElementById('postFocus').value,
+                        completedAt: new Date().toISOString()
+                    };
+                    
+                    // Save to localStorage (can be sent to backend later)
+                    const sessions = JSON.parse(localStorage.getItem('ymirSessions') || '[]');
+                    sessions.push(assessmentData);
+                    localStorage.setItem('ymirSessions', JSON.stringify(sessions));
+                    
+                    alert('Assessment submitted! Thank you for your feedback.');
+                    
+                    // Hide assessment
+                    document.getElementById('postSessionQuestions').classList.add('hidden');
+                });
+                
+                console.log('✅ Event listeners setup complete');
+            }
             
             function initializeSession(goal) {
                 // Set goal display
@@ -513,8 +739,7 @@
                 const frequencyDetails = document.getElementById('frequencyDetails');
                 
                 currentFreq.textContent = `${goalInfo.frequency} Hz`;
-                freqType.textContent = goalInfo.rhythmType;
-                pulseRate.textContent = `Pulse: ${goalInfo.frequency} Hz`;
+                freqType.textContent = goalInfo.waveType;
                 
                 frequencyDetails.innerHTML = `
                     <div class="bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-lg p-4">
@@ -529,8 +754,74 @@
                     </div>
                 `;
                 
-                // Initialize canvas
-                setupCanvas();
+                // Set isochronic audio source based on goal
+                const isochronicPath = getIsochronicPath(goal);
+                console.log('🎧 Setting isochronic path:', isochronicPath);
+                isochronicSource.src = isochronicPath;
+                isochronicAudio.load();
+                
+                // Set default music if selected
+                if (musicSelect.value) {
+                    const musicPath = getMusicPath(musicSelect.value);
+                    const trackInfo = getTrackInfo(musicSelect.value);
+                    console.log('🎼 Setting default music path:', musicPath);
+                    musicSource.src = musicPath;
+                    musicAudio.load();
+                    updateTrackDisplay(trackInfo);
+                } else {
+                    console.log('ℹ️ No default music selected');
+                    updateTrackDisplay({
+                        name: 'Select a track',
+                        artist: 'No artist selected'
+                    });
+                }
+                
+                // Set initial volumes
+                const initialMusicVolume = musicVolumeSlider.value;
+                if (musicGainNode && initialMusicVolume > 100) {
+                    musicAudio.volume = 1.0;
+                    musicGainNode.gain.value = initialMusicVolume / 100;
+                } else {
+                    musicAudio.volume = Math.min(initialMusicVolume / 100, 1.0);
+                    if (musicGainNode) musicGainNode.gain.value = 1.0;
+                }
+                isochronicAudio.volume = Math.min(isochronicVolumeSlider.value / 100, 1.0);
+                
+                console.log('Session initialized for goal:', goal);
+                
+                // Add error listeners for audio elements
+                isochronicAudio.addEventListener('error', function(e) {
+                    console.error('Isochronic audio error:', e.target.error);
+                    alert('Error loading isochronic audio. Please check the file path.');
+                });
+                
+                musicAudio.addEventListener('error', function(e) {
+                    console.error('Music audio error:', e.target.error);
+                    alert('Error loading music. Please try a different track.');
+                });
+                
+                // Add loaded event listeners for debugging
+                isochronicAudio.addEventListener('loadeddata', function() {
+                    console.log('✅ Isochronic audio loaded successfully');
+                    console.log('   📁 Source:', isochronicSource.src);
+                    console.log('   ⏱️ Duration:', isochronicAudio.duration);
+                    console.log('   📊 Ready state:', isochronicAudio.readyState);
+                });
+                
+                isochronicAudio.addEventListener('canplaythrough', function() {
+                    console.log('✅ Isochronic audio can play through');
+                });
+                
+                musicAudio.addEventListener('loadeddata', function() {
+                    console.log('✅ Music audio loaded successfully');
+                    console.log('   📁 Source:', musicSource.src);
+                    console.log('   ⏱️ Duration:', musicAudio.duration);
+                    console.log('   📊 Ready state:', musicAudio.readyState);
+                });
+                
+                musicAudio.addEventListener('canplaythrough', function() {
+                    console.log('✅ Music audio can play through');
+                });
             }
             
             function getGoalInfo(goal) {
@@ -538,307 +829,331 @@
                     sleep: {
                         name: 'Deep Sleep',
                         emoji: '🌙',
-                        frequency: '2.0',
-                        rhythmType: 'Delta Rhythm',
-                        effects: ['Deep restorative sleep', 'Enhanced dream recall', 'Physical recovery', 'Reduced sleep latency'],
-                        description: 'Delta rhythm pulses (0.5-4Hz) help synchronize brain activity for deep, restorative sleep cycles.'
+                        frequency: '0.5-4',
+                        waveType: 'Delta Waves',
+                        effects: ['Deep restorative sleep', 'Enhanced dream recall', 'Physical recovery', 'Immune system boost'],
+                        description: 'Delta waves (0.5-4Hz) are the slowest brainwaves associated with deep, dreamless sleep and physical restoration.'
                     },
                     focus: {
                         name: 'Enhanced Focus',
                         emoji: '🎯',
-                        frequency: '20.0',
-                        rhythmType: 'Beta Rhythm',
-                        effects: ['Improved concentration', 'Enhanced mental clarity', 'Better task performance', 'Sustained attention'],
-                        description: 'Beta rhythm pulses (13-30Hz) promote focused attention and analytical thinking through rhythmic stimulation.'
+                        frequency: '12-30',
+                        waveType: 'Beta Waves',
+                        effects: ['Improved concentration', 'Enhanced mental clarity', 'Better problem solving', 'Increased alertness'],
+                        description: 'Beta waves (12-30Hz) are associated with focused attention, analytical thinking, and active concentration.'
                     },
                     anxiety: {
                         name: 'Anxiety Relief',
                         emoji: '🕊️',
-                        frequency: '10.0',
-                        rhythmType: 'Alpha Rhythm',
+                        frequency: '8-12',
+                        waveType: 'Alpha Waves',
                         effects: ['Reduced anxiety', 'Calmer mind', 'Stress relief', 'Emotional balance'],
-                        description: 'Alpha rhythm pulses (8-12Hz) activate the relaxation response and calm the nervous system.'
+                        description: 'Alpha waves (8-12Hz) promote a relaxed yet alert state, helping to reduce anxiety and stress.'
                     },
                     relaxation: {
                         name: 'Deep Relaxation',
                         emoji: '🧘',
-                        frequency: '6.0',
-                        rhythmType: 'Theta Rhythm',
-                        effects: ['Deep relaxation', 'Meditation state', 'Inner peace', 'Muscle tension relief'],
-                        description: 'Theta rhythm pulses (4-8Hz) induce deep meditative states and profound relaxation.'
+                        frequency: '4-8',
+                        waveType: 'Theta Waves',
+                        effects: ['Deep relaxation', 'Meditation state', 'Inner peace', 'Stress reduction'],
+                        description: 'Theta waves (4-8Hz) are associated with deep meditation, relaxation, and the subconscious mind.'
                     },
                     stress: {
                         name: 'Stress Reduction',
                         emoji: '⚡',
-                        frequency: '8.0',
-                        rhythmType: 'Alpha Rhythm',
+                        frequency: '8-12',
+                        waveType: 'Alpha Waves',
                         effects: ['Lower cortisol levels', 'Reduced tension', 'Emotional balance', 'Mental calm'],
-                        description: 'Alpha rhythm pulses help activate the parasympathetic nervous system for stress recovery.'
+                        description: 'Alpha waves help activate the parasympathetic nervous system, promoting rest and recovery.'
                     },
                     creativity: {
                         name: 'Creative Flow',
                         emoji: '🎨',
-                        frequency: '6.0',
-                        rhythmType: 'Theta Rhythm',
+                        frequency: '4-8',
+                        waveType: 'Theta Waves',
                         effects: ['Enhanced creativity', 'Artistic inspiration', 'Flow state', 'Innovative thinking'],
-                        description: 'Theta rhythm pulses facilitate creative insights and artistic inspiration through subconscious activation.'
+                        description: 'Theta waves are linked to creative insights, artistic inspiration, and the flow state.'
                     }
                 };
                 
                 return goalMap[goal] || goalMap.focus;
             }
             
-            function setupCanvas() {
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
+            function getIsochronicPath(goal) {
+                // Map goals to frequency types and select appropriate isochronic file
+                const frequencyMap = {
+                    sleep: 'delta',     // 0.5-4 Hz
+                    focus: 'beta',      // 12-30 Hz
+                    anxiety: 'alpha',   // 8-12 Hz
+                    relaxation: 'theta', // 4-8 Hz
+                    stress: 'alpha',    // 8-12 Hz
+                    creativity: 'theta' // 4-8 Hz
+                };
                 
-                // Draw initial grid
-                drawGrid();
+                // Map frequency types to actual filenames with Hz values
+                const fileMap = {
+                    'alpha': 'isochronic_alpha_v1_185Hz.wav',
+                    'beta': 'isochronic_beta_v1_216Hz.wav', 
+                    'delta': 'isochronic_delta_v1_218Hz.wav',
+                    'theta': 'isochronic_theta_v1_182Hz.wav',
+                    'gamma': 'isochronic_gamma_v1_188Hz.wav'
+                };
+                
+                const freqType = frequencyMap[goal] || 'alpha';
+                const filename = fileMap[freqType] || fileMap['alpha'];
+                
+                return `/experimental/isochronic_tone/${filename}`;
             }
             
-            function drawGrid() {
-                ctx.strokeStyle = 'rgba(147, 51, 234, 0.2)';
-                ctx.lineWidth = 1;
+            function getMusicPath(musicKey) {
+                const musicMap = {
+                    'ludovico-night': '/experimental/foreground_music/Ludovico Einaudi - Night (Official Video).mp3',
+                    'ludovico-nuvole': '/experimental/foreground_music/Ludovico Einaudi - Nuvole Bianche.mp3',
+                    'peder-you-me': '/experimental/foreground_music/Peder B. Helland - You & Me (Piano Version).mp3',
+                    'yiruma-river': '/experimental/foreground_music/Yiruma, (이루마) - River Flows in You.mp3'
+                };
+                return musicMap[musicKey] || '';
+            }
+            
+            function getTrackInfo(musicKey) {
+                const trackMap = {
+                    'ludovico-night': {
+                        name: 'Night',
+                        artist: 'Ludovico Einaudi'
+                    },
+                    'ludovico-nuvole': {
+                        name: 'Nuvole Bianche',
+                        artist: 'Ludovico Einaudi'
+                    },
+                    'peder-you-me': {
+                        name: 'You & Me (Piano Version)',
+                        artist: 'Peder B. Helland'
+                    },
+                    'yiruma-river': {
+                        name: 'River Flows in You',
+                        artist: 'Yiruma'
+                    }
+                };
+                return trackMap[musicKey] || { name: 'Unknown Track', artist: 'Unknown Artist' };
+            }
+            
+            function updateTrackDisplay(trackInfo) {
+                currentTrackName.textContent = trackInfo.name;
+                currentArtist.textContent = trackInfo.artist;
+            }
+            
+            function updatePlayPauseIcon(isPaused) {
+                if (isPaused) {
+                    musicPlayIcon.classList.remove('hidden');
+                    musicPauseIcon.classList.add('hidden');
+                } else {
+                    musicPlayIcon.classList.add('hidden');
+                    musicPauseIcon.classList.remove('hidden');
+                }
+            }
+            
+            function updateProgress() {
+                if (musicAudio.duration) {
+                    const progress = (musicAudio.currentTime / musicAudio.duration) * 100;
+                    progressBarMusic.style.width = `${progress}%`;
+                    currentTime.textContent = formatTime(musicAudio.currentTime);
+                }
+            }
+            
+            function updateTotalTime() {
+                if (musicAudio.duration) {
+                    totalTime.textContent = formatTime(musicAudio.duration);
+                }
+            }
+            
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            function selectNextTrack() {
+                const options = Array.from(musicSelect.options);
+                const currentIndex = options.findIndex(option => option.value === musicSelect.value);
+                const nextIndex = (currentIndex + 1) % options.length;
                 
-                // Horizontal lines
-                for (let i = 0; i <= 4; i++) {
-                    const y = (canvas.height / 4) * i;
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(canvas.width, y);
-                    ctx.stroke();
+                // Skip "No Background Music" option
+                if (options[nextIndex].value === '') {
+                    const afterEmptyIndex = (nextIndex + 1) % options.length;
+                    musicSelect.value = options[afterEmptyIndex].value;
+                } else {
+                    musicSelect.value = options[nextIndex].value;
                 }
                 
-                // Vertical lines
-                for (let i = 0; i <= 10; i++) {
-                    const x = (canvas.width / 10) * i;
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, canvas.height);
-                    ctx.stroke();
+                // Trigger change event
+                musicSelect.dispatchEvent(new Event('change'));
+                
+                // Auto-play if session is active
+                if (sessionActive && musicSelect.value) {
+                    musicAudio.play().catch(console.error);
+                }
+            }
+            
+            function selectPreviousTrack() {
+                const options = Array.from(musicSelect.options);
+                const currentIndex = options.findIndex(option => option.value === musicSelect.value);
+                let prevIndex = currentIndex - 1;
+                
+                if (prevIndex < 0) {
+                    prevIndex = options.length - 1;
+                }
+                
+                // Skip "No Background Music" option
+                if (options[prevIndex].value === '') {
+                    prevIndex = prevIndex - 1;
+                    if (prevIndex < 0) {
+                        prevIndex = options.length - 1;
+                    }
+                }
+                
+                musicSelect.value = options[prevIndex].value;
+                
+                // Trigger change event
+                musicSelect.dispatchEvent(new Event('change'));
+                
+                // Auto-play if session is active
+                if (sessionActive && musicSelect.value) {
+                    musicAudio.play().catch(console.error);
                 }
             }
             
             async function startSession() {
                 if (!sessionActive) {
-                    // Show pre-session questions
-                    document.getElementById('preSessionQuestions').classList.remove('hidden');
-                    
-                    // Initialize Web Audio API
                     try {
-                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                        await createIsochronicTones();
+                        console.log('🚀 Starting isochronic tones session...');
+                        console.log('📊 Session state - sessionActive:', sessionActive);
+                        console.log('🎵 Music selection:', musicSelect.value);
+                        console.log('🧠 Isochronic source:', isochronicSource ? isochronicSource.src : 'undefined');
+                        console.log('🎼 Music source:', musicSource ? musicSource.src : 'undefined');
+                        
+                        // Check if audio elements are properly initialized
+                        if (!isochronicAudio || !musicAudio || !isochronicSource || !musicSource) {
+                            throw new Error('Audio elements not properly initialized');
+                        }
+                        
+                        // Check if audio sources are set correctly
+                        if (!isochronicSource.src || isochronicSource.src === window.location.href) {
+                            throw new Error('Isochronic audio source not set correctly');
+                        }
                         
                         sessionActive = true;
-                        sessionPaused = false;
                         
-                        // Update UI
+                        // Update UI immediately
                         startBtn.classList.add('hidden');
-                        pauseBtn.classList.remove('hidden');
                         stopBtn.classList.remove('hidden');
+                        updateStatus('playing', 'Session Starting...');
+                        
+                        // Wait for isochronic audio to be ready
+                        console.log('⏯️ Attempting to play isochronic tones...');
+                        console.log('   📁 File path:', isochronicSource.src);
+                        console.log('   🔊 Volume:', isochronicAudio.volume);
+                        console.log('   ⏱️ Ready state:', isochronicAudio.readyState);
+                        
+                        // Force reload if not ready
+                        if (isochronicAudio.readyState < 2) {
+                            console.log('🔄 Reloading isochronic audio...');
+                            isochronicAudio.load();
+                            await new Promise(resolve => {
+                                isochronicAudio.addEventListener('canplay', resolve, { once: true });
+                            });
+                        }
+                        
+                        isochronicAudio.currentTime = 0;
+                        await isochronicAudio.play();
+                        console.log('✅ Isochronic tones playing successfully!');
+                        
+                        // Start foreground music if selected
+                        if (musicSelect.value && musicSource.src && musicSource.src !== window.location.href) {
+                            console.log('⏯️ Attempting to play foreground music...');
+                            console.log('   📁 File path:', musicSource.src);
+                            console.log('   🔊 Volume:', musicAudio.volume);
+                            console.log('   ⏱️ Ready state:', musicAudio.readyState);
+                            
+                            // Force reload if not ready
+                            if (musicAudio.readyState < 2) {
+                                console.log('🔄 Reloading music audio...');
+                                musicAudio.load();
+                                await new Promise(resolve => {
+                                    musicAudio.addEventListener('canplay', resolve, { once: true });
+                                });
+                            }
+                            
+                            musicAudio.currentTime = 0;
+                            await musicAudio.play();
+                            console.log('✅ Foreground music playing successfully!');
+                        } else {
+                            console.log('ℹ️ No foreground music selected or source not set');
+                        }
                         
                         updateStatus('playing', 'Session Active');
-                        audioStatus.textContent = 'Audio: Isochronic Tones Playing';
+                        audioStatus.textContent = 'Audio: Playing';
+                        console.log('🎉 Session started successfully!');
                         
-                        // Start timer and pulse visualization
-                        sessionTimer = setInterval(updateTimer, 1000);
-                        startPulseVisualization();
+                        // Show pre-session questions
+                        document.getElementById('preSessionQuestions').classList.remove('hidden');
+                        
+                        // Debug audio states
+                        setTimeout(() => {
+                            console.log('🔍 Audio states after 1 second:');
+                            console.log('   🧠 Isochronic paused:', isochronicAudio.paused);
+                            console.log('   🧠 Isochronic time:', isochronicAudio.currentTime);
+                            console.log('   🎼 Music paused:', musicAudio.paused);
+                            console.log('   🎼 Music time:', musicAudio.currentTime);
+                        }, 1000);
                         
                     } catch (error) {
-                        console.error('Failed to start audio:', error);
-                        alert('Failed to start audio. Please check your browser settings.');
+                        console.error('❌ Failed to start audio:', error);
+                        console.error('   Error details:', {
+                            name: error.name,
+                            message: error.message,
+                            stack: error.stack
+                        });
+                        
+                        // More specific error messages
+                        let userMessage = 'Failed to start audio. ';
+                        if (error.name === 'NotAllowedError') {
+                            userMessage += 'Please click somewhere on the page first to enable audio, then try again.';
+                        } else if (error.name === 'AbortError') {
+                            userMessage += 'Audio playback was interrupted. Please try again.';
+                        } else if (error.name === 'NotSupportedError') {
+                            userMessage += 'Your browser does not support the audio format.';
+                        } else {
+                            userMessage += error.message;
+                        }
+                        
+                        alert(userMessage);
+                        sessionActive = false;
+                        
+                        // Reset UI on error
+                        startBtn.classList.remove('hidden');
+                        stopBtn.classList.add('hidden');
+                        updateStatus('stopped', 'Session Failed');
+                        audioStatus.textContent = 'Audio: Error';
                     }
-                } else if (sessionPaused) {
-                    // Resume
-                    audioContext.resume();
-                    sessionPaused = false;
-                    
-                    pauseBtn.textContent = 'Pause Session';
-                    updateStatus('playing', 'Session Active');
-                    sessionTimer = setInterval(updateTimer, 1000);
-                    startPulseVisualization();
-                }
-            }
-            
-            function pauseSession() {
-                if (sessionActive && !sessionPaused) {
-                    audioContext.suspend();
-                    sessionPaused = true;
-                    
-                    pauseBtn.textContent = 'Resume Session';
-                    updateStatus('paused', 'Session Paused');
-                    clearInterval(sessionTimer);
-                    stopPulseVisualization();
                 }
             }
             
             function stopSession() {
                 sessionActive = false;
-                sessionPaused = false;
                 
-                // Stop audio
-                if (audioContext) {
-                    audioContext.close();
-                    audioContext = null;
-                }
+                // Stop both audio tracks
+                isochronicAudio.pause();
+                musicAudio.pause();
                 
                 // Reset UI
                 startBtn.classList.remove('hidden');
-                pauseBtn.classList.add('hidden');
                 stopBtn.classList.add('hidden');
-                pauseBtn.textContent = 'Pause Session';
                 
                 updateStatus('stopped', 'Session Stopped');
                 audioStatus.textContent = 'Audio: Not Playing';
                 
-                // Clear timers
-                clearInterval(sessionTimer);
-                stopPulseVisualization();
-                
                 // Show post-session questions
                 document.getElementById('postSessionQuestions').classList.remove('hidden');
-                
-                // Reset timer
-                currentTime = totalTime;
-                updateTimerDisplay();
-                updateProgress();
-            }
-            
-            async function createIsochronicTones() {
-                const goalInfo = getGoalInfo(new URLSearchParams(window.location.search).get('goal') || 'focus');
-                const carrierFreq = parseInt(document.getElementById('carrierFreqSelect').value);
-                const pulseFreq = parseFloat(goalInfo.frequency);
-                const waveType = document.getElementById('pulsePattern').value;
-                
-                // Create carrier oscillator
-                oscillator = audioContext.createOscillator();
-                oscillator.frequency.value = carrierFreq;
-                oscillator.type = 'sine';
-                
-                // Create gain nodes
-                gainNode = audioContext.createGain();
-                pulseGainNode = audioContext.createGain();
-                gainNode.gain.value = volumeSlider.value / 100;
-                pulseGainNode.gain.value = 0; // Start silent
-                
-                // Connect audio graph
-                oscillator.connect(pulseGainNode);
-                pulseGainNode.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                // Start oscillator
-                oscillator.start();
-                
-                // Start pulse modulation
-                startPulseModulation(pulseFreq);
-            }
-            
-            function startPulseModulation(frequency) {
-                const period = 1 / frequency; // seconds per cycle
-                const dutyCyclePercent = parseInt(dutyCycle.value);
-                const onTime = (period * dutyCyclePercent) / 100;
-                const offTime = period - onTime;
-                
-                function pulse() {
-                    if (sessionActive && !sessionPaused) {
-                        // Turn on
-                        pulseGainNode.gain.setValueAtTime(1, audioContext.currentTime);
-                        
-                        // Visual pulse indication
-                        triggerPulseVisualization();
-                        
-                        // Turn off after onTime
-                        setTimeout(() => {
-                            if (pulseGainNode) {
-                                pulseGainNode.gain.setValueAtTime(0, audioContext.currentTime);
-                            }
-                        }, onTime * 1000);
-                        
-                        // Schedule next pulse
-                        pulseTimer = setTimeout(pulse, period * 1000);
-                    }
-                }
-                
-                pulse();
-            }
-            
-            function startPulseVisualization() {
-                const goalInfo = getGoalInfo(new URLSearchParams(window.location.search).get('goal') || 'focus');
-                const frequency = parseFloat(goalInfo.frequency);
-                
-                // Update pulse rate display
-                pulseRate.textContent = `Pulse: ${frequency} Hz`;
-            }
-            
-            function stopPulseVisualization() {
-                if (pulseTimer) {
-                    clearTimeout(pulseTimer);
-                }
-            }
-            
-            function triggerPulseVisualization() {
-                // Visual pulse indicator
-                pulseIndicator.classList.remove('pulse-active');
-                setTimeout(() => {
-                    pulseIndicator.classList.add('pulse-active');
-                }, 10);
-                
-                // Canvas visualization
-                drawPulse();
-            }
-            
-            function drawPulse() {
-                // Clear and redraw grid
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawGrid();
-                
-                // Draw pulse wave
-                ctx.strokeStyle = '#ec4899';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                
-                const amplitude = canvas.height * 0.3;
-                const centerY = canvas.height / 2;
-                const time = Date.now() / 1000;
-                
-                for (let x = 0; x < canvas.width; x++) {
-                    const goalInfo = getGoalInfo(new URLSearchParams(window.location.search).get('goal') || 'focus');
-                    const frequency = parseFloat(goalInfo.frequency);
-                    const t = (x / canvas.width) * 4; // 4 seconds worth
-                    const y = centerY + amplitude * Math.sin(2 * Math.PI * frequency * (t + time));
-                    
-                    if (x === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
-                }
-                
-                ctx.stroke();
-            }
-            
-            function updateTimer() {
-                if (currentTime > 0) {
-                    currentTime--;
-                    updateTimerDisplay();
-                    updateProgress();
-                } else {
-                    // Session complete
-                    stopSession();
-                    alert('Session completed! Please complete the post-session assessment.');
-                }
-            }
-            
-            function updateTimerDisplay() {
-                const minutes = Math.floor(currentTime / 60);
-                const seconds = currentTime % 60;
-                timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
-            
-            function updateProgress() {
-                const progress = ((totalTime - currentTime) / totalTime) * 100;
-                progressBar.style.width = `${progress}%`;
-                progressPercent.textContent = `${Math.round(progress)}%`;
             }
             
             function updateStatus(status, text) {
@@ -846,52 +1161,20 @@
                 statusText.textContent = text;
             }
             
-            // Assessment slider handlers
-            document.getElementById('preStress').addEventListener('input', function() {
-                document.getElementById('preStressValue').textContent = this.value;
-            });
+            // Initialize DOM elements first
+            if (!initializeDOMElements()) {
+                console.error('❌ Failed to initialize DOM elements');
+                return;
+            }
             
-            document.getElementById('preFocus').addEventListener('input', function() {
-                document.getElementById('preFocusValue').textContent = this.value;
-            });
+            // Initialize Web Audio API for music amplification
+            initializeWebAudio();
             
-            document.getElementById('postStress').addEventListener('input', function() {
-                document.getElementById('postStressValue').textContent = this.value;
-            });
+            // Setup event listeners
+            setupEventListeners();
             
-            document.getElementById('postFocus').addEventListener('input', function() {
-                document.getElementById('postFocusValue').textContent = this.value;
-            });
-            
-            document.getElementById('submitAssessment').addEventListener('click', function() {
-                // Collect assessment data
-                const assessmentData = {
-                    goal: new URLSearchParams(window.location.search).get('goal'),
-                    sessionType: 'isochronic',
-                    preStress: document.getElementById('preStress').value,
-                    preFocus: document.getElementById('preFocus').value,
-                    postStress: document.getElementById('postStress').value,
-                    postFocus: document.getElementById('postFocus').value,
-                    sessionDuration: totalTime,
-                    completedAt: new Date().toISOString()
-                };
-                
-                // Save to localStorage (can be sent to backend later)
-                const sessions = JSON.parse(localStorage.getItem('ymirSessions') || '[]');
-                sessions.push(assessmentData);
-                localStorage.setItem('ymirSessions', JSON.stringify(sessions));
-                
-                alert('Assessment submitted! Thank you for your feedback.');
-                
-                // Hide assessment
-                document.getElementById('postSessionQuestions').classList.add('hidden');
-            });
-            
-            // Initialize timer display
-            updateTimerDisplay();
-            
-            // Resize canvas when window resizes
-            window.addEventListener('resize', setupCanvas);
+            // Initialize session
+            initializeSession(goal);
         });
     </script>
     
