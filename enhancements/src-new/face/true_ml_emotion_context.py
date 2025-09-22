@@ -276,7 +276,34 @@ class TrueMLEmotionContext:
                 if total > 0:
                     predicted_dict = {k: (v/total)*100 for k, v in predicted_dict.items()}
                 
-                return predicted_dict
+                # 🎯 TRUST DEEPFACE MORE! Blend based on DeepFace confidence
+                deepface_confidence = max(current_emotions.values()) / 100.0  # Convert to 0-1
+                deepface_dominant = max(current_emotions.items(), key=lambda x: x[1])[0]
+                
+                # If DeepFace is confident (>70%), trust it more
+                if deepface_confidence > 0.70:
+                    # High confidence DeepFace: 80% DeepFace + 20% ML
+                    blend_factor = 0.8
+                elif deepface_confidence > 0.50:
+                    # Medium confidence: 60% DeepFace + 40% ML  
+                    blend_factor = 0.6
+                else:
+                    # Low confidence: 40% DeepFace + 60% ML
+                    blend_factor = 0.4
+                
+                # Blend the emotions
+                blended_emotions = {}
+                for emotion in emotion_names:
+                    deepface_val = current_emotions.get(emotion, 0)
+                    ml_val = predicted_dict.get(emotion, 0)
+                    blended_emotions[emotion] = (blend_factor * deepface_val) + ((1 - blend_factor) * ml_val)
+                
+                # Normalize blended emotions
+                total_blended = sum(blended_emotions.values())
+                if total_blended > 0:
+                    blended_emotions = {k: (v/total_blended)*100 for k, v in blended_emotions.items()}
+                
+                return blended_emotions
             
         except Exception as e:
             # Prediction failed - using fallback

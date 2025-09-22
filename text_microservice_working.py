@@ -1279,7 +1279,7 @@ class GeminiChatbot:
             'temperature': 0.7,
             'top_k': 40,
             'top_p': 0.95,
-            'max_tokens': 2048,
+            'max_tokens': 8192,  # 🚀 INCREASED: 2048 → 8192 for full responses!
             'safety_settings': [
                 {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
                 {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
@@ -1453,35 +1453,69 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
         return "\n".join(context_parts) + f"\n\nUser: {user_input}"
     
     def _quick_emotion_analysis(self, text: str) -> Dict[str, Any]:
-        """⚡ INSTANT basic emotion analysis for immediate response"""
-        # Simple keyword-based analysis for instant results
+        """⚡ ENHANCED keyword-based emotion analysis with pattern matching"""
+        import re
         text_lower = text.lower()
         
-        # Quick emotion keywords
-        emotion_keywords = {
-            'happy': ['happy', 'joy', 'great', 'awesome', 'love', 'excellent', 'amazing', 'wonderful', '😊', '😄', '🎉'],
-            'sad': ['sad', 'depressed', 'down', 'terrible', 'awful', 'crying', 'hurt', '😢', '😭', '💔'],
-            'angry': ['angry', 'mad', 'furious', 'hate', 'annoying', 'stupid', 'damn', '😡', '🤬', '😠'],
-            'fear': ['scared', 'afraid', 'worried', 'anxious', 'nervous', 'panic', 'terrified', '😰', '😨', '😱'],
-            'surprise': ['wow', 'amazing', 'incredible', 'unexpected', 'surprised', 'shocked', '😮', '😲', '🤩'],
-            'disgust': ['disgusting', 'gross', 'yuck', 'eww', 'horrible', 'nasty', '🤢', '🤮', '😷']
+        # Enhanced emotion keywords with pattern matching
+        emotion_patterns = {
+            'happy': [
+                r'happ+y+', r'joy+', r'great+', r'awesome+', r'love+', r'excellent+', 
+                r'amazing+', r'wonderful+', r'yay+', r'yooo+', r'yes+', r'nice+',
+                '😊', '😄', '🎉', '😃', '🥳', '🙂'
+            ],
+            'sad': [
+                r'sad+', r'depress+', r'down+', r'terrible+', r'awful+', r'cry+', 
+                r'hurt+', r'miserable+', r'upset+', '😢', '😭', '💔', '😞'
+            ],
+            'angry': [
+                r'angry+', r'mad+', r'furious+', r'hate+', r'annoying+', r'stupid+', 
+                r'damn+', r'pissed+', r'rage+', '😡', '🤬', '😠', '🔥'
+            ],
+            'fear': [
+                r'scared+', r'afraid+', r'worr+', r'anxious+', r'nervous+', r'panic+', 
+                r'terrified+', r'frighten+', '😰', '😨', '😱'
+            ],
+            'surprise': [
+                r'wow+', r'amazing+', r'incredible+', r'unexpected+', r'surprised+', 
+                r'shocked+', r'omg+', '😮', '😲', '🤩', '😯'
+            ],
+            'excited': [
+                r'excit+', r'pumped+', r'thrilled+', r'energetic+', r'enthusiastic+'
+            ]
         }
         
-        # Count matches
+        # Count pattern matches with improved scoring
         emotion_scores = {}
-        for emotion, keywords in emotion_keywords.items():
-            score = sum(1 for keyword in keywords if keyword in text_lower)
+        for emotion, patterns in emotion_patterns.items():
+            score = 0
+            for pattern in patterns:
+                if pattern.startswith('�') or pattern.startswith('�'):
+                    # Emoji exact match
+                    if pattern in text_lower:
+                        score += 2  # Higher weight for emojis
+                else:
+                    # Regex pattern match for text variations
+                    matches = len(re.findall(pattern, text_lower))
+                    score += matches
+            
             if score > 0:
-                emotion_scores[emotion] = score / len(keywords)  # Normalize
+                emotion_scores[emotion] = score
         
-        # Determine dominant emotion
+        # Determine dominant emotion with better confidence calculation
         if emotion_scores:
+            total_score = sum(emotion_scores.values())
             dominant = max(emotion_scores.items(), key=lambda x: x[1])
+            confidence = min(0.9, (dominant[1] / total_score) * 0.8 + 0.1)
+            
+            # Normalize all scores for better representation
+            normalized_emotions = {k: v/total_score for k, v in emotion_scores.items()}
+            
             return {
                 'dominant_emotion': dominant[0],
-                'confidence': min(0.8, dominant[1] * 2),  # Quick confidence
-                'all_emotions': emotion_scores,
-                'method': 'quick_keyword'
+                'confidence': confidence,
+                'all_emotions': normalized_emotions,
+                'method': 'enhanced_keyword'
             }
         else:
             return {
@@ -1492,58 +1526,74 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
             }
     
     def generate_response(self, user_input: str) -> Dict[str, Any]:
-        """⚡ INSTANT response generation with async emotion analysis"""
+        """🤖 PURE AI emotion analysis - NO KEYWORDS, AI ONLY"""
         try:
-            # ⚡ INSTANT: Store user message immediately with basic emotion
-            basic_emotion = self._quick_emotion_analysis(user_input)
+            # 🤖 PURE AI: Only use AI emotion analysis with extended timeout
+            print(f"🤖 Running PURE AI emotion analysis for: '{user_input[:50]}...'")
             
-            # Create user message instantly
+            final_emotion_result = None
+            try:
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(self.emotion_analyzer.analyze_text_emotion, user_input)
+                    final_emotion_result = future.result(timeout=10.0)  # 10-second timeout for AI
+                
+                print(f"✅ AI SUCCESS: {final_emotion_result['dominant_emotion']} ({final_emotion_result['confidence']:.2f})")
+                final_emotion_result['method'] = 'pure_ai'
+                final_emotion_result['processing_time'] = '🤖 AI Only'
+                
+            except concurrent.futures.TimeoutError:
+                print("❌ AI TIMEOUT - This should not happen! Increasing timeout or check models")
+                # NO FALLBACK - Return error instead
+                return {
+                    'response': "AI emotion analysis timed out. Please try again.",
+                    'emotion': {'dominant_emotion': 'error', 'confidence': 0.0, 'method': 'ai_timeout'},
+                    'functions_used': [],
+                    'streaming': False,
+                    'error': 'ai_timeout'
+                }
+            except Exception as e:
+                print(f"❌ AI FAILED: {e}")
+                # NO FALLBACK - Return error instead
+                return {
+                    'response': "AI emotion analysis failed. Please try again.",
+                    'emotion': {'dominant_emotion': 'error', 'confidence': 0.0, 'method': 'ai_error'},
+                    'functions_used': [],
+                    'streaming': False,
+                    'error': f'ai_error: {str(e)}'
+                }
+            
+            if not final_emotion_result:
+                print("❌ NO AI RESULT")
+                return {
+                    'response': "No emotion analysis result. Please try again.",
+                    'emotion': {'dominant_emotion': 'error', 'confidence': 0.0, 'method': 'no_result'},
+                    'functions_used': [],
+                    'streaming': False,
+                    'error': 'no_ai_result'
+                }
+            
+            # 🎯 Record PURE AI emotion result
+            print(f"🎯 PURE AI EMOTION: {final_emotion_result['dominant_emotion']} ({final_emotion_result['confidence']:.2f})")
+            
             user_message = ChatMessage(
                 role='user',
                 content=user_input,
                 timestamp=datetime.now(),
-                emotion=basic_emotion['dominant_emotion'],
-                confidence=basic_emotion['confidence'],
-                metadata=basic_emotion
+                emotion=final_emotion_result['dominant_emotion'],
+                confidence=final_emotion_result['confidence'],
+                metadata={
+                    'emotion_analysis': final_emotion_result,
+                    'analysis_method': final_emotion_result.get('method', 'pure_ai'),
+                    'all_emotions': final_emotion_result.get('all_emotions', {}),
+                    'processing_time': '🤖 Pure AI',
+                    'models_used': final_emotion_result.get('models_used', [])
+                }
             )
             
-            # ⚡ INSTANT: Store in Firebase immediately
+            # Store PURE AI emotion in Firebase
             self.firebase_storage.store_message(user_message)
             self.conversation_history.append(user_message)
-            
-            # 🧠 BACKGROUND: Start detailed AI emotion analysis in thread (non-blocking)
-            def detailed_emotion_analysis():
-                try:
-                    detailed_emotion = self.emotion_analyzer.analyze_text_emotion(user_input)
-                    
-                    # Update Firebase with detailed AI analysis
-                    if detailed_emotion['dominant_emotion'] != basic_emotion['dominant_emotion']:
-                        # Emotion updated with AI analysis
-                        
-                        # Store updated emotion with AI context in Firebase
-                        if detailed_emotion.get('ai_context'):
-                            enhanced_message = ChatMessage(
-                                id=user_message.id,  # Same ID to update
-                                role='user',
-                                content=user_input,
-                                timestamp=datetime.now(),
-                                emotion=detailed_emotion['dominant_emotion'],
-                                confidence=detailed_emotion['confidence'],
-                                metadata={
-                                    'emotion_analysis': detailed_emotion,
-                                    'ai_context': detailed_emotion['ai_context'],
-                                    'all_emotions': detailed_emotion.get('all_emotions', {}),
-                                    'preprocessing_applied': detailed_emotion['ai_context'].get('preprocessing_applied', False)
-                                }
-                            )
-                            # Update Firebase with AI-enhanced analysis
-                            self.firebase_storage.store_message(enhanced_message)
-                            # AI-enhanced emotion stored
-                except Exception as e:
-                    print(f"⚠️ Background emotion analysis failed: {e}")
-            
-            # Start background AI analysis (non-blocking)
-            threading.Thread(target=detailed_emotion_analysis, daemon=True).start()
             
             # Check for function calls (keep this fast)
             function_calls = self.function_calling.detect_function_calls(user_input)
@@ -1554,19 +1604,18 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
                 result = self.function_calling.execute_function(call['function'], call['args'])
                 function_results.append(result)
             
-            # Build context with basic emotion (fast)
-            enhanced_prompt = self._build_context_prompt(user_input, basic_emotion)
+            # Build context with CORRECTED emotion analysis result
+            enhanced_prompt = self._build_context_prompt(user_input, final_emotion_result)
             
             if function_results:
                 enhanced_prompt += f"\n\nFunction results: {'; '.join(function_results)}"
             
-            # Generate response (fast with basic emotion - shortened prompt)
+            # Generate response with proper emotion context
             if self.model and self.chat_session:
                 try:
-                    # Use shorter prompt for faster response
-                    quick_prompt = f"Brief supportive reply (max 50 words) to: '{user_input[:100]}'"
-                    response = self.chat_session.send_message(quick_prompt)
-                    response_text = response.text[:200]  # Limit response length
+                    # Use full context prompt for complete responses
+                    response = self.chat_session.send_message(enhanced_prompt)
+                    response_text = response.text  # 🚀 NO LENGTH LIMIT - Full response!
                 except Exception as e:
                     error_msg = str(e).lower()
                     if ('quota' in error_msg or 'limit' in error_msg or 'exhausted' in error_msg or 
@@ -1581,20 +1630,20 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
                         if self.model and self.chat_session:
                             # Successfully reinitialized
                             try:
-                                response = self.chat_session.send_message(quick_prompt)
-                                response_text = response.text[:200]
+                                response = self.chat_session.send_message(enhanced_prompt)
+                                response_text = response.text  # 🚀 Full response on retry too!
                                 # Request successful with new API key
                             except Exception as retry_error:
                                 # Retry failed with new key
-                                response_text = self._generate_fallback_response(user_input, basic_emotion)
+                                response_text = self._generate_fallback_response(user_input, final_emotion_result)
                         else:
                             # Failed to reinitialize model
-                            response_text = self._generate_fallback_response(user_input, basic_emotion)
+                            response_text = self._generate_fallback_response(user_input, final_emotion_result)
                     else:
                         # Gemini API error
-                        response_text = self._generate_fallback_response(user_input, basic_emotion)
+                        response_text = self._generate_fallback_response(user_input, final_emotion_result)
             else:
-                response_text = self._generate_fallback_response(user_input, basic_emotion)
+                response_text = self._generate_fallback_response(user_input, final_emotion_result)
             
             assistant_message = ChatMessage(
                 role='assistant', 
@@ -1603,22 +1652,22 @@ Adapt your response to be supportive and appropriate for someone feeling {emotio
                 metadata={'functions_used': function_calls}
             )
             
-            # ⚡ INSTANT: Store assistant response immediately  
+            # Store assistant response immediately  
             self.firebase_storage.store_message(assistant_message)
             self.conversation_history.append(assistant_message)
             
-            # Update profile with basic emotion
+            # Update profile with CORRECTED emotion
             if self.user_profile:
                 self.user_profile.last_active = datetime.now()
-                if basic_emotion['dominant_emotion'] != 'neutral':
-                    self.user_profile.emotion_history.append(basic_emotion['dominant_emotion'])
+                if final_emotion_result['dominant_emotion'] != 'neutral':
+                    self.user_profile.emotion_history.append(final_emotion_result['dominant_emotion'])
                     self.user_profile.emotion_history = self.user_profile.emotion_history[-20:]
                 self._save_user_profile()
             
-            # ⚡ INSTANT: Return response immediately
+            # Return response with VALIDATED/CORRECTED emotion analysis
             return {
                 'response': response_text,
-                'emotion': basic_emotion,  # Use basic emotion for instant response
+                'emotion': final_emotion_result,  # Use CORRECTED emotion analysis
                 'functions_used': function_calls,
                 'streaming': True,
                 'user_message': user_message,
@@ -1854,7 +1903,10 @@ def api_analyze_text():
 @app.route('/api/chat', methods=['POST'])
 def api_chat():
     """API endpoint for complete chat with emotion analysis and AI response"""
+    import time
+    start_time = time.time()
     print("🔥 CHAT ENDPOINT CALLED - DEBUG ACTIVE")
+    print(f"⏱️ Request started at: {start_time}")
     try:
         data = request.get_json()
         if not data or 'message' not in data:
@@ -1880,18 +1932,20 @@ def api_chat():
         user_info = verify_firebase_token(auth_token) if auth_token else None
         print(f"🔍 User info result: {user_info}")
         
-        # Create or get chatbot instance for this user
+        # 🚀 PERFORMANCE FIX: Reuse global chatbot instead of creating new ones
+        user_chatbot = chatbot  # Always reuse the global instance!
+        
         if user_info:
-            # Authenticated user - create chatbot with Firebase user info and session ID
-            user_chatbot = GeminiChatbot(user_info=user_info, session_id=frontend_session_id)
-            # Authenticated user
+            # Authenticated user - update existing chatbot with user info
+            user_chatbot.current_user = user_info
+            print(f"✅ Updated chatbot with user info for: {user_info.get('email', 'unknown')}")
+        
+        # 🔥 CRITICAL: Set session ID from frontend
+        if frontend_session_id:
+            user_chatbot.firebase_storage.session_id = frontend_session_id
+            print(f"✅ Session ID provided from frontend: {frontend_session_id}")
         else:
-            # Temporary user - use existing chatbot or create temporary one
-            user_chatbot = chatbot
-            # 🔥 CRITICAL: Set session ID for temporary user
-            if frontend_session_id:
-                print(f"🔗 Setting session ID for temporary user: {frontend_session_id}")
-                user_chatbot.firebase_storage.session_id = frontend_session_id
+            print("⚠️ No session ID provided from frontend")
             # Temporary user session
         
         # 🔥 DEBUG: Session ID status
@@ -1905,7 +1959,15 @@ def api_chat():
         
         # Generate complete response using the appropriate chatbot
         print(f"🎭 Processing text message for emotion analysis...")
+        processing_start = time.time()
         response_data = user_chatbot.generate_response(user_message)
+        processing_time = time.time() - processing_start
+        total_time = time.time() - start_time
+        
+        print(f"⏱️ PERFORMANCE METRICS:")
+        print(f"   🎭 Text processing time: {processing_time:.2f}s")
+        print(f"   🚀 Total request time: {total_time:.2f}s")
+        print(f"   💾 Model loading time: {total_time - processing_time:.2f}s")
         
         # Add emotion_analysis to user_message for frontend compatibility
         user_message_dict = response_data['user_message'].to_dict()

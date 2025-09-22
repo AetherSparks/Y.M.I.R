@@ -153,7 +153,7 @@ class MicroserviceClient:
     def check_face_service_health(self):
         """Check if face microservice is running"""
         try:
-            response = requests.get(f'{self.face_service_url}/health', timeout=2)
+            response = requests.get(f'{self.face_service_url}/health', timeout=10)
             return response.status_code == 200
         except Exception:
             return False
@@ -181,7 +181,7 @@ class MicroserviceClient:
     def get_emotions(self):
         """Get current emotions from microservice"""
         try:
-            response = requests.get(f'{self.face_service_url}/api/emotions', timeout=2)
+            response = requests.get(f'{self.face_service_url}/api/emotions', timeout=10)
             return response.json()
         except Exception as e:
             return {'error': f'Microservice error: {str(e)}'}
@@ -189,7 +189,7 @@ class MicroserviceClient:
     def get_face_service_status(self):
         """Get face service status"""
         try:
-            response = requests.get(f'{self.face_service_url}/api/status', timeout=2)
+            response = requests.get(f'{self.face_service_url}/api/status', timeout=10)
             return response.json()
         except Exception as e:
             return {'error': f'Microservice error: {str(e)}'}
@@ -197,7 +197,7 @@ class MicroserviceClient:
     def check_text_service_health(self):
         """Check if text microservice is running"""
         try:
-            response = requests.get(f'{self.text_service_url}/health', timeout=2)
+            response = requests.get(f'{self.text_service_url}/health', timeout=10)
             return response.status_code == 200
         except Exception:
             return False
@@ -234,7 +234,7 @@ class MicroserviceClient:
     def get_text_conversation(self):
         """Get conversation history from text microservice"""
         try:
-            response = requests.get(f'{self.text_service_url}/api/conversation', timeout=5)
+            response = requests.get(f'{self.text_service_url}/api/conversation', timeout=10)
             return response.json()
         except Exception as e:
             return {'success': False, 'error': f'Text microservice error: {str(e)}'}
@@ -242,7 +242,7 @@ class MicroserviceClient:
     def get_text_service_status(self):
         """Get text service status"""
         try:
-            response = requests.get(f'{self.text_service_url}/api/status', timeout=2)
+            response = requests.get(f'{self.text_service_url}/api/status', timeout=10)
             return response.json()
         except Exception as e:
             return {'error': f'Text microservice error: {str(e)}'}
@@ -880,7 +880,7 @@ def api_camera_settings():
         
         # Forward settings to face microservice
         response = requests.post(f'{microservice_client.face_service_url}/api/settings',
-                               json=settings, timeout=5)
+                               json=settings, timeout=10)
         
         if response.status_code == 200:
             return jsonify({'success': True, 'message': 'Visual settings updated successfully'})
@@ -920,7 +920,7 @@ def api_face_status():
 def api_mediapipe_landmarks():
     """Proxy MediaPipe landmarks from face microservice"""
     try:
-        response = requests.get(f'{FACE_MICROSERVICE_URL}/api/mediapipe/landmarks', timeout=5)
+        response = requests.get(f'{FACE_MICROSERVICE_URL}/api/mediapipe/landmarks', timeout=10)
         return jsonify(response.json())
     except Exception as e:
         return jsonify({
@@ -984,7 +984,7 @@ def api_learning_analytics():
     try:
         user_id = request.args.get('user_id', 'default')
         response = requests.get(f'{microservice_client.text_service_url}/api/learning_analytics',
-                              params={'user_id': user_id}, timeout=5)
+                              params={'user_id': user_id}, timeout=10)
         return jsonify(response.json())
     except Exception as e:
         return jsonify({
@@ -1005,7 +1005,7 @@ def api_emotion_suggestions():
                                   'text': text,
                                   'predicted_emotion': predicted_emotion,
                                   'user_id': user_id
-                              }, timeout=5)
+                              }, timeout=10)
         return jsonify(response.json())
     except Exception as e:
         return jsonify({
@@ -1029,7 +1029,23 @@ def api_combined_emotions():
 def api_music_recommendations():
     """🎵 Get emotion-based music recommendations for the carousel (100 songs for scrolling)"""
     try:
-        session_id = request.args.get('session_id', 'default')
+        # 🎯 FIX: Get actual session ID from face microservice if not provided
+        session_id = request.args.get('session_id')
+        if not session_id or session_id == 'default':
+            try:
+                # Get current session ID from face microservice
+                face_status = requests.get(f'{FACE_MICROSERVICE_URL}/api/status', timeout=10)
+                if face_status.status_code == 200:
+                    face_data = face_status.json()
+                    session_id = face_data.get('session_id', 'default')
+                    print(f"🎯 Got session ID from face microservice: {session_id}")
+                else:
+                    session_id = 'default'
+                    print(f"⚠️ Face microservice not available, using default session")
+            except Exception as e:
+                session_id = 'default'
+                print(f"⚠️ Could not get session ID from face microservice: {e}")
+        
         limit = int(request.args.get('limit', 100))  # Default 100 for carousel
         minutes_back = int(request.args.get('minutes_back', 10))
         strategy = request.args.get('strategy', 'adaptive')
